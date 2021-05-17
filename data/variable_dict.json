@@ -1,0 +1,6 @@
+    [
+        { "variable": "papers_sold", "label": "Papers Sold" },
+        { "variable": "subscribers", "label": "Subscribers" },
+        { "variable": "followers", "label": "Followers" },
+        { "variable": "unique_visitors", "label": "Unique Visitors", "tooltip": "Average daily unique website visitors" }
+    ]

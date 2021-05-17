@@ -1,0 +1,31 @@
+{% extends "layout.html" %} {% block content %}
+<h1 class="mb-4">Blog Home</h1>
+{% for post in posts %}
+<article class="card mb-4">
+    <div class="card-header">
+        <img class="rounded-circle me-2" src="{{ url_for('static', filename='profile_pics/' + post.author.avatar_img) }}" height="50px"> By {% if post.author.display_name %} {{ post.author.display_name }} {% else %} {{ post.author.username }} {% endif
+        %} on <small>{{ post.date_published.strftime('%A, %d %b %Y') }}</small></div>
+    <div class="card-body">
+        <a href="{{ url_for('posts.post', post_id=post.uid) }}">
+            <h5 class="card-title">{{ post.title }}</h5>
+        </a>
+        <p class="card-text">{{ post.content }}</p>
+    </div>
+    <div class="card-footer text-muted">
+        Tags: {% for tag in post.tags %}
+        <span class="badge rounded-pill bg-dark">{{tag}}</span> {% endfor %}
+    </div>
+</article>
+{% endfor %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+
+        {% for page_num in pages %} {% if current_page == page_num %}
+        <li class="page-item active" aria-current="page"><a class="page-link" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a></li>
+        {% endif %} {% endfor %}
+    </ul>
+</nav>
+
+{% endblock content %}

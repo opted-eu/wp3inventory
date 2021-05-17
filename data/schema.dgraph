@@ -1,0 +1,189 @@
+<dgraph.drop.op>: string .
+<dgraph.graphql.p_query>: string @index(sha256) .
+<dgraph.graphql.schema>: string .
+<dgraph.graphql.xid>: string @index(exact) @upsert .
+type <dgraph.graphql> {
+	dgraph.graphql.schema
+	dgraph.graphql.xid
+}
+type <dgraph.graphql.persisted_query> {
+	dgraph.graphql.p_query
+}
+
+# Define Types
+
+type User {
+    username
+    email
+    pw
+    user_displayname
+	user_orcid	
+    date_joined
+    user_level
+    user_affiliation
+}
+
+type Source {
+    unique_name
+    name
+    entry_added
+    entry_edit_history
+    entry_review_status
+    other_names
+    wikidataID
+    related
+    founded
+    channel
+    channel_url
+    channel_comments
+    channel_feeds
+    channel_epaper
+    country
+    payment_model
+    contains_ads
+    publication_kind
+    topical_focus
+    publication_cycle
+    audience_scope
+    audience_location_geo
+    audience_location_name
+    languages
+    audience_size
+    audience_residency
+}
+
+type Channel {
+    unique_name
+    name
+    description
+    entry_added
+    entry_edit_history
+    entry_review_status
+}
+
+type Organization {
+    unique_name
+    name
+    entry_added
+    entry_edit_history
+    entry_review_status
+    other_names
+    wikidataID
+    founded
+    country
+    address_string
+    address_geo
+    employees
+    publishes
+    owns   
+}
+
+type Country {
+    unique_name
+    name
+    entry_added
+    entry_edit_history
+    entry_review_status
+    other_names
+    wikidataID
+}
+
+type Archive {
+    unique_name
+    name
+    description
+    entry_added
+    entry_edit_history
+    entry_review_status
+    other_names
+    wikidataID
+    access
+    sources_included
+    url
+}
+
+type ResearchPaper {
+    doi
+    arxiv
+    isbn
+    title
+    authors
+    published_date
+    description
+    paper_kind
+    journal
+    url
+    sources_included
+    country
+    entry_review_status
+    entry_added
+    entry_edit_history
+}
+
+# Define Directives and index
+
+# User Predicates   
+username: string @index(hash) .
+display_name: string . 
+email: string @index(hash) @upsert .
+pw: password .
+date_joined: dateTime .
+user_displayname: string @index(term) .
+user_orcid: string @index(hash) .
+user_level: string .
+user_affiliation: string @index(term). 
+
+# Generic Predicates 
+unique_name: string @index(hash, trigram) .
+name: string @index(term, trigram) . 
+entry_added: uid @reverse .
+entry_edit_history: [uid] @reverse .
+entry_review_status: string .
+other_names: [string] @index(term, trigram) .
+wikidataID: int .
+founded: dateTime @index(year) .
+country: [uid] @reverse .
+description: string .
+
+# Source Predicates
+related: [uid] @reverse .
+channel: uid @reverse .
+channel_comments: bool .
+channel_url: string .
+channel_feeds: [string] .
+channel_epaper: string .
+payment_model: string .
+contains_ads: bool .
+publication_kind: string .
+topical_focus: [string] .
+publication_cycle: string .
+audience_scope: string .
+audience_location_name: string .
+audience_location_geo: geo @index(geo) .
+languages: [string] @index(hash) .
+audience_size: [dateTime] .
+audience_residency: [dateTime] .
+
+# Organization Predicates
+address_string: string .
+address_geo: geo @index(geo) .
+employees: string .
+owns: [uid] @reverse .
+publishes: [uid] @reverse .
+
+# Archive and ResearchPaper Predicates
+sources_included: [uid] @reverse .
+url: string .
+
+# Archive Predicates
+access: string .
+
+# ResearchPaper Predicates
+doi: string .
+arxiv: string .
+isbn: string .
+title: string @index(term) .
+authors: string @index(term) .
+published_date: dateTime .
+paper_kind: string .
+journal: string .

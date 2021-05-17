@@ -1,0 +1,67 @@
+/* icon aliases */
+
+.bi-website::before {
+    content: "\f3ee";
+}
+
+.bi-print::before {
+    content: "\f4a3";
+}
+
+.icon-website::before {
+    content: "\f0ac";
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
+    font-style: normal;
+}
+
+.icon-print::before {
+    content: "\f1ea";
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
+    font-style: normal;
+}
+
+.icon-instagram::before {
+    content: "\e055";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+.icon-facebook::before {
+    content: "\f09a";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+.icon-twitter::before {
+    content: "\f099";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+
+/* social colors */
+
+.color-facebook {
+    color: #3b5999;
+}
+
+.color-twitter {
+    color: #55acee;
+}
+
+.color-instagram {
+    color: #e4405f;
+}
+
+.color-researchgate {
+    color: #40ba9b;
+}
+
+.color-github {
+    color: black;
+}

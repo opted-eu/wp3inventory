@@ -1,0 +1,48 @@
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <img class="bi me-2" height="40" src="{{ url_for('static', filename='opted_logo_stylized_blue.svg') }}">
+            <span class="fs-4">WP3 Inventory</span>
+            <span class="text-muted ps-4 fs-6">v{{ config.get('APP_VERSION') }}</span>
+        </a>
+        <var id="result-container" class="result-container"></var>
+
+        <form class="w-50" id="search-everything" name="search-everything" method="GET" action="{{ url_for('inventory.search') }}">
+            <div class="typeahead__container">
+                <div class="">
+                    <div class="typeahead__query input-group">
+                        <input class="search-everything form-control" name="query" placeholder="Search everything..." autocomplete="off">
+                        <button class="btn btn-outline-success" type="submit"> <i class="fas fa-search"></i>
+                    </button>
+                    </div>
+                    {# <div class="search__everything__button"> #}
+                    {# <i class="typeahead__search-icon"></i>  #}
+                    {# </div> #}
+                </div>
+            </div>
+        </form>
+        <ul class="nav nav-pills">
+            {% if current_user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('posts.new_post') }}" tabindex="-1">New Post</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.profile') }}" tabindex="-1">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.logout') }}" tabindex="-1">Logout</a>
+            </li>
+            {% else %}
+
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.login') }}" tabindex="-1">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.register') }}" tabindex="-1">Register</a>
+            </li>
+            {% endif %}
+        </ul>
+
+    </header>
+</div>

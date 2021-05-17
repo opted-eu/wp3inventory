@@ -1,0 +1,241 @@
+{
+    "set": [{
+            "uid": "_:austria",
+            "unique_name": "austria",
+            "dgraph.type": "Country",
+            "name": "Austria",
+            "other_names": [
+                "Österreich"
+            ],
+            "wikidataID": 40
+        },
+        {
+            "uid": "_:belgium",
+            "unique_name": "belgium",
+            "dgraph.type": "Country",
+            "name": "Belgium",
+            "wikidataID": 31
+        },
+        {
+            "uid": "_:bulgaria",
+            "unique_name": "bulgaria",
+            "dgraph.type": "Country",
+            "name": "Bulgaria",
+            "wikidataID": 219
+        },
+        {
+            "uid": "_:cyprus",
+            "unique_name": "cyprus",
+            "dgraph.type": "Country",
+            "name": "Cyprus",
+            "wikidataID": 229
+        },
+        {
+            "uid": "_:czechia",
+            "unique_name": "czechia",
+            "dgraph.type": "Country",
+            "name": "Czech Republic",
+            "other_names": ["Czechia"],
+            "wikidataID": 221
+        },
+        {
+            "uid": "_:germany",
+            "unique_name": "germany",
+            "dgraph.type": "Country",
+            "name": "Germany",
+            "wikidataID": 183
+        },
+        {
+            "uid": "_:denmark",
+            "unique_name": "denmark",
+            "dgraph.type": "Country",
+            "name": "Denmark",
+            "wikidataID": 35
+        },
+        {
+            "uid": "_:estonia",
+            "unique_name": "estonia",
+            "dgraph.type": "Country",
+            "name": "Estonia",
+            "wikidataID": 191
+        },
+        {
+            "uid": "_:spain",
+            "unique_name": "spain",
+            "dgraph.type": "Country",
+            "name": "Spain",
+            "wikidataID": 29
+        },
+        {
+            "uid": "_:finland",
+            "unique_name": "finland",
+            "dgraph.type": "Country",
+            "name": "Finland",
+            "wikidataID": 33
+        },
+        {
+            "uid": "_:france",
+            "unique_name": "france",
+            "dgraph.type": "Country",
+            "name": "France",
+            "wikidataID": 142
+        },
+        {
+            "uid": "_:greece",
+            "unique_name": "greece",
+            "dgraph.type": "Country",
+            "name": "Greece",
+            "wikidataID": 41
+        },
+        {
+            "uid": "_:croatia",
+            "unique_name": "croatia",
+            "dgraph.type": "Country",
+            "name": "Croatia",
+            "wikidataID": 224
+        },
+        {
+            "uid": "_:hungary",
+            "unique_name": "hungary",
+            "dgraph.type": "Country",
+            "name": "Hungary",
+            "wikidataID": 28
+        },
+        {
+            "uid": "_:ireland",
+            "unique_name": "ireland",
+            "dgraph.type": "Country",
+            "name": "Ireland",
+            "wikidataID": 27
+        },
+        {
+            "uid": "_:italy",
+            "unique_name": "italy",
+            "dgraph.type": "Country",
+            "name": "Italy",
+            "wikidataID": 38
+        },
+        {
+            "uid": "_:lithuania",
+            "unique_name": "lithuania",
+            "dgraph.type": "Country",
+            "name": "Lithuania",
+            "wikidataID": 37
+        },
+        {
+            "uid": "_:luxemburg",
+            "unique_name": "luxemburg",
+            "dgraph.type": "Country",
+            "name": "Luxemburg",
+            "wikidataID": 32
+        },
+        {
+            "uid": "_:latvia",
+            "unique_name": "latvia",
+            "dgraph.type": "Country",
+            "name": "latvia",
+            "wikidataID": 211
+        },
+        {
+            "uid": "_:malta",
+            "unique_name": "malta",
+            "dgraph.type": "Country",
+            "name": "Malta",
+            "wikidataID": 233
+        },
+        {
+            "uid": "_:malta",
+            "unique_name": "malta",
+            "dgraph.type": "Country",
+            "name": "Malta",
+            "wikidataID": 233
+        },
+        {
+            "uid": "_:netherlands",
+            "unique_name": "netherlands",
+            "dgraph.type": "Country",
+            "name": "Netherlands",
+            "wikidataID": 55
+        },
+        {
+            "uid": "_:netherlands",
+            "unique_name": "netherlands",
+            "dgraph.type": "Country",
+            "name": "Netherlands",
+            "wikidataID": 55
+        },
+        {
+            "uid": "_:poland",
+            "unique_name": "poland",
+            "dgraph.type": "Country",
+            "name": "Poland",
+            "wikidataID": 36
+        },
+        {
+            "uid": "_:portugal",
+            "unique_name": "portugal",
+            "dgraph.type": "Country",
+            "name": "Portugal",
+            "wikidataID": 45
+        },
+        {
+            "uid": "_:romania",
+            "unique_name": "romania",
+            "dgraph.type": "Country",
+            "name": "Romania",
+            "wikidataID": 218
+        },
+        {
+            "uid": "_:sweden",
+            "unique_name": "sweden",
+            "dgraph.type": "Country",
+            "name": "Sweden",
+            "wikidataID": 34
+        },
+        {
+            "uid": "_:slovenia",
+            "unique_name": "slovenia",
+            "dgraph.type": "Country",
+            "name": "Slovenia",
+            "wikidataID": 215
+        },
+        {
+            "uid": "_:slovakia",
+            "unique_name": "slovakia",
+            "dgraph.type": "Country",
+            "name": "Slovakia",
+            "wikidataID": 214
+        },
+        {
+            "uid": "_:uk",
+            "unique_name": "unitedkingdom",
+            "dgraph.type": "Country",
+            "name": "United Kingdom",
+            "other_names": ["UK", "Great Britain"],
+            "wikidataID": 214
+        },
+        {
+            "uid": "_:israel",
+            "unique_name": "israel",
+            "dgraph.type": "Country",
+            "name": "Israel",
+            "other_names": ["ישראל"],
+            "wikidataID": 214
+        },
+        {
+            "uid": "_:norway",
+            "unique_name": "norway",
+            "dgraph.type": "Country",
+            "name": "Norway",
+            "wikidataID": 20
+        },
+        {
+            "uid": "_:switzerland",
+            "unique_name": "switzerland",
+            "dgraph.type": "Country",
+            "name": "Switzerland",
+            "wikidataID": 39
+        }
+
+    ]
+}

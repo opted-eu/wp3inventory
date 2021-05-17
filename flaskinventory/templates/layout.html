@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"> -->
+    <script src="https://kit.fontawesome.com/077062ce2c.js" crossorigin="anonymous"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- <script src="{{ url_for('static',  filename='/js/bloodhound.min.js') }}"></script> -->
+    <!-- <script src="{{ url_for('static',  filename='/js/typeahead.bundle.min.js') }}"></script> -->
+    <script src="{{ url_for('static',  filename='js/jquery.typeahead.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/jquery.typeahead_edited.css') }}"> 
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    {% if title %}
+    <title>WP3 Inventory - {{ title }}</title>
+    {% else %}
+    <title>WP3 Inventory</title>
+    {% endif %}
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="container">
+        <main role="main">
+            <div class="row">
+                <div class="col-md-8">
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %} {% block content %} {% endblock %}
+                </div>
+                <div class="col-md-4">
+                    {% include 'sidebar.html' %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="container">
+        <footer class="pt-5 my-5border-top">
+            <p><a href="{{ url_for('main.about') }}">About</a> · <a href="http://opted.eu" target="_blank">OPTED Main Page</a> · <a href="http://twitter.com/OPTED_H2020" target="_blank"><i class="fab fa-twitter fs-5 color-twitter"></i></a> · <a href="http://www.researchgate.net/project/OPTED-H2020" target="_blank"><i class="fab fa-researchgate fs-5 color-researchgate"></i></a> · <a href="https://github.com/opted-eu" target="_blank"><i class="fab fa-github fs-5 color-github"></i></a></p>
+            <p class="text-muted ">This project has received funding from the European Union’s Horizon 2020 research & innovation programme under grant agreement No 951832. The document reflects only the authors’ views. The European Union is not liable for any use that may
+                be made of the information contained herein.</p>
+        </footer>
+    </div>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static',  filename='js/search_everything.js') }}"></script>
+</body>
+
+</html>

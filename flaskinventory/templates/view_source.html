@@ -1,0 +1,142 @@
+{% extends "layout.html" %} {% block content %}
+<article>
+    <div class="col d-flex align-items-start mb-4">
+        <div class="icon-square me-3">
+            <h2><i class="icon-{{ entry.channel.unique_name }} color-{{ entry.channel.unique_name }}" alt="{{ entry.channel.name }}"></i></h2>
+        </div>
+        <div>
+            <h2>{% if entry.channel.unique_name in ['twitter', 'instagram'] %}@{% endif %}{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>
+        </div>
+        <div class="ms-auto text-muted"><a href="#"><i class="fas fa-exclamation-circle"> </i></a> </div>
+    </div>
+
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted">Here is space for explanations.</small></dd>
+            {% if entry.other_names %}
+            <dt class="col-sm-3">Also known as</dt>
+            <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}
+            </dd>{% endif %} {% if entry.wikidataID %}
+            <dt class="col-sm-3">Wikidata</dt>
+            <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
+            </dd>{% endif %} {% if entry.founded %}
+            <dt class="col-sm-3">Founded</dt>
+            <dd class="col-sm-9">{{ entry.founded.strftime('%Y-%m-%d') }}
+            </dd>{% endif %}
+            <dt class="col-sm-3">Country</dt>
+            <dd class="col-sm-9">{% if entry.country.name %}<a href="{{ url_for('inventory.view_country', unique_name=entry.country.unique_name) }}">{{ entry.country.name }}</a>{% else %}<span class="text-danger">Missing!</span>{% endif %}
+            </dd>
+        </dl>
+    </div>
+
+
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Published by</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+            {% if entry.published_by %} {% for publisher in entry.published_by %}
+            <dt class="col-sm-3"></dt>
+            <dd class="col-sm-9"><a href="{{ url_for('inventory.view_organization', unique_name=publisher.unique_name) }}">{{ publisher.name }}</a></dd>
+            {% endfor %} {% else %}
+            <dt class="col-sm-3"></dt>
+            <dd class="col-sm-9 text-danger">Missing!</dd>
+            {% endif %}
+        </dl>
+    </div>
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Channel</h5></dt>
+            <dd class="col-sm-9 mb-4"><a href="{{ url_for('inventory.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> {% if entry.channel_url %} {% if entry.channel.unique_name == 'twitter' %}
+                <a class="mx-4" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
+                {% elif entry.channel.unique_name == 'instagram' %}
+                <a class="mx-4" target="_blank" href="https://instagram.com/{{ entry.channel_url }}">
+                    {% elif entry.channel.unique_name == 'website' %}
+                <a class="mx-4" target="_blank" href="{{ entry.channel_url }}">
+                    {% elif entry.channel.unique_name == 'facebook' %}
+                <a class="mx-4" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
+                {% endif %}<i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open External</a> {% endif %}</dd>
+
+            {% if entry.channel_comments %}
+            <dt class="col-sm-3">Allows user comments</dt>
+            <dd class="col-sm-9">{{ entry.channel_comments }}</dd>{% endif %} {% if entry.channel_feeds %}
+            <dt class="col-sm-3">Feeds</dt>
+            <dd class="col-sm-9">{% for feed in entry.channel_feeds %}<a href="{{feed.url}}" target="_blank">{{ feed.kind }}</a>{{ ", " if not loop.last else "" }} {% endfor %}</dd> {% endif %} {% if entry.channel_epaper %}
+            <dt class="col-sm-3">E-Paper</dt>
+            <dd class="col-sm-9"><a href="{{ entry.channel_epaper }}" target="_blank">Link</a></dd>{% endif %}
+        </dl>
+    </div>
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Economic</h5>
+            </dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+            {% if entry.payment_model %}
+            <dt class="col-sm-3">Payment Model</dt>
+            <dd class="col-sm-9">{{ entry.payment_model }}</dd>{% endif %} {% if entry.contains_ads %}
+            <dt class="col-sm-3">Contains Ads</dt>
+            <dd class="col-sm-9">{{ entry.contains_ads }}</dd>{% endif %}
+        </dl>
+    </div>
+
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Routines</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+            {% if entry.publication_kind %}
+            <dt class="col-sm-3">Publication Kind</dt>
+            <dd class="col-sm-9"><span class="">{{ entry.publication_kind }}</span></dd>{% endif %} {% if entry.topical_focus %}
+            <dt class="col-sm-3">Topical Focus</dt>
+            <dd class="col-sm-9">{{ ", ".join(entry.topical_focus) }}</dd>{% endif %} {% if entry.publication_kind %}
+            <dt class="col-sm-3">Publication Cycle</dt>
+            <dd class="col-sm-9">{{ entry.publication_cycle }}</dd>{% endif %}
+        </dl>
+    </div>
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+
+            {% if entry.audience_scope %}
+            <dd class="col-sm-3">Intrinsic Geographic Scope</dd>
+            <dd class="col-sm-9"><span class="">{{ entry.audience_scope }}</span></dd>{% endif %} {% if entry.audience_location_name %}
+            <dd class="col-sm-3">Scope Specification</dd>
+            <dd class="col-sm-9">{{ entry.audience_location_name }}</dd>{% endif %} {% if entry.languages %}
+            <dd class="col-sm-3">languages</dd>
+            <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %} {% if entry.audience_size %}
+            <dd class="col-sm-3">Audience Size</dd>
+            <dd class="col-sm-9"> {{ entry.audience_size_table }}</dd> {% endif %} {% if entry.audience_residency %}
+            <dd class="col-sm-3">Audience Residency</dd>
+            <dd class="col-sm-9"> {{ entry.audience_residency_table }}</dd> {% endif %}
+        </dl>
+    </div>
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Data Access</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted">Following data bases include full text data.</small></dd>
+            {% if entry.archives %} {% for archive in entry.archives %}
+            <dt class="col-sm-3"></dt>
+            <dd class="col-sm-9"><a href="{{ url_for('inventory.view_archive', unique_name=archive.unique_name) }}">{{archive.name}}</a> <span class="text-muted mx-3">{% if archive.get('archives|from') %} from: {{ archive.get('archives|from') }}</span>{%endif%} {% if archive.get('archives|to')
+                %}
+                <span class="text-muted mx-3">to: {{ archive.get('archives|to') }}</span> {%endif%}{% endfor %}</dd>{% endif %}
+        </dl>
+    </div>
+
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Research</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted">Following publications investigated this source. The date range indicates the sample composition.</small></dd>
+
+            {% if entry.papers %} {% for paper in entry.papers %}
+            <dt class="col-sm-3"></dt>
+            <dd>
+                <a href="{{ url_for('inventory.view_researchpaper', uid=paper.uid) }}">
+                    <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{paper.title}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if paper.authors is string %} {{ paper.authors }}{%else%}{{
+                            paper.authors[0] }}{%endif%}</span>
+                </a> <span class="text-muted mx-3">{% if paper.get('papers|from') %} from: {{ paper.get('papers|from') }}</span>{%endif%} {% if paper.get('papers|to') %}
+                <span class="text-muted mx-1">to: {{ paper.get('papers|to') }}</span> {%endif%}{% endfor %}</dd>{% endif %}
+        </dl>
+    </div>
+
+</article>
+{% endblock content %}
