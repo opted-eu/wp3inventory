@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+flaskinventory/config.json
+flaskinventory/static/icons
+flaskinventory/static/labels
+flaskinventory/static/profile_pics
