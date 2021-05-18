@@ -24,7 +24,8 @@
             <dd class="col-sm-9">{{ entry.founded.strftime('%Y-%m-%d') }}
             </dd>{% endif %}
             <dt class="col-sm-3">Country</dt>
-            <dd class="col-sm-9">{% if entry.country.name %}<a href="{{ url_for('inventory.view_country', unique_name=entry.country.unique_name) }}">{{ entry.country.name }}</a>{% else %}<span class="text-danger">Missing!</span>{% endif %}
+            <dd class="col-sm-9">{% for country in entry.country %}
+                <a href="{{ url_for('inventory.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
             </dd>{% if entry.address_string %}
             <dt class="col-sm-3">Primary Address</dt>
             <dd class="col-sm-9"><a href="https://www.openstreetmap.org/search?query={{ entry.address_string }}" target="_blank">{{ entry.address_string }}</a>
