@@ -132,3 +132,5 @@ flaskinventory/config.json
 flaskinventory/static/icons
 flaskinventory/static/labels
 flaskinventory/static/profile_pics
+
+tools/secrets.md
