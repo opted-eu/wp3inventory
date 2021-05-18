@@ -39,4 +39,3 @@ WP3 Inventory
 
 # Server
 
-Gp0Q1wx2rHUnc1qQKYH9jUANdR2f9eHKa_lFpCQetv8
