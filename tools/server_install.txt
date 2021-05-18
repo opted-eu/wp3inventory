@@ -22,6 +22,13 @@ curl https://get.dgraph.io -sSf | bash -s -- --systemd
 
 adduser ava
 
+# login as new user
+
+# create venv
+python3 -m venv environments/wp3
+
+# get source from github
+git clone ....
 
 # install python dependencies
 source environments/wp3/bin/activate
@@ -33,17 +40,17 @@ python -m pip install -r requirements.txt
 export flaskinventory_SECRETKEY=123456789
 
 # setup dgraph schema
-curl localhost:8080/alter?runInBackground=true -XPOST -d "$(cat schema.dgraph)"
+curl localhost:8080/alter?runInBackground=true -XPOST -d "$(cat wp3inventory/data/schema.dgraph)"
 
 # upload sample data
-curl -H "Content-Type: application/rdf" -X POST localhost:8080/mutate?commitNow=true -d "$(cat sample_data.rdf)"
-curl -H "Content-Type: application/json" -X POST localhost:8080/mutate?commitNow=true -d "$(cat countries_noaustria.json)"
+curl -H "Content-Type: application/rdf" -X POST localhost:8080/mutate?commitNow=true -d "$(cat wp3inventory/data/sample_data.rdf)"
+curl -H "Content-Type: application/json" -X POST localhost:8080/mutate?commitNow=true -d "$(cat wp3inventory/data/countries_noaustria.json)"
 
 # Run flask with waitress
 waitress-serve --call --listen "*:5000" 'flaskinventory:create_app'
 
 # run flask as systemd service
-
+# requires root access
 sudo nano /etc/systemd/system/flaskinventory.service
 sudo systemctl enable flaskinventory
 sudo service flaskinventory start
