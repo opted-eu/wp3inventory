@@ -1,0 +1,48 @@
+# install basics
+
+apt update
+apt upgrade
+apt install curl git ufw nano htop python3-venv python3-pip -y
+
+# change ssh port
+nano /etc/ssh/sshd_config
+service ssh restart
+
+# configure firewall
+
+ufw allow 5000 # dev server port
+ufw allow 8472 # ssh port
+ufw enable
+
+# install dgraph with systemd service
+
+curl https://get.dgraph.io -sSf | bash -s -- --systemd
+
+# add new user
+
+adduser ava
+
+
+# install python dependencies
+source environments/wp3/bin/activate
+
+python -m pip install wheel waitress
+python -m pip install -r requirements.txt
+
+# set app secret key
+export flaskinventory_SECRETKEY=123456789
+
+# setup dgraph schema
+curl localhost:8080/alter?runInBackground=true -XPOST -d "$(cat schema.dgraph)"
+
+# upload sample data
+curl -H "Content-Type: application/rdf" -X POST localhost:8080/mutate?commitNow=true -d "$(cat sample_data.rdf)"
+
+# Run flask with waitress
+waitress-serve --call --listen "*:5000" 'flaskinventory:create_app'
+
+# run flask as systemd service
+
+sudo nano /etc/systemd/system/flaskinventory.service
+sudo systemctl enable flaskinventory
+sudo service flaskinventory start
