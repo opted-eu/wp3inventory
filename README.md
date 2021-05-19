@@ -3,7 +3,14 @@ WP3 Inventory
 
 ## In Development
 
+## User Permissions
 
+Level | Name | Permissions
+------|------|------------
+0     | Anonymous | Add entries
+1     | User  | Add entries
+2     | Reviewer | + Review Entries, Invite Users
+10    | Admin   | + Change User Permissions 
 
 
 # Todos
