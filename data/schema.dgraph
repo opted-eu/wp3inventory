@@ -13,7 +13,6 @@ type <dgraph.graphql.persisted_query> {
 # Define Types
 
 type User {
-    username
     email
     pw
     user_displayname
