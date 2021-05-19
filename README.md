@@ -25,23 +25,24 @@ Level | Name | Permissions
 - [x] add enter button for full text search
         - add route for full text search results
 - [ ] add "report" button to detail view, add form for reporting need to edit item
-- [ ] add data entry views
-        - [ ] new source
-        - [ ] new organization
-        - [ ] new paper
-        - [ ] new archive
 
-- [ ] add advanced query
-        - [ ] complex filters based on variables
+add data entry views
+- [ ] new source
+- [ ] new organization
+- [ ] new paper
+- [ ] new archive
 
-- [ ] Automated Data Retrieval
-        - [ ] Get Twitter Data: joined date, followers, bio/descriptions
-        - [ ] Get Instagram Data: joined date, followers, bio/descriptions
-        - [ ] Get Facebook Data: followers, bio/descriptions
-        - [ ] Get telegram data??
-        - [ ] Detect RSS/XML Feeds & Sitemaps
-        - [ ] Get Wikidata ID: get year founded (if possible), headquarter location
-        - [ ] Geocode Strings (e.g. Addresses) automatically via `geocode.osm('Address')`
+add advanced query
+- [ ] complex filters based on variables
+
+Automated Data Retrieval
+- [ ] Get Twitter Data: joined date, followers, bio/descriptions
+- [ ] Get Instagram Data: joined date, followers, bio/descriptions
+- [ ] Get Facebook Data: followers, bio/descriptions
+- [ ] Get telegram data??
+- [ ] Detect RSS/XML Feeds & Sitemaps
+- [ ] Get Wikidata ID: get year founded (if possible), headquarter location
+- [ ] Geocode Strings (e.g. Addresses) automatically via `geocode.osm('Address')`
 
 
 
