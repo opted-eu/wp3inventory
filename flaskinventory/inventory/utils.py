@@ -45,12 +45,12 @@ def make_results_table(table_data):
     if 'founded' in cols:
         for item in table_data:
             if item.get('founded'):
-                item['founded'] = item['founded'].split('-')[0]
+                item['founded'] = item['founded'].year
 
     if 'published_date' in cols:
         for item in table_data:
             if item.get('published_date'):
-                item['published_date'] = item['published_date'].split('-')[0]
+                item['published_date'] = item['published_date'].year
 
     if 'authors' in cols:
         for item in table_data:
