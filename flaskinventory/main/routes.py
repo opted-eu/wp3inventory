@@ -20,3 +20,7 @@ def home():
 @main.route('/about/')
 def about():
     return render_template('about.html', title="About Page")
+
+@main.route('/notimplemented')
+def under_development():
+    return render_template('not_implemented.html')
