@@ -3,33 +3,31 @@
 <div class="content-section">
     <form method="POST" action="">
         {{ form.hidden_tag() }}
-        <fieldset class="form-group">
+        <fieldset class="form-floating">
             <legend class="border-bottom mb-4">Log In</legend>
-            <div class="form-group">
-                {{ form.email.label(class="form-control-label") }} {% if form.email.errors %} {{ form.email(class="form-control form-control-lg is-invalid") }}
+            <div class="form-floating mb-3">
+                {% if form.email.errors %} {{ form.email(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.email.errors %}
                     <span>{{ error }}</span> {% endfor %}
                 </div>
-                {% else %} {{ form.email(class="form-control form-control-lg") }} {% endif %}
-
+                {% else %} {{ form.email(class="form-control form-control-lg", placeholder="name@example.com") }} {% endif %} {{ form.email.label() }}
             </div>
 
-            <div class="form-group">
-                {{ form.password.label(class="form-control-label") }} {% if form.password.errors %} {{ form.password(class="form-control form-control-lg is-invalid") }}
+            <div class="form-floating mb-3">
+                {% if form.password.errors %} {{ form.password(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.password.errors %}
                     <span>{{ error }}</span> {% endfor %}
                 </div>
-                {% else %} {{ form.password(class="form-control form-control-lg") }} {% endif %}
-
+                {% else %} {{ form.password(class="form-control form-control-lg", placeholder="secret") }} {% endif %} {{ form.password.label() }}
             </div>
-            <div class="form-check">
+            <div class="form-check mb-3">
                 {{ form.remember(class="form-check-input") }} {{ form.remember.label(class="form-check-label") }}
             </div>
         </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info my-4") }}
+        <div class="form-group mb-3">
+            {{ form.submit(class="btn btn-primary me-4") }}
             <small class="text-muted my-2 pb-2">
                 <a href="{{ url_for('users.reset_request') }}">Forgot Password?</a>
             </small>

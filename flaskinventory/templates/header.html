@@ -15,22 +15,30 @@
                         <button class="btn btn-outline-success" type="submit"> <i class="fas fa-search"></i>
                     </button>
                     </div>
-                    {# <div class="search__everything__button"> #}
-                    {# <i class="typeahead__search-icon"></i>  #}
-                    {# </div> #}
+                    {#
+                    <div class="search__everything__button"> #} {# <i class="typeahead__search-icon"></i> #} {# </div> #}
                 </div>
             </div>
         </form>
         <ul class="nav nav-pills">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('posts.new_post') }}" tabindex="-1">New Post</a>
+                <a class="nav-link" href="{{ url_for('main.under_development') }}" tabindex="-1"><i class="fas fa-plus-circle me-2"></i>Add Entry</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('users.profile') }}" tabindex="-1">Profile</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('users.logout') }}" tabindex="-1">Logout</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user me-2"></i>Tasks
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="{{ url_for('users.profile') }}" tabindex="-1"><i class="fas fa-id-badge me-2 fa-fw"></i>Profile</a></li>
+                    {% if current_user.user_level >= 2 %}
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-glasses me-2 fa-fw"></i>Review Entries</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-envelope-open-text me-2 fa-fw"></i>Invite New User</a></li>
+                    {% endif %}
+
+                    <li><a class="dropdown-item" href="{{ url_for('users.logout') }}"><i class="fas fa-power-off me-2 fa-fw"></i>Logout</a></li>
+                </ul>
             </li>
             {% else %}
 

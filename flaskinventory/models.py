@@ -12,32 +12,26 @@ class User(UserMixin):
     id = None
 
     def __init__(self, **kwargs):
-        if 'uid' or 'email' or 'username' in kwargs.keys():
+        if 'uid' or 'email' in kwargs.keys():
             self.get_user(**kwargs)
 
     def get_user(self, **kwargs):
         user_data = dgraph.get_user(**kwargs)
         if user_data:
-            self.id = user_data['uid']
-            self.username = user_data['username']
-            self.email = user_data['email']
-            self.avatar_img = user_data['avatar_img']
-            self.date_joined = user_data['date_joined']
+            for k, v in user_data.items():
+                if k == 'uid':
+                    self.id = v
+                setattr(self, k, v)
 
     def update_profile(self, form_data):
         user_data = {}
-        user_data['username'] = form_data.username.data
-        user_data['email'] = form_data.email.data
-        if form_data.avatar_img.data:
-            user_data['avatar_img'] = form_data.avatar_img.data.filename
+        for k, v in form_data.data.items():
+            if k in ['submit', 'csrf_token']: continue
+            else: user_data[k] = v
         result = dgraph.update_entry(self.id, user_data)
         if result:
-            if 'username' in user_data.keys():
-                self.username = user_data['username']
-            if 'email' in user_data.keys():
-                self.email = user_data['email']
-            if 'avatar_img' in user_data.keys():
-                self.avatar_img = user_data['avatar_img']
+            for k, v in user_data.items():
+                setattr(self, k, v)
             return True
         else: return False
 

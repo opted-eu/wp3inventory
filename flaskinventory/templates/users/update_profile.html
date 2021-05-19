@@ -1,0 +1,38 @@
+{% extends "layout.html" %} {% block content %}
+<div class="content-section">
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group mb-3">
+            <legend class="border-bottom mb-4">Update Profile</legend>
+            <div class="form-floating mb-3">
+                {% if form.user_displayname.errors %} {{ form.user_displayname(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.user_displayname.errors %}
+                    <span>{{ error }}</span> {% endfor %}
+                </div>
+                {% else %} {{ form.user_displayname(class="form-control form-control-lg", placeholder="{{ current_user.displayname }}") }} {% endif %} {{ form.user_displayname.label() }}
+            </div>
+            <div class="form-floating mb-3">
+                {% if form.user_affiliation.errors %} {{ form.user_affiliation(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.user_affiliation.errors %}
+                    <span>{{ error }}</span> {% endfor %}
+                </div>
+                {% else %} {{ form.user_affiliation(class="form-control form-control-lg", placeholder="{{ current_user.affiliation }}") }} {% endif %} {{ form.user_affiliation.label() }}
+            </div>
+            <div class="form-floating mb-3">
+                {% if form.user_orcid.errors %} {{ form.user_orcid(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.user_orcid.errors %}
+                    <span>{{ error }}</span> {% endfor %}
+                </div>
+                {% else %} {{ form.user_orcid(class="form-control form-control-lg", placeholder="{{ current_user.orcid }}") }} {% endif %} {{ form.user_orcid.label() }}
+            </div>
+
+        </fieldset>
+        <div class="form-group mb-3">
+            {{ form.submit(class="btn btn-outline-info my-4") }}
+        </div>
+    </form>
+</div>
+{% endblock content %} {% block sidebar %} {% endblock sidebar %}

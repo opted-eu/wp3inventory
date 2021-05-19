@@ -7,8 +7,6 @@ from flaskinventory import dgraph
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
 
@@ -17,11 +15,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), Length(min=3), EqualTo('password')])
 
-    submit = SubmitField('Sign Up')
-
-    def validate_username(self, username):
-        if dgraph.get_uid('username', username.data):
-            raise ValidationError('That username is taken, please choose a different one.')
+    submit = SubmitField('Request Account')
 
     def validate_email(self, email):
         if dgraph.get_uid('email', f'"{email.data}"'):
@@ -40,24 +34,14 @@ class LoginForm(FlaskForm):
 
 
 class UpdateProfileForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-
-    avatar_img = FileField('Update Profile Picture', validators=[FileAllowed(['png', 'jpg'])])
+    user_displayname = StringField('Display Name',
+                        validators=[Length(min=2, max=40)])
+    user_affiliation = StringField('Affiliation', 
+                        validators=[Length(max=(60))])
+    user_orcid = StringField('ORCID', 
+                        validators=[Length(min=12)])
 
     submit = SubmitField('Update')
-
-    def validate_username(self, username):
-        if username.data != current_user.username:
-            if dgraph.get_uid('username', username.data):
-                raise ValidationError('That username is taken, please choose a different one.')
-
-    def validate_email(self, email):
-        if email.data != current_user.email:
-            if dgraph.get_uid('email', f'"{email.data}"'):
-                raise ValidationError('That email is taken. Try to login!')
 
 
 class RequestResetForm(FlaskForm):

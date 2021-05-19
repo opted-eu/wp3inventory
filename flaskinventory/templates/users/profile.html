@@ -1,0 +1,58 @@
+{% extends "layout.html" %} {% block content %}
+<div class="content-section">
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>User Information</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted">We retain as little personal data as possible. Your Email is invisible for other users. Feel free to add some more information about yourself though.</small></dd>
+            <dt class="col-sm-3 mb-4">Email</dt>
+            <dd class="col-sm-9">{{ current_user.email }}</dd>
+            <dt class="col-sm-3 mb-4">Date joined</dt>
+            <dd class="col-sm-9">{{ current_user.date_joined.strftime('%Y-%m-%d') }}</dd>
+            <dt class="col-sm-3 mb-4">User Level</dt>
+            <dd class="col-sm-9">{{ current_user.user_level }}</dd>
+            <dt class="col-sm-3 mb-4">Display Name</dt>
+            <dd class="col-sm-9">{{ current_user.user_displayname }}</dd>
+            <dt class="col-sm-3 mb-4">Affiliation</dt>
+            <dd class="col-sm-9">{{ current_user.user_affiliation }}</dd>
+            <dt class="col-sm-3 mb-4">ORCID</dt>
+            <dd class="col-sm-9"><a href="https://orcid.org/{{ current_user.user_orcid }}" target="_blank">{{ current_user.user_orcid }}</a></dd>
+        </dl>
+        <a class="btn btn-outline-info" href="{{ url_for('users.update_profile') }}">Update Profile</a>
+        <button class="btn btn-sm btn-outline-danger mx-4" data-bs-toggle="modal" data-bs-target="#deleteAccount">Delete Account</button>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountLabel">Are you sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                If you delete your account, the changes will take effect immediately. The data you entered will be retained, but all your personal information (e.g. email address) will be deleted from our database.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a type="button" href="{{ url_for('main.under_development') }}" class="btn btn-danger">Delete Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %} {% block sidebar %}
+
+<div class="" style="width: 380px;">
+    <a href="#" class="d-flex align-items-center flex-shrink-0 pb-3 link-dark text-decoration-none">
+        <span class="fs-5 fw-semibold">Tasks</span>
+    </a>
+    <div class="list-group">
+        <a href="{{ url_for('main.under_development') }}" type="button" class="list-group-item list-group-item-action">
+            <i class="fas fa-plus-circle me-3 fa-fw"></i>Add new entry
+        </a>
+        <a href="{{ url_for('main.under_development') }}" type="button" class="list-group-item list-group-item-action {% if current_user.user_level < 2 %}disabled{% endif %}"><i class="fas fa-glasses me-3 fa-fw"></i>Review Entries</a>
+        <a href="{{ url_for('main.under_development') }}" type="button" class="list-group-item list-group-item-action {% if current_user.user_level < 2 %}disabled{% endif %}"><i class="fas fa-envelope-open-text me-3 fa-fw"></i>Invite New User</a>
+        <a href="{{ url_for('main.under_development') }}" type="button" class="list-group-item list-group-item-action {% if current_user.user_level < 10 %}disabled{% endif %}"><i class="fas fa-users-cog me-3 fa-fw"></i>Change User Permissions</a>
+    </div>
+</div>
+{% endblock sidebar %}
