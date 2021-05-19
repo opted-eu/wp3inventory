@@ -44,7 +44,8 @@ class DGraph(object):
     @staticmethod
     def parse_datetime(s):
         try:
-            return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
+            # return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.datetime.fromisoformat(s.split('Z')[0])
         except:
             return s
 
@@ -159,6 +160,8 @@ class DGraph(object):
         
         user_data['uid'] =  '_:newuser'
         user_data['dgraph.type'] = 'User'
+        user_data['user_level'] = 0
+        user_data['user_displayname'] = user_data['email'].split('@')[0][:10]
         user_data['date_joined'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         
         txn = self.client.txn()

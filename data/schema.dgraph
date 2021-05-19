@@ -129,7 +129,7 @@ pw: password .
 date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .
-user_level: string .
+user_level: int .
 user_affiliation: string @index(term). 
 
 # Generic Predicates 
