@@ -19,21 +19,43 @@ Level | Name | Permissions
 
 - [ ] Soll ein entity mit mehreren Ländern in Verbindung gebracht werden, oder nur mit einem?
 
-## Layout
-
-- Use Floating Labels for form input: https://getbootstrap.com/docs/5.0/forms/floating-labels/
-
 ## Features
 
-- [ ] add researchpaper title to quick search: cannot because searching multiple field names isn't working (jquery problem)
+- [ ] ~~add researchpaper title to quick search: cannot because searching multiple field names isn't working (jquery problem)~~
 - [x] add enter button for full text search
         - add route for full text search results
+- [ ] add "report" button to detail view, add form for reporting need to edit item
+- [ ] add data entry views
+        - [ ] new source
+        - [ ] new organization
+        - [ ] new paper
+        - [ ] new archive
 
-- add "report" button to detail view, add form for reporting need to edit item
+- [ ] add advanced query
+        - [ ] complex filters based on variables
+
+- [ ] Automated Data Retrieval
+        - [ ] Get Twitter Data: joined date, followers, bio/descriptions
+        - [ ] Get Instagram Data: joined date, followers, bio/descriptions
+        - [ ] Get Facebook Data: followers, bio/descriptions
+        - [ ] Get telegram data??
+        - [ ] Detect RSS/XML Feeds & Sitemaps
+        - [ ] Get Wikidata ID: get year founded (if possible), headquarter location
+        - [ ] Geocode Strings (e.g. Addresses) automatically via `geocode.osm('Address')`
+
+
+
+## User Features
+
+- [ ] add invite new user feature
+- [ ] remove registration feature
+- [ ] add admin view to change user levels
 
 ## Performance
 
 - [ ] investigate caching for form input fields
+- [ ] caching for external assets (fontawesome, js libs)
+- [ ] do not include third-party libraries in this repository (e.g. use yarn to get js libs)
 
 ## Cleanup
 
