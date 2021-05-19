@@ -1,0 +1,197 @@
+_:austria <dgraph.type> "Country" .
+_:austria <unique_name> "austria" .
+_:austria <name> "Austria" .
+_:austria <other_names> "Österreich" .
+_:austria <wikidataID> "40" .
+
+_:website <dgraph.type> "Channel" .
+_:website <unique_name> "website" .
+_:website <name> "Self-Hosted Website" .
+
+_:print <dgraph.type> "Channel" .
+_:print <unique_name> "print" .
+_:print <name> "Print" .
+
+_:twitter <dgraph.type> "Channel" .
+_:twitter <unique_name> "twitter" .
+_:twitter <name> "Twitter" .
+
+_:instagram <dgraph.type> "Channel" .
+_:instagram <unique_name> "instagram" .
+_:instagram <name> "Instagram" .
+
+_:facebook <dgraph.type> "Channel" .
+_:facebook <unique_name> "facebook" .
+_:facebook <name> "Facebook" .
+
+_:derstandardat <dgraph.type> "Source" .
+_:derstandardat <unique_name> "www.derstandard.at" .
+_:derstandardat <name> "www.derstandard.at" .
+_:derstandardat <other_names> "DerStandard.at" .
+_:derstandardat <other_names> "Der Standard.at" .
+_:derstandardat <wikidataID> "1192004" .
+_:derstandardat <founded> "1995-02-02" .
+_:derstandardat <channel> _:website .
+_:derstandardat <channel_url> "https://www.derstandard.at/" .
+_:derstandardat <channel_comments> "true" .
+_:derstandardat <channel_feeds> "XML" (url="https://www.derstandard.at/sitemaps/news.xml") .
+_:derstandardat <channel_feeds> "Sitemap" (url="https://www.derstandard.at/sitemaps/sitemap.xml") .
+_:derstandardat <channel_feeds> "RSS" (url="https://www.derstandard.at/rss") .
+_:derstandardat <payment_model> "soft paywall" .
+_:derstandardat <country> _:austria .
+_:derstandardat <contains_ads> "true" .
+_:derstandardat <publication_kind> "daily newspaper" .
+_:derstandardat <topical_focus> "general news" .
+_:derstandardat <publication_cycle> "continuous" .
+_:derstandardat <audience_scope> "national" .
+_:derstandardat <audience_location_name> "Austria" .
+_:derstandardat <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+_:derstandardat <languages> "de" .
+_:derstandardat <audience_size> "2021-05-06" (daily_visitors=884687, datafrom="https://siterankdata.com/derstandard.at") .
+_:derstandardat <audience_residency> "2021-05-06" (austria=68.8, germany=11.9, usa=9.4, datafrom="https://www.alexa.com/siteinfo/derstandard.at") .
+
+_:derstandardprint <dgraph.type> "Source" .
+_:derstandardprint <unique_name> "derstandard_print" .
+_:derstandardprint <name> "Der Standard" .
+_:derstandardprint <other_names> "DerStandard" .
+_:derstandardprint <other_names> "DER STANDARD" .
+_:derstandardprint <wikidataID> "128660" .
+_:derstandardprint <founded> "1988-10-19" .
+_:derstandardprint <channel> _:print .
+_:derstandardprint <payment_model> "subscription" .
+_:derstandardprint <country> _:austria .
+_:derstandardprint <contains_ads> "true" .
+_:derstandardprint <publication_kind> "daily newspaper" .
+_:derstandardprint <topical_focus> "general news" .
+_:derstandardprint <publication_cycle> "daily" .
+_:derstandardprint <audience_scope> "national" .
+_:derstandardprint <audience_location_name> "Austria" .
+_:derstandardprint <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+_:derstandardprint <languages> "de" .
+_:derstandardprint <audience_size> "2018" (papers_sold=57221, subscribers=52046, datafrom="https://www.oeak.at/wp-content/uploads/2019/01/KORR_Auflagenliste_H1_2018.pdf") .
+_:derstandardprint <audience_residency> "2018" (austria=100) .
+
+_:derstandardinstagram <dgraph.type> "Source" .
+_:derstandardinstagram <unique_name> "derstandard_instagram" .
+_:derstandardinstagram <name> "derstandardat" .
+_:derstandardinstagram <other_names> "DER STANDARD" .
+_:derstandardinstagram <wikidataID> "128660" .
+_:derstandardinstagram <founded> "2012-06-22" .
+_:derstandardinstagram <channel> _:instagram .
+_:derstandardinstagram <channel_url> "derstandardat" .
+_:derstandardinstagram <country> _:austria .
+_:derstandardinstagram <publication_kind> "daily newspaper" .
+_:derstandardinstagram <topical_focus> "general news" .
+_:derstandardinstagram <publication_cycle> "continuous" .
+_:derstandardinstagram <audience_scope> "national" .
+_:derstandardinstagram <audience_location_name> "Austria" .
+_:derstandardinstagram <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+_:derstandardinstagram <languages> "de" .
+_:derstandardinstagram <audience_size> "2021-05-06" (followers=292000) .
+
+_:derstandardtwitter <dgraph.type> "Source" .
+_:derstandardtwitter <unique_name> "derstandard_twitter" .
+_:derstandardtwitter <name> "derStandardat" .
+_:derstandardtwitter <other_names> "DER STANDARD" .
+_:derstandardtwitter <wikidataID> "128660" .
+_:derstandardtwitter <founded> "2009-03" .
+_:derstandardtwitter <channel> _:twitter .
+_:derstandardtwitter <channel_url> "derStandardat" .
+_:derstandardtwitter <country> _:austria .
+_:derstandardtwitter <publication_kind> "daily newspaper" .
+_:derstandardtwitter <topical_focus> "general news" .
+_:derstandardtwitter <publication_cycle> "continuous" .
+_:derstandardtwitter <audience_scope> "national" .
+_:derstandardtwitter <audience_location_name> "Austria" .
+_:derstandardtwitter <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+_:derstandardtwitter <languages> "de" .
+_:derstandardtwitter <audience_size> "2021-05-06" (followers=333700) .
+
+
+_:derstandardfacebook <dgraph.type> "Source" .
+_:derstandardfacebook <unique_name> "derstandard_facebook" .
+_:derstandardfacebook <name> "derStandardat" .
+_:derstandardfacebook <other_names> "DER STANDARD" .
+_:derstandardfacebook <wikidataID> "128660" .
+_:derstandardfacebook <founded> "2010-09-04" .
+_:derstandardfacebook <channel> _:facebook .
+_:derstandardfacebook <channel_url> "derStandardat" .
+_:derstandardfacebook <country> _:austria .
+_:derstandardfacebook <publication_kind> "daily newspaper" .
+_:derstandardfacebook <topical_focus> "general news" .
+_:derstandardfacebook <publication_cycle> "continuous" .
+_:derstandardfacebook <audience_scope> "national" .
+_:derstandardfacebook <audience_location_name> "Austria" .
+_:derstandardfacebook <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+_:derstandardfacebook <languages> "de" .
+_:derstandardfacebook <audience_size> "2021-05-06" (followers=347671) .
+
+_:derstandardat <related> _:derstandardprint .
+_:derstandardat <related> _:derstandardinstagram .
+_:derstandardat <related> _:derstandardtwitter .
+_:derstandardat <related> _:derstandardfacebook .
+
+_:derstandardprint <related> _:derstandardat .
+_:derstandardprint <related> _:derstandardinstagram .
+_:derstandardprint <related> _:derstandardtwitter .
+_:derstandardprint <related> _:derstandardfacebook .
+
+_:derstandardinstagram <related> _:derstandardat .
+_:derstandardinstagram <related> _:derstandardprint .
+_:derstandardinstagram <related> _:derstandardtwitter .
+_:derstandardinstagram <related> _:derstandardfacebook .
+
+_:derstandardtwitter <related> _:derstandardat .
+_:derstandardtwitter <related> _:derstandardprint .
+_:derstandardtwitter <related> _:derstandardinstagram .
+_:derstandardtwitter <related> _:derstandardfacebook .
+
+_:derstandardfacebook <related> _:derstandardprint .
+_:derstandardfacebook <related> _:derstandardinstagram .
+_:derstandardfacebook <related> _:derstandardtwitter .
+_:derstandardfacebook <related> _:derstandardfacebook .
+
+_:mbhderstandard <dgraph.type> "Organization" .
+_:mbhderstandard <unique_name> "derstandard_mbh" .
+_:mbhderstandard <name> "STANDARD Verlagsgesellschaft m.b.H." .
+_:mbhderstandard <founded> "1995-04-28" .
+_:mbhderstandard <country> _:austria .
+_:mbhderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
+_:mbhderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
+_:mbhderstandard <publishes> _:derstandardat .  
+_:mbhderstandard <publishes> _:derstandardprint .
+_:mbhderstandard <publishes> _:derstandardinstagram .
+_:mbhderstandard <publishes> _:derstandardtwitter .
+_:mbhderstandard <publishes> _:derstandardfacebook .
+
+_:agderstandard <dgraph.type> "Organization" .
+_:agderstandard <unique_name> "derstandard_medien_ag" .
+_:agderstandard <name> "STANDARD Medien AG" .
+_:agderstandard <founded> "2000-08-05" .
+_:agderstandard <country> _:austria .
+_:agderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
+_:agderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
+_:agderstandard <owns> _:mbhderstandard .  
+
+_:apa <dgraph.type> "Archive" .
+_:apa <unique_name> "apa_archive" .
+_:apa <name> "APA OnlineManager Library" .
+_:apa <other_names> "AOM" .
+_:apa <other_names> "APA Defacto CAMPUS" .
+_:apa <description> "Die Datenbank der APA-OnlineManager Library umfasst die Inhalte österreichischen Tageszeitungen sowie Wochen-, Monatsmagazine und Transkripte von Informationssendungen aus Radio & TV - derzeit aktuell mehr als 350 Medien. Zusätzlich sind auch viele internationale Zeitungen und Magazine verfügbar. Die Medienberichte werden 7 Tage nach Erscheinen in die Datenbank integriert und reichen zurück teilweise bis 1990." . 
+_:apa <access> "restricted" .
+_:apa <url> "https://aomlibrary.apa.at/" .
+_:apa <sources_included> _:derstandardat (from=2009) .
+_:apa <sources_included> _:derstandardprint (from=1995) .
+
+_:paper1 <dgraph.type> "ResearchPaper" .
+_:paper1 <doi> "10.1080/1461670X.2020.1745667" .
+_:paper1 <title> "From Novelty to Normalization? How Journalists Use the Term “Fake News” in their Reporting" .
+_:paper1 <authors> "[Jana Laura Egelhofer; Loes Aaldering; Jakob-Moritz Eberl; Sebastian Galyga; Sophie Lecheler]" .        
+_:paper1 <published_date> "2020-03-20" .
+_:paper1 <description> "During recent years, worries about fake news have been a salient aspect of mediated debates..." .
+_:paper1 <paper_kind> "Journal Article" .
+_:paper1 <url> "https://www.tandfonline.com/doi/full/10.1080/1461670X.2020.1745667" .
+_:paper1 <sources_included> _:derstandardprint (from="2015-01-01", to="2018-05-01") .
+_:paper1 <journal> "Journalism Studies" .
+_:paper1 <country> _:austria .
