@@ -38,7 +38,7 @@ class DGraph(object):
         current_app.logger.info(f"Closing Connection: {current_app.config['DGRAPH_ENDPOINT']}")
         self.client_stub.close()
 
-    ''' static methods '''
+    ''' Static Methods '''
 
     # Helper function for parsing dgraph's iso strings
     @staticmethod
@@ -59,6 +59,7 @@ class DGraph(object):
                 obj[k] = DGraph.parse_datetime(v)
         return obj
 
+    # flatten timeseries information embedded through facets
     @staticmethod
     def flatten_date_facets(data, field_name):
         tmp_list = []
@@ -72,6 +73,35 @@ class DGraph(object):
         data[field_name] = tmp_list
         data[field_name + '_labels'] = facet_labels
         return data
+
+    # Helper method for iterating over filter dictionaries
+    @staticmethod
+    def iter_filt_dict(filt_dict):
+        for key, val in filt_dict.items():
+                filt_string = f'{key}('
+                if type(val) == dict:
+                    for subkey, subval in val.items():
+                        filt_string += f'{subkey}, "{subval}")'
+                else:
+                    filt_string += f'{val})'
+        return filt_string
+    
+    # Helper Method for building complex query filter strings
+    @staticmethod
+    def build_filt_string(filt, operator="AND"):
+        if type(filt) == str:
+            return filt
+        elif type(filt) == dict:
+            return f'@filter({DGraph.iter_filt_dict(filt)})'
+        elif type(filt) == list:
+            filt_string = f" {operator} ".join([DGraph.iter_filt_dict(item) for item in filt])    
+            return f'@filter({filt_string})'
+        else:
+            return ''
+
+    """    
+    Generic Query Methods 
+    """
 
     def query(self, query_string, variables=None):
         current_app.logger.debug(f"Sending dgraph query.")
@@ -90,22 +120,23 @@ class DGraph(object):
             return None
         return data['q'][0]['uid']
 
+    """ 
+        User Related Methods 
+    """
+
     def get_user(self, **kwargs):
 
         uid = kwargs.get('uid', None)
-        username = kwargs.get('username', None)
         email = kwargs.get('email', None)
 
         if uid:
             query_func = f'{{ q(func: uid({uid}))'
         elif email:
             query_func = f'{{ q(func: eq(email, "{email}"))'
-        elif username:
-            query_func = f'{{ q(func: eq(username, "{username}"))'
         else:
             raise ValueError()
 
-        query_fields =  f'{{ uid username email avatar_img date_joined }} }}'
+        query_fields =  f'{{ uid email user_displayname	user_orcid date_joined user_level user_affiliation }} }}'
         query_string = query_func + query_fields
         data = self.query(query_string)
         if len(data['q']) == 0:
@@ -129,7 +160,6 @@ class DGraph(object):
         user_data['uid'] =  '_:newuser'
         user_data['dgraph.type'] = 'User'
         user_data['date_joined'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        user_data['avatar_img'] = os.path.join('default.jpg')
         
         txn = self.client.txn()
 
@@ -145,43 +175,9 @@ class DGraph(object):
             return response.uids['newuser']
         else: return False
 
-    def update_entry(self, uid, input_data):
-        if type(input_data) is not dict:
-            raise TypeError()
-        
-        input_data['uid'] =  uid
-        
-        txn = self.client.txn()
-
-        try:
-            response = txn.mutate(set_obj=input_data)
-            txn.commit()
-        except:
-            response = False
-        finally:
-            txn.discard()
-
-        if response:
-            return True
-        else: return False
-
-    def delete_entry(self, uid):
-
-        mutation = {'uid': uid}
-        txn = self.client.txn()
-
-        try:
-            response = txn.mutate(del_obj=mutation)
-            txn.commit()
-        except:
-            response = False
-        finally:
-            txn.discard()
-
-        if response:
-            return True
-        else: return False
-
+    """
+        Inventory Detail View Methods
+    """
     def get_source(self, unique_name=None, uid=None):
         if unique_name:
             query_func = f'{{ source(func: eq(unique_name, "{unique_name}"))'
@@ -345,50 +341,12 @@ class DGraph(object):
                     }'''
         pass
 
-    def create_post(self, post_data):
-        if type(post_data) is not dict:
-            raise TypeError()
-        
-        post_data['uid'] =  '_:newpost'
-        post_data['dgraph.type'] = 'Post'
-        post_data['date_published'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        
-        txn = self.client.txn()
-
-        try:
-            response = txn.mutate(set_obj=post_data)
-            txn.commit()
-        except:
-            response = False
-        finally:
-            txn.discard()
-
-        if response:
-            return response.uids['newpost']
-        else: return False
-
-    def iter_filt_dict(self, filt_dict):
-        for key, val in filt_dict.items():
-                filt_string = f'{key}('
-                if type(val) == dict:
-                    for subkey, subval in val.items():
-                        filt_string += f'{subkey}, "{subval}")'
-                else:
-                    filt_string += f'{val})'
-        return filt_string
-
-    def build_filt_string(self, filt, operator="AND"):
-        if type(filt) == str:
-            return filt
-        elif type(filt) == dict:
-            return f'@filter({self.iter_filt_dict(filt)})'
-        elif type(filt) == list:
-            filt_string = f" {operator} ".join([self.iter_filt_dict(item) for item in filt])    
-            return f'@filter({filt_string})'
-        else:
-            return ''
-
     
+    """ 
+        Query Related Methods 
+    """
+
+    # List all entries of specified type, allows to pass in filters
     def list_by_type(self, typename, filt=None, relation_filt=None, fields=None, normalize=False):
         query_head = f'{{ q(func: type("{typename}")) '
         if filt:
@@ -446,8 +404,45 @@ class DGraph(object):
             return False
 
         data = data['q']
-
-        # parse dates
-
         return data
 
+    """ 
+        Misc Methods (unused)
+    """
+
+    def update_entry(self, uid, input_data):
+        if type(input_data) is not dict:
+            raise TypeError()
+        
+        input_data['uid'] =  uid
+        
+        txn = self.client.txn()
+
+        try:
+            response = txn.mutate(set_obj=input_data)
+            txn.commit()
+        except:
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return True
+        else: return False
+
+    def delete_entry(self, uid):
+
+        mutation = {'uid': uid}
+        txn = self.client.txn()
+
+        try:
+            response = txn.mutate(del_obj=mutation)
+            txn.commit()
+        except:
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return True
+        else: return False
