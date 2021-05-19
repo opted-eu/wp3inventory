@@ -178,6 +178,12 @@ class DGraph(object):
             return response.uids['newuser']
         else: return False
 
+    def list_users(self):
+        data = self.query('{ q(func: type("User")) { uid expand(_all_) } }')
+        if len(data['q']) == 0:
+            return False
+        return data['q']
+
     """
         Inventory Detail View Methods
     """

@@ -1,9 +1,12 @@
 import secrets
 import os
+from functools import wraps
 from PIL import Image
+from flask import current_app, url_for, flash, abort
 from flaskinventory import mail
 from flask_mail import Message
-from flask import current_app, url_for
+from flask_login import current_user
+
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
@@ -24,11 +27,40 @@ def send_reset_email(user):
     token = user.get_reset_token()
     msg = Message('Password Reset Request',
                   sender='paul.balluff@univie.ac.at', recipients=[user.email])
-    
-    msg.body = f'''To reset your password visit the following link:
-{url_for('users.reset_token', token=token, _external=True)}
 
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
+    msg.body = f'''To reset your password visit the following link:
+        {url_for('users.reset_token', token=token, _external=True)}
+
+        If you did not make this request then simply ignore this email and no changes will be made.
+        '''
 
     mail.send(msg)
+
+
+def requires_access_level(access_level):
+    def decorator(func):
+        @wraps(func)
+        def decorated_view(*args, **kwargs):
+            if current_user.user_level < access_level:
+                flash(f'You are not allowed to view this page!', 'warning')
+                # return redirect(url_for('main.home'))
+                return abort(403)
+            return func(*args, **kwargs)
+        return decorated_view
+    return decorator
+
+
+from flaskinventory.inventory.utils import InternalURLCol
+from flask_table import create_table, Col, DateCol, LinkCol
+from flask_table.html import element
+
+def make_users_table(table_data):
+    cols = sorted(list(table_data[0].keys()))
+    TableCls = create_table('Table')
+    TableCls.classes = ['table']
+
+    TableCls.add_column('date_joined', DateCol('Joined Date'))
+    TableCls.add_column('email', Col('Email'))
+    TableCls.add_column('uid', LinkCol('UID', 'users.edit_user', url_kwargs=dict(uid='uid'), attr_list='uid'))
+    TableCls.add_column('user_level', Col('User Level'))
+    return TableCls(table_data)

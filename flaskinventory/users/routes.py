@@ -1,12 +1,16 @@
-from flask import (Blueprint, render_template, url_for, flash, redirect, request, abort)
+from flask import (Blueprint, render_template, url_for,
+                   flash, redirect, request, abort)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.models import User
 from flaskinventory.users.forms import (RegistrationForm, LoginForm,
-                             UpdateProfileForm, RequestResetForm, ResetPasswordForm)
-from flaskinventory.users.utils import save_picture, send_reset_email
+                                        UpdateProfileForm, RequestResetForm, ResetPasswordForm,
+                                        EditUserForm)
+from flaskinventory.users.utils import send_reset_email, requires_access_level, make_users_table
+from flaskinventory.users.constants import ACCESS_LEVEL
 
 users = Blueprint('users', __name__)
+
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
@@ -53,6 +57,7 @@ def logout():
 def profile():
     return render_template('users/profile.html', title='Profile')
 
+
 @users.route('/profile/update', methods=['GET', 'POST'])
 @login_required
 def update_profile():
@@ -62,11 +67,14 @@ def update_profile():
         flash(f'Your account has been updated', 'success')
         return redirect(url_for('users.profile'))
     elif request.method == 'GET':
-        form.user_displayname.data = getattr(current_user, "user_displayname", None)
-        form.user_affiliation.data = getattr(current_user, "user_affiliation", None)
+        form.user_displayname.data = getattr(
+            current_user, "user_displayname", None)
+        form.user_affiliation.data = getattr(
+            current_user, "user_affiliation", None)
         form.user_orcid.data = getattr(current_user, "user_orcid", None)
         # form.avatar_img.data = current_user.avatar_img
     return render_template('users/update_profile.html', title='Update Profile', form=form)
+
 
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -85,12 +93,12 @@ def reset_request():
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    
+
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('reset_request'))
-    
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         # hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -100,3 +108,40 @@ def reset_token(token):
         flash(f'Password updated for {user.id}!', 'success')
         return redirect(url_for('users.login'))
     return render_template('users/reset_token.html', title='Reset Password', form=form)
+
+
+@users.route('/users/admin')
+@login_required
+@requires_access_level(ACCESS_LEVEL.Admin)
+def admin_view():
+    user_list = dgraph.list_users()
+    if user_list:
+        users_table = make_users_table(user_list)
+    return render_template('users/admin.html', title='Manage Users', users=users_table)
+
+
+@users.route('/users/<string:uid>/edit', methods=['GET', 'POST'])
+@login_required
+@requires_access_level(ACCESS_LEVEL.Admin)
+def edit_user(uid):
+    editable_user = dgraph.get_user(uid=uid)
+    if editable_user is None:
+        return abort(404)
+    form = EditUserForm()
+    if form.validate_on_submit():
+        user_data = {}
+        for k, v in form.data.items():
+            print(k)
+            if k in ['submit', 'csrf_token']: continue
+            else: user_data[k] = v
+        try:
+            result = dgraph.update_entry(uid, user_data)
+            print(result)
+        except Exception as e:
+            return f'Database error {e}'
+        flash(f'User {uid} has been updated', 'success')
+        return redirect(url_for('users.admin_view'))
+    elif request.method == 'GET':
+        form.user_displayname.data = editable_user.get("user_displayname")
+        form.user_level.data = editable_user.get("user_level")  
+    return render_template('users/update_user.html', title='Manage Users', user=editable_user, form=form)
