@@ -40,8 +40,8 @@ Level | Name | Permissions
 ### DGraph Class
 
 - [ ] standardize query method and usage in other functions
-- [ ] remove unnecessary methods
-- [ ] dateparsing (also raise request)
+- [x] remove unnecessary methods
+- [x] dateparsing (also raise request)
 
 
 # Server
