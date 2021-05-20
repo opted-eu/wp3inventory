@@ -195,3 +195,11 @@ _:paper1 <url> "https://www.tandfonline.com/doi/full/10.1080/1461670X.2020.17456
 _:paper1 <sources_included> _:derstandardprint (from="2015-01-01", to="2018-05-01") .
 _:paper1 <journal> "Journalism Studies" .
 _:paper1 <country> _:austria .
+
+_:admin <dgraph.type> "User" .
+_:admin <email> "wp3@opted.eu" .
+_:admin <password> "admin" .
+_:admin <user_displayname> "Admin" .
+_:admin <date_joined> "2020-05-20" .
+_:admin <user_level> "10" .
+
