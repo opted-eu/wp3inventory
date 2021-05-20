@@ -24,7 +24,7 @@ def create_app(config_class=Config, config_json=None):
     if config_json:
         app.config.from_json(config_json)
     else:
-        app.config.from_object(Config)
+        app.config.from_object(config_class)
     
     from flaskinventory.users.routes import users
     from flaskinventory.inventory.routes import inventory
