@@ -34,7 +34,7 @@
                     <li><a class="dropdown-item" href="{{ url_for('users.profile') }}" tabindex="-1"><i class="fas fa-id-badge me-2 fa-fw"></i>Profile</a></li>
                     {% if current_user.user_level >= 2 %}
                     <li><a class="dropdown-item" href="#"><i class="fas fa-glasses me-2 fa-fw"></i>Review Entries</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-envelope-open-text me-2 fa-fw"></i>Invite New User</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('users.invite') }}"><i class="fas fa-envelope-open-text me-2 fa-fw"></i>Invite New User</a></li>
                     {% endif %}
 
                     <li><a class="dropdown-item" href="{{ url_for('users.logout') }}"><i class="fas fa-power-off me-2 fa-fw"></i>Logout</a></li>
@@ -45,9 +45,6 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('users.login') }}" tabindex="-1">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('users.register') }}" tabindex="-1">Register</a>
             </li>
             {% endif %}
         </ul>

@@ -3,29 +3,37 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.models import User
-from flaskinventory.users.forms import (RegistrationForm, LoginForm,
+from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm)
-from flaskinventory.users.utils import send_reset_email, requires_access_level, make_users_table
+from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table
 from flaskinventory.users.constants import ACCESS_LEVEL
+from secrets import token_hex
 
 users = Blueprint('users', __name__)
 
 
-@users.route('/register', methods=['GET', 'POST'])
+# registration deactivated
+# @users.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if current_user.is_authenticated:
+#         return redirect(url_for('main.home'))
+#     form = RegistrationForm()
+#     if form.validate_on_submit():
+#         # hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#         new_user = {'email': form.email.data,
+#                     'pw': form.password.data}
+#         new_uid = dgraph.create_user(new_user)
+
+#         flash(f'Accounted created for {new_uid}!', 'success')
+#         return redirect(url_for('users.login'))
+#     return render_template('users/register.html', title='Register', form=form)
+
+@users.route('/register')
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        # hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_user = {'email': form.email.data,
-                    'pw': form.password.data}
-        new_uid = dgraph.create_user(new_user)
-
-        flash(f'Accounted created for {new_uid}!', 'success')
-        return redirect(url_for('users.login'))
-    return render_template('users/register.html', title='Register', form=form)
+    return render_template('users/register.html', title='Register')
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -110,6 +118,22 @@ def reset_token(token):
     return render_template('users/reset_token.html', title='Reset Password', form=form)
 
 
+@users.route('/users/invite', methods=['GET', 'POST'])
+@login_required
+def invite():
+    form = InviteUserForm()
+    if form.validate_on_submit():
+        new_user = {'email': form.email.data,
+                    'pw': token_hex(32)}
+        new_uid = dgraph.create_user(new_user, invited_by=current_user.id)
+        NewUser = User(uid=new_uid)
+        send_invite_email(NewUser)
+        flash(
+            f'Accounted created for {new_user["email"]} ({new_uid})!', 'success')
+        return redirect(url_for('users.profile'))
+    return render_template('users/invite.html', title='Invite New User', form=form)
+
+
 @users.route('/users/admin')
 @login_required
 @requires_access_level(ACCESS_LEVEL.Admin)
@@ -132,8 +156,10 @@ def edit_user(uid):
         user_data = {}
         for k, v in form.data.items():
             print(k)
-            if k in ['submit', 'csrf_token']: continue
-            else: user_data[k] = v
+            if k in ['submit', 'csrf_token']:
+                continue
+            else:
+                user_data[k] = v
         try:
             result = dgraph.update_entry(uid, user_data)
             print(result)
@@ -143,5 +169,5 @@ def edit_user(uid):
         return redirect(url_for('users.admin_view'))
     elif request.method == 'GET':
         form.user_displayname.data = editable_user.get("user_displayname")
-        form.user_level.data = editable_user.get("user_level")  
+        form.user_level.data = editable_user.get("user_level")
     return render_template('users/update_user.html', title='Manage Users', user=editable_user, form=form)

@@ -20,6 +20,7 @@ type User {
     date_joined
     user_level
     user_affiliation
+    invited_by
 }
 
 type Source {
@@ -130,7 +131,8 @@ date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .
 user_level: int .
-user_affiliation: string @index(term). 
+user_affiliation: string @index(term) . 
+invited_by: [uid] @reverse .
 
 # Generic Predicates 
 unique_name: string @index(hash, trigram) .

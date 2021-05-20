@@ -11,16 +11,22 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
 
-    password = PasswordField('Password',
-                             validators=[DataRequired(), Length(min=3)])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), Length(min=3), EqualTo('password')])
-
     submit = SubmitField('Request Account')
 
     def validate_email(self, email):
         if dgraph.get_uid('email', f'"{email.data}"'):
             raise ValidationError('That email is taken. Try to login!')
+
+
+class InviteUserForm(FlaskForm):
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+
+    submit = SubmitField('Invite User')
+
+    def validate_email(self, email):
+        if dgraph.get_uid('email', f'"{email.data}"'):
+            raise ValidationError('That email is taken. User has been invited already!')
 
 
 class LoginForm(FlaskForm):
@@ -40,7 +46,7 @@ class UpdateProfileForm(FlaskForm):
     user_affiliation = StringField('Affiliation',
                                    validators=[Length(max=(60))])
     user_orcid = StringField('ORCID',
-                             validators=[Length(min=12)])
+                             validators=[Length(max=20)])
 
     submit = SubmitField('Update')
 

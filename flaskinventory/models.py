@@ -41,6 +41,11 @@ class User(UserMixin):
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
+    
+    def get_invite_token(self, expires_days=7):
+        expires_sec = expires_days * 24 * 60 * 60 
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_token(token):
