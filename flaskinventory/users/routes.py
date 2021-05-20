@@ -174,14 +174,12 @@ def edit_user(uid):
     if form.validate_on_submit():
         user_data = {}
         for k, v in form.data.items():
-            print(k)
             if k in ['submit', 'csrf_token']:
                 continue
             else:
                 user_data[k] = v
         try:
             result = dgraph.update_entry(uid, user_data)
-            print(result)
         except Exception as e:
             return f'Database error {e}'
         flash(f'User {uid} has been updated', 'success')
