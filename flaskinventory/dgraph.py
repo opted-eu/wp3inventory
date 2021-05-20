@@ -1,5 +1,6 @@
 import json
 import datetime
+from dateutil.parser import isoparse
 import os
 
 from flask import current_app, _app_ctx_stack, Markup
@@ -48,7 +49,7 @@ class DGraph(object):
     def parse_datetime(s):
         try:
             # return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ")
-            return datetime.datetime.fromisoformat(s.split('Z')[0])
+            return isoparse(s)
         except:
             return s
 

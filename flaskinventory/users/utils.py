@@ -55,6 +55,7 @@ from flask_table.html import element
 def make_users_table(table_data):
     cols = sorted(list(table_data[0].keys()))
     TableCls = create_table('Table')
+    TableCls.allow_empty = True
     TableCls.classes = ['table']
 
     TableCls.add_column('date_joined', DateCol('Joined Date'))
