@@ -19,6 +19,9 @@ Level | Name | Permissions
 
 - [ ] Soll ein entity mit mehreren Ländern in Verbindung gebracht werden, oder nur mit einem?
 
+- [ ] Add new types "Corpus", "Annotated Data"?
+- [ ] Develop edit history tracking (create duplicates? facets? )
+
 ## Features
 
 - [ ] ~~add researchpaper title to quick search: cannot because searching multiple field names isn't working (jquery problem)~~
