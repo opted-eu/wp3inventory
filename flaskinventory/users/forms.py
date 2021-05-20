@@ -70,6 +70,13 @@ class ResetPasswordForm(FlaskForm):
 
     submit = SubmitField('Reset Password')
 
+class AcceptInvitationForm(FlaskForm):
+    password = PasswordField('Password',
+                             validators=[DataRequired(), Length(min=3)])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), Length(min=3), EqualTo('password')])
+
+    submit = SubmitField('Set Password')
 
 class EditUserForm(FlaskForm):
     user_displayname = StringField('Display Name',

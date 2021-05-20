@@ -5,7 +5,7 @@ from flaskinventory import dgraph
 from flaskinventory.models import User
 from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
-                                        EditUserForm)
+                                        EditUserForm, AcceptInvitationForm)
 from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table
 from flaskinventory.users.constants import ACCESS_LEVEL
 from secrets import token_hex
@@ -116,6 +116,25 @@ def reset_token(token):
         flash(f'Password updated for {user.id}!', 'success')
         return redirect(url_for('users.login'))
     return render_template('users/reset_token.html', title='Reset Password', form=form)
+
+@users.route("/accept_invitation/<token>", methods=['GET', 'POST'])
+def accept_invitation(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('reset_request'))
+
+    form = AcceptInvitationForm()
+    if form.validate_on_submit():
+        new_password = {'pw': form.password.data}
+        new_uid = dgraph.update_entry(user.id, new_password)
+
+        flash(f'Password updated for {user.email} ({user.id})!', 'success')
+        return redirect(url_for('users.login'))
+    return render_template('users/accept_invitation.html', title='Accept Invitation', form=form)
 
 
 @users.route('/users/invite', methods=['GET', 'POST'])
