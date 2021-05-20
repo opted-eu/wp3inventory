@@ -48,9 +48,10 @@ Automated Data Retrieval
 
 ## User Features
 
-- [ ] add invite new user feature
-- [ ] remove registration feature
-- [ ] add admin view to change user levels
+- [x] add invite new user feature
+- [x] remove registration feature
+- [x] add admin view to change user levels
+- [ ] Enhance security: expire password reset tokens after usage
 
 ## Performance
 
