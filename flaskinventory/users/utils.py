@@ -2,25 +2,10 @@ import secrets
 import os
 from functools import wraps
 from PIL import Image
-from flask import current_app, url_for, flash, abort
+from flask import current_app, url_for, flash, abort, render_template
 from flaskinventory import mail
 from flask_mail import Message
 from flask_login import current_user
-
-
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(
-        current_app.root_path, 'static', 'profile_pics', picture_fn)
-
-    output_size = (300, 300)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
 
 
 def send_reset_email(user):
@@ -37,6 +22,17 @@ def send_reset_email(user):
     mail.send(msg)
 
 
+def send_invite_email(user):
+    token = user.get_invite_token()
+    msg = Message('OPTED: Invitation to join WP3 Inventory',
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[user.email])
+
+    msg.html = render_template('emails/invitation.html', token=token)
+
+    mail.send(msg)
+
+# custom decorator @requires_access_level()
+# access level is integer
 def requires_access_level(access_level):
     def decorator(func):
         @wraps(func)
@@ -54,6 +50,8 @@ from flaskinventory.inventory.utils import InternalURLCol
 from flask_table import create_table, Col, DateCol, LinkCol
 from flask_table.html import element
 
+# generate table for user admin view
+# lists all users and links to edit permissions
 def make_users_table(table_data):
     cols = sorted(list(table_data[0].keys()))
     TableCls = create_table('Table')
@@ -64,3 +62,19 @@ def make_users_table(table_data):
     TableCls.add_column('uid', LinkCol('UID', 'users.edit_user', url_kwargs=dict(uid='uid'), attr_list='uid'))
     TableCls.add_column('user_level', Col('User Level'))
     return TableCls(table_data)
+
+
+# unused utility function for saving picture files to static folder
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(
+        current_app.root_path, 'static', 'profile_pics', picture_fn)
+
+    output_size = (300, 300)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
