@@ -5,9 +5,9 @@ from flaskinventory import dgraph
 from flaskinventory.records.external import get_geocoords
 records = Blueprint('records', __name__)
 
-@records.route("/jquerytests")
+@records.route("/geocodetest")
 def jquerytests():
-    return render_template('jquery_test.html')
+    return render_template('ajax_geocode_test.html')
 
 @records.route("/external/geocode", methods=['POST'])
 def geocode():
