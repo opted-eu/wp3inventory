@@ -7,7 +7,7 @@ from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginF
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
 from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table
-from flaskinventory.users.constants import ACCESS_LEVEL
+from flaskinventory.users.constants import USER_ROLES
 from secrets import token_hex
 
 users = Blueprint('users', __name__)
@@ -155,7 +155,7 @@ def invite():
 
 @users.route('/users/admin')
 @login_required
-@requires_access_level(ACCESS_LEVEL.Admin)
+@requires_access_level(USER_ROLES.Admin)
 def admin_view():
     user_list = dgraph.list_users()
     if user_list:
@@ -165,7 +165,7 @@ def admin_view():
 
 @users.route('/users/<string:uid>/edit', methods=['GET', 'POST'])
 @login_required
-@requires_access_level(ACCESS_LEVEL.Admin)
+@requires_access_level(USER_ROLES.Admin)
 def edit_user(uid):
     editable_user = dgraph.get_user(uid=uid)
     if editable_user is None:
@@ -186,5 +186,5 @@ def edit_user(uid):
         return redirect(url_for('users.admin_view'))
     elif request.method == 'GET':
         form.user_displayname.data = editable_user.get("user_displayname")
-        form.user_level.data = editable_user.get("user_level")
+        form.user_role.data = editable_user.get("user_role")
     return render_template('users/update_user.html', title='Manage Users', user=editable_user, form=form)

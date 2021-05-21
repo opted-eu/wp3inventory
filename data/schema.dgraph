@@ -18,7 +18,7 @@ type User {
     user_displayname
 	user_orcid	
     date_joined
-    user_level
+    user_role
     user_affiliation
     invited_by
 }
@@ -130,7 +130,7 @@ pw: password .
 date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .
-user_level: int .
+user_role: int .
 user_affiliation: string @index(term) . 
 invited_by: [uid] @reverse .
 

@@ -37,7 +37,7 @@ def requires_access_level(access_level):
     def decorator(func):
         @wraps(func)
         def decorated_view(*args, **kwargs):
-            if current_user.user_level < access_level:
+            if current_user.user_role < access_level:
                 flash(f'You are not allowed to view this page!', 'warning')
                 # return redirect(url_for('main.home'))
                 return abort(403)
@@ -61,7 +61,7 @@ def make_users_table(table_data):
     TableCls.add_column('date_joined', DateCol('Joined Date'))
     TableCls.add_column('email', Col('Email'))
     TableCls.add_column('uid', LinkCol('UID', 'users.edit_user', url_kwargs=dict(uid='uid'), attr_list='uid'))
-    TableCls.add_column('user_level', Col('User Level'))
+    TableCls.add_column('user_role', Col('User Level'))
     return TableCls(table_data)
 
 

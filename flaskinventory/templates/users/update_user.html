@@ -5,12 +5,12 @@
         <fieldset class="form-group mb-3">
             <legend class="border-bottom mb-4">Update User {{ user.email }} {{ user.uid }}</legend>
             <div class="mb-3">
-                {{ form.user_level.label(class='form-label') }} {% if form.user_level.errors %} {{ form.user_level(class="form-select form-select-lg is-invalid") }}
+                {{ form.user_role.label(class='form-label') }} {% if form.user_role.errors %} {{ form.user_role(class="form-select form-select-lg is-invalid") }}
                 <div class="invalid-feedback">
-                    {% for error in form.user_level.errors %}
+                    {% for error in form.user_role.errors %}
                     <span>{{ error }}</span> {% endfor %}
                 </div>
-                {% else %} {{ form.user_level(class="form-select form-select-lg") }} {% endif %}
+                {% else %} {{ form.user_role(class="form-select form-select-lg") }} {% endif %}
             </div>
             <div class="form-floating mb-3">
                 {% if form.user_displayname.errors %} {{ form.user_displayname(class="form-control form-control-lg is-invalid") }}

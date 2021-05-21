@@ -4,7 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 from flaskinventory import dgraph
-from flaskinventory.users.constants import ACCESS_LEVEL
+from flaskinventory.users.constants import USER_ROLES
 
 
 class RegistrationForm(FlaskForm):
@@ -82,7 +82,7 @@ class EditUserForm(FlaskForm):
     user_displayname = StringField('Display Name',
                                    validators=[Length(min=2, max=40)])
 
-    user_level = SelectField(
-        'User Level', choices=ACCESS_LEVEL.list_of_tuples_b)
+    user_role = SelectField(
+        'User Role', choices=USER_ROLES.list_of_tuples_b)
 
     submit = SubmitField('Update')

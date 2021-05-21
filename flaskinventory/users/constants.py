@@ -1,6 +1,6 @@
 import inspect
 
-class AccessLevel(object):
+class UserRoles(object):
     Anon = 0
     User = 1
     Reviewer = 2
@@ -16,4 +16,4 @@ class AccessLevel(object):
         return '<Access Level>'
 
 
-ACCESS_LEVEL = AccessLevel()
+USER_ROLES = UserRoles()
