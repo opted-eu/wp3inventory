@@ -40,6 +40,7 @@ class User(UserMixin):
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        dgraph.update_entry(self.id, {'pw_reset': True})
         return s.dumps({'user_id': self.id}).decode('utf-8')
     
     def get_invite_token(self, expires_days=7):
@@ -54,4 +55,8 @@ class User(UserMixin):
             user_id = s.loads(token)['user_id']
         except:
             return None
-        return User(uid=user_id)
+        user = User(uid=user_id)
+        if user.pw_reset:
+            return user
+        else:
+            return None

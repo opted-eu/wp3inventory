@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort)
 from flask_login import login_user, current_user, logout_user, login_required
@@ -105,17 +106,17 @@ def reset_token(token):
     user = User.verify_reset_token(token)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('reset_request'))
+        return redirect(url_for('users.reset_request'))
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        # hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_password = {'pw': form.password.data}
+        new_password = {'pw': form.password.data, 'pw_reset': False}
         new_uid = dgraph.update_entry(user.id, new_password)
 
         flash(f'Password updated for {user.id}!', 'success')
         return redirect(url_for('users.login'))
     return render_template('users/reset_token.html', title='Reset Password', form=form)
+
 
 @users.route("/accept_invitation/<token>", methods=['GET', 'POST'])
 def accept_invitation(token):
@@ -129,7 +130,10 @@ def accept_invitation(token):
 
     form = AcceptInvitationForm()
     if form.validate_on_submit():
-        new_password = {'pw': form.password.data}
+        new_password = {'pw': form.password.data,
+                        'pw_reset': False,
+                        'date_joined': datetime.now(
+                            datetime.timezone.utc).isoformat()}
         new_uid = dgraph.update_entry(user.id, new_password)
 
         flash(f'Password updated for {user.email} ({user.id})!', 'success')

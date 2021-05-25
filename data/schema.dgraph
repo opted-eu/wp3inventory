@@ -15,6 +15,7 @@ type <dgraph.graphql.persisted_query> {
 type User {
     email
     pw
+    pw_reset
     user_displayname
 	user_orcid	
     date_joined
@@ -127,6 +128,7 @@ username: string @index(hash) .
 display_name: string . 
 email: string @index(hash) @upsert .
 pw: password .
+pw_reset bool .
 date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .
