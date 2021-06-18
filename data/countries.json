@@ -144,13 +144,6 @@
             "wikidataID": 233
         },
         {
-            "uid": "_:malta",
-            "unique_name": "malta",
-            "dgraph.type": "Country",
-            "name": "Malta",
-            "wikidataID": 233
-        },
-        {
             "uid": "_:netherlands",
             "unique_name": "netherlands",
             "dgraph.type": "Country",
