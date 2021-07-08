@@ -35,19 +35,17 @@
         _:derstandardat <founded> "1995-02-02" .
         _:derstandardat <channel> _:website .
         _:derstandardat <channel_url> "https://www.derstandard.at/" .
-        _:derstandardat <channel_comments> "true" .
+        _:derstandardat <channel_comments> "Registration required" .
         _:derstandardat <channel_feeds> "XML" (url="https://www.derstandard.at/sitemaps/news.xml") .
         _:derstandardat <channel_feeds> "Sitemap" (url="https://www.derstandard.at/sitemaps/sitemap.xml") .
         _:derstandardat <channel_feeds> "RSS" (url="https://www.derstandard.at/rss") .
         _:derstandardat <payment_model> "soft paywall" .
-        _:derstandardat <country> _:austria .
-        _:derstandardat <contains_ads> "true" .
-        _:derstandardat <publication_kind> "daily newspaper" .
-        _:derstandardat <topical_focus> "general news" .
+        _:derstandardat <contains_ads> "Non subscribers" .
+        _:derstandardat <publication_kind> "Newspaper" .
+        _:derstandardat <special_interest> "false" .
         _:derstandardat <publication_cycle> "continuous" .
-        _:derstandardat <audience_scope> "national" .
-        _:derstandardat <audience_location_name> "Austria" .
-        _:derstandardat <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+        _:derstandardat <geographic_scope> "national" .
+        _:derstandardat <geographic_scope_countries> _:austria .
         _:derstandardat <languages> "de" .
         _:derstandardat <audience_size> "2021-05-06" (daily_visitors=884687, datafrom="https://siterankdata.com/derstandard.at") .
         _:derstandardat <audience_residency> "2021-05-06" (austria=68.8, germany=11.9, usa=9.4, datafrom="https://www.alexa.com/siteinfo/derstandard.at") .
@@ -61,14 +59,12 @@
         _:derstandardprint <founded> "1988-10-19" .
         _:derstandardprint <channel> _:print .
         _:derstandardprint <payment_model> "subscription" .
-        _:derstandardprint <country> _:austria .
-        _:derstandardprint <contains_ads> "true" .
-        _:derstandardprint <publication_kind> "daily newspaper" .
-        _:derstandardprint <topical_focus> "general news" .
+        _:derstandardprint <contains_ads> "yes" .
+        _:derstandardprint <publication_kind> "Newspaper" .
+        _:derstandardprint <special_interest> "false" .
         _:derstandardprint <publication_cycle> "daily" .
-        _:derstandardprint <audience_scope> "national" .
-        _:derstandardprint <audience_location_name> "Austria" .
-        _:derstandardprint <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+        _:derstandardprint <geographic_scope> "national" .
+        _:derstandardprint <geographic_scope_countries> _:austria .
         _:derstandardprint <languages> "de" .
         _:derstandardprint <audience_size> "2018" (papers_sold=57221, subscribers=52046, datafrom="https://www.oeak.at/wp-content/uploads/2019/01/KORR_Auflagenliste_H1_2018.pdf") .
         _:derstandardprint <audience_residency> "2018" (austria=100) .
@@ -81,13 +77,11 @@
         _:derstandardinstagram <founded> "2012-06-22" .
         _:derstandardinstagram <channel> _:instagram .
         _:derstandardinstagram <channel_url> "derstandardat" .
-        _:derstandardinstagram <country> _:austria .
-        _:derstandardinstagram <publication_kind> "daily newspaper" .
-        _:derstandardinstagram <topical_focus> "general news" .
+        _:derstandardinstagram <publication_kind> "Newspaper" .
+        _:derstandardinstagram <special_interest> "false" .
         _:derstandardinstagram <publication_cycle> "continuous" .
-        _:derstandardinstagram <audience_scope> "national" .
-        _:derstandardinstagram <audience_location_name> "Austria" .
-        _:derstandardinstagram <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+        _:derstandardinstagram <geographic_scope> "national" .
+        _:derstandardinstagram <geographic_scope_countries> _:austria .
         _:derstandardinstagram <languages> "de" .
         _:derstandardinstagram <audience_size> "2021-05-06" (followers=292000) .
 
@@ -99,16 +93,13 @@
         _:derstandardtwitter <founded> "2009-03" .
         _:derstandardtwitter <channel> _:twitter .
         _:derstandardtwitter <channel_url> "derStandardat" .
-        _:derstandardtwitter <country> _:austria .
-        _:derstandardtwitter <publication_kind> "daily newspaper" .
-        _:derstandardtwitter <topical_focus> "general news" .
+        _:derstandardtwitter <publication_kind> "Newspaper" .
+        _:derstandardtwitter <special_interest> "false" .
         _:derstandardtwitter <publication_cycle> "continuous" .
-        _:derstandardtwitter <audience_scope> "national" .
-        _:derstandardtwitter <audience_location_name> "Austria" .
-        _:derstandardtwitter <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+        _:derstandardtwitter <geographic_scope> "national" .
+        _:derstandardtwitter <geographic_scope_countries> _:austria .
         _:derstandardtwitter <languages> "de" .
         _:derstandardtwitter <audience_size> "2021-05-06" (followers=333700) .
-        
 
         _:derstandardfacebook <dgraph.type> "Source" .
         _:derstandardfacebook <unique_name> "derstandard_facebook" .
@@ -118,13 +109,11 @@
         _:derstandardfacebook <founded> "2010-09-04" .
         _:derstandardfacebook <channel> _:facebook .
         _:derstandardfacebook <channel_url> "derStandardat" .
-        _:derstandardfacebook <country> _:austria .
-        _:derstandardfacebook <publication_kind> "daily newspaper" .
-        _:derstandardfacebook <topical_focus> "general news" .
+        _:derstandardfacebook <publication_kind> "Newspaper" .
+        _:derstandardfacebook <special_interest> "false" .
         _:derstandardfacebook <publication_cycle> "continuous" .
-        _:derstandardfacebook <audience_scope> "national" .
-        _:derstandardfacebook <audience_location_name> "Austria" .
-        _:derstandardfacebook <audience_location_geo> "{'type':'Point','coordinates':[14.000,48.000]}"^^<geo:geojson> .
+        _:derstandardfacebook <geographic_scope> "national" .
+        _:derstandardfacebook <geographic_scope_countries> _:austria .
         _:derstandardfacebook <languages> "de" .
         _:derstandardfacebook <audience_size> "2021-05-06" (followers=347671) .
 
@@ -157,6 +146,8 @@
         _:mbhderstandard <unique_name> "derstandard_mbh" .
         _:mbhderstandard <name> "STANDARD Verlagsgesellschaft m.b.H." .
         _:mbhderstandard <founded> "1995-04-28" .
+        _:mbhderstandard <is_person> "false" .
+        _:mbhderstandard <ownership_kind> "Private ownership" .
         _:mbhderstandard <country> _:austria .
         _:mbhderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
         _:mbhderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
@@ -170,6 +161,8 @@
         _:agderstandard <unique_name> "derstandard_medien_ag" .
         _:agderstandard <name> "STANDARD Medien AG" .
         _:agderstandard <founded> "2000-08-05" .
+        _:agderstandard <is_person> "false" .
+        _:agderstandard <ownership_kind> "Private ownership" .
         _:agderstandard <country> _:austria .
         _:agderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
         _:agderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .

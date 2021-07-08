@@ -30,6 +30,7 @@ type Source {
     entry_added
     entry_edit_history
     entry_review_status
+    entry_notes
     other_names
     wikidataID
     related
@@ -39,18 +40,22 @@ type Source {
     channel_comments
     channel_feeds
     channel_epaper
+    transcript_kind
     country
     payment_model
     contains_ads
     publication_kind
+    special_interest
     topical_focus
     publication_cycle
-    audience_scope
-    audience_location_geo
-    audience_location_name
-    languages
+    publication_cycle_weekday
+    geographic_scope
+    geographic_scope_countries
+    geographic_scope_subunit
+    geographic_scope_subunit_geo
     audience_size
     audience_residency
+    languages
 }
 
 type Channel {
@@ -60,6 +65,7 @@ type Channel {
     entry_added
     entry_edit_history
     entry_review_status
+    entry_notes
 }
 
 type Organization {
@@ -68,9 +74,12 @@ type Organization {
     entry_added
     entry_edit_history
     entry_review_status
+    entry_notes
     other_names
     wikidataID
     founded
+    is_person
+    ownership_kind
     country
     address_string
     address_geo
@@ -85,6 +94,7 @@ type Country {
     entry_added
     entry_edit_history
     entry_review_status
+    entry_notes
     other_names
     wikidataID
 }
@@ -96,12 +106,31 @@ type Archive {
     entry_added
     entry_edit_history
     entry_review_status
+    entry_notes
     other_names
     wikidataID
     access
     sources_included
     url
 }
+
+
+type Dataset {
+    unique_name
+    name
+    description
+    entry_added
+    entry_edit_history
+    entry_review_status
+    entry_notes
+    other_names
+    access
+    sources_included
+    url
+    annotations
+    fulltext
+}
+
 
 type ResearchPaper {
     doi
@@ -119,6 +148,7 @@ type ResearchPaper {
     entry_review_status
     entry_added
     entry_edit_history
+    entry_notes
 }
 
 # Define Directives and index
@@ -128,7 +158,7 @@ username: string @index(hash) .
 display_name: string . 
 email: string @index(hash) @upsert .
 pw: password .
-pw_reset bool .
+pw_reset: bool .
 date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .
@@ -142,6 +172,7 @@ name: string @index(term, trigram) .
 entry_added: uid @reverse .
 entry_edit_history: [uid] @reverse .
 entry_review_status: string .
+entry_notes: string .
 other_names: [string] @index(term, trigram) .
 wikidataID: int .
 founded: dateTime @index(year) .
@@ -151,23 +182,29 @@ description: string .
 # Source Predicates
 related: [uid] @reverse .
 channel: uid @reverse .
-channel_comments: bool .
+channel_comments: string .
 channel_url: string .
 channel_feeds: [string] .
 channel_epaper: string .
+transcript_kind: string .
 payment_model: string .
-contains_ads: bool .
+contains_ads: string .
 publication_kind: string .
+special_interest: bool .
 topical_focus: [string] .
 publication_cycle: string .
-audience_scope: string .
-audience_location_name: string .
-audience_location_geo: geo @index(geo) .
+publication_cycle_weekday: [string] .
+geographic_scope: string .
+geographic_scope_countries: [uid] @reverse .
+geographic_scope_subunit: string .
+geographic_scope_subunit_geo: geo @index(geo) .
 languages: [string] @index(hash) .
 audience_size: [dateTime] .
 audience_residency: [dateTime] .
 
 # Organization Predicates
+is_person: bool .
+ownership_kind: string .
 address_string: string .
 address_geo: geo @index(geo) .
 employees: string .
@@ -180,6 +217,10 @@ url: string .
 
 # Archive Predicates
 access: string .
+
+# Dataset Predicates
+annotations: [string] .
+fulltext: bool .
 
 # ResearchPaper Predicates
 doi: string .
