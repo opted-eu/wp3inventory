@@ -17,9 +17,9 @@ Level | Name | Permissions
 
 ## Data Structure 
 
-- [ ] Soll ein entity mit mehreren Ländern in Verbindung gebracht werden, oder nur mit einem?
+- [x] Soll ein entity mit mehreren Ländern in Verbindung gebracht werden, oder nur mit einem?
 
-- [ ] Add new types "Corpus", "Annotated Data"?
+- [x] Add new types "Corpus", "Annotated Data"?
 - [ ] Develop edit history tracking (create duplicates? facets? )
 
 ## Features
