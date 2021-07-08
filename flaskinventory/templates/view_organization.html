@@ -74,8 +74,10 @@
         <dl class="row">
             <dt class="col-sm-3 mb-2"><h5>Economic</h5></dt>
             <dd class="col-sm-9">
-                {% if entry.business_kind %}
-                <p class="card-text">Kind of Business: {{ entry.business_kind }}</p>{% endif %} {% if entry.employees %}
+                {% if entry.ownership_kind %}
+                <dt class="col-sm-3">Type of Organization</dt>
+            <dd class="col-sm-9">{{ entry.ownership_kind }}
+            </dd>{% endif %}{% if entry.employees %}
                 <p class="card-text">Employees: {{ entry.employees }}</p>{% endif %}
             </dd>
     </div>

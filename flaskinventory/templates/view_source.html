@@ -17,20 +17,123 @@
             {% if entry.other_names %}
             <dt class="col-sm-3">Also known as</dt>
             <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}
-            </dd>{% endif %} {% if entry.wikidataID %}
+            </dd>{% endif %} 
+            <dt class="col-sm-3">Channel</dt>
+            <dd class="col-sm-9 mb-4"><a href="{{ url_for('inventory.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> {% if entry.channel_url %} {% if entry.channel.unique_name == 'twitter' %}
+                <a class="mx-4" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
+                {% elif entry.channel.unique_name == 'instagram' %}
+                <a class="mx-4" target="_blank" href="https://instagram.com/{{ entry.channel_url }}">
+                    {% elif entry.channel.unique_name == 'website' %}
+                <a class="mx-4" target="_blank" href="{{ entry.channel_url }}">
+                    {% elif entry.channel.unique_name == 'facebook' %}
+                <a class="mx-4" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
+                {% endif %}<i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open External</a> {% endif %}</dd>
+            
+            {% if entry.wikidataID %}
             <dt class="col-sm-3">Wikidata</dt>
             <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
             </dd>{% endif %} {% if entry.founded %}
             <dt class="col-sm-3">Founded</dt>
             <dd class="col-sm-9">{{ entry.founded.strftime('%Y-%m-%d') }}
-            </dd>{% endif %}
-            <dt class="col-sm-3">Country</dt>
-            <dd class="col-sm-9">{% for country in entry.country %}
-                <a href="{{ url_for('inventory.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
-            </dd>
+            </dd>{% endif %} {% if entry.transcript_kind %}
+            <dt class="col-sm-3">Transcript</dt>
+            <dd class="col-sm-9">{{ entry.transcript_kind }}</dd> {% endif %}
         </dl>
     </div>
 
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Routines</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+            {% if entry.publication_kind %}
+            <dt class="col-sm-3">Publication Kind</dt>
+            <dd class="col-sm-9"><span class="">{{ entry.publication_kind }}</span></dd>{% endif %}
+            <dt class="col-sm-3">Special Interest Publication</dt>
+            <dd class="col-sm-9">{{ entry.special_interest }}</dd>
+            {% if entry.topical_focus %}
+            <dt class="col-sm-3">Topical Focus</dt>
+            <dd class="col-sm-9">{{ ", ".join(entry.topical_focus) }}</dd>{% endif %} {% if entry.publication_cycle %}
+            <dt class="col-sm-3">Publication Cycle</dt>
+            <dd class="col-sm-9">{{ entry.publication_cycle }}</dd>{% endif %}
+            {% if entry.publication_cycle_weekday %}
+            <dt class="col-sm-3">Publication weekdays</dt>
+            <dd class="col-sm-9">
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item 
+                    {% if 1 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Mon</li>
+                    <li class="list-group-item 
+                    {% if 2 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Tue</li>
+                    <li class="list-group-item 
+                    {% if 3 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Wed</li>
+                    <li class="list-group-item 
+                    {% if 4 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Thu</li>
+                    <li class="list-group-item 
+                    {% if 5 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Fri</li>
+                    <li class="list-group-item 
+                    {% if 6 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Sat</li>
+                    <li class="list-group-item 
+                    {% if 7 in entry.publication_cycle_weekday %}
+                    list-group-item-primary
+                    {% else %}
+                    list-group-item-secondary
+                    {% endif %}
+                    ">Sun</li>
+                  </ul>
+            </dd>{% endif %}
+        </dl>
+    </div>
+
+    <div class="border rounded p-3">
+        <dl class="row">
+            <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
+            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+            <dt class="col-sm-3">Geographic Scope</dt>
+            <dd class="col-sm-9">{{ entry.geographic_scope }}
+            <dt class="col-sm-3">Countries</dt>
+            <dd class="col-sm-9">{% for country in entry.geographic_scope_countries %}
+                <a href="{{ url_for('inventory.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
+            </dd>
+            {% if entry.geographic_scope_subunit %}
+            <dd class="col-sm-3">Subunit</dd>
+            <dd class="col-sm-9"><span class="">{{ entry.geographic_scope_subunit }}</span></dd>{% endif %} {% if entry.languages %}
+            <dt class="col-sm-3">Languages</dt>
+            <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %} {% if entry.audience_size %}
+            <dt class="col-sm-3">Audience Size</dt>
+            <dd class="col-sm-9"> {{ entry.audience_size_table }}</dd> {% endif %} {% if entry.audience_residency %}
+            <dt class="col-sm-3">Audience Residency</dt>
+            <dd class="col-sm-9"> {{ entry.audience_residency_table }}</dd> {% endif %}
+        </dl>
+    </div>
 
     <div class="border rounded p-3">
         <dl class="row">
@@ -47,16 +150,8 @@
     </div>
     <div class="border rounded p-3">
         <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>Channel</h5></dt>
-            <dd class="col-sm-9 mb-4"><a href="{{ url_for('inventory.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> {% if entry.channel_url %} {% if entry.channel.unique_name == 'twitter' %}
-                <a class="mx-4" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
-                {% elif entry.channel.unique_name == 'instagram' %}
-                <a class="mx-4" target="_blank" href="https://instagram.com/{{ entry.channel_url }}">
-                    {% elif entry.channel.unique_name == 'website' %}
-                <a class="mx-4" target="_blank" href="{{ entry.channel_url }}">
-                    {% elif entry.channel.unique_name == 'facebook' %}
-                <a class="mx-4" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
-                {% endif %}<i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open External</a> {% endif %}</dd>
+            <dt class="col-sm-3 mb-4"><h5>Channel Features</h5></dt>
+            
 
             {% if entry.channel_comments %}
             <dt class="col-sm-3">Allows user comments</dt>
@@ -80,37 +175,8 @@
         </dl>
     </div>
 
-    <div class="border rounded p-3">
-        <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>Routines</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
-            {% if entry.publication_kind %}
-            <dt class="col-sm-3">Publication Kind</dt>
-            <dd class="col-sm-9"><span class="">{{ entry.publication_kind }}</span></dd>{% endif %} {% if entry.topical_focus %}
-            <dt class="col-sm-3">Topical Focus</dt>
-            <dd class="col-sm-9">{{ ", ".join(entry.topical_focus) }}</dd>{% endif %} {% if entry.publication_kind %}
-            <dt class="col-sm-3">Publication Cycle</dt>
-            <dd class="col-sm-9">{{ entry.publication_cycle }}</dd>{% endif %}
-        </dl>
-    </div>
-    <div class="border rounded p-3">
-        <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+   
 
-            {% if entry.audience_scope %}
-            <dd class="col-sm-3">Intrinsic Geographic Scope</dd>
-            <dd class="col-sm-9"><span class="">{{ entry.audience_scope }}</span></dd>{% endif %} {% if entry.audience_location_name %}
-            <dd class="col-sm-3">Scope Specification</dd>
-            <dd class="col-sm-9">{{ entry.audience_location_name }}</dd>{% endif %} {% if entry.languages %}
-            <dd class="col-sm-3">languages</dd>
-            <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %} {% if entry.audience_size %}
-            <dd class="col-sm-3">Audience Size</dd>
-            <dd class="col-sm-9"> {{ entry.audience_size_table }}</dd> {% endif %} {% if entry.audience_residency %}
-            <dd class="col-sm-3">Audience Residency</dd>
-            <dd class="col-sm-9"> {{ entry.audience_residency_table }}</dd> {% endif %}
-        </dl>
-    </div>
     <div class="border rounded p-3">
         <dl class="row">
             <dt class="col-sm-3 mb-4"><h5>Data Access</h5></dt>

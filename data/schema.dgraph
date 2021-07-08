@@ -41,7 +41,6 @@ type Source {
     channel_feeds
     channel_epaper
     transcript_kind
-    country
     payment_model
     contains_ads
     publication_kind
@@ -193,7 +192,7 @@ publication_kind: string .
 special_interest: bool .
 topical_focus: [string] .
 publication_cycle: string .
-publication_cycle_weekday: [string] .
+publication_cycle_weekday: [int] .
 geographic_scope: string .
 geographic_scope_countries: [uid] @reverse .
 geographic_scope_subunit: string .

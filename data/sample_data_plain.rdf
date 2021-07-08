@@ -166,6 +166,46 @@ _:agderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
 _:agderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
 _:agderstandard <owns> _:mbhderstandard .  
 
+_:falterprint <dgraph.type> "Source" .
+_:falterprint <unique_name> "falter_print" .
+_:falterprint <name> "Falter" .
+_:falterprint <wikidataID> "1394979" .
+_:falterprint <founded> "1977-05-25" .
+_:falterprint <channel> _:print .
+_:falterprint <payment_model> "subscription" .
+_:falterprint <contains_ads> "yes" .
+_:falterprint <publication_kind> "Newspaper" .
+_:falterprint <special_interest> "false" .
+_:falterprint <publication_cycle> "weekly" .
+_:falterprint <publication_cycle_weekday> "3" .
+_:falterprint <geographic_scope> "national" .
+_:falterprint <geographic_scope_countries> _:austria .
+_:falterprint <languages> "de" .
+_:falterprint <audience_size> "2020" (papers_sold=51000, datafrom="https://www.falter.at/media/b2b/Mediadaten2021_FALTER.pdf") .
+_:falterprint <audience_residency> "2020" (austria=100) .
+
+_:falterverlag <dgraph.type> "Organization" .
+_:falterverlag <unique_name> "falter_mbh" .
+_:falterverlag <name> "Falter - Zeitschriften Gesellschaft m.b.H." .
+_:falterverlag <founded> "1987-09-28" .
+_:falterverlag <is_person> "false" .
+_:falterverlag <ownership_kind> "Private ownership" .
+_:falterverlag <country> _:austria .
+_:falterverlag <address_string> "Marc-Aurel-Str. 9, 1010 Wien" .
+_:falterverlag <address_geo> "{'type':'Point','coordinates':[16.37364, 48.21255]}"^^<geo:geojson> .
+_:falterverlag <publishes> _:falterprint .  
+
+_:stverlag <dgraph.type> "Organization" .
+_:stverlag <unique_name> "st_verlagmbh" .
+_:stverlag <name> "ST Verlagsbeteiligungs­gesellschaft m.b.H." .
+_:stverlag <founded> "1999-11-30" .
+_:stverlag <is_person> "false" .
+_:stverlag <ownership_kind> "Private ownership" .
+_:stverlag <country> _:austria .
+_:stverlag <address_string> "Marc-Aurel-Str. 9, 1010 Wien" .
+_:stverlag <address_geo> "{'type':'Point','coordinates':[16.37364, 48.21255]}"^^<geo:geojson> .
+_:stverlag <owns> _:falterverlag .  
+
 _:apa <dgraph.type> "Archive" .
 _:apa <unique_name> "apa_archive" .
 _:apa <name> "APA OnlineManager Library" .
@@ -176,6 +216,7 @@ _:apa <access> "restricted" .
 _:apa <url> "https://aomlibrary.apa.at/" .
 _:apa <sources_included> _:derstandardat (from=2009) .
 _:apa <sources_included> _:derstandardprint (from=1995) .
+_:apa <sources_included> _:falterprint (from=1998) .
 
 _:paper1 <dgraph.type> "ResearchPaper" .
 _:paper1 <doi> "10.1080/1461670X.2020.1745667" .
