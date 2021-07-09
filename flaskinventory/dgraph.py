@@ -440,6 +440,20 @@ class DGraph(object):
         data = data['q']
         return data
 
+    def generate_fieldoptions(self):
+        query_head = f'{{ channel(func: type("Channel")) '
+        query_fields = ''' uid: uid unique_name: unique_name name: name founded: founded
+                                    channel { channel: name }
+                                    '''
+        query_relation = ''
+        query_string = query_head + \
+            ' { ' + query_fields + ' ' + query_relation + ' } }'
+        
+        res = self.client.txn(read_only=True).query(query_string)
+        data = json.loads(res.json, object_hook=self.datetime_hook)
+
+        return data
+
     """ 
         Misc Methods (unused)
     """
