@@ -24,6 +24,10 @@ _:facebook <dgraph.type> "Channel" .
 _:facebook <unique_name> "facebook" .
 _:facebook <name> "Facebook" .
 
+_:transcript <dgraph.type> "Channel" .
+_:transcript <unique_name> "transcript" .
+_:transcript <name> "Transcript (TV/Radio/Podcast)" .
+
 _:derstandardat <dgraph.type> "Source" .
 _:derstandardat <unique_name> "www.derstandard.at" .
 _:derstandardat <name> "www.derstandard.at" .
