@@ -21,3 +21,16 @@ def geocode():
     
     else: 
         return abort(405)
+
+
+@records.route("/new/fieldoptions")
+def fieldoptions():
+    return jsonify(dgraph.generate_fieldoptions())
+
+@records.route("/new/source")
+def new_source():
+    return render_template("records/newsource.html")
+
+@records.route('/new/echo', methods=['POST'])
+def echo_json():
+    return jsonify(request.json)
