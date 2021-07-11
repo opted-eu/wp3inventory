@@ -65,6 +65,10 @@ type Channel {
     entry_edit_history
     entry_review_status
     entry_notes
+    form_name_question
+    form_name_placeholder
+    form_name_addon
+    form_name_helptext
 }
 
 type Organization {
@@ -177,6 +181,12 @@ wikidataID: int .
 founded: dateTime @index(year) .
 country: [uid] @reverse .
 description: string .
+
+# Channel Predicates
+form_name_question: string .
+form_name_placeholder: string .
+form_name_addon: string .
+form_name_helptext: string .
 
 # Source Predicates
 related: [uid] @reverse .
