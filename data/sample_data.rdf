@@ -30,6 +30,28 @@
         _:transcript <unique_name> "transcript" .
         _:transcript <name> "Transcript (TV/Radio/Podcast)" .
 
+        _:facebook <form_name_question> "What is the name of the Facebook page?" .
+        _:facebook <form_name_placeholder> "pagehandle" .
+        _:facebook <form_name_addon> "https://www.facebook.com/" .
+        
+        _:print <form_name_question> "What is the name of the print news source?" .
+        _:print <form_name_placeholder> "e.g. 'The Royal Gazette" .
+        
+        _:instagram <form_name_question> "What is the name of Instagram account?" .
+        _:instagram <form_name_placeholder> "account" .
+        _:instagram <form_name_addon> "@" .
+        
+        _:twitter <form_name_question> "What is the name of Twitter account?" .
+        _:twitter <form_name_placeholder> "account" .
+        _:twitter <form_name_addon> "@" .
+        
+        _:website <form_name_question> "What is the address of the self-hosted news website?" .
+        _:website <form_name_placeholder> "e.g. 'http://www.thedailynews.com'" .
+        
+        _:transcript <form_name_question> "What is the name of the website that provides tv, radio, or podcast scripts?" .
+        _:transcript <form_name_placeholder> "e.g. 'http://www.theweeklypodcast.com/transcript'" .
+        _:transcript <form_name_helptext> "Please specify the URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)" .
+
         _:derstandardat <dgraph.type> "Source" .
         _:derstandardat <unique_name> "www.derstandard.at" .
         _:derstandardat <name> "www.derstandard.at" .
