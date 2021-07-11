@@ -12,117 +12,70 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
 
+    <style>
+        
+    </style>
 
 </head>
 
   <body>
       <div class="container my-4"> 
-        <form id="new-source" class="needs-validation" novalidate="" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-primary my-5" id="loading-form" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" style="display: none;">
             <div class="progress my-4">
                 <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
+            </div>
             <fieldset id="section-general">
-                <div class="mb-3">
-                <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
-                <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
-                <select id="channel-select" class="form-select">
-                    <option selected></option>
-                </select>
-                <input type="text" name="channel" id="channel-select-hidden" style="display: none;">
-            </div>
-            <div id="group-channel-new" class="mb-3" style="display: none;">
-                <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
-                <input type="text" name="channel_new" id="channel-new">
-            </div>
-            <div class="mb-3">
-                <div id="group-name-print">
-                    <label for="name-print" class="form-label">What is the name of the print news source?</label>
-                    <input name="name" type="text" class="form-control" id="name-print" placeholder="e.g. 'The Royal Gazette'">
-                </div>
-                <div id="group-name-website">
-                <label for="name-website" class="form-label">What is the address of the self-hosted news website?</label>
-                <input name="channel_url" type="text" class="form-control" id="name-website" placeholder="e.g. 'http://www.thedailynews.com'">
-            </div>
-
-            <div id="group-name-transcript">
-                <label for="name-transcript" class="form-label">What is the name of the website that provides tv, radio, or podcast scripts?</label>
-                <div>
-                <input name="channel_url" type="text" class="form-control" id="name-transcript" placeholder="e.g. 'http://www.theweeklypodcast.com/transcript'">
-                    <small>Please specify the URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)</small>
-                </div>
-
-                <div id="group-transcript-kind" class="my-3">
-                    <label for="transcript-kind" class="form-label">What kind of show is transcribed?</label>
-                    <select name="transcript_kind" class="form-select" id="transcript-kind">
-                        <option value="tv">TV (broadcast, cable, satellite, etc)</option>
-                        <option value="radio">Radio</option>
-                        <option value="podcast">Podcast</option>    
-                        <option value="None" selected>Don't know</option>
+                <div class="mb-3 form-group">
+                    <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
+                    <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
+                    <select name="channel" id="channel-select" class="form-select" required>
+                        <option value="" selected disabled>Select...</option>
                     </select>
+                    <input type="text" name="channel_uid" id="channel-select-hidden" disabled>
+                </div>
+                <div id="group-channel-new" class="mb-3" style="display: none;">
+                    <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
+                    <input type="text" name="channel_new" class="form-control" id="channel-new" aria-describedby="channel-new-feedback">
+                    <div id="channel-new-feedback"></div>
+                </div>
+                <div class="mb-3">
+                    <div id="group-name" class="form-group">
+                        <label for="name" class="form-label">What is the name of the print news source?</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
+                        <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" required>
+                        </div>
+                        <small id="name-helptext"></small>
+                        <div id="name-feedback"></div>
                     </div>
-
+                    <div id="group-transcript-kind" class="my-3 form-group">
+                        <label for="transcript-kind" class="form-label">What kind of show is transcribed?</label>
+                        <select name="transcript_kind" class="form-select" id="transcript-kind">
+                            <option disabled selected>Choose...</option>
+                            <option value="tv">TV (broadcast, cable, satellite, etc)</option>
+                            <option value="radio">Radio</option>
+                            <option value="podcast">Podcast</option>    
+                            <option value="None">Don't know</option>
+                        </select>
+                    </div>
             </div>
-                
-            <div id="group-name-facebook">
-                <label for="name-facebook" class="form-label">What is the name of the Facebook page?</label>
-                <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">https://www.facebook.com/</span>
-                <input name="channel_url" type="text" class="form-control" id="name-facebook" aria-describedby="basic-addon3">
-                </div>
-            </div>
-
-            <div id="group-name-instagram">
-                <label for="name-instagram" class="form-label">What is the name of the Instagram account?</label>
-                <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">@</span>
-                <input name="channel_url" type="text" class="form-control" id="name-instagram" aria-describedby="basic-addon3">
-                </div>
-            </div>
-
-                <div id="group-name-twitter">
-                <label for="name-twitter" class="form-label">What is the name of the Twitter account?</label>
-                <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">@</span>
-                <input name="channel_url" type="text" class="form-control" id="name-twitter" aria-describedby="basic-addon3">
-                </div>
-            </div>
-                
-                <div id="group-name-telegram">
-                <label for="name-telegram" class="form-label">What is the name of the Telegram account?</label>
-                <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">@</span>
-                <input name="channel_url" type="text" class="form-control" id="name-telegram" aria-describedby="basic-addon3">
-                </div>
-            </div>
-
-                <div id="group-name-vkontakte">
-                <label for="name-vkontakte" class="form-label">What is the name of the VKontakte account?</label>
-                <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon3">@</span>
-                <input name="channel_url" type="text" class="form-control" id="name-vkontakte" aria-describedby="basic-addon3">
-                </div>
-                </div>
-
-                <div id="group-name-other">
-                <label for="name-other" class="form-label">What is the name of the news source that you suggest?</label>
-                <input name="name" type="text" class="form-control" id="name-other" >
-            </div>
-            </div>
-
             
-            
-            <div class="mb-3">
+            <div class="mb-3 form-group">
                 <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
                 <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma">
             </div>
 
-            <div id="group-epaper" class="mb-3" style="display: none;">
+            <div id="group-epaper" class="mb-3 form-group" style="display: none;">
                 <label for="channel-epaper" class="form-label">Does the print news source have an e-paper version? Please insert the url here:</label>
                 <input name="channel_epaper" type="text" class="form-control" id="channel-epaper" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)">
-                </div>
-                
+            </div>
 
-            <div id="group-channel-comments" class="mb-3" style="display: none;">
+            <div id="group-channel-comments" class="mb-3 form-group" style="display: none;">
                 <label for="channel-comments" class="form-label">Does the online news source have user comments below individual news articles?</label>
                 <select name="channel_comments" type="text" class="form-control" id="channel-comments" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)">
                     <option selected></option>
@@ -133,9 +86,10 @@
                 </select>
                 </div>
             
-            <div class="mb-3">
+            <div class="mb-3 form-group">
                 <label for="source-founded" class="form-label">What year was the news source founded?</label>
-                <input name="founded" type="number" step="1" min="1900" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY">
+                <input name="founded" type="number" step="1" min="1900" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
+                <div id="founded-feedback"></div>
                 </div>
 
                 <input type="button" class="btn btn-primary next" value="Next Step">
@@ -146,83 +100,255 @@
             </fieldset>
             <fieldset id="section-final" style="display: none;">
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
-            <input type="submit" class="btn btn-success" value="Submit" disabled/>
-        </fieldset>
+                <input type="submit" class="btn btn-success" value="Submit" />
+            </fieldset>
+            <div class="mb-3 d-flex flex-row-reverse">
+                <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" />
+            </div>
         
         </form>
 </div>
 
 <script>
+
+    // rewrite everything with jquery https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/#selecting-elements
     // GLOBAL CONSTANTS
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    var csrftoken = "{{ csrf_token() }}";
+    const csrftoken = "{{ csrf_token() }}";
+    
+    // ********************
+    // Function declaration
+    // ********************
 
+    // Get custom attribute (data-value) from all select and put them in hidden fields
+    (function($) {
+        $.fn.extend({
+            inputSelectToHidden: function() {
+                return this.change(function() {
+                    var option = $('option:selected', this).attr('data-value');
+                    var hidden = $("#" + this.id + "-hidden");
+                    hidden.val(option);
+                })
+                }
+        });
+    })(jQuery);
 
-    // BLOCK
-    // Get value from all select and put them in hidden fields
-    document.querySelector('select').addEventListener('input', function(e) {
-    var input = e.target,
-        list = input.getAttribute('list'),
-        options = document.querySelectorAll('#' + list + ' option'),
-        hiddenInput = document.getElementById(input.getAttribute('id') + '-hidden'),
-        inputValue = input.value;
+    function addFieldOptions(fieldOptions, key, selector) {
+        fieldOptions[key].forEach(function(item, i) {
+            $(selector).append('<option value="' + item.unique_name + '" data-value="' + item.uid + '" data-index="' + i + '">' + item.name + '</option>');
 
-    hiddenInput.value = inputValue;
+    })
+        $(selector).append('<option value="other" data-value="new" data-index="99">Other</option>');
 
-    for(var i = 0; i < options.length; i++) {
-        var option = options[i];
+    };
 
-        if(option.innerText === inputValue) {
-            hiddenInput.value = option.getAttribute('data-value');
-            break;
-        }
-    }
-});
-    // Load Select options from json file
-
-    var channelInput = document.getElementById('channel-select')
-    // var channelOptions = document.getElementById('channel-options');
-    channelInput.placeholder = "Loading options..."
-    var request = new XMLHttpRequest();
-
-    // Handle state changes for the request.
-    request.onreadystatechange = function(response) {
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-            // Parse the JSON
-            var jsonOptions = JSON.parse(request.responseText);
-
-            // Loop over the JSON array.
-            jsonOptions.channel.forEach(function(item) {
-                // Create a new <option> element.
-                var option = document.createElement('option');
-                // Set the value using the item in the JSON array.
-                option.value = item.uid;
-                option.setAttribute('data-value', item.unique_name);
-                // option.value = item.name;
-                option.innerText = item.name;
-                // Add the <option> element to the <select>.
-                    channelInput.appendChild(option);
+    function getFieldOptions(targetUrl) {
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: targetUrl,
+                success: function(data) {
+                    resolve(data); // Resolve promise and go to then()
+                    $('#loading-form').hide();
+                    $('#new-source').show();
+                },
+                error: function(err) {
+                    reject(err) // Reject the promise and go to catch()
+                }
             });
-            // Add 'Other' option
-            var otherOption = document.createElement('option');
-            otherOption.value = 'new';
-            otherOption.innerText = 'Other'
-            otherOption.setAttribute('data-value', 'other');
-            channelInput.appendChild(otherOption)
+        });
+    }
 
-            // Update the placeholder text.
-            channelInput.placeholder = "e.g. Print, Website, Facebook";
-            } else {
-            // An error occured :(
-            channelInput.placeholder = "Couldn't load Select options :(";
-            }
-        }
+    // Field Visibility Logic
+    function fieldVisibility(fieldOptions, allNames, el) {
+        var value = $(el).find(':selected').val();
+        console.log(value);
+        var index = $(el).find(':selected').data('index');
+        allNames.hide()
+        $('#group-channel-new').hide();
+        $('#group-name').show();
+        if (index != 99) {
+            $('#group-name label').html(fieldOptions.channel[index]['form_name_question']);
+            $('#source-name').attr("placeholder", fieldOptions.channel[index]['form_name_placeholder']);
+            if ('form_name_helptext' in fieldOptions.channel[index]) {
+                $('#name-helptext').html(fieldOptions.channel[index]['form_name_helptext']);
+            } else { $('#name-helptext').html("") };
+            if ('form_name_addon' in fieldOptions.channel[index]) {
+                $('#name-addon').show().html(fieldOptions.channel[index]['form_name_addon']);
+            } else { $('#name-addon').hide() };
+        } else {
+            $('#group-name label').html("What is the name of the news source that you suggest?");
+            $('#source-name').attr("placeholder", "");
+            $('#name-addon').hide();
         };
 
+        if (value == 'other') {
+            $('#group-channel-new').show()
+        } else if (value == 'print') {
+            $('#group-epaper').show()
+        } else if (value == 'transcript') {
+            $('#group-transcript-kind').show()
+        } else if (value == 'website') {
+            $('#group-channel-comments').show()
+        }
+    };
 
-    request.open('GET', '{{ url_for("records.fieldoptions") }}', true);
-    request.send();
+    // make form persistent with local storage
+    function getFormData(f, fID) {
+        let data = {
+            [fID]: {}
+        };
+        for (var element of f.elements) {
+            if (element.name.length > 0) {
+                data[fID][element.name] = element.value;
+            }
+        }
+        return data;
+    };
+
+    // populate form on page load
+    function populateForm(f, fID) {
+        if (localStorage.key(fID)) {
+            var savedData = JSON.parse(localStorage.getItem(fID));
+            for (var element of f.elements) {
+                if (element.name in savedData) {
+                    element.value = savedData[element.name];
+                }
+            }
+        }
+    };
+
+    // Progress Bar
+    function setProgressBar(curStep, steps) {
+        var percent = parseFloat(100 / steps) * curStep;
+        percent = percent.toFixed();
+        $("#questionnaire-progress").css("width", percent + "%")
+        $("#questionnaire-progress").attr('aria-valuenow', percent + "%")
+    };
+
+
+    $(document).ready(function() {
+
+        // declare constants
+        const formId = "new-source";
+        const formUrl = location.href;
+        const formIdentifier = `${formUrl} ${formId}`;
+        var persistentForm = document.querySelector(`#${formId}`)
+
+        // Load Select options from json api
+        getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
+                addFieldOptions(data, 'channel', '#channel-select');
+
+                // handle field visibility / dependency logic
+                const allNames = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind')
+                allNames.hide()
+                $('#channel-select').change(function() {
+                    let element = $(this);
+                    fieldVisibility(data, allNames, element);
+                    });
+
+                // Populate form with locally stored data
+                populateForm(persistentForm, formIdentifier);
+                $('#channel-select').change();
+
+
+            }).catch(function(err) {
+                // Run this when promise was rejected via reject()
+                console.log(err)
+            })       
+
+        // Get custom attribute (data-value) from all select and put them in hidden fields
+        $('select').inputSelectToHidden();
+
+        // persistence: save changes in form
+        $("#" + formId).change(function() {
+            var data = getFormData(persistentForm, formIdentifier);
+            localStorage.setItem(formIdentifier, JSON.stringify(data[formIdentifier]));
+        });
+
+        // persistence: clear local storage on "reset"
+        $("#reset-form").click(function() {
+            localStorage.removeItem(formIdentifier);
+        })
+
+        // form progression in multiple steps
+        var current = 0,
+            current_step, next_step, steps;
+        steps = $("fieldset").length;
+        $('.next').click(function() {
+            current_step = $(this).parent();
+            next_step = $(this).parent().next();
+            next_step.fadeIn('fast');
+            current_step.hide();
+            setProgressBar(++current, steps);
+        });
+
+        $('.prev').click(function() {
+            current_step = $(this).parent();
+            prev_step = $(this).parent().prev();
+            prev_step.fadeIn('fast');
+            current_step.hide();
+            setProgressBar(--current, steps);
+        });
+        setProgressBar(current, steps);
+
+    });
+
+    // validation
+    const form = document.getElementById("new-source");
+    form.noValidate = true;
+    form.addEventListener('submit', function handleFormSubmit(event) {
+        const isValid = form.reportValidity();
+
+        if (isValid) {
+            // POST form data to backend with fetch
+        }
+
+        event.preventDefault();
+        });
+
+    const visited = [];
+    for (const field of form.elements) {
+        field.addEventListener("invalid", function handleInvalidField(event) {
+            setFieldValidity(field);
+            event.preventDefault();
+            });
+
+        field.addEventListener("blur", function handleFieldBlur() {
+            
+            if (!visited.includes(field)) {
+                visited.push(field);
+                }
+            field.checkValidity();
+            });
+
+        field.addEventListener("input", function handleFieldInput(event) {
+            if (!visited.includes(field)) return;
+            setFieldValidity(field); 
+            
+        });
+
+        }
+
+    function errorContainer(field) {
+        const errorContainerId = field
+            .getAttribute("aria-describedby")
+            .split(" ")
+            .find((id) => id.includes("feedback"));
+        return document.getElementById(errorContainerId);
+    }
+
+    function setFieldValidity(field) {
+        if (!field.validity.valid) {
+            errorContainer(field).textContent = field.validationMessage;
+            field.setAttribute("aria-invalid", "true");
+            field.classList.add('is-invalid');
+        } else {
+            errorContainer(field).textContent = "";
+            field.removeAttribute("aria-invalid");
+            field.classList.remove('is-invalid');
+        }
+    }
+
 
     // submit form
     
@@ -262,71 +388,7 @@
         });
     });
 
-    // Field Visibility Logic
-
-    $( document ).ready(function() {
-    var allNames = $('[id^=group-name-], #group-epaper, #group-channel-comments')
-    allNames.hide()
-
-    $('#channel-select').change( function (){ 
-        
-        var value = $(this).find(':selected').data('value');
-        console.log(value);
-        allNames.hide();
-        $('#group-channel-new').hide();
-        $('#group-name-' + value).show();
-        if (value == 'other') {
-            $('#group-channel-new').show()
-        }
-
-        else if (value == 'print') {
-            $('#group-epaper').show()
-        }
-
-        else if (value == 'website') {
-            $('#group-channel-comments').show()
-        }
-
-
-    });
-
-    });
-
-    // form section progression
-
-    $( document ).ready(function() {
-        var current = 0, current_step, next_step, steps;
-        steps = $("fieldset").length;
-
-        $('.next').click(function() {
-            current_step = $(this).parent();
-            next_step = $(this).parent().next();
-            next_step.show();
-            current_step.hide();
-            setProgressBar(++current);       
-        }
-        )
-
-        $('.prev').click(function() {
-            current_step = $(this).parent();
-            prev_step = $(this).parent().prev();
-            prev_step.show();
-            current_step.hide();
-            setProgressBar(--current);       
-        }
-        )
-        setProgressBar(current)
-
-        function setProgressBar(curStep) {
-            var percent = parseFloat(100 / steps) * curStep;
-            percent = percent.toFixed();
-            $("#questionnaire-progress").css("width", percent + "%")
-            $("#questionnaire-progress").attr('aria-valuenow', percent + "%")
-        }
-
-    }
-    )
-
+*/
 
 </script>
 
