@@ -165,7 +165,10 @@ def query():
         if data:
             table = make_results_table(data)
         else: table = 'No results'
+        
+        # CACHE THIS
         countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
+        
         c_choices = [(country.get('uid'), country.get('name')) for country in countries['q']]
         c_choices = sorted(c_choices, key= lambda x: x[1])
         c_choices.insert(0, ('all', 'All'))
