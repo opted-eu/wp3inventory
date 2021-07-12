@@ -3,10 +3,10 @@
 // ********************
 
 // Get custom attribute (data-value) from all select and put them in hidden fields
-(function($) {
+(function ($) {
     $.fn.extend({
-        inputSelectToHidden: function() {
-            return this.change(function() {
+        inputSelectToHidden: function () {
+            return this.change(function () {
                 var option = $('option:selected', this).attr('data-value');
                 var hidden = $("#" + this.id + "-hidden");
                 hidden.val(option);
@@ -17,14 +17,14 @@
 
 // Load Select options from json api
 function getFieldOptions(targetUrl) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         $.ajax({
             url: targetUrl,
             // beforeSend: function() { $("#new-source").addClass("loading"); },
-            success: function(data) {
+            success: function (data) {
                 resolve(data) // Resolve promise and go to then()
             },
-            error: function(err) {
+            error: function (err) {
                 reject(err) // Reject the promise and go to catch()
             }
         });
@@ -35,7 +35,7 @@ function getFieldOptions(targetUrl) {
 
 // Dynamically add select options from data object
 function addFieldOptions(fieldOptions, key, selector) {
-    fieldOptions[key].forEach(function(item, i) {
+    fieldOptions[key].forEach(function (item, i) {
         $(selector).append('<option value="' + item.unique_name + '" data-value="' + item.uid + '" data-index="' + i + '">' + item.name + '</option>');
 
     })
@@ -48,6 +48,9 @@ function fieldVisibility(fieldOptions, allNames, el) {
 
     var value = $(el).find(':selected').val();
     var index = $(el).find(':selected').data('index');
+    if (index == null) {
+        return;
+    }
 
     allNames.hide()
     $('#group-channel-new').hide();
@@ -67,14 +70,22 @@ function fieldVisibility(fieldOptions, allNames, el) {
         $('#name-addon').hide();
     };
 
+    // Set / Reset certain fields to be required
+    $('#transcript-kind').attr("required", false);
+    $('#channel-new').attr("required", false);
+    $('#channel-comments').attr("required", false);
+
     if (value == 'other') {
-        $('#group-channel-new').show()
+        $('#group-channel-new').show();
+        $('#channel-new').attr("required", true);
     } else if (value == 'print') {
         $('#group-epaper').show()
     } else if (value == 'transcript') {
-        $('#group-transcript-kind').show()
+        $('#group-transcript-kind').show();
+        $('#transcript-kind').attr("required", true);
     } else if (value == 'website') {
-        $('#group-channel-comments').show()
+        $('#group-channel-comments').show();
+        $('#channel-comments').attr("required", true);
     }
 };
 
@@ -116,7 +127,7 @@ function setProgressBar(curStep) {
 
 // Main function
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     // declare constants
     const formId = "new-source";
@@ -125,7 +136,7 @@ $(document).ready(function() {
     var persistentForm = document.querySelector(`#${formId}`)
 
     // Load Select options from json api
-    getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
+    getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function (data) {
         console.log(data["channel"]);
         // add field options to multiple choice fields
         addFieldOptions(data, 'channel', '#channel-select');
@@ -133,7 +144,7 @@ $(document).ready(function() {
         // handle field visibility / dependency logic
         const allNames = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind')
         allNames.hide()
-        $('#channel-select').change(function() {
+        $('#channel-select').change(function () {
             let element = $(this);
             fieldVisibility(data, allNames, element);
         });
@@ -143,7 +154,7 @@ $(document).ready(function() {
         $('#channel-select').change();
 
 
-    }).catch(function(err) {
+    }).catch(function (err) {
         // Run this when promise was rejected via reject()
         console.log(err)
     })
@@ -153,13 +164,13 @@ $(document).ready(function() {
     $('select').inputSelectToHidden();
 
     // persistence: save changes in form
-    $("#" + formId).change(function() {
+    $("#" + formId).change(function () {
         var data = getFormData(persistentForm, formIdentifier);
         localStorage.setItem(formIdentifier, JSON.stringify(data[formIdentifier]));
     });
 
     // persistence: clear local storage on "reset"
-    $("#reset-form").click(function() {
+    $("#reset-form").click(function () {
         localStorage.removeItem(formIdentifier);
     })
 
@@ -167,15 +178,25 @@ $(document).ready(function() {
     var current = 0,
         current_step, next_step, steps;
     steps = $("fieldset").length;
-    $('.next').click(function() {
+    $('.next').click(function () {
         current_step = $(this).parent();
+        // validate fields before proceeding
+        for (field of current_step[0].elements) { 
+            if (!visited.includes(field)) {
+                    visited.push(field);
+                }
+            var validatedField = field.reportValidity() 
+            if (!validatedField) {                    
+                return;
+            };
+        };
         next_step = $(this).parent().next();
         next_step.show();
         current_step.hide();
         setProgressBar(++current);
     });
 
-    $('.prev').click(function() {
+    $('.prev').click(function () {
         current_step = $(this).parent();
         prev_step = $(this).parent().prev();
         prev_step.show();
@@ -197,6 +218,7 @@ form.addEventListener('submit', function handleFormSubmit(event) {
 
     if (isValid) {
         // POST form data to backend with fetch
+        submitForm('{{ url_for("records.echo_json") }}', form);
     }
 
     event.preventDefault();
@@ -223,7 +245,7 @@ for (const field of form.elements) {
 
     });
 
-}
+};
 
 function errorContainer(field) {
     const errorContainerId = field
@@ -231,16 +253,50 @@ function errorContainer(field) {
         .split(" ")
         .find((id) => id.includes("feedback"));
     return document.getElementById(errorContainerId);
-}
+};
 
 function setFieldValidity(field) {
     if (!field.validity.valid) {
         errorContainer(field).textContent = field.validationMessage;
+        errorContainer(field).classList.add('invalid-feedback');
         field.setAttribute("aria-invalid", "true");
         field.classList.add('is-invalid');
     } else {
         errorContainer(field).textContent = "";
+        errorContainer(field).classList.remove('invalid-feedback');
         field.removeAttribute("aria-invalid");
         field.classList.remove('is-invalid');
     }
-}
+};
+
+// submit form
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+        }
+    }
+});
+
+function submitForm(endpoint, form) {
+    var serializeForm = function (form) {
+        var obj = {};
+        var formData = new FormData(form);
+        for (var key of formData.keys()) {
+            obj[key] = formData.get(key);
+        }
+        return obj;
+    };
+    $.ajax({
+        type: "POST",
+        url: endpoint,
+        data: JSON.stringify(serializeForm(form)),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data) {
+            console.log(data)
+        }
+    })
+
+};

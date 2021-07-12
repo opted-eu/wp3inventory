@@ -8,13 +8,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
-
-    <style>
-        
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/js/tom-select.complete.min.js"></script>
+    <link href="{{ url_for('static',  filename='js/tom-select.bootstrap5.css') }}" rel="stylesheet">
 
 </head>
 
@@ -33,10 +29,11 @@
                 <div class="mb-3 form-group">
                     <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
                     <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
-                    <select name="channel" id="channel-select" class="form-select" required>
-                        <option value="" selected disabled>Select...</option>
+                    <select name="channel" id="channel-select" class="form-select" aria-describedby="channel-select-feedback" required>
+                        <option value="" selected>Select...</option>
                     </select>
-                    <input type="text" name="channel_uid" id="channel-select-hidden" disabled>
+                    <div id="channel-select-feedback"></div>
+                    <input type="text" name="channel_uid" id="channel-select-hidden" style="display: none;">
                 </div>
                 <div id="group-channel-new" class="mb-3" style="display: none;">
                     <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
@@ -49,25 +46,26 @@
                     <div class="input-group">
                         <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
                         <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" required>
+                        <div id="name-feedback"></div>
                         </div>
                         <small id="name-helptext"></small>
-                        <div id="name-feedback"></div>
                     </div>
                     <div id="group-transcript-kind" class="my-3 form-group">
                         <label for="transcript-kind" class="form-label">What kind of show is transcribed?</label>
-                        <select name="transcript_kind" class="form-select" id="transcript-kind">
-                            <option disabled selected>Choose...</option>
+                        <select name="transcript_kind" class="form-select" id="transcript-kind" aria-describedby="transcript-kind-feedback">
+                            <option value="" selected>Choose...</option>
                             <option value="tv">TV (broadcast, cable, satellite, etc)</option>
                             <option value="radio">Radio</option>
                             <option value="podcast">Podcast</option>    
                             <option value="None">Don't know</option>
                         </select>
+                        <div id="transcript-kind-feedback"></div>
                     </div>
             </div>
             
             <div class="mb-3 form-group">
                 <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
-                <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma">
+                <select type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></select>
             </div>
 
             <div id="group-epaper" class="mb-3 form-group" style="display: none;">
@@ -77,13 +75,14 @@
 
             <div id="group-channel-comments" class="mb-3 form-group" style="display: none;">
                 <label for="channel-comments" class="form-label">Does the online news source have user comments below individual news articles?</label>
-                <select name="channel_comments" type="text" class="form-control" id="channel-comments" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)">
-                    <option selected></option>
+                <select name="channel_comments" type="text" class="form-control" id="channel-comments" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-comments-feedback">
+                    <option value="">Choose...</option>
                     <option label="No comments">No comments</option>
                     <option label="User comments with registration">Registration required</option>
                     <option label="User comments without registration">Anyone</option>
                     <option label="Don't know">DK</option>
                 </select>
+                <div id="channel-comments-feedback"></div>
                 </div>
             
             <div class="mb-3 form-group">
@@ -94,7 +93,55 @@
 
                 <input type="button" class="btn btn-primary next" value="Next Step">
             </fieldset>
+
+
+         <!-- SECTION: ECONOMIC VARIABLES -->
             <fieldset id="section-economic" style="display: none;">
+                <div id="group-payment-model" class="mb-3 form-group">
+                    <label for="payment-model" class="form-label">Is the content produced by the news source accessible free of charge?</label>
+                    <select name="payment_model" class="form-select" id="payment-model" aria-describedby="payment-model-feedback" required>
+                        <option value="" selected>Choose...</option>
+                        <option value="free">Free</option>
+                        <option value="soft paywall">Soft paywall</option>
+                        <option value="subscription">Subscription</option>    
+                        <option value="None">Don't know</option>
+                    </select>
+                    <div id="payment-model-feedback"></div>
+                </div>
+
+                <div id="group-contains-ads" class="mb-3 form-group">
+                    <label for="contains-ads" class="form-label">Does the news source contain advertisements?</label>
+                    <select name="contains_ads" class="form-select" id="contains-ads" aria-describedby="contains-ads-feedback" required>
+                        <option value="" selected>Choose...</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="non subscribers">Only for non-paying users</option>    
+                        <option value="None">Don't know</option>
+                    </select>
+                    <div id="contains-ads-feedback"></div>
+                </div>
+
+                <div id="group-publishes" class="mb-3 form-group">
+                    <label for="publishes" class="form-label">Which organization or person owns the news source?</label>
+                    <select name="publishes" id="publishes" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="publishes-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
+                </div>
+
+                <div id="group-ownership-kind" class="mb-3 form-group">
+                    <label for="ownership-kind" class="form-label">Is the news source funded mainly public or mainly private?</label>
+                    <select name="ownership_kind" class="form-select" id="ownership-kind" aria-describedby="ownership-kind-feedback" required>
+                        <option value="" selected>Choose...</option>
+                        <option value="public ownership">Mainly public</option>
+                        <option value="private ownership">Mainly Private</option>
+                        <option value="unknown">News source does not mention the type of funding</option>    
+                        <option value="None">Don't know</option>
+                    </select>
+                    <div id="ownership-kind-feedback"></div>
+                    <small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small>
+                </div>
+
+
+
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
                 <input type="button" class="btn btn-primary next" value="Next Step">
             </fieldset>
@@ -161,8 +208,10 @@
     // Field Visibility Logic
     function fieldVisibility(fieldOptions, allNames, el) {
         var value = $(el).find(':selected').val();
-        console.log(value);
         var index = $(el).find(':selected').data('index');
+        if (index == null) {
+            return;
+        }
         allNames.hide()
         $('#group-channel-new').hide();
         $('#group-name').show();
@@ -181,14 +230,22 @@
             $('#name-addon').hide();
         };
 
+        // Set / Reset certain fields to be required
+        $('#transcript-kind').attr("required", false);
+        $('#channel-new').attr("required", false);
+        $('#channel-comments').attr("required", false);
+
         if (value == 'other') {
-            $('#group-channel-new').show()
+            $('#group-channel-new').show();
+            $('#channel-new').attr("required", true);
         } else if (value == 'print') {
             $('#group-epaper').show()
         } else if (value == 'transcript') {
-            $('#group-transcript-kind').show()
+            $('#group-transcript-kind').show();
+            $('#transcript-kind').attr("required", true);
         } else if (value == 'website') {
-            $('#group-channel-comments').show()
+            $('#group-channel-comments').show();
+            $('#channel-comments').attr("required", true);
         }
     };
 
@@ -276,6 +333,16 @@
         steps = $("fieldset").length;
         $('.next').click(function() {
             current_step = $(this).parent();
+            for (field of current_step[0].elements) { 
+                if (!visited.includes(field)) {
+                        visited.push(field);
+                    }
+                var validatedField = field.reportValidity() 
+                if (!validatedField) {                    
+                    return;
+                };
+            };
+
             next_step = $(this).parent().next();
             next_step.fadeIn('fast');
             current_step.hide();
@@ -293,7 +360,8 @@
 
     });
 
-    // validation
+    // validation & submission
+
     const form = document.getElementById("new-source");
     form.noValidate = true;
     form.addEventListener('submit', function handleFormSubmit(event) {
@@ -301,7 +369,8 @@
 
         if (isValid) {
             // POST form data to backend with fetch
-        }
+            submitForm('{{ url_for("records.echo_json") }}', form);
+        };
 
         event.preventDefault();
         });
@@ -340,10 +409,12 @@
     function setFieldValidity(field) {
         if (!field.validity.valid) {
             errorContainer(field).textContent = field.validationMessage;
+            errorContainer(field).classList.add('invalid-feedback');
             field.setAttribute("aria-invalid", "true");
             field.classList.add('is-invalid');
         } else {
             errorContainer(field).textContent = "";
+            errorContainer(field).classList.remove('invalid-feedback');
             field.removeAttribute("aria-invalid");
             field.classList.remove('is-invalid');
         }
@@ -360,35 +431,92 @@
         }
     });
 
-    function objectifyForm(formArray) {
-    //serialize data function
-    var returnArray = {};
-    for (var i = 0; i < formArray.length; i++){
-        if (formArray[i]['value'] === "") { continue }
-        returnArray[formArray[i]['name']] = formArray[i]['value'];
-    }
-    return returnArray;
-    }
 
-    $(document).ready(function() {
-        var form = $('#new-source');
-        form.submit(function (e) {
-            var url = "{{ url_for('records.echo_json') }}"; // send the form data here.
-            e.preventDefault(); // block the traditional submission of the form.
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: JSON.stringify(objectifyForm(form.serializeArray())), // serializes the form's elements.
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (data) {
-                    console.log(data)  // display the returned data in the console.
-                }
-            });
-        });
-    });
+    function submitForm(endpoint, form) {
+        var serializeForm = function (form) {
+            var obj = {};
+            var formData = new FormData(form);
+            
+            var obj = Object.fromEntries(
+                Array.from(formData.keys()).map(key => [
+                    key, formData.getAll(key).length > 1 ? 
+                    formData.getAll(key) : formData.get(key)
+                ])
+                )
 
-*/
+            return obj;
+        };
+        $.ajax({
+            type: "POST",
+            url: endpoint,
+            data: JSON.stringify(serializeForm(form)),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+            }
+        })
+
+    };
+
+    // autocomplete organization
+
+    var TomSelectOrganizationConfig = {
+        plugins: ['remove_button'],
+        create: function(input,callback){
+                var returnData = {
+                    value:input,
+                    text:input,
+                    name:input,
+                    country: [
+                        {name: 'none'}
+                    ]
+            };
+                console.log(returnData)
+                callback(createItem(returnData));
+            },
+        valueField: 'uid',
+        labelField: 'name',
+        searchField: 'name',
+        delimiter: ',',
+        selectOnTab: true,
+        // createFilter: function(input) { return input.length >= 3 },
+        load: function(query, callback) {
+            if ( query.length < 3 ) return callback();
+            var url = '{{ url_for("records.orglookup") }}?person=false&q=' + encodeURIComponent(query);
+            fetch(url)
+            .then(response => response.json())
+            .then(json => {
+                callback(json.data);
+            }).catch(() => {callback();});
+        },
+        render: {
+            option: function(data, escape) {
+                return '<div>' +
+                        '<span class="title">' + escape(data.name) + '</span>' +
+                        '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>' +
+                    '</div>';
+            },
+            item: function(data, escape) {
+                console.log(data);
+                return '<div>' + escape(data.name) + ' <small class="mx-1"> (' + escape(data.country[0].name) + ')</small></div>';
+            }
+	    }
+    };
+    new TomSelect('#publishes', TomSelectOrganizationConfig);
+
+    var TomSelectOtherNamesConfig = {
+        plugins: ['remove_button'],
+        create: true,
+        render: {
+            no_results:function(data,escape){
+			    return '<div></div>';
+		}
+        }
+    };
+
+    new TomSelect('#other-names', TomSelectOtherNamesConfig);
+
 
 </script>
 
