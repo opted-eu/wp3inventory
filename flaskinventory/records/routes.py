@@ -23,14 +23,44 @@ def geocode():
         return abort(405)
 
 
-@records.route("/new/fieldoptions")
-def fieldoptions():
-    return jsonify(dgraph.generate_fieldoptions())
 
 @records.route("/new/source")
 def new_source():
     return render_template("records/newsource.html")
 
+
+
+# API Endpoints
+
+@records.route("/new/fieldoptions")
+def fieldoptions():
+    return jsonify(dgraph.generate_fieldoptions())
+
 @records.route('/new/echo', methods=['POST'])
 def echo_json():
     return jsonify(request.json)
+
+
+@records.route('/_orglookup')
+def orglookup():
+    query= request.args.get('q')
+    person = request.args.get('person')
+    # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
+    query_string = f'''{{
+            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Organization") AND eq(is_person, {person}))
+            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Organization") AND eq(is_person, {person}))
+  
+	        data(func: uid(field1, field2)) {{
+                uid
+                unique_name
+                name
+                dgraph.type
+                is_person
+                other_names
+                country {{ name }}
+                }}
+            }}
+    '''
+    result = dgraph.query(query_string)
+    result['status'] = True
+    return jsonify(result)
