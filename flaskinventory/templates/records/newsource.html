@@ -26,6 +26,7 @@
                 <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <fieldset id="section-general">
+                <h3 class="mb-4">General Information</h3>
                 <div class="mb-3 form-group">
                     <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
                     <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
@@ -57,7 +58,7 @@
                             <option value="tv">TV (broadcast, cable, satellite, etc)</option>
                             <option value="radio">Radio</option>
                             <option value="podcast">Podcast</option>    
-                            <option value="None">Don't know</option>
+                            <option value="none">Don't know</option>
                         </select>
                         <div id="transcript-kind-feedback"></div>
                     </div>
@@ -89,7 +90,7 @@
                 <label for="source-founded" class="form-label">What year was the news source founded?</label>
                 <input name="founded" type="number" step="1" min="1900" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
                 <div id="founded-feedback"></div>
-                </div>
+            </div>
 
                 <input type="button" class="btn btn-primary next" value="Next Step">
             </fieldset>
@@ -97,6 +98,7 @@
 
          <!-- SECTION: ECONOMIC VARIABLES -->
             <fieldset id="section-economic" style="display: none;">
+                <h3 class="mb-4">Economic Properties</h3>
                 <div id="group-payment-model" class="mb-3 form-group">
                     <label for="payment-model" class="form-label">Is the content produced by the news source accessible free of charge?</label>
                     <select name="payment_model" class="form-select" id="payment-model" aria-describedby="payment-model-feedback" required>
@@ -104,7 +106,7 @@
                         <option value="free">Free</option>
                         <option value="soft paywall">Soft paywall</option>
                         <option value="subscription">Subscription</option>    
-                        <option value="None">Don't know</option>
+                        <option value="none">Don't know</option>
                     </select>
                     <div id="payment-model-feedback"></div>
                 </div>
@@ -116,7 +118,7 @@
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="non subscribers">Only for non-paying users</option>    
-                        <option value="None">Don't know</option>
+                        <option value="none">Don't know</option>
                     </select>
                     <div id="contains-ads-feedback"></div>
                 </div>
@@ -134,7 +136,7 @@
                         <option value="public ownership">Mainly public</option>
                         <option value="private ownership">Mainly Private</option>
                         <option value="unknown">News source does not mention the type of funding</option>    
-                        <option value="None">Don't know</option>
+                        <option value="none">Don't know</option>
                     </select>
                     <div id="ownership-kind-feedback"></div>
                     <small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small>
@@ -145,6 +147,242 @@
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
                 <input type="button" class="btn btn-primary next" value="Next Step">
             </fieldset>
+
+            <!-- SECTION JOURNALISTIC ROUTINE -->
+
+            <fieldset id="section-routines" style="display: none;">
+                <h3 class="mb-4">Journalistic Routines</h3>
+
+                <div id="group-publication-kind" class="mb-3 form-group">
+                    <label for="publication-kind" class="form-label">What label or labels describe the source?</label>
+                    <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" required multiple>
+                        <option value="" selected>Choose...</option>
+                        <option value="newspaper">Newspaper</option>
+                        <option value="news agency">News Agency</option>
+                        <option value="magazine">Magazine</option>
+                        <option value="tv show">TV Show</option>
+                        <option value="radio show">Radio Show</option>
+                        <option value="podcast">Podcast</option>
+                        <option value="news blog">News Blog</option>
+                        <option value="alternative media">Alternative Media</option>
+                        <option value="none">Don't know</option>
+                    </select>
+                    <div id="publication-kind-feedback"></div>
+                    <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
+                </div>
+
+
+
+                <div id="group-special-interest" class="mb-3 mt-4 form-group">
+                    <p class="form-label">Does the news source have one main topical focus?</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no"  aria-describedby="special-interest-feedback" checked>
+                        <label class="form-check-label" for="special_interest1">
+                            No, it is a general interest news source (i.e., general news) 
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback" >
+                        <label class="form-check-label" for="special_interest2">
+                            Yes, is a special interest news source (i.e., clear focus on one topic) 
+                        </label>
+                      </div>
+                      <div id="special-interest-feedback"></div>
+                </div>
+
+                <div id="group-topical-focus" class="mb-3 form-group" hidden>
+                    <label for="topical-focus" class="form-label">What is the main topical focus of the news source?</label>
+                    <select name="topical_focus" class="form-select" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
+                        <option value="" selected>Choose...</option>
+                        <option value="politics">Politics</option>
+                        <option value="society">Society & Panorama</option>
+                        <option value="economy">Economy, Finance & Stocks</option>
+                        <option value="religion">Religion</option>
+                        <option value="science">Science & Technology</option>
+                        <option value="media">Media</option>
+                        <option value="environment">Environment</option>
+                        <option value="education">Education</option>
+                        <option value="none">Don't know</option>
+                    </select>
+                    <div id="topical-focus-feedback"></div>
+                    <small id="topical-focus-helptext"></small>
+                </div>
+
+                <div id="group-publication-cycle" class="mb-3 form-group">
+                    <label for="publication-cycle" class="form-label">What is the publication cycle of the source?</label>
+                    <select name="publication_cycle" class="form-select" id="publication-cycle" aria-describedby="publication-cycle-feedback">
+                        <option value="" selected>Choose...</option>
+                        <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
+                        <option value="daily">Daily (7 times a week)</option>
+                        <option value="mulitple times per week">Multiple times per week</option>
+                        <option value="weekly">Once a week</option>
+                        <option value="twice a month">Twice a month</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="none">Don't know</option>
+                    </select>
+                    <div id="publication-cycle-feedback"></div>
+                    <small id="publication-cycle-helptext"></small>
+                </div>
+
+                <div id="group-publication-cycle-weekday" class="mb-3" hidden>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday1" id="publication-cycle-weekday1" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday1">Monday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday2" id="publication-cycle-weekday2" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday2">Tuesday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday3" id="publication-cycle-weekday3" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday3">Wednesday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday4" id="publication-cycle-weekday4" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday4">Thursday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday5" id="publication-cycle-weekday5" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday5">Friday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday6" id="publication-cycle-weekday6" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday6">Saturday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday7" id="publication-cycle-weekday7" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday7">Sunday</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_na_weekday" id="publication-cycle-weekday-none" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday7">Don't know</label>
+                    </div>
+                    <div id="publication-cycle-weekday-feedback"></div>
+                </div>
+
+                <input type="button" class="btn btn-primary prev" value="Previous Step">
+                <input type="button" class="btn btn-primary next" value="Next Step">
+            </fieldset>
+
+            <!-- SECTION AUDIENCE RELATED -->
+
+            <fieldset id="section-audience" style="display: none;">
+                <h3 class="mb-4">Audience Related</h3>
+
+                <div id="group-geographic-scope" class="mb-3 mt-4 form-group">
+                    <div class="form-label">
+                        <p>What is the geographic scope of the news source? Who is the audience that the source is primarily addressing? </p>
+                        <small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope1" value="multinational" checked>
+                        <label class="form-check-label" for="geographic_scope1">
+                            Multinational (e.g., EU in general, German-speaking countries)
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope2" value="national">
+                        <label class="form-check-label" for="geographic_scope2">
+                            National (consumed mainly in one country) 
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope3" value="subnational">
+                        <label class="form-check-label" for="geographic_scope3">
+                            Subnational (consumed in a city/county/province/department)
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope4" value="none">
+                        <label class="form-check-label" for="geographic_scope4">
+                            Don't know
+                        </label>
+                      </div>
+                      <div id="geographic-scope-feedback"></div>
+                </div>
+
+                <div id="group-geographic-scope-countries" class="mb-3 form-group">
+                    <label for="geographic-scope-countries" class="form-label">What is the multinational scope?</label>
+                    <select name="geographic-scope-countries" id="geographic-scope-countries" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="geographic-scope-countries-helptext"></small>
+                </div>
+
+                <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
+                    <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
+                    <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" placeholder="Separate by comma" multiple></select>
+                </div>
+
+                <div id="group-languages" class="mb-3 form-group">
+                    <label for="languages" class="form-label">In which language(s) does the news source publish its news texts?</label>
+                    <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="languages-helptext"></small>
+                </div>
+
+                <div id="group-audience-size" class="mb-3 mt-4">
+                    <div id="group-audience-size-subscribers" class="mb-3">
+                        <label for="audience-size-subscribers" class="form-label">How many people subscribe to this newspaper? <span class="text-muted">Please specify an absolute number (no percentage)</span></label>
+                        <input name="audience_size_subscribers" type="number" step="1" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                        <div id="audience-size-subscribers-feedback"></div>
+                    </div>
+                    <div id="group-audience-size-year" class="mb-3">
+                        <label for="audience-size-year" class="form-label">For which year is this information?<span class="text-muted mx-1">(i.e., number of subscribers)</span></label>
+                        <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
+                        <div id="audience-size-year-feedback"></div>
+                    </div>
+                    <div id="group-audience-size-datafrom" class="mb-3">
+                        <label for="audience-size-datafrom" class="form-label">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted"></span></label>
+                        <input name="audience_size_datafrom" type="text" class="form-control" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
+                        <div id="audience-size-datafrom-feedback"></div>
+                    </div>
+
+                    <small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small>
+                </div>
+                <input type="button" class="btn btn-primary prev" value="Previous Step">
+                <input type="button" class="btn btn-primary next" value="Next Step">
+            </fieldset>
+
+            <!-- SECTION ACCESS TO RAW TEXT AND ANNOTATION -->
+
+            <fieldset id="section-annotations" style="display: none;">
+                <h3 class="mb-4">Access to Raw Text and Annotations</h3>
+
+                <div id="group-archive-sources-included" class="mb-3 form-group">
+                    <label for="archive-sources-included" class="form-label">Are texts from the news source available for download in one or several of the following data archives?</label>
+                    <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="archive-sources-included-helptext"></small>
+                </div>
+
+                <div id="group-dataset-sources-included" class="mb-3 form-group">
+                    <label for="dataset-sources-included" class="form-label">Is the news source included in one or several of the following annotated media text data sets?</label>
+                    <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="dataset-sources-included-helptext"></small>
+                </div>
+
+                <input type="button" class="btn btn-primary prev" value="Previous Step">
+                <input type="button" class="btn btn-primary next" value="Next Step">
+            </fieldset>
+
+            <!-- SECTION OTHER -->
+
+            <fieldset id="section-other" style="display: none;">
+                <h3 class="mb-4">Other Information</h3>
+
+                <div id="group-entry-notes" class="mb-3 form-group">
+                    <label for="entry-notes" class="form-label">Do you have any other notes on the source that you just coded?<span class="text-muted mx-1">(optional)</span></label>
+                    <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" placeholder="">
+                    <small id="entry-notes-helptext"></small>
+                </div>
+
+                <div id="group-related-sources" class="mb-3 form-group">
+                    <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below</label>
+                    <select name="related_sources" id="related-sources" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <small id="related-sources-helptext"></small>
+                </div>
+
+                <input type="button" class="btn btn-primary prev" value="Previous Step">
+                <input type="button" class="btn btn-primary next" value="Next Step">
+            </fieldset>
+
             <fieldset id="section-final" style="display: none;">
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
                 <input type="submit" class="btn btn-success" value="Submit" />
@@ -152,6 +390,8 @@
             <div class="mb-3 d-flex flex-row-reverse">
                 <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" />
             </div>
+
+            
         
         </form>
 </div>
@@ -206,7 +446,7 @@
     }
 
     // Field Visibility Logic
-    function fieldVisibility(fieldOptions, allNames, el) {
+    function channelVisibility(fieldOptions, allNames, el) {
         var value = $(el).find(':selected').val();
         var index = $(el).find(':selected').data('index');
         if (index == null) {
@@ -239,7 +479,8 @@
             $('#group-channel-new').show();
             $('#channel-new').attr("required", true);
         } else if (value == 'print') {
-            $('#group-epaper').show()
+            $('#group-epaper').show();
+            $('#group-audience-size').show();
         } else if (value == 'transcript') {
             $('#group-transcript-kind').show();
             $('#transcript-kind').attr("required", true);
@@ -248,6 +489,81 @@
             $('#channel-comments').attr("required", true);
         }
     };
+
+    if (document.querySelector('input[name="special_interest"]')) {
+        document.querySelectorAll('input[name="special_interest"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+            var item = event.target.value;
+            if (item == 'no') {
+                document.getElementById('group-topical-focus').hidden = true;
+            }
+            if (item == 'yes') {
+                document.getElementById('group-topical-focus').hidden = false;
+            }
+            });
+        });
+    };
+
+    if (document.querySelector('#publication-cycle')) {
+        document.getElementById('publication-cycle').addEventListener("change", function(event) {
+            if (this.value == 'mulitple times per week' || this.value == 'weekly' ) {
+                document.getElementById('group-publication-cycle-weekday').hidden = false;
+            }
+            else {
+                document.getElementById('group-publication-cycle-weekday').hidden = true;
+            }
+            });
+    };
+
+    if (document.querySelector('#publication-cycle-weekday-none')) {
+        document.getElementById('publication-cycle-weekday-none').addEventListener("change", function(event) {
+            if (this.checked) {
+                document.querySelectorAll('input[name^="publication_cycle_weekday"').forEach((elem) => {
+                    elem.checked = true
+                    elem.disabled = true
+                });
+            } 
+            else {
+                document.querySelectorAll('input[name^="publication_cycle_weekday"').forEach((elem) => {
+                    elem.disabled = false
+                });
+            }
+        } )
+    }
+
+    if (document.querySelector('input[name="geographic_scope"]')) {
+        document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+            var item = event.target.value;
+            if (item == 'multinational') {
+                document.getElementById('group-geographic-scope-countries').hidden = false;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the multinational scope?';
+                document.getElementById('geographic-scope-countries').multiple = true;
+
+            }
+            else if (item == 'national') {
+                document.getElementById('group-geographic-scope-countries').hidden = false;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the national scope?';
+                document.getElementById('geographic-scope-countries').multiple = false;
+            }
+            else if (item == 'subnational') {
+                document.getElementById('group-geographic-scope-countries').hidden = false;
+                document.getElementById('group-geographic-scope-subunit').hidden = false;
+                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the national scope?';
+                document.getElementById('geographic-scope-countries').multiple = false;
+            }
+            else {
+                document.getElementById('group-geographic-scope-countries').hidden = true;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+            }
+            });
+        });
+    };
+
+
+
 
     // make form persistent with local storage
     function getFormData(f, fID) {
@@ -294,17 +610,27 @@
         // Load Select options from json api
         getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
                 addFieldOptions(data, 'channel', '#channel-select');
+                addFieldOptions(data, 'language', '#languages');
+                addFieldOptions(data, 'country', '#geographic-scope-countries');
 
                 // handle field visibility / dependency logic
-                const allNames = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind')
-                allNames.hide()
+                const channelVisibilityFields = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size')
+                channelVisibilityFields.hide()
                 $('#channel-select').change(function() {
                     let element = $(this);
-                    fieldVisibility(data, allNames, element);
+                    channelVisibility(data, channelVisibilityFields, element);
                     });
 
+                // add Tom Select for dynamically loaded data
+                var TomSelectCountriesConfig = {
+                    plugins: ['remove_button']
+                }
+                
+                new TomSelect('#geographic-scope-countries', TomSelectCountriesConfig);
+
+
                 // Populate form with locally stored data
-                populateForm(persistentForm, formIdentifier);
+                // populateForm(persistentForm, formIdentifier);
                 $('#channel-select').change();
 
 
@@ -380,7 +706,13 @@
         field.addEventListener("invalid", function handleInvalidField(event) {
             setFieldValidity(field);
             event.preventDefault();
-            });
+        });
+        
+        field.addEventListener("valid", function handleInvalidField(event) {
+            console.log(field);
+            setFieldValidity(field);
+            event.preventDefault();
+        });
 
         field.addEventListener("blur", function handleFieldBlur() {
             
@@ -388,7 +720,7 @@
                 visited.push(field);
                 }
             field.checkValidity();
-            });
+        });
 
         field.addEventListener("input", function handleFieldInput(event) {
             if (!visited.includes(field)) return;
@@ -471,9 +803,9 @@
                     country: [
                         {name: 'none'}
                     ]
-            };
+                };
                 console.log(returnData)
-                callback(createItem(returnData));
+                callback(this.addOption(returnData));
             },
         valueField: 'uid',
         labelField: 'name',
@@ -516,6 +848,28 @@
     };
 
     new TomSelect('#other-names', TomSelectOtherNamesConfig);
+
+
+    var TomSelectPublicationKindConfig = {
+        plugins: ['remove_button'],
+        create: true,
+        onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+            this.input.classList.remove('is-invalid');
+            this.input.removeAttribute("aria-invalid");
+        },
+        onChange: function(){ // invoke validation on change
+            setFieldValidity(this.input);
+	}
+    };
+    new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
+
+    var TomSelectTopicalFocusConfig = TomSelectPublicationKindConfig;
+
+    new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
+
+    
+
+
 
 
 </script>
