@@ -20,6 +20,50 @@
                 </div>
             </div>
         </form>
+        <!-- <form class="w-50" id="search-everything" name="search-everything" method="GET" action="{{ url_for('inventory.search') }}">
+                    <div class="typeahead__query input-group">
+                        <input class="form-control" name="query" id="searchbar-top" placeholder="Search everything..." autocomplete="off">
+                        <button class="btn btn-outline-success" type="submit"> <i class="fas fa-search"></i>
+                    </button>
+        </form>
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/css/tom-select.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/js/tom-select.complete.min.js"></script>
+        <link href="{{ url_for('static',  filename='js/tom-select.bootstrap5.css') }}" rel="stylesheet">
+        <script>
+        var config = {
+            maxItems: 1,
+            onItemAdd: function() {return},
+            valueField: 'uid',
+            labelField: 'name',
+            searchField: 'name',
+            load: function(query, callback) {
+                var url = "{{ url_for('inventory.quicksearch') }}" + "?q=" + encodeURIComponent(query);
+                fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        callback(json.data);
+                    }).catch(() => {callback();
+                    });
+            },
+            render: {
+                option: function(item, esacpe) {
+                    if (item.channel != null) {
+                        var channel_label = `- ${item.channel}`
+                    } else { channel_label = '' }
+                    var target_url = $SCRIPT_ROOT + "/view/" + item.type.toString().toLowerCase() + '/' + item.unique_name.toString();
+                    return `<a href="${target_url}"><div>${item.name} ${channel_label}<small> (Type: ${item.type}) <span class="text-muted">(uid: ${item.uid})</span></small></div></a>`
+                },
+                item: function(item, esacpe) {
+                    if (item.channel != null) {
+                        var channel_label = `- ${item.channel}`
+                    } else { channel_label = '' }
+                    return `<div>${item.name} ${channel_label}<small> (Type: ${item.type}) <span class="text-muted">(uid: ${item.uid})</span></small></div>`
+                }
+            }
+            
+        };
+        var searchbar = new TomSelect('#searchbar-top',config);
+        </script> -->
         <ul class="nav nav-pills">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
