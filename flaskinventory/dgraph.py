@@ -7,7 +7,7 @@ from flask import current_app, _app_ctx_stack, Markup
 import pydgraph
 
 from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.auxiliary import icu_codes
+from flaskinventory.auxiliary import icu_codes, icu_codes_list
 
 
 class DGraph(object):
@@ -441,14 +441,16 @@ class DGraph(object):
         return data
 
     def generate_fieldoptions(self):
-        query_head = f'{{ channel(func: type("Channel")) '
-        query_fields = ''' uid expand(_all_) '''
-        query_relation = ''
-        query_string = query_head + \
-            ' { ' + query_fields + ' ' + query_relation + ' } }'
-        
+
+        query_channel = '''channel(func: type("Channel")) { uid expand(_all_) }'''
+        query_country = '''country(func: type("Country")) { uid unique_name name  }'''
+
+        query_string = '{ ' + query_channel + query_country + ' }'
+
         res = self.client.txn(read_only=True).query(query_string)
         data = json.loads(res.json, object_hook=self.datetime_hook)
+
+        data['language'] = icu_codes_list
 
         return data
 
