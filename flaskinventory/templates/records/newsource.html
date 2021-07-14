@@ -46,7 +46,7 @@
                         <label for="name" class="form-label">What is the name of the print news source?</label>
                     <div class="input-group">
                         <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
-                        <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" required>
+                        <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
                         <div id="name-feedback"></div>
                         </div>
                         <small id="name-helptext"></small>
@@ -64,7 +64,7 @@
                     </div>
             </div>
             
-            <div class="mb-3 form-group">
+            <div id="group-other-names" class="mb-3 form-group">
                 <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
                 <select type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></select>
             </div>
@@ -124,9 +124,16 @@
                 </div>
 
                 <div id="group-publishes" class="mb-3 form-group">
-                    <label for="publishes" class="form-label">Which organization or person owns the news source?</label>
-                    <select name="publishes" id="publishes" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
-                    <small id="publishes-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
+                    <p class="form-label">Which organization or person owns the news source?</p>
+                    <div class="input-group">
+                        <span class="input-group-text">Organization</span>
+                        <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">Person</span>
+                        <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+                    </div>
+                    <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
                 </div>
 
                 <div id="group-ownership-kind" class="mb-3 form-group">
@@ -210,7 +217,7 @@
 
                 <div id="group-publication-cycle" class="mb-3 form-group">
                     <label for="publication-cycle" class="form-label">What is the publication cycle of the source?</label>
-                    <select name="publication_cycle" class="form-select" id="publication-cycle" aria-describedby="publication-cycle-feedback">
+                    <select name="publication_cycle" class="form-select" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
                         <option value="" selected>Choose...</option>
                         <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
                         <option value="daily">Daily (7 times a week)</option>
@@ -255,7 +262,7 @@
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_na_weekday" id="publication-cycle-weekday-none" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday7">Don't know</label>
+                        <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
                     </div>
                     <div id="publication-cycle-weekday-feedback"></div>
                 </div>
@@ -301,21 +308,31 @@
                       <div id="geographic-scope-feedback"></div>
                 </div>
 
-                <div id="group-geographic-scope-countries" class="mb-3 form-group">
-                    <label for="geographic-scope-countries" class="form-label">What is the multinational scope?</label>
-                    <select name="geographic-scope-countries" id="geographic-scope-countries" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
-                    <small id="geographic-scope-countries-helptext"></small>
+                <div id="group-geographic-scope-multiple" class="mb-3 form-group">
+                    <label for="geographic-scope-multiple" class="form-label">What is the multinational scope?</label>
+                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple..." autocomplete="off" required multiple></select>
+                    <small id="geographic-scope-multiple-helptext"></small>
+                    <div id="geographic-scope-multiple-feedback"></div>
+                </div>
+
+                <div id="group-geographic-scope-single" class="mb-3 form-group" hidden>
+                    <label for="geographic-scope-single" class="form-label">What is the national scope?</label>
+                    <select name="geographic_scope_single" id="geographic-scope-single" class="form-select form-select-lg" aria-describedby="geographic-scope-single-feedback" placeholder="Select one..." autocomplete="off"></select>
+                    <small id="geographic-scope-single-helptext"></small>
+                    <div id="geographic-scope-single-feedback"></div>
                 </div>
 
                 <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
                     <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
-                    <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" placeholder="Separate by comma" multiple></select>
+                    <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
+                    <div id="geographic-scope-subunit-feedback"></div>
                 </div>
 
                 <div id="group-languages" class="mb-3 form-group">
                     <label for="languages" class="form-label">In which language(s) does the news source publish its news texts?</label>
-                    <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Select multiple..." aria-describedby="languages-feedback" multiple required></select>
                     <small id="languages-helptext"></small>
+                    <div id="languages-feedback"></div>
                 </div>
 
                 <div id="group-audience-size" class="mb-3 mt-4">
@@ -348,14 +365,16 @@
 
                 <div id="group-archive-sources-included" class="mb-3 form-group">
                     <label for="archive-sources-included" class="form-label">Are texts from the news source available for download in one or several of the following data archives?</label>
-                    <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
                     <small id="archive-sources-included-helptext"></small>
+                    <div id="archive-sources-included-feedback"></div>
                 </div>
 
                 <div id="group-dataset-sources-included" class="mb-3 form-group">
                     <label for="dataset-sources-included" class="form-label">Is the news source included in one or several of the following annotated media text data sets?</label>
-                    <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
                     <small id="dataset-sources-included-helptext"></small>
+                    <div id="dataset-sources-included-feedback"></div>
                 </div>
 
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
@@ -369,14 +388,17 @@
 
                 <div id="group-entry-notes" class="mb-3 form-group">
                     <label for="entry-notes" class="form-label">Do you have any other notes on the source that you just coded?<span class="text-muted mx-1">(optional)</span></label>
-                    <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" placeholder="">
+                    <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" aria-describedby="entry-notes-feedback" placeholder="">
                     <small id="entry-notes-helptext"></small>
+                    <div id="entry-notes-feedback"></div>
                 </div>
 
                 <div id="group-related-sources" class="mb-3 form-group">
                     <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below</label>
-                    <select name="related_sources" id="related-sources" class="form-select form-select-lg" placeholder="Separate by comma" multiple></select>
+                    <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
                     <small id="related-sources-helptext"></small>
+                    <div id="related-sources-feedback"></div>
+                    
                 </div>
 
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
@@ -420,13 +442,39 @@
         });
     })(jQuery);
 
-    function addFieldOptions(fieldOptions, key, selector) {
-        fieldOptions[key].forEach(function(item, i) {
+    function compareName( a, b ) {
+        console.log(a, b)
+        if ( a.name < b.name ){
+            return -1;
+        }
+        if ( a.name > b.name ){
+            return 1;
+        }
+        return 0;
+    }
+
+    function addFieldOptionsData(fieldOptions, key, selector) {
+        var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
+        opts.forEach(function(item, i) {
             $(selector).append('<option value="' + item.unique_name + '" data-value="' + item.uid + '" data-index="' + i + '">' + item.name + '</option>');
-
-    })
+        });
         $(selector).append('<option value="other" data-value="new" data-index="99">Other</option>');
+    };
 
+    function addFieldOptions(fieldOptions, key, selector, addother) {
+        var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
+        opts.forEach(function(item, i) {
+            $(selector).append('<option value="' + item.uid + '" data-value="' + item.unique_name + '" data-index="' + i + '">' + item.name + '</option>');
+        });
+        if (addother) {
+            $(selector).append('<option value="other" data-value="new" data-index="99">Other</option>');
+        };
+    };
+
+    function addLanguages(fieldOptions, key, selector) {
+        fieldOptions[key].forEach(function(item, i) {
+            $(selector).append('<option value="' + item.code + '">' + item.name + '</option>');
+        });
     };
 
     function getFieldOptions(targetUrl) {
@@ -496,9 +544,14 @@
             var item = event.target.value;
             if (item == 'no') {
                 document.getElementById('group-topical-focus').hidden = true;
+                document.getElementById('topical-focus-tomselected').required = false;
+                document.getElementById('topical-focus').required = false;
+
             }
             if (item == 'yes') {
                 document.getElementById('group-topical-focus').hidden = false;
+                document.getElementById('topical-focus-tomselected').required = true;
+                document.getElementById('topical-focus').required = true;
             }
             });
         });
@@ -519,7 +572,7 @@
         document.getElementById('publication-cycle-weekday-none').addEventListener("change", function(event) {
             if (this.checked) {
                 document.querySelectorAll('input[name^="publication_cycle_weekday"').forEach((elem) => {
-                    elem.checked = true
+                    elem.checked = false
                     elem.disabled = true
                 });
             } 
@@ -530,38 +583,6 @@
             }
         } )
     }
-
-    if (document.querySelector('input[name="geographic_scope"]')) {
-        document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
-            elem.addEventListener("change", function(event) {
-            var item = event.target.value;
-            if (item == 'multinational') {
-                document.getElementById('group-geographic-scope-countries').hidden = false;
-                document.getElementById('group-geographic-scope-subunit').hidden = true;
-                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the multinational scope?';
-                document.getElementById('geographic-scope-countries').multiple = true;
-
-            }
-            else if (item == 'national') {
-                document.getElementById('group-geographic-scope-countries').hidden = false;
-                document.getElementById('group-geographic-scope-subunit').hidden = true;
-                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the national scope?';
-                document.getElementById('geographic-scope-countries').multiple = false;
-            }
-            else if (item == 'subnational') {
-                document.getElementById('group-geographic-scope-countries').hidden = false;
-                document.getElementById('group-geographic-scope-subunit').hidden = false;
-                document.querySelector('label[for="geographic-scope-countries"]').innerText = 'What is the national scope?';
-                document.getElementById('geographic-scope-countries').multiple = false;
-            }
-            else {
-                document.getElementById('group-geographic-scope-countries').hidden = true;
-                document.getElementById('group-geographic-scope-subunit').hidden = true;
-            }
-            });
-        });
-    };
-
 
 
 
@@ -609,9 +630,10 @@
 
         // Load Select options from json api
         getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
-                addFieldOptions(data, 'channel', '#channel-select');
-                addFieldOptions(data, 'language', '#languages');
-                addFieldOptions(data, 'country', '#geographic-scope-countries');
+                addFieldOptionsData(data, 'channel', '#channel-select');
+                addLanguages(data, 'language', '#languages', false);
+                addFieldOptions(data, 'country', '#geographic-scope-single', false);
+                addFieldOptions(data, 'country', '#geographic-scope-multiple', false);
 
                 // handle field visibility / dependency logic
                 const channelVisibilityFields = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size')
@@ -621,17 +643,114 @@
                     channelVisibility(data, channelVisibilityFields, element);
                     });
 
-                // add Tom Select for dynamically loaded data
-                var TomSelectCountriesConfig = {
-                    plugins: ['remove_button']
-                }
-                
-                new TomSelect('#geographic-scope-countries', TomSelectCountriesConfig);
-
-
                 // Populate form with locally stored data
                 // populateForm(persistentForm, formIdentifier);
                 $('#channel-select').change();
+
+                // add Tom Select for dynamically loaded data
+                var TomSelectCountriesConfig = {
+                    plugins: ['remove_button'],
+                    selectOnTab: true,
+                    onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                        this.input.classList.remove('is-invalid');
+                        this.input.removeAttribute("aria-invalid");
+                    },
+                    onChange: function(){ // invoke validation on change
+                        setFieldValidity(this.input);
+                    }
+                };
+                var TomSelectCountryConfig = {
+                    selectOnTab: true,
+                    onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                        this.input.classList.remove('is-invalid');
+                        this.input.removeAttribute("aria-invalid");
+                    },
+                    onChange: function(){ // invoke validation on change
+                        setFieldValidity(this.input);
+                    }
+                };
+                
+                const geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
+                const geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
+
+                var TomSelectLanguagesConfig = { 
+                    plugins: ['remove_button'],
+                    selectOnTab: true,
+                    onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                        this.input.classList.remove('is-invalid');
+                        this.input.removeAttribute("aria-invalid");
+                    },
+                    onChange: function(){ // invoke validation on change
+                        setFieldValidity(this.input);
+                    }
+                };
+
+                const languagesSelect = new TomSelect('#languages', TomSelectLanguagesConfig)
+
+                if (document.querySelector('input[name="geographic_scope"]')) {
+                    document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
+                        elem.addEventListener("change", function(event) {
+                        var item = event.target.value;
+                        if (item == 'multinational') {
+                            document.getElementById('group-geographic-scope-multiple').hidden = false;
+                            document.getElementById('group-geographic-scope-single').hidden = true;
+                            document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                            document.getElementById('geographic-scope-multiple').required = true;
+                            document.getElementById('geographic-scope-multiple-tomselected').required = true;
+
+                            document.getElementById('geographic-scope-single').required = false;
+                            document.getElementById('geographic-scope-single-tomselected').required = false;
+
+                            document.getElementById('geographic-scope-subunit').required = false;
+                            document.getElementById('geographic-scope-subunit-tomselected').required = false;
+
+                            geographicScopeSingle.clear();
+
+                        }
+                        else if (item == 'national') {
+                            document.getElementById('group-geographic-scope-multiple').hidden = true;
+                            document.getElementById('group-geographic-scope-single').hidden = false;
+                            document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                            document.getElementById('geographic-scope-multiple').required = false;
+                            document.getElementById('geographic-scope-multiple-tomselected').required = false;
+
+                            document.getElementById('geographic-scope-single').required = true;
+                            document.getElementById('geographic-scope-single-tomselected').required = true;
+
+                            document.getElementById('geographic-scope-subunit').required = false;
+                            document.getElementById('geographic-scope-subunit-tomselected').required = false;
+
+                            geographicScopeMultiple.clear();
+                        }
+                        else if (item == 'subnational') {
+                            document.getElementById('group-geographic-scope-multiple').hidden = true;
+                            document.getElementById('group-geographic-scope-single').hidden = false;
+                            document.getElementById('group-geographic-scope-subunit').hidden = false;
+
+                            document.getElementById('geographic-scope-multiple').required = false;
+                            document.getElementById('geographic-scope-multiple-tomselected').required = false;
+
+                            document.getElementById('geographic-scope-single').required = true;
+                            document.getElementById('geographic-scope-single-tomselected').required = true;
+
+                            document.getElementById('geographic-scope-subunit').required = true;
+                            document.getElementById('geographic-scope-subunit-tomselected').required = true;
+
+                            geographicScopeMultiple.clear();
+                        }
+                        else {
+                            document.getElementById('group-geographic-scope-multiple').hidden = true;
+                            document.getElementById('group-geographic-scope-single').hidden = true;
+                            document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                            geographicScopeSingle.clear();
+                            geographicScopeMultiple.clear();
+                        }
+                        });
+                    });
+                };
 
 
             }).catch(function(err) {
@@ -670,8 +789,11 @@
             };
 
             next_step = $(this).parent().next();
-            next_step.fadeIn('fast');
             current_step.hide();
+            next_step.fadeIn('fast');
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
             setProgressBar(++current, steps);
         });
 
@@ -798,14 +920,15 @@
         create: function(input,callback){
                 var returnData = {
                     value:input,
+                    uid:input,
+                    unique_name:input,
                     text:input,
                     name:input,
                     country: [
-                        {name: 'none'}
+                        {name: 'NEW!'}
                     ]
                 };
-                console.log(returnData)
-                callback(this.addOption(returnData));
+                callback(returnData);
             },
         valueField: 'uid',
         labelField: 'name',
@@ -830,12 +953,57 @@
                     '</div>';
             },
             item: function(data, escape) {
-                console.log(data);
                 return '<div>' + escape(data.name) + ' <small class="mx-1"> (' + escape(data.country[0].name) + ')</small></div>';
             }
 	    }
     };
-    new TomSelect('#publishes', TomSelectOrganizationConfig);
+    new TomSelect('#publishes_org', TomSelectOrganizationConfig);
+
+    var TomSelectPersonConfig = {
+        plugins: ['remove_button'],
+        create: function(input,callback){
+                var returnData = {
+                    value:input,
+                    uid:input,
+                    unique_name:input,
+                    text:input,
+                    name:input,
+                    country: [
+                        {name: 'NEW!'}
+                    ]
+                };
+                callback(returnData);
+            },
+        valueField: 'uid',
+        labelField: 'name',
+        searchField: 'name',
+        delimiter: ',',
+        selectOnTab: true,
+        // createFilter: function(input) { return input.length >= 3 },
+        load: function(query, callback) {
+            if ( query.length < 3 ) return callback();
+            var url = '{{ url_for("records.orglookup") }}?person=true&q=' + encodeURIComponent(query);
+            fetch(url)
+            .then(response => response.json())
+            .then(json => {
+                callback(json.data);
+            }).catch(() => {callback();});
+        },
+        render: {
+            option: function(data, escape) {
+                return '<div>' +
+                        '<span class="title">' + escape(data.name) + '</span>' +
+                        '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>' +
+                    '</div>';
+            },
+            item: function(data, escape) {
+                return '<div>' + escape(data.name) + ' <small class="mx-1"> (' + escape(data.country[0].name) + ')</small></div>';
+            }
+	    }
+    };
+    new TomSelect('#publishes_person', TomSelectPersonConfig);
+
+
 
     var TomSelectOtherNamesConfig = {
         plugins: ['remove_button'],
@@ -848,11 +1016,13 @@
     };
 
     new TomSelect('#other-names', TomSelectOtherNamesConfig);
+    new TomSelect('#geographic-scope-subunit', TomSelectOtherNamesConfig);
 
 
     var TomSelectPublicationKindConfig = {
         plugins: ['remove_button'],
         create: true,
+        selectOnTab: true,
         onInitialize: function() { // hacky way of forcing the field to be not-validated on load
             this.input.classList.remove('is-invalid');
             this.input.removeAttribute("aria-invalid");
@@ -866,10 +1036,6 @@
     var TomSelectTopicalFocusConfig = TomSelectPublicationKindConfig;
 
     new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
-
-    
-
-
 
 
 </script>
