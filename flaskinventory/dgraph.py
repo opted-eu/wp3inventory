@@ -444,8 +444,10 @@ class DGraph(object):
 
         query_channel = '''channel(func: type("Channel")) { uid expand(_all_) }'''
         query_country = '''country(func: type("Country")) { uid unique_name name  }'''
+        query_dataset = '''dataset(func: type("Dataset")) { uid unique_name name  }'''
+        query_archive = '''archive(func: type("Archive")) { uid unique_name name  }'''
 
-        query_string = '{ ' + query_channel + query_country + ' }'
+        query_string = '{ ' + query_channel + query_country + query_dataset + query_archive + ' }'
 
         res = self.client.txn(read_only=True).query(query_string)
         data = json.loads(res.json, object_hook=self.datetime_hook)
