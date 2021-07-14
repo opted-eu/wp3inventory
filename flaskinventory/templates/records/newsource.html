@@ -634,6 +634,8 @@
                 addLanguages(data, 'language', '#languages', false);
                 addFieldOptions(data, 'country', '#geographic-scope-single', false);
                 addFieldOptions(data, 'country', '#geographic-scope-multiple', false);
+                addFieldOptions(data, 'archive', '#archive-sources-included', false);
+                addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
 
                 // handle field visibility / dependency logic
                 const channelVisibilityFields = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size')
@@ -669,7 +671,7 @@
                         setFieldValidity(this.input);
                     }
                 };
-                
+     
                 const geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
                 const geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
 
@@ -686,6 +688,15 @@
                 };
 
                 const languagesSelect = new TomSelect('#languages', TomSelectLanguagesConfig)
+
+                var TomSelectDatasetConfig = { 
+                    selectOnTab: true,
+                    plugins: ['remove_button'],
+                    create: true
+                 }
+
+                const archiveSelect = new TomSelect('#archive-sources-included', TomSelectDatasetConfig)
+                const datasetSelect = new TomSelect('#dataset-sources-included', TomSelectDatasetConfig)
 
                 if (document.querySelector('input[name="geographic_scope"]')) {
                     document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
