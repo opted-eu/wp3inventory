@@ -52,15 +52,42 @@
                         <small id="name-helptext"></small>
                     </div>
                     <div id="group-transcript-kind" class="my-3 form-group">
-                        <label for="transcript-kind" class="form-label">What kind of show is transcribed?</label>
-                        <select name="transcript_kind" class="form-select" id="transcript-kind" aria-describedby="transcript-kind-feedback">
+                        <p class="form-label">What kind of show is transcribed?</p>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind1" value="tv"  aria-describedby="transcript-kind-feedback">
+                            <label class="form-check-label" for="transcript_kind1">
+                                TV (broadcast, cable, satellite, etc)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind2" value="radio"  aria-describedby="transcript-kind-feedback">
+                            <label class="form-check-label" for="transcript_kind2">
+                                Radio
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind3" value="podcast"  aria-describedby="transcript-kind-feedback">
+                            <label class="form-check-label" for="transcript_kind3">
+                                Podcast
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind4" value="none"  aria-describedby="transcript-kind-feedback">
+                            <label class="form-check-label" for="transcript_kind4">
+                                Don't know
+                            </label>
+                            <div id="transcript-kind-feedback"></div>
+                        </div>
+
+                        <!-- <select name="transcript_kind" class="form-select" id="transcript-kind" aria-describedby="transcript-kind-feedback">
                             <option value="" selected>Choose...</option>
                             <option value="tv">TV (broadcast, cable, satellite, etc)</option>
                             <option value="radio">Radio</option>
                             <option value="podcast">Podcast</option>    
                             <option value="none">Don't know</option>
-                        </select>
-                        <div id="transcript-kind-feedback"></div>
+                        </select> -->
+                        
                     </div>
             </div>
             
@@ -182,12 +209,12 @@
 
                 <div id="group-special-interest" class="mb-3 mt-4 form-group">
                     <p class="form-label">Does the news source have one main topical focus?</p>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no"  aria-describedby="special-interest-feedback" checked>
-                        <label class="form-check-label" for="special_interest1">
-                            No, it is a general interest news source (i.e., general news) 
-                        </label>
-                      </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no"  aria-describedby="special-interest-feedback" checked>
+                            <label class="form-check-label" for="special_interest1">
+                                No, it is a general interest news source (i.e., general news) 
+                            </label>
+                        </div>
                       <div class="form-check">
                         <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback" >
                         <label class="form-check-label" for="special_interest2">
@@ -519,7 +546,9 @@
         };
 
         // Set / Reset certain fields to be required
-        $('#transcript-kind').attr("required", false);
+        document.querySelectorAll('input[name="transcript_kind"').forEach((elem) => {
+            elem.setAttribute('required', false)
+        })
         $('#channel-new').attr("required", false);
         $('#channel-comments').attr("required", false);
 
@@ -531,7 +560,10 @@
             $('#group-audience-size').show();
         } else if (value == 'transcript') {
             $('#group-transcript-kind').show();
-            $('#transcript-kind').attr("required", true);
+            // $('#transcript-kind').attr("required", true);
+            document.querySelectorAll('input[name="transcript_kind"').forEach((elem) => {
+                elem.setAttribute('required', true)
+            })
         } else if (value == 'website') {
             $('#group-channel-comments').show();
             $('#channel-comments').attr("required", true);
@@ -794,7 +826,10 @@
                         visited.push(field);
                     }
                 var validatedField = field.reportValidity() 
-                if (!validatedField) {                    
+                
+            };
+            for (field of current_step[0].elements) {
+                if (!field.validity.valid) {
                     return;
                 };
             };
