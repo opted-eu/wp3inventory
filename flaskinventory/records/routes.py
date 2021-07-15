@@ -64,3 +64,25 @@ def orglookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
+
+
+
+@records.route('/_sourcelookup')
+def sourcelookup():
+    query= request.args.get('q')
+    query_string = f'''{{
+            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
+            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
+  
+	        data(func: uid(field1, field2)) {{
+                uid
+                unique_name
+                name
+                channel {{ name }}
+                geographic_scope_countries {{ name }}
+                }}
+            }}
+    '''
+    result = dgraph.query(query_string)
+    result['status'] = True
+    return jsonify(result)

@@ -1048,6 +1048,78 @@
 
     new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
 
+    // autocomplete related sources
+
+    function createNewSourceField(container, sourceName) {
+        var row = document.createElement('div')
+        row.classList.add('row', 'mb-3')
+        var label = document.createElement('label')
+        label.classList.add('col-sm-2', 'col-form-label')
+        label.addAttribute('for', 'new-source')
+        label.innerText = sourceName;
+        row.append(label)
+        var col = document.createElement('div');
+        col.classList.add('col-sm-10');
+        var select = document.createElement('select')
+        select.classList.add('form-select')
+        select.addAttribute('name', 'new_source')
+        
+        // add options
+
+        // append elements
+
+        // append to container
+
+
+
+     }
+
+
+    var TomSelectRelatedSourcesConfig = {
+        plugins: ['remove_button'],
+        create: function(input,callback){
+                var returnData = {
+                    value:input,
+                    uid:input,
+                    text:input,
+                    name:input,
+                    geographic_scope_countries: [
+                        {name: 'NEW!'}
+                    ],
+                    channel: [
+                        {name: ' '}
+                    ]
+                };
+                callback(returnData);
+            },
+        valueField: 'uid',
+        labelField: 'name',
+        searchField: 'name',
+        delimiter: ',',
+        selectOnTab: true,
+        load: function(query, callback) {
+            if ( query.length < 3 ) return callback();
+            var url = '{{ url_for("records.sourcelookup") }}?q=' + encodeURIComponent(query);
+            fetch(url)
+            .then(response => response.json())
+            .then(json => {
+                callback(json.data);
+            }).catch(() => {callback();});
+        },
+        render: {
+            option: function(data, escape) {
+                return '<div>' +
+                        '<span class="title">' + escape(data.name) + ' (' + escape(data.channel.name) + ') ' + '</span>' +
+                        '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>' +
+                    '</div>';
+            },
+            item: function(data, escape) {
+                return '<div>' + escape(data.name) + ' (' + escape(data.channel.name) + ') ' + ' <small class="mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small></div>';
+            }
+	    }
+    };
+    new TomSelect('#related-sources', TomSelectRelatedSourcesConfig);
+
 
 </script>
 
