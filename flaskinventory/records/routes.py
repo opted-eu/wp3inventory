@@ -3,6 +3,9 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory.posts.forms import PostForm
 from flaskinventory import dgraph
 from flaskinventory.records.external import get_geocoords
+from flaskinventory.records.forms import NewEntry
+from flaskinventory.records.utils import database_check_table
+
 records = Blueprint('records', __name__)
 
 @records.route("/geocodetest")
@@ -23,6 +26,41 @@ def geocode():
         return abort(405)
 
 
+@records.route("/new", methods=['GET', 'POST'])
+def new_entry():
+    form = NewEntry()
+    if form.validate_on_submit():
+        query_string = f'''{{
+                field1 as var(func: match(name, "{form.name.data}", 8)) @filter(type("{form.entity.data}"))
+                field2 as var(func: match(other_names, "{form.name.data}", 8)) @filter(type("{form.entity.data}"))
+    
+                data(func: uid(field1, field2)) @normalize {{
+                    uid
+                    unique_name: unique_name
+                    name: name
+                    other_names: other_names
+                    channel {{ channel: name }}
+                    geographic_scope_countries {{ country: name }}
+                    }}
+                }}
+        '''
+        print(query_string)
+        result = dgraph.query(query_string)
+        if len(result['data']) > 0:
+            for item in result['data']:
+                if item.get('other_names'):
+                    item['other_names'] = ", ".join(item['other_names'])
+            table = database_check_table(result['data'])
+            return render_template('records/database_check.html', table=table)
+            # return redirect(url_for('records.database_check', result=result['data']))
+        else:
+            return redirect(url_for('records.new_source', entry_name=form.name))
+    return render_template('records/newentry.html', form=form)
+
+@records.route("/new/check")
+def database_check():
+    table = make_results_table(request.args.get('result'))
+    return render_template('records/database_check.html', table=table)
 
 @records.route("/new/source")
 def new_source():
@@ -69,7 +107,7 @@ def orglookup():
 
 @records.route('/_sourcelookup')
 def sourcelookup():
-    query= request.args.get('q')
+    query = request.args.get('q')
     query_string = f'''{{
             field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
             field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))

@@ -1,0 +1,37 @@
+{% extends "layout.html" %} {% block content %}
+
+<main>
+    <h1>Add new entry</h1>
+    <p class="fs-5 col-md-8">Placeholder for disclaimer and learning module...</p>
+    <div class="mb-5">
+        {% if form %}
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="row mb-4">
+                <div class="col-md-5">
+                    {{ form.name.label(class="form-label") }}
+                    <div class="invalid-feedback">
+                        Enter a name
+                    </div>
+                    {{ form.name(class="form-control form-control-lg") }}
+                </div>
+                <div class="col-md-5">
+                    {{ form.entity.label(class="form-label") }}
+                    <div class="invalid-feedback">
+                        Please select one type.
+                    </div>
+                    {{ form.entity(class="form-select form-select-lg") }}
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-5 d-flex align-content-end flex-wrap">
+                    <button class="btn btn-primary btn-lg mx-2" type="submit">Add new entry</button>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</main>
+
+{% endblock content %}
