@@ -1,39 +1,4 @@
-
-
-<!DOCTYPE html>
-  <head>
-    <title>newsource</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/css/tom-select.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/js/tom-select.complete.min.js"></script>
-    <link href="{{ url_for('static',  filename='js/tom-select.bootstrap5.css') }}" rel="stylesheet">
-    <style>
-        @keyframes fadein {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
-        fieldset[hidden] {
-            opacity: 0;
-        }
-        fieldset {
-            opacity: 1;
-            -webkit-animation: fadein 200ms; /* Safari, Chrome and Opera > 12.1 */
-            -moz-animation: fadein 200ms; /* Firefox < 16 */
-            -ms-animation: fadein 200ms; /* Internet Explorer */
-            -o-animation: fadein 200ms; /* Opera < 12.1 */
-            animation: fadein 200ms;
-            
-        }
-    </style>
-</head>
-
-  <body>
-      <div class="container my-4"> 
+{% extends "layout.html" %} {% block content %}
         <div class="d-flex justify-content-center">
             <div class="spinner-border text-primary my-5" id="loading-form" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -202,7 +167,7 @@
                 <div id="group-publishes" class="mb-3 form-group">
                     <p class="form-label">Which organization or person owns the news source?</p>
                     <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
-                    <div class="input-group">
+                    <div class="input-group mb-2">
                         <span class="input-group-text">Organization</span>
                         <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
                     </div>
@@ -508,15 +473,11 @@
             <div class="mb-3 d-flex flex-row-reverse">
                 <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" />
             </div>
-
-            
-        
-        </form>
-</div>
+</form>
 
 <script>
 
-    // rewrite everything with jquery https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/#selecting-elements
+    // rewrite everything without jquery https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/#selecting-elements
     // GLOBAL CONSTANTS
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     const csrftoken = "{{ csrf_token() }}";
@@ -1290,7 +1251,4 @@
 
 
 </script>
-
-
-  </body>
-</html>
+{% endblock content %} {% block sidebar %} {% endblock sidebar %}
