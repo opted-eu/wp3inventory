@@ -180,7 +180,3 @@ def query():
 @inventory.route("/query/advanced")
 def advanced_query():
     return render_template('not_implemented.html')
-
-@inventory.route("/new")
-def new_entry():
-    return render_template('not_implemented.html')
