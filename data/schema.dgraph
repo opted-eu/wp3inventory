@@ -100,6 +100,19 @@ type Country {
     entry_notes
     other_names
     wikidataID
+    country_code
+}
+
+type Subunit {
+    unique_name
+    name
+    country
+    entry_added
+    entry_edit_history
+    entry_review_status
+    entry_notes
+    other_names
+    wikidataID
 }
 
 type Archive {
@@ -180,6 +193,7 @@ other_names: [string] @index(term, trigram) .
 wikidataID: int .
 founded: dateTime @index(year) .
 country: [uid] @reverse .
+country_code: string .
 description: string .
 
 # Channel Predicates
@@ -205,7 +219,7 @@ publication_cycle: string .
 publication_cycle_weekday: [int] .
 geographic_scope: string .
 geographic_scope_countries: [uid] @reverse .
-geographic_scope_subunit: string .
+geographic_scope_subunit: [uid] @reverse .
 geographic_scope_subunit_geo: geo @index(geo) .
 languages: [string] @index(hash) .
 audience_size: [dateTime] .

@@ -3,6 +3,14 @@ _:austria <unique_name> "austria" .
 _:austria <name> "Austria" .
 _:austria <other_names> "Österreich" .
 _:austria <wikidataID> "40" .
+_:austria <country_code> "at" .
+
+_:vienna <dgraph.type> "Subunit" .
+_:vienna <unique_name> "vienna" .
+_:vienna <name> "Vienna" .
+_:vienna <other_names> "Wien" . 
+_:vienna <wikidataID> "1741" .
+_:vienna <country> _:austria . 
 
 _:website <dgraph.type> "Channel" .
 _:website <unique_name> "website" .
