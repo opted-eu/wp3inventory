@@ -36,7 +36,7 @@
                     <div id="channel-select-feedback"></div>
                     <input type="text" name="channel_uid" id="channel-select-hidden" style="display: none;">
                 </div>
-                <div id="group-channel-new" class="mb-3" style="display: none;">
+                <div id="group-channel-new" class="mb-3" hidden>
                     <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
                     <input type="text" name="channel_new" class="form-control" id="channel-new" aria-describedby="channel-new-feedback">
                     <div id="channel-new-feedback"></div>
@@ -44,12 +44,12 @@
                 <div class="mb-3">
                     <div id="group-name" class="form-group">
                         <label for="name" class="form-label">What is the name of the print news source?</label>
+                        <small id="name-helptext"></small>
                     <div class="input-group">
                         <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
                         <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
                         <div id="name-feedback"></div>
                         </div>
-                        <small id="name-helptext"></small>
                     </div>
                     <div id="group-transcript-kind" class="my-3 form-group">
                         <p class="form-label">What kind of show is transcribed?</p>
@@ -79,15 +79,6 @@
                             </label>
                             <div id="transcript-kind-feedback"></div>
                         </div>
-
-                        <!-- <select name="transcript_kind" class="form-select" id="transcript-kind" aria-describedby="transcript-kind-feedback">
-                            <option value="" selected>Choose...</option>
-                            <option value="tv">TV (broadcast, cable, satellite, etc)</option>
-                            <option value="radio">Radio</option>
-                            <option value="podcast">Podcast</option>    
-                            <option value="none">Don't know</option>
-                        </select> -->
-                        
                     </div>
             </div>
             
@@ -96,12 +87,12 @@
                 <select type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></select>
             </div>
 
-            <div id="group-epaper" class="mb-3 form-group" style="display: none;">
+            <div id="group-epaper" class="mb-3 form-group" hidden>
                 <label for="channel-epaper" class="form-label">Does the print news source have an e-paper version? Please insert the url here:</label>
                 <input name="channel_epaper" type="text" class="form-control" id="channel-epaper" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)">
             </div>
 
-            <div id="group-channel-comments" class="mb-3 form-group" style="display: none;">
+            <div id="group-channel-comments" class="mb-3 form-group" hidden>
                 <label for="channel-comments" class="form-label">Does the online news source have user comments below individual news articles?</label>
                 <select name="channel_comments" type="text" class="form-control" id="channel-comments" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-comments-feedback">
                     <option value="">Choose...</option>
@@ -113,7 +104,7 @@
                 <div id="channel-comments-feedback"></div>
                 </div>
             
-            <div class="mb-3 form-group">
+            <div id="group-source-founded" class="mb-3 form-group">
                 <label for="source-founded" class="form-label">What year was the news source founded?</label>
                 <input name="founded" type="number" step="1" min="1900" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
                 <div id="founded-feedback"></div>
@@ -127,31 +118,72 @@
             <fieldset id="section-economic" style="display: none;">
                 <h3 class="mb-4">Economic Properties</h3>
                 <div id="group-payment-model" class="mb-3 form-group">
-                    <label for="payment-model" class="form-label">Is the content produced by the news source accessible free of charge?</label>
-                    <select name="payment_model" class="form-select" id="payment-model" aria-describedby="payment-model-feedback" required>
-                        <option value="" selected>Choose...</option>
-                        <option value="free">Free</option>
-                        <option value="soft paywall">Soft paywall</option>
-                        <option value="subscription">Subscription</option>    
-                        <option value="none">Don't know</option>
-                    </select>
-                    <div id="payment-model-feedback"></div>
+                        <p class="form-label">Is the content produced by the news source accessible free of charge?</p>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free"  aria-describedby="payment-model-feedback" required>
+                            <label class="form-check-label" for="payment_model1">
+                               Free
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="soft paywall"  aria-describedby="payment-model-feedback" required>
+                            <label class="form-check-label" for="payment_model2">
+                                Soft paywall
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="subscription"  aria-describedby="payment-model-feedback" required>
+                            <label class="form-check-label" for="payment_model3">
+                                Subscription
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model4" value="none"  aria-describedby="payment-model-feedback" required>
+                            <label class="form-check-label" for="payment_model4">
+                                Don't know
+                            </label>
+                            <div id="payment-model-feedback"></div>
+                        </div>
                 </div>
 
+
+
+
                 <div id="group-contains-ads" class="mb-3 form-group">
-                    <label for="contains-ads" class="form-label">Does the news source contain advertisements?</label>
-                    <select name="contains_ads" class="form-select" id="contains-ads" aria-describedby="contains-ads-feedback" required>
-                        <option value="" selected>Choose...</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="non subscribers">Only for non-paying users</option>    
-                        <option value="none">Don't know</option>
-                    </select>
-                    <div id="contains-ads-feedback"></div>
+
+                    <p class="form-label">Does the news source contain advertisements?</p>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes"  aria-describedby="contains-ads-feedback" required>
+                            <label class="form-check-label" for="contains_ads1">
+                               Yes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads2" value="no"  aria-describedby="contains-ads-feedback" required>
+                            <label class="form-check-label" for="contains_ads2">
+                                No
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads3" value="non subscribers"  aria-describedby="contains-ads-feedback" required>
+                            <label class="form-check-label" for="contains_ads3">
+                                Only for non-paying users
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads4" value="none"  aria-describedby="contains-ads-feedback" required>
+                            <label class="form-check-label" for="contains_ads4">
+                                Don't know
+                            </label>
+                            <div id="contains-ads-feedback"></div>
+                        </div>
                 </div>
 
                 <div id="group-publishes" class="mb-3 form-group">
                     <p class="form-label">Which organization or person owns the news source?</p>
+                    <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
                     <div class="input-group">
                         <span class="input-group-text">Organization</span>
                         <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
@@ -160,20 +192,38 @@
                         <span class="input-group-text">Person</span>
                         <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
                     </div>
-                    <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
                 </div>
 
                 <div id="group-ownership-kind" class="mb-3 form-group">
-                    <label for="ownership-kind" class="form-label">Is the news source funded mainly public or mainly private?</label>
-                    <select name="ownership_kind" class="form-select" id="ownership-kind" aria-describedby="ownership-kind-feedback" required>
-                        <option value="" selected>Choose...</option>
-                        <option value="public ownership">Mainly public</option>
-                        <option value="private ownership">Mainly Private</option>
-                        <option value="unknown">News source does not mention the type of funding</option>    
-                        <option value="none">Don't know</option>
-                    </select>
-                    <div id="ownership-kind-feedback"></div>
+                    <p class="form-label">Is the news source funded mainly public or mainly private?</p>
                     <small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small>
+
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind1" value="public ownership"  aria-describedby="ownership-kind-feedback" required>
+                            <label class="form-check-label" for="ownership_kind1">
+                               Mainly public
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind2" value="private ownership"  aria-describedby="ownership-kind-feedback" required>
+                            <label class="form-check-label" for="ownership_kind2">
+                                Mainly private
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind3" value="unknown"  aria-describedby="ownership-kind-feedback" required>
+                            <label class="form-check-label" for="ownership_kind3">
+                                News source does not mention the type of funding
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind4" value="none"  aria-describedby="ownership-kind-feedback" required>
+                            <label class="form-check-label" for="ownership_kind4">
+                                Don't know
+                            </label>
+                            <div id="ownership-kind-feedback"></div>
+                        </div>
                 </div>
 
 
@@ -189,6 +239,7 @@
 
                 <div id="group-publication-kind" class="mb-3 form-group">
                     <label for="publication-kind" class="form-label">What label or labels describe the source?</label>
+                    <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
                     <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" required multiple>
                         <option value="" selected>Choose...</option>
                         <option value="newspaper">Newspaper</option>
@@ -202,7 +253,7 @@
                         <option value="none">Don't know</option>
                     </select>
                     <div id="publication-kind-feedback"></div>
-                    <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
+                    
                 </div>
 
 
@@ -521,52 +572,88 @@
     }
 
     // Field Visibility Logic
-    function channelVisibility(fieldOptions, allNames, el) {
-        var value = $(el).find(':selected').val();
-        var index = $(el).find(':selected').data('index');
+    function channelVisibility(fieldOptions, allNames, el) {        
+        var value = el.target.value
+        console.log(value)
+        var index = el.target.options[el.target.selectedIndex].getAttribute('data-index')
         if (index == null) {
             return;
         }
-        allNames.hide()
-        $('#group-channel-new').hide();
-        $('#group-name').show();
+        allNames.forEach((elem) => elem.hidden = true);
+        document.getElementById('group-channel-new').hidden = true;
+        document.getElementById('group-name').hidden = false;
+
         if (index != 99) {
-            $('#group-name label').html(fieldOptions.channel[index]['form_name_question']);
-            $('#source-name').attr("placeholder", fieldOptions.channel[index]['form_name_placeholder']);
+            document.querySelector("#group-name label").innerText = fieldOptions.channel[index]['form_name_question'];
+            document.querySelector("#source-name").setAttribute("placeholder", fieldOptions.channel[index]['form_name_placeholder'])
             if ('form_name_helptext' in fieldOptions.channel[index]) {
-                $('#name-helptext').html(fieldOptions.channel[index]['form_name_helptext']);
-            } else { $('#name-helptext').html("") };
+                document.querySelector('#name-helptext').innerText = fieldOptions.channel[index]['form_name_helptext'];
+            } else { document.querySelector('#name-helptext').innerText = "" };
             if ('form_name_addon' in fieldOptions.channel[index]) {
-                $('#name-addon').show().html(fieldOptions.channel[index]['form_name_addon']);
-            } else { $('#name-addon').hide() };
+                document.querySelector("#name-addon").hidden = false;
+                document.querySelector("#name-addon").innerText = fieldOptions.channel[index]['form_name_addon'];
+            } else { document.querySelector("#name-addon").hidden = true; };
         } else {
-            $('#group-name label').html("What is the name of the news source that you suggest?");
-            $('#source-name').attr("placeholder", "");
-            $('#name-addon').hide();
+
+            document.querySelector("#group-name label").innerText = "What is the name of the news source that you suggest?";
+            document.querySelector("#source-name").setAttribute("placeholder", "");
+            document.querySelector("#name-addon").hidden = true;
         };
 
         // Set / Reset certain fields to be required
         document.querySelectorAll('input[name="transcript_kind"').forEach((elem) => {
-            elem.setAttribute('required', false)
+            elem.removeAttribute('required')
         })
-        $('#channel-new').attr("required", false);
-        $('#channel-comments').attr("required", false);
+
+        document.querySelector("#channel-new").removeAttribute("required");
+        document.querySelector("#channel-comments").removeAttribute("required");
+
+        document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
+            elem.removeAttribute('required')
+        })
 
         if (value == 'other') {
-            $('#group-channel-new').show();
-            $('#channel-new').attr("required", true);
-        } else if (value == 'print') {
-            $('#group-epaper').show();
-            $('#group-audience-size').show();
-        } else if (value == 'transcript') {
-            $('#group-transcript-kind').show();
-            // $('#transcript-kind').attr("required", true);
-            document.querySelectorAll('input[name="transcript_kind"').forEach((elem) => {
-                elem.setAttribute('required', true)
+            document.querySelector("#group-channel-new").hidden = false;
+            document.querySelector("#channel-new").required = true;
+            document.querySelector("#group-source-founded").hidden = false;
+
+            document.querySelector("#group-payment-model").hidden = false;
+            document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
+                elem.setAttribute('required', true);
             })
+
+        } else if (value == 'print') {
+            document.querySelector("#group-epaper").hidden = false;
+            document.querySelector("#group-audience-size").hidden = false;
+            document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector("#group-payment-model").hidden = false;
+            document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
+                elem.setAttribute('required', true);
+            })
+
+
+        } else if (value == 'transcript') {
+            document.querySelector("#group-transcript-kind").hidden = false;
+            document.querySelectorAll('input[name="transcript_kind"').forEach((elem) => {
+                elem.setAttribute('required', true);
+            });
+            document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector("#group-payment-model").hidden = false;
+            document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
+                elem.setAttribute('required', true);
+            })
+
+
         } else if (value == 'website') {
-            $('#group-channel-comments').show();
-            $('#channel-comments').attr("required", true);
+            document.querySelector("#group-channel-comments").hidden = false;
+            document.querySelector("#group-channel-comments").required = true;
+            document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector("#group-payment-model").hidden = false;
+            document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
+                elem.setAttribute('required', true);
+            })
+
+
         }
     };
 
@@ -670,12 +757,11 @@
                 addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
 
                 // handle field visibility / dependency logic
-                const channelVisibilityFields = $('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size')
-                channelVisibilityFields.hide()
-                $('#channel-select').change(function() {
-                    let element = $(this);
+                const channelVisibilityFields = document.querySelectorAll('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size, #group-source-founded, #group-payment-model');
+                channelVisibilityFields.forEach((elem) => elem.hidden = true);
+                document.getElementById('channel-select').addEventListener('change', (element) => {
                     channelVisibility(data, channelVisibilityFields, element);
-                    });
+                })
 
                 // Populate form with locally stored data
                 // populateForm(persistentForm, formIdentifier);
@@ -917,6 +1003,13 @@
             errorContainer(field).classList.remove('invalid-feedback');
             field.removeAttribute("aria-invalid");
             field.classList.remove('is-invalid');
+            if (field.type = 'radio') {
+                document.querySelectorAll(`input[name=${field.name}]`).forEach(function (el) {
+                    errorContainer(el).classList.remove('invalid-feedback');
+                    el.removeAttribute("aria-invalid");
+                    el.classList.remove('is-invalid');
+                });
+            };
         }
     }
 
