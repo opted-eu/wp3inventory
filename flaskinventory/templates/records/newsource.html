@@ -11,7 +11,25 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@1.7.6/dist/js/tom-select.complete.min.js"></script>
     <link href="{{ url_for('static',  filename='js/tom-select.bootstrap5.css') }}" rel="stylesheet">
+    <style>
+        @keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
 
+        fieldset[hidden] {
+            opacity: 0;
+        }
+        fieldset {
+            opacity: 1;
+            -webkit-animation: fadein 200ms; /* Safari, Chrome and Opera > 12.1 */
+            -moz-animation: fadein 200ms; /* Firefox < 16 */
+            -ms-animation: fadein 200ms; /* Internet Explorer */
+            -o-animation: fadein 200ms; /* Opera < 12.1 */
+            animation: fadein 200ms;
+            
+        }
+    </style>
 </head>
 
   <body>
@@ -115,7 +133,7 @@
 
 
          <!-- SECTION: ECONOMIC VARIABLES -->
-            <fieldset id="section-economic" style="display: none;">
+            <fieldset id="section-economic" hidden>
                 <h3 class="mb-4">Economic Properties</h3>
                 <div id="group-payment-model" class="mb-3 form-group">
                         <p class="form-label">Is the content produced by the news source accessible free of charge?</p>
@@ -234,7 +252,7 @@
 
             <!-- SECTION JOURNALISTIC ROUTINE -->
 
-            <fieldset id="section-routines" style="display: none;">
+            <fieldset id="section-routines" hidden>
                 <h3 class="mb-4">Journalistic Routines</h3>
 
                 <div id="group-publication-kind" class="mb-3 form-group">
@@ -351,7 +369,7 @@
 
             <!-- SECTION AUDIENCE RELATED -->
 
-            <fieldset id="section-audience" style="display: none;">
+            <fieldset id="section-audience" hidden>
                 <h3 class="mb-4">Audience Related</h3>
 
                 <div id="group-geographic-scope" class="mb-3 mt-4 form-group">
@@ -438,7 +456,7 @@
 
             <!-- SECTION ACCESS TO RAW TEXT AND ANNOTATION -->
 
-            <fieldset id="section-annotations" style="display: none;">
+            <fieldset id="section-annotations" hidden>
                 <h3 class="mb-4">Access to Raw Text and Annotations</h3>
 
                 <div id="group-archive-sources-included" class="mb-3 form-group">
@@ -461,7 +479,7 @@
 
             <!-- SECTION OTHER -->
 
-            <fieldset id="section-other" style="display: none;">
+            <fieldset id="section-other" hidden>
                 <h3 class="mb-4">Other Information</h3>
 
                 <div id="group-entry-notes" class="mb-3 form-group">
@@ -483,7 +501,7 @@
                 <input type="button" class="btn btn-primary next" value="Next Step">
             </fieldset>
 
-            <fieldset id="section-final" style="display: none;">
+            <fieldset id="section-final" hidden>
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
                 <input type="submit" class="btn btn-success" value="Submit" />
             </fieldset>
@@ -765,7 +783,7 @@
 
                 // Populate form with locally stored data
                 // populateForm(persistentForm, formIdentifier);
-                $('#channel-select').change();
+                // $('#channel-select').change();
 
                 // add Tom Select for dynamically loaded data
                 var TomSelectCountriesConfig = {
@@ -776,6 +794,7 @@
                         this.input.removeAttribute("aria-invalid");
                     },
                     onChange: function(){ // invoke validation on change
+                        console.log("tom select countries", this)
                         setFieldValidity(this.input);
                     }
                 };
@@ -902,40 +921,62 @@
         })
 
         // form progression in multiple steps
-        var current = 0,
-            current_step, next_step, steps;
-        steps = $("fieldset").length;
-        $('.next').click(function() {
-            current_step = $(this).parent();
-            for (field of current_step[0].elements) { 
-                if (!visited.includes(field)) {
+        var current = 0;
+        var currentStep;
+        var nextStep;
+        var prevStep
+        steps = document.querySelectorAll("fieldset").length;
+        document.querySelectorAll('.next').forEach((nextbutton) => {
+            nextbutton.addEventListener('click', function() {
+                currentStep = nextbutton.parentElement;
+
+                for (field of currentStep.elements) {
+                    if (!visited.includes(field)) {
                         visited.push(field);
+                        // hacky solution to prevent validation loop
+                        if (field.id == "languages-tomselected") {
+                            field.checkValidity();
+                        }
+                        else {
+                        field.reportValidity();
+                        }
                     }
-                var validatedField = field.reportValidity() 
-                
-            };
-            for (field of current_step[0].elements) {
-                if (!field.validity.valid) {
-                    return;
                 };
-            };
+                for (field of currentStep.elements) {
+                    if (!field.validity.valid) {
+                        // field.reportValidity();
+                        return;
+                    };
+                };
+                nextStep = nextbutton.parentElement.nextElementSibling;
+                currentStep.hidden = true;
+                nextStep.hidden = false
+                document.body.scrollTop = 0; // For Safari
+                document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 
-            next_step = $(this).parent().next();
-            current_step.hide();
-            next_step.fadeIn('fast');
-            document.body.scrollTop = 0; // For Safari
-            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                setProgressBar(++current, steps);
 
-            setProgressBar(++current, steps);
+            });
+
         });
 
-        $('.prev').click(function() {
-            current_step = $(this).parent();
-            prev_step = $(this).parent().prev();
-            prev_step.fadeIn('fast');
-            current_step.hide();
-            setProgressBar(--current, steps);
+        document.querySelectorAll('.prev').forEach((prevbutton) => {
+            prevbutton.addEventListener('click', function() {
+                currentStep = prevbutton.parentElement;
+                prevStep = prevbutton.parentElement.previousElementSibling;
+                currentStep.hidden = true;
+                prevStep.hidden = false;
+                setProgressBar(--current, steps);
+            });
         });
+
+        // $('.prev').click(function() {
+        //     current_step = $(this).parent();
+        //     prev_step = $(this).parent().prev();
+        //     prev_step.fadeIn('fast');
+        //     current_step.hide();
+        //     setProgressBar(--current, steps);
+        // });
         setProgressBar(current, steps);
 
     });
@@ -1003,7 +1044,7 @@
             errorContainer(field).classList.remove('invalid-feedback');
             field.removeAttribute("aria-invalid");
             field.classList.remove('is-invalid');
-            if (field.type = 'radio') {
+            if (field.type == 'radio') {
                 document.querySelectorAll(`input[name=${field.name}]`).forEach(function (el) {
                     errorContainer(el).classList.remove('invalid-feedback');
                     el.removeAttribute("aria-invalid");
@@ -1214,9 +1255,8 @@
                     geographic_scope_countries: [
                         {name: 'NEW!'}
                     ],
-                    channel: [
-                        {name: ' '}
-                    ]
+                    channel: 
+                        {name: ''}
                 };
                 callback(returnData);
             },
