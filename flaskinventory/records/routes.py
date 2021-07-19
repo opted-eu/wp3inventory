@@ -44,29 +44,25 @@ def new_entry():
                     }}
                 }}
         '''
-        print(query_string)
         result = dgraph.query(query_string)
         if len(result['data']) > 0:
             for item in result['data']:
                 if item.get('other_names'):
                     item['other_names'] = ", ".join(item['other_names'])
             table = database_check_table(result['data'])
-            return render_template('records/database_check.html', table=table)
+            return render_template('records/database_check.html', query=form.name.data, table=table)
             # return redirect(url_for('records.database_check', result=result['data']))
         else:
-            return redirect(url_for('records.new_source', entry_name=form.name))
+            return redirect(url_for('records.new_source', entry_name=form.name.data))
     return render_template('records/newentry.html', form=form)
-
-@records.route("/new/check")
-def database_check():
-    table = make_results_table(request.args.get('result'))
-    return render_template('records/database_check.html', table=table)
 
 @records.route("/new/source")
 def new_source():
     return render_template("records/newsource.html")
 
-
+@records.route("/new/confirmation")
+def confirmation():
+    return render_template("not_implemented.html")
 
 # API Endpoints
 
@@ -124,3 +120,9 @@ def sourcelookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
+
+
+
+@records.route('/new/submit', methods=['POST'])
+def submit():
+    return render_template('not_implemented')

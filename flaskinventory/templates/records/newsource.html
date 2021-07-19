@@ -14,10 +14,10 @@
                     <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
                     <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
                     <select name="channel" id="channel-select" class="form-select" aria-describedby="channel-select-feedback" required>
-                        <option value="" selected>Select...</option>
+                        <option value="" selected>Select Channel...</option>
                     </select>
                     <div id="channel-select-feedback"></div>
-                    <input type="text" name="channel_uid" id="channel-select-hidden" style="display: none;">
+                    <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
                 </div>
                 <div id="group-channel-new" class="mb-3" hidden>
                     <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
@@ -30,9 +30,9 @@
                         <small id="name-helptext"></small>
                     <div class="input-group">
                         <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
-                        <input name="name" type="text" class="form-control" id="source-name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
-                        <div id="name-feedback"></div>
-                        </div>
+                        <input name="name" type="text" class="form-control" id="name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
+                    </div>
+                    <div id="name-feedback"></div>
                     </div>
                     <div id="group-transcript-kind" class="my-3 form-group">
                         <p class="form-label">What kind of show is transcribed?</p>
@@ -67,7 +67,7 @@
             
             <div id="group-other-names" class="mb-3 form-group">
                 <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
-                <select type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></select>
+                <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></input>
             </div>
 
             <div id="group-epaper" class="mb-3 form-group" hidden>
@@ -76,16 +76,34 @@
             </div>
 
             <div id="group-channel-comments" class="mb-3 form-group" hidden>
-                <label for="channel-comments" class="form-label">Does the online news source have user comments below individual news articles?</label>
-                <select name="channel_comments" type="text" class="form-control" id="channel-comments" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-comments-feedback">
-                    <option value="">Choose...</option>
-                    <option label="No comments">No comments</option>
-                    <option label="User comments with registration">Registration required</option>
-                    <option label="User comments without registration">Anyone</option>
-                    <option label="Don't know">DK</option>
-                </select>
-                <div id="channel-comments-feedback"></div>
+                <p class="form-label">Does the online news source have user comments below individual news articles?</p>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments1" value="no comments"  aria-describedby="channel-comments-feedback">
+                    <label class="form-check-label" for="channel_comments1">
+                        No comments
+                    </label>
                 </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments2" value="user comments with registration"  aria-describedby="channel-comments-feedback">
+                    <label class="form-check-label" for="channel_comments2">
+                        Registration required
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments3" value="user comments without registration"  aria-describedby="channel-comments-feedback">
+                    <label class="form-check-label" for="channel_comments3">
+                        Anyone
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments4" value="none"  aria-describedby="channel-comments-feedback">
+                    <label class="form-check-label" for="channel_comments4">
+                        Don't know
+                    </label>
+                    <div id="channel-comments-feedback"></div>
+                </div>
+            </div>
             
             <div id="group-source-founded" class="mb-3 form-group">
                 <label for="source-founded" class="form-label">What year was the news source founded?</label>
@@ -126,8 +144,8 @@
                             <label class="form-check-label" for="payment_model4">
                                 Don't know
                             </label>
-                            <div id="payment-model-feedback"></div>
                         </div>
+                        <div id="payment-model-feedback"></div>
                 </div>
 
 
@@ -135,7 +153,7 @@
 
                 <div id="group-contains-ads" class="mb-3 form-group">
 
-                    <p class="form-label">Does the news source contain advertisements?</p>
+                    <p for="contains_ads" class="form-label">Does the news source contain advertisements?</p>
 
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes"  aria-describedby="contains-ads-feedback" required>
@@ -371,7 +389,7 @@
 
                 <div id="group-geographic-scope-multiple" class="mb-3 form-group">
                     <label for="geographic-scope-multiple" class="form-label">What is the multinational scope?</label>
-                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple..." autocomplete="off" required multiple></select>
+                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
                     <small id="geographic-scope-multiple-helptext"></small>
                     <div id="geographic-scope-multiple-feedback"></div>
                 </div>
@@ -462,16 +480,26 @@
                     
                 </div>
 
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
+                <div id="group-newrelated-container">
 
+                </div>
+
+                <input type="button" class="btn btn-primary prev" value="Previous Step">
+                <input type="button" onclick="generateSummary()" class="btn btn-primary next" value="Next Step">
+            </fieldset>
+            
+            
             <fieldset id="section-final" hidden>
+                <h3>Summary</h3>
+    
+                <div id='summary-container'>
+
+                </div>
                 <input type="button" class="btn btn-primary prev" value="Previous Step">
                 <input type="submit" class="btn btn-success" value="Submit" />
             </fieldset>
             <div class="mb-3 d-flex flex-row-reverse">
-                <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" />
+                <!-- <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" /> -->
             </div>
 </form>
 
@@ -564,7 +592,7 @@
 
         if (index != 99) {
             document.querySelector("#group-name label").innerText = fieldOptions.channel[index]['form_name_question'];
-            document.querySelector("#source-name").setAttribute("placeholder", fieldOptions.channel[index]['form_name_placeholder'])
+            document.querySelector("#name").setAttribute("placeholder", fieldOptions.channel[index]['form_name_placeholder'])
             if ('form_name_helptext' in fieldOptions.channel[index]) {
                 document.querySelector('#name-helptext').innerText = fieldOptions.channel[index]['form_name_helptext'];
             } else { document.querySelector('#name-helptext').innerText = "" };
@@ -575,7 +603,7 @@
         } else {
 
             document.querySelector("#group-name label").innerText = "What is the name of the news source that you suggest?";
-            document.querySelector("#source-name").setAttribute("placeholder", "");
+            document.querySelector("#name").setAttribute("placeholder", "");
             document.querySelector("#name-addon").hidden = true;
         };
 
@@ -585,11 +613,13 @@
         })
 
         document.querySelector("#channel-new").removeAttribute("required");
-        document.querySelector("#channel-comments").removeAttribute("required");
+        document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
+            elem.removeAttribute('required') 
+        });
 
         document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
             elem.removeAttribute('required')
-        })
+        });
 
         if (value == 'other') {
             document.querySelector("#group-channel-new").hidden = false;
@@ -625,7 +655,9 @@
 
         } else if (value == 'website') {
             document.querySelector("#group-channel-comments").hidden = false;
-            document.querySelector("#group-channel-comments").required = true;
+            document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
+            elem.setAttribute('required', true) 
+            });
             document.querySelector("#group-source-founded").hidden = false;
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
@@ -683,26 +715,17 @@
     }
 
 
-
-    // make form persistent with local storage
-    function getFormData(f, fID) {
-        let data = {
-            [fID]: {}
-        };
-        for (var element of f.elements) {
-            if (element.name.length > 0) {
-                data[fID][element.name] = element.value;
-            }
-        }
-        return data;
-    };
-
     // populate form on page load
     function populateForm(f, fID) {
         if (localStorage.key(fID)) {
             var savedData = JSON.parse(localStorage.getItem(fID));
             for (var element of f.elements) {
                 if (element.name in savedData) {
+                    if (Array.isArray(element))
+                        {
+                            element.value = savedData[element.name].join()
+                        }
+
                     element.value = savedData[element.name];
                 }
             }
@@ -724,7 +747,7 @@
         const formId = "new-source";
         const formUrl = location.href;
         const formIdentifier = `${formUrl} ${formId}`;
-        var persistentForm = document.querySelector(`#${formId}`)
+        // var persistentForm = document.querySelector(`#${formId}`)
 
         // Load Select options from json api
         getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
@@ -744,11 +767,12 @@
 
                 // Populate form with locally stored data
                 // populateForm(persistentForm, formIdentifier);
-                // $('#channel-select').change();
+                // document.getElementById('channel-select').dispatchEvent(new Event('change'))
 
                 // add Tom Select for dynamically loaded data
                 var TomSelectCountriesConfig = {
                     plugins: ['remove_button'],
+                    create: true,
                     selectOnTab: true,
                     onInitialize: function() { // hacky way of forcing the field to be not-validated on load
                         this.input.classList.remove('is-invalid');
@@ -871,15 +895,17 @@
         $('select').inputSelectToHidden();
 
         // persistence: save changes in form
-        $("#" + formId).change(function() {
-            var data = getFormData(persistentForm, formIdentifier);
-            localStorage.setItem(formIdentifier, JSON.stringify(data[formIdentifier]));
-        });
+
+        // document.getElementById(formId).addEventListener('change', function() {
+        //     var obj = serializeForm(this);
+        //     localStorage.setItem(formIdentifier, JSON.stringify(obj))
+        // });
 
         // persistence: clear local storage on "reset"
-        $("#reset-form").click(function() {
-            localStorage.removeItem(formIdentifier);
-        })
+        // document.getElementById('reset-form').addEventListener('click', function() {
+        //     localStorage.removeItem(formIdentifier);
+        //     location.reload()
+        // })
 
         // form progression in multiple steps
         var current = 0;
@@ -930,14 +956,6 @@
                 setProgressBar(--current, steps);
             });
         });
-
-        // $('.prev').click(function() {
-        //     current_step = $(this).parent();
-        //     prev_step = $(this).parent().prev();
-        //     prev_step.fadeIn('fast');
-        //     current_step.hide();
-        //     setProgressBar(--current, steps);
-        // });
         setProgressBar(current, steps);
 
     });
@@ -952,6 +970,7 @@
         if (isValid) {
             // POST form data to backend with fetch
             submitForm('{{ url_for("records.echo_json") }}', form);
+            window.location.assign('{{ url_for("records.confirmation") }}')
         };
 
         event.preventDefault();
@@ -1027,10 +1046,9 @@
     });
 
 
-    function submitForm(endpoint, form) {
-        var serializeForm = function (form) {
-            var obj = {};
-            var formData = new FormData(form);
+    function serializeForm(f) {
+        var obj = {};
+            var formData = new FormData(f);
             
             var obj = Object.fromEntries(
                 Array.from(formData.keys()).map(key => [
@@ -1041,6 +1059,9 @@
 
             return obj;
         };
+
+
+    function submitForm(endpoint, form) {
         $.ajax({
             type: "POST",
             url: endpoint,
@@ -1051,7 +1072,6 @@
                 console.log(data)
             }
         })
-
     };
 
     // autocomplete organization
@@ -1185,25 +1205,32 @@
         row.classList.add('row', 'mb-3')
         var label = document.createElement('label')
         label.classList.add('col-sm-2', 'col-form-label')
-        label.addAttribute('for', 'new-source')
+        label.setAttribute('for', 'newsource_' + sourceName)
         label.innerText = sourceName;
         row.append(label)
         var col = document.createElement('div');
         col.classList.add('col-sm-10');
         var select = document.createElement('select')
         select.classList.add('form-select')
-        select.addAttribute('name', 'new_source')
+        select.setAttribute('name', 'newsource_' + sourceName)
         
-        // add options
+        // copy options from the first page
+        select.innerHTML = document.getElementById('channel-select').innerHTML
+        for (option of select) {
+            if ( option.getAttribute('data-value') == 'new') {
+                option.remove()
+            }
+            option.value = option.getAttribute('data-value')
+        }
 
         // append elements
+        col.append(select);
+        row.append(col)
 
         // append to container
-
-
+        document.getElementById(container).append(row) 
 
      }
-
 
     var TomSelectRelatedSourcesConfig = {
         plugins: ['remove_button'],
@@ -1226,6 +1253,9 @@
         searchField: 'name',
         delimiter: ',',
         selectOnTab: true,
+        onOptionAdd: function(input) { 
+            createNewSourceField('group-newrelated-container', input)
+        },
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
             var url = '{{ url_for("records.sourcelookup") }}?q=' + encodeURIComponent(query);
@@ -1237,17 +1267,89 @@
         },
         render: {
             option: function(data, escape) {
+                var channel_label = ' (' + escape(data.channel.name) + ') '
+                if (data.channel.name == '') {
+                    channel_label = ' '
+                };
                 return '<div>' +
-                        '<span class="title">' + escape(data.name) + ' (' + escape(data.channel.name) + ') ' + '</span>' +
+                        '<span class="title">' + escape(data.name) + channel_label + '</span>' +
                         '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>' +
                     '</div>';
             },
             item: function(data, escape) {
-                return '<div>' + escape(data.name) + ' (' + escape(data.channel.name) + ') ' + ' <small class="mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small></div>';
+                console.log(data.channel.name)
+                var channel_label = ' (' + escape(data.channel.name) + ') '
+                if (data.channel.name == '') {
+                    channel_label = ' '
+                };
+                return '<div>' + escape(data.name) + channel_label + ' <small class="mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small></div>';
             }
 	    }
     };
     new TomSelect('#related-sources', TomSelectRelatedSourcesConfig);
+
+    // summary at the end
+
+    function generateSummary() {
+
+        data = serializeForm(document.getElementById('new-source'));
+
+        var descriptionList = document.createElement('dl')
+        descriptionList.classList.add('row')
+
+        for (const [key, value] of Object.entries(data)) {
+            var question = document.createElement('dt');
+            question.classList.add('col-sm-4');
+            question.innerText = key;
+            var answer = document.createElement('dd');
+            answer.classList.add('col-sm-8');
+            answer.innerText = value;
+
+            descriptionList.append(question)
+            descriptionList.append(answer)
+
+        }
+
+        document.getElementById('summary-container').append(descriptionList);
+
+
+        // var formFields = document.querySelectorAll('#new-source input, select');
+        // for ( var i = 0; i < formFields.length; i++) {
+
+        //     if ( formFields[i].hidden || formFields[i].type == 'button' || formFields[i].id.endsWith('-tomselected') ) {
+        //         continue
+        //     }
+
+        //     if (formFields[i].type == 'radio' ) {
+        //         if (!formFields[i].checked) {
+        //             continue
+        //         }
+        //     }
+
+        //     console.log(formFields[i].id)
+
+        //     var question = document.createElement('dt');
+        //     question.classList.add('col-sm-4');
+        //     var answer = document.createElement('dd');
+        //     answer.classList.add('col-sm-8');
+
+        //     if (formFields[i].type == 'radio') {
+        //         question.innerText = document.querySelector('[for="' + formFields[i].name + '"]').innerText
+        //     }
+        //     else {
+        //     question.innerText = document.querySelector('label[for="' + formFields[i].id + '"]').innerText
+        //     }
+        //     answer.innerText = formFields[i].value
+
+        //     descriptionList.append(question)
+        //     descriptionList.append(answer)
+
+
+        // }
+
+
+
+    }
 
 
 </script>

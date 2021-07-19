@@ -6,7 +6,7 @@ from flask import url_for
 def database_check_table(table_data):
     cols = list(table_data[0].keys())
     TableCls = create_table('Table')
-    TableCls.classes = ['table']
+    TableCls.classes = ['table', 'table-hover']
 
     if 'name' in cols:
         TableCls.add_column('name', LinkCol('Name', 'inventory.view_source', url_kwargs=dict(unique_name='unique_name'), attr_list='name'))

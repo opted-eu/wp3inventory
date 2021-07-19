@@ -1,13 +1,22 @@
 {% extends "layout.html" %} {% block content %}
 
-<main>
-    <h1>We already have the following entries in the inventory</h1>
-    <p class="fs-5 col-md-8">Placeholder for disclaimer and learning module...</p>
-    <div class="mb-5">
-        
-        {{ table }} 
-        
+<div class="row">    
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Found following entries matching "{{ query }}"</h4>
+        <p>Please go through the list below and make sure your suggestion is not in the inventory yet</p>
     </div>
-</main>
+    <div class="mb-5">
+            
+            {{ table }} 
+            
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h4>Is your suggestion listed above or new?</h4>
+        <div class="my-4 d-grid gap-2 d-md-flex">
+        <a class="btn btn-outline-secondary" href="{{ url_for('records.new_entry') }}" role="button">Already listed</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('records.new_source') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+</div>
 
 {% endblock content %}
