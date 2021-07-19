@@ -39,7 +39,11 @@
     <div class="container">
         <main role="main">
             <div class="row">
+                {% if show_sidebar %}
                 <div class="col-md-8">
+                {% else %}
+                <div class="col-md-12">
+                {% endif %}
                     {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
                     <div class="alert alert-{{ category }} alert-dismissible fade show">
                         {{ message }}
@@ -47,6 +51,7 @@
                     </div>
                     {% endfor %} {% endif %} {% endwith %} {% block content %} {% endblock %}
                 </div>
+                {% if show_sidebar %}
                 <div class="col-md-4">
                     {% block sidebar %}
                     <div class="d-flex flex-column align-items-stretch bg-white" style="width: 380px;">
@@ -94,6 +99,7 @@
 </div>
                     {% endblock sidebar %}
                 </div>
+                {% endif %}
             </div>
         </main>
     </div>

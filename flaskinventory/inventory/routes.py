@@ -76,6 +76,7 @@ def view_source(unique_name):
         return render_template('view_source.html',
                                title=unique_item.get('name'),
                                entry=unique_item,
+                               show_sidebar=True,
                                sidebar_title=sidebar_title,
                                sidebar_items=sidebar_items)
     else:
@@ -174,7 +175,7 @@ def query():
         c_choices.insert(0, ('all', 'All'))
         form = SimpleQuery()
         form.country.choices = c_choices
-        return render_template('query_result.html', title='Query Result', table=table, sidebar_title="Query", sidebar_form=form)
+        return render_template('query_result.html', title='Query Result', table=table, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
     return redirect(url_for('main.home'))
 
 @inventory.route("/query/advanced")
