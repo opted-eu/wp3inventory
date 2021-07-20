@@ -113,6 +113,7 @@ type Subunit {
     entry_notes
     other_names
     wikidataID
+    location_point
 }
 
 type Archive {
@@ -193,8 +194,9 @@ other_names: [string] @index(term, trigram) .
 wikidataID: int .
 founded: dateTime @index(year) .
 country: [uid] @reverse .
-country_code: string .
+country_code: string @index(exact).
 description: string .
+location_point: geo @index(geo) .
 
 # Channel Predicates
 form_name_question: string .
