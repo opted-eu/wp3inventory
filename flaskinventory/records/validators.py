@@ -1,6 +1,7 @@
 class InventoryValidationError(Exception):
     pass
 
+
 class ValidateNewSource():
 
     def __init__(self, json):

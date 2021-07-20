@@ -302,7 +302,7 @@
                         <option value="" selected>Choose...</option>
                         <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
                         <option value="daily">Daily (7 times a week)</option>
-                        <option value="mulitple times per week">Multiple times per week</option>
+                        <option value="multiple times per week">Multiple times per week</option>
                         <option value="weekly">Once a week</option>
                         <option value="twice a month">Twice a month</option>
                         <option value="monthly">Monthly</option>
@@ -314,35 +314,35 @@
 
                 <div id="group-publication-cycle-weekday" class="mb-3" hidden>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday1" id="publication-cycle-weekday1" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday1">Monday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday2" id="publication-cycle-weekday2" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday2">Tuesday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday3" id="publication-cycle-weekday3" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday3">Wednesday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday4" id="publication-cycle-weekday4" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday4">Thursday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday5" id="publication-cycle-weekday5" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday5">Friday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday6" id="publication-cycle-weekday6" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday6">Saturday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday7" id="publication-cycle-weekday7" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday7">Sunday</label>
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
+                        <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_na_weekday" id="publication-cycle-weekday-none" value="yes">
+                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
                         <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
                     </div>
                     <div id="publication-cycle-weekday-feedback"></div>
@@ -691,9 +691,33 @@
 
     if (document.querySelector('#publication-cycle')) {
         document.getElementById('publication-cycle').addEventListener("change", function(event) {
-            if (this.value == 'mulitple times per week' || this.value == 'weekly' ) {
+            if (this.value == 'multiple times per week' || this.value == 'weekly' ) {
                 document.getElementById('group-publication-cycle-weekday').hidden = false;
+
+                if (this.value == 'weekly') {
+                    let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
+                    weekday.forEach((el) => {
+                        el.setAttribute('type', 'radio')
+                        el.setAttribute('name', 'publication_cycle_weekday')
+                        el.setAttribute('value', el.id.replace('publication-cycle-weekday-', ''))
+                        el.disabled = false
+                        el.checked = false
+                    });
+
+                }
+                if (this.value == 'multiple times per week') {
+                    let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
+                    weekday.forEach((el) => {
+                        el.setAttribute('type', 'checkbox')
+                        el.setAttribute('name', 'publication_cycle_weekday_' + el.id.replace('publication-cycle-weekday-', ''))
+                        el.setAttribute('value', 'yes')
+                        el.disabled = false
+                        el.checked = false
+                    });
+                }
             }
+
+
             else {
                 document.getElementById('group-publication-cycle-weekday').hidden = true;
             }
@@ -702,10 +726,12 @@
 
     if (document.querySelector('#publication-cycle-weekday-none')) {
         document.getElementById('publication-cycle-weekday-none').addEventListener("change", function(event) {
-            if (this.checked) {
+            if (this.checked && this.type == 'checkbox' ) {
                 document.querySelectorAll('input[name^="publication_cycle_weekday"').forEach((elem) => {
-                    elem.checked = false
-                    elem.disabled = true
+                    if (!elem.id.includes('none')) {
+                        elem.checked = false
+                        elem.disabled = true
+                    }
                 });
             } 
             else {
@@ -781,7 +807,6 @@
                         this.input.removeAttribute("aria-invalid");
                     },
                     onChange: function(){ // invoke validation on change
-                        console.log("tom select countries", this)
                         setFieldValidity(this.input);
                     }
                 };
@@ -972,7 +997,7 @@
         if (isValid) {
             // POST form data to backend with fetch
             submitForm('{{ url_for("records.echo_json") }}', form);
-            window.location.assign('{{ url_for("records.confirmation") }}')
+            // window.location.assign('{{ url_for("records.confirmation") }}')
         };
 
         event.preventDefault();
@@ -986,7 +1011,6 @@
         });
         
         field.addEventListener("valid", function handleInvalidField(event) {
-            console.log(field);
             setFieldValidity(field);
             event.preventDefault();
         });
@@ -1069,16 +1093,38 @@
 
 
     function submitForm(endpoint, form) {
-        $.ajax({
-            type: "POST",
-            url: endpoint,
-            data: JSON.stringify(serializeForm(form)),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (data) {
-                console.log(data)
+        // $.ajax({
+        //     type: "POST",
+        //     url: endpoint,
+        //     data: JSON.stringify(serializeForm(form)),
+        //     contentType: "application/json; charset=utf-8",
+        //     dataType: "json",
+        //     success: function (data) {
+        //         console.log(data)
+        //     },
+        //     error: function(xhr, textStatus, errorThrown) {
+        //         console.log("error");
+        //     }
+        // })
+        var xhr = new XMLHttpRequest();
+        var url = endpoint;
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                var json = JSON.parse(xhr.responseText);
+                console.log(json);
             }
-        })
+            else {
+                console.log("error", xhr.statusText)
+            }
+        }
+        };
+        var data = JSON.stringify(serializeForm(form));
+        xhr.send(data);
+
     };
 
     // autocomplete organization

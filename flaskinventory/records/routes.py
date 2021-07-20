@@ -1,10 +1,11 @@
-from flask import (Blueprint, render_template, url_for, flash, redirect, request, abort, jsonify)
+from flask import (Blueprint, json, render_template, url_for, flash, redirect, request, abort, jsonify)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory.posts.forms import PostForm
 from flaskinventory import dgraph
 from flaskinventory.records.external import get_geocoords
 from flaskinventory.records.forms import NewEntry
 from flaskinventory.records.utils import database_check_table
+from flaskinventory.records.process import process_print
 
 records = Blueprint('records', __name__)
 
@@ -72,7 +73,11 @@ def fieldoptions():
 
 @records.route('/new/echo', methods=['POST'])
 def echo_json():
-    return jsonify(request.json)
+    try:
+        response = process_print(request.json)
+    except Exception as e:
+        response = {'error': f'{e}'}
+    return jsonify(response)
 
 
 @records.route('/_orglookup')
