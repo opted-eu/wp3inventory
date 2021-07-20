@@ -21,6 +21,8 @@ def geocode(address):
     r = geocoder.osm(address)
     if r.status_code != 200:
         return False
+    if not r.ok:
+        return False
     return r.json
 
 
