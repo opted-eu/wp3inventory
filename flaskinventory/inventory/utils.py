@@ -46,6 +46,8 @@ def make_results_table(table_data):
         for item in table_data:
             if item.get('founded'):
                 item['founded'] = item['founded'].year
+            else:
+                item['founded'] = 'NA'
 
     if 'published_date' in cols:
         for item in table_data:
