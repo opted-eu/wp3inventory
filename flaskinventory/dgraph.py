@@ -446,8 +446,9 @@ class DGraph(object):
         query_country = '''country(func: type("Country")) { uid unique_name name  }'''
         query_dataset = '''dataset(func: type("Dataset")) { uid unique_name name  }'''
         query_archive = '''archive(func: type("Archive")) { uid unique_name name  }'''
+        query_subunit = '''subunit(func: type("Subunit")) { uid unique_name name country { name } }'''
 
-        query_string = '{ ' + query_channel + query_country + query_dataset + query_archive + ' }'
+        query_string = '{ ' + query_channel + query_country + query_dataset + query_archive + query_subunit + ' }'
 
         res = self.client.txn(read_only=True).query(query_string)
         data = json.loads(res.json, object_hook=self.datetime_hook)
