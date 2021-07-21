@@ -1,29 +1,25 @@
 import time
 import requests
-import geocoder
 import feedparser
 from urllib.robotparser import RobotFileParser
 import urllib.parse
 from bs4 import BeautifulSoup as bs4
 import validators
 
-
-
-
-def get_geocoords(address):
-    time.sleep(5)
-    r = geocoder.osm(address)
-    if r.status_code != 200:
-        return False
-    return r.geojson.get('features')[0].get('geometry')
-
 def geocode(address):
-    r = geocoder.osm(address)
+    payload = {'q': address, 
+        'format': 'jsonv2', 
+        'addressdetails': 1, 
+        'limit': 1, 
+        'namedetails': 1}
+    api = "https://nominatim.openstreetmap.org/search"
+    r = requests.get(api, params=payload)
     if r.status_code != 200:
         return False
-    if not r.ok:
+    elif len(r.json()) == 0:
         return False
-    return r.json
+    else: 
+        return r.json()[0] 
 
 
 # Sitemaps & RSS/XML/Atom Feeds

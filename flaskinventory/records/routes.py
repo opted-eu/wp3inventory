@@ -1,31 +1,15 @@
-from flask import (Blueprint, json, render_template, url_for, flash, redirect, request, abort, jsonify)
+from logging import error
+from flask import (Blueprint, json, render_template, url_for,
+                   flash, redirect, request, abort, jsonify)
 from flask_login import login_user, current_user, logout_user, login_required
+import requests
 from flaskinventory.posts.forms import PostForm
 from flaskinventory import dgraph
-from flaskinventory.records.external import get_geocoords
 from flaskinventory.records.forms import NewEntry
 from flaskinventory.records.utils import database_check_table
-from flaskinventory.records.process import process_print
+from flaskinventory.records.process import EntryProcessor
 
 records = Blueprint('records', __name__)
-
-@records.route("/geocodetest")
-def jquerytests():
-    return render_template('ajax_geocode_test.html')
-
-@records.route("/external/geocode", methods=['POST'])
-def geocode():
-    if request.method == 'POST':
-        if request.form.get('address'):
-            r = get_geocoords(request.form['address'])
-            if r:
-                return jsonify({'status': 'success', 'content': r})
-            else: return jsonify({'status': 'failed'})
-        else: return jsonify({'status': 'failed', 'message': 'please supply "address"'})
-    
-    else: 
-        return abort(405)
-
 
 @records.route("/new", methods=['GET', 'POST'])
 def new_entry():
@@ -57,15 +41,19 @@ def new_entry():
             return redirect(url_for('records.new_source', entry_name=form.name.data))
     return render_template('records/newentry.html', form=form)
 
+
 @records.route("/new/source")
+@login_required
 def new_source():
     return render_template("records/newsource.html")
+
 
 @records.route("/new/confirmation")
 def confirmation():
     return render_template("not_implemented.html")
 
 # API Endpoints
+
 
 @records.route("/new/fieldoptions")
 def fieldoptions():
@@ -74,15 +62,16 @@ def fieldoptions():
 @records.route('/new/echo', methods=['POST'])
 def echo_json():
     try:
-        response = process_print(request.json)
+        processor = EntryProcessor(request.json, current_user, request.remote_addr)
+        return jsonify(processor.processed)
     except Exception as e:
-        response = {'error': f'{e}'}
-    return jsonify(response)
+        error = {'error': f'{e}'}
+        return jsonify(error)
 
 
 @records.route('/_orglookup')
 def orglookup():
-    query= request.args.get('q')
+    query = request.args.get('q')
     person = request.args.get('person')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
     query_string = f'''{{
@@ -105,7 +94,6 @@ def orglookup():
     return jsonify(result)
 
 
-
 @records.route('/_sourcelookup')
 def sourcelookup():
     query = request.args.get('q')
@@ -125,7 +113,6 @@ def sourcelookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
-
 
 
 @records.route('/new/submit', methods=['POST'])
