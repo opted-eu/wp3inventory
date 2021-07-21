@@ -391,8 +391,10 @@
 
                 <div id="group-geographic-scope-multiple" class="mb-3 form-group">
                     <label for="geographic-scope-multiple" class="form-label">What is the multinational scope?</label>
-                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
                     <small id="geographic-scope-multiple-helptext"></small>
+                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
+                    <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly>
+                    <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly> 
                     <div id="geographic-scope-multiple-feedback"></div>
                 </div>
 
@@ -565,6 +567,20 @@
     };
 
     function getFieldOptions(targetUrl) {
+
+            // TODO: WITHOUT AJAX
+            //         fetch('fieldoptions')
+            // .then(response => response.json())
+            // .then((json) => {
+            //     console.log(json.subunit)
+            //     var countries = json.country
+            //     var subunits = json.subunit
+            //     countries.forEach((c) => c.class = 'country')
+            //     subunits.forEach((su) => su.class = 'subunit')
+            //     const optgroup = countries.concat(json.subunit)
+            //     console.log(optgroup)
+            // })
+
         return new Promise(function(resolve, reject) {
             $.ajax({
                 url: targetUrl,
@@ -583,7 +599,6 @@
     // Field Visibility Logic
     function channelVisibility(fieldOptions, allNames, el) {        
         var value = el.target.value
-        console.log(value)
         var index = el.target.options[el.target.selectedIndex].getAttribute('data-index')
         if (index == null) {
             return;
@@ -779,12 +794,69 @@
 
         // Load Select options from json api
         getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
-                addFieldOptionsData(data, 'channel', '#channel-select');
-                addLanguages(data, 'language', '#languages', false);
-                addFieldOptions(data, 'country', '#geographic-scope-single', false);
-                addFieldOptions(data, 'country', '#geographic-scope-multiple', false);
-                addFieldOptions(data, 'archive', '#archive-sources-included', false);
-                addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
+
+            addFieldOptionsData(data, 'channel', '#channel-select');
+            addLanguages(data, 'language', '#languages', false);
+            addFieldOptions(data, 'country', '#geographic-scope-single', false);
+            addFieldOptions(data, 'subunit', '#geographic-scope-subunit', false);            
+            
+            addFieldOptions(data, 'archive', '#archive-sources-included', false);
+            addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
+            
+            // Add field options for Country & Subunit Selection (Multiple Choice)
+            var countries = data.country;
+            var subunits = data.subunit;
+            // Sort values alphabetically
+            countries.sort((a,b) => a.name > b.name ? 1 : -1);
+            subunits.sort((a,b) => a.name > b.name ? 1 : -1);
+
+            var inputGeographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+            var optgroupCountries = document.createElement('optgroup');
+            optgroupCountries.setAttribute('label', 'Country');
+            countries.forEach(function(item, i) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.unique_name)
+                opt.setAttribute('data-uid', item.uid)
+                opt.setAttribute('data-type', 'country')
+                opt.innerText = item.name
+                optgroupCountries.append(opt)
+            });
+
+            var optgroupSubunits = document.createElement('optgroup');
+            optgroupSubunits.setAttribute('label', 'Subunit');
+            subunits.forEach(function(item, i) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.unique_name)
+                opt.setAttribute('data-uid', item.uid)
+                opt.setAttribute('data-type', 'subunit')
+                opt.innerText = item.name
+                optgroupSubunits.append(opt)
+            });
+
+            inputGeographicScopeMultiple.append(optgroupCountries)
+            inputGeographicScopeMultiple.append(optgroupSubunits)
+
+            inputGeographicScopeMultiple.addEventListener('change', function() {
+                var hiddenGeographicScopeCountry = document.getElementById('geographic-scope-countries-hidden')
+                var hiddenGeographicScopeSubunits = document.getElementById('geographic-scope-subunits-hidden')
+                var selectedCountries = new Array;
+                var selectedSubunits = new Array;
+                for (opt of this.selectedOptions) {
+                    if (opt.getAttribute('data-type') == 'country') {
+                        selectedCountries.push(opt.getAttribute('data-uid'));
+                    }
+                    else {
+                        if (opt.getAttribute('data-uid') === null) { 
+                            selectedSubunits.push(opt.value);
+                        }
+                            selectedSubunits.push(opt.getAttribute('data-uid'));
+                    }
+                }
+                hiddenGeographicScopeCountry.value = selectedCountries.join()
+                hiddenGeographicScopeSubunits.value = selectedSubunits.join()
+            });
+
+
 
                 // handle field visibility / dependency logic
                 const channelVisibilityFields = document.querySelectorAll('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size, #group-source-founded, #group-payment-model');
@@ -820,9 +892,23 @@
                         setFieldValidity(this.input);
                     }
                 };
+
+                var TomSelectSubunitConfig = {
+                    selectOnTab: true,
+                    create: true,
+                    onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                        this.input.classList.remove('is-invalid');
+                        this.input.removeAttribute("aria-invalid");
+                    },
+                    onChange: function(){ // invoke validation on change
+                        setFieldValidity(this.input);
+                    }
+                };
      
                 const geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
                 const geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
+                const geographicScopeSubunit = new TomSelect('#geographic-scope-subunit', TomSelectSubunitConfig);
+
 
                 var TomSelectLanguagesConfig = { 
                     plugins: ['remove_button'],
@@ -866,6 +952,7 @@
                             document.getElementById('geographic-scope-subunit-tomselected').required = false;
 
                             geographicScopeSingle.clear();
+                            geographicScopeSubunit.clear();
 
                         }
                         else if (item == 'national') {
@@ -883,6 +970,7 @@
                             document.getElementById('geographic-scope-subunit-tomselected').required = false;
 
                             geographicScopeMultiple.clear();
+                            geographicScopeSubunit.clear();
                         }
                         else if (item == 'subnational') {
                             document.getElementById('group-geographic-scope-multiple').hidden = true;
@@ -907,6 +995,7 @@
 
                             geographicScopeSingle.clear();
                             geographicScopeMultiple.clear();
+                            geographicScopeSubunit.clear();
                         }
                         });
                     });
@@ -1093,24 +1182,11 @@
 
 
     function submitForm(endpoint, form) {
-        // $.ajax({
-        //     type: "POST",
-        //     url: endpoint,
-        //     data: JSON.stringify(serializeForm(form)),
-        //     contentType: "application/json; charset=utf-8",
-        //     dataType: "json",
-        //     success: function (data) {
-        //         console.log(data)
-        //     },
-        //     error: function(xhr, textStatus, errorThrown) {
-        //         console.log("error");
-        //     }
-        // })
         var xhr = new XMLHttpRequest();
         var url = endpoint;
         xhr.open("POST", url, true);
         xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
@@ -1118,7 +1194,7 @@
                 console.log(json);
             }
             else {
-                console.log("error", xhr.statusText)
+                console.log("error", xhr.statusText, xhr.responseText)
             }
         }
         };
@@ -1230,7 +1306,6 @@
     };
 
     new TomSelect('#other-names', TomSelectOtherNamesConfig);
-    new TomSelect('#geographic-scope-subunit', TomSelectOtherNamesConfig);
 
 
     var TomSelectPublicationKindConfig = {
@@ -1273,7 +1348,9 @@
             if ( option.getAttribute('data-value') == 'new') {
                 option.remove()
             }
-            option.value = option.getAttribute('data-value')
+            // this is a lazy way of getting two bits of data into one field
+            // we have to split this later at the comma to get the unique_name and uid
+            option.value = option.value + ',' + option.getAttribute('data-value')
         }
 
         // append elements
