@@ -107,6 +107,7 @@ type Subunit {
     unique_name
     name
     country
+    country_code
     entry_added
     entry_edit_history
     entry_review_status
