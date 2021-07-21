@@ -11,6 +11,7 @@ from flaskinventory.records.process import EntryProcessor
 
 records = Blueprint('records', __name__)
 
+@login_required
 @records.route("/new", methods=['GET', 'POST'])
 def new_entry():
     form = NewEntry()
