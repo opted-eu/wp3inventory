@@ -70,9 +70,9 @@
         _:derstandardat <channel> _:website .
         _:derstandardat <channel_url> "https://www.derstandard.at/" .
         _:derstandardat <channel_comments> "Registration required" .
-        _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml (kind=sitemap) .
-        _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/sitemap.xml" (kind=sitemap) .
-        _:derstandardat <channel_feeds> "https://www.derstandard.at/rss" (kind=rss) .
+        _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml" (kind="sitemap") .
+        _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/sitemap.xml" (kind="sitemap") .
+        _:derstandardat <channel_feeds> "https://www.derstandard.at/rss" (kind="rss") .
         _:derstandardat <payment_model> "soft paywall" .
         _:derstandardat <contains_ads> "Non subscribers" .
         _:derstandardat <publication_kind> "Newspaper" .
