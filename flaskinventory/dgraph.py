@@ -235,11 +235,11 @@ class DGraph(object):
         # flatten facets
         if data.get('channel_feeds'):
             tmp_list = []
-            for key, item in data['channel_feeds|url'].items():
+            for key, item in data['channel_feeds|kind'].items():
                 tmp_list.append(
-                    {'kind': data['channel_feeds'][int(key)], 'url': item})
+                    {'url': data['channel_feeds'][int(key)], 'kind': item})
             data['channel_feeds'] = tmp_list
-            data.pop('channel_feeds|url', None)
+            data.pop('channel_feeds|kind', None)
         if data.get('audience_size'):
             data = self.flatten_date_facets(data, 'audience_size')
         if data.get('audience_residency'):
