@@ -1,6 +1,6 @@
 from flaskinventory.records.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.records.external import geocode, parse_meta, siterankdata, find_sitemaps, find_feeds
+from flaskinventory.records.external import geocode, instagram, parse_meta, siterankdata, find_sitemaps, find_feeds, build_url
 from flaskinventory import dgraph
 from slugify import slugify
 import secrets
@@ -139,6 +139,39 @@ class EntryProcessor():
 
         self.mutation.append(self.new_source)
 
+    def process_instagram(self):
+
+        # general info
+        self.fetch_instagram()
+        self.parse_other_names()
+        self.parse_founded()
+
+        # economic
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interset()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # data access
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other
+        self.parse_entry_notes()
+        self.parse_related()
+
+        self.generate_unique_name()
+        self.new_source = self.add_entry_meta(self.new_source)
+        self.mutation.append(self.new_source)
+
     def parse_name(self):
         if self.json.get('name'):
             self.new_source['name'] = self.json.get('name')
@@ -155,7 +188,7 @@ class EntryProcessor():
 
     def parse_other_names(self):
         if self.json.get('other_names'):
-            self.new_source['other_names'] = self.json.get(
+            self.new_source['other_names'] += self.json.get(
                 'other_names').split(',')
 
     def parse_epaper(self):
@@ -177,6 +210,10 @@ class EntryProcessor():
                 self.new_source['other_names'] += names
             if len(urls) > 0:
                 self.new_source['other_names'] += urls
+                self.new_source['channel_url'] = urls[0]
+            else:
+                self.new_source['channel_url'] = build_url(
+                    self.json.get('name'))
 
         else:
             raise InventoryValidationError(
@@ -361,7 +398,8 @@ class EntryProcessor():
         if daily_visitors:
             self.new_source['audience_size'] = str(datetime.date.today())
             self.new_source['audience_size|daily_visitors'] = daily_visitors
-            self.new_source['audience_size|datafrom'] = f"https://siterankdata.com/{self.new_source['name'].replace('www.', '')}" 
+            self.new_source[
+                'audience_size|datafrom'] = f"https://siterankdata.com/{self.new_source['name'].replace('www.', '')}"
 
     def source_unique_name(self, name, channel=None, channel_uid=None, country=None, country_uid=None):
         name = slugify(name, separator="_")
@@ -634,7 +672,7 @@ class EntryProcessor():
             for i, sitemap in enumerate(sitemaps):
                 self.new_source['channel_feeds'].append(sitemap)
                 self.new_source['channel_feeds|kind'][i] = 'sitemap'
-        
+
         feeds = find_feeds(self.new_source['name'])
 
         if len(feeds) > 0:
@@ -642,8 +680,24 @@ class EntryProcessor():
                 self.new_source['channel_feeds'].append(feed)
                 self.new_source['channel_feeds|kind'][i] = 'rss'
 
+    def fetch_instagram(self):
+        if self.json.get('name'):
+            profile = instagram(self.json.get('name'))
+            if profile:
+                self.new_source['name'] = self.json.get('name').lower()
+            else:
+                raise InventoryValidationError(
+                    f"Instagram profile not found: {self.json.get('name')}")
 
+            if profile['full_name']:
+                self.new_source['other_names'].append(profile['full_name'])
+            if profile['followers']:
+                self.new_source['audience_size'] = str(datetime.date.today())
+                self.new_source['audience_size|followers'] = int(
+                    profile['followers'])
 
-
+        else:
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
 
     # unique names of related & new sources are generated later (after reviewed)

@@ -200,7 +200,7 @@ def instagram(username):
 
     url = "https://www.instagram.com/"
 
-    r = requests.get(url + username + '/?__a=1', headers=headers)
+    r = requests.get(url + username.lower() + '/?__a=1', headers=headers)
 
     if r.status_code != 200:
         return False
