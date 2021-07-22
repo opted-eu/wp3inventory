@@ -7,6 +7,7 @@ import urllib.parse
 from bs4 import BeautifulSoup as bs4
 import re
 import json
+from requests.api import head
 import validators
 
 def geocode(address):
@@ -194,3 +195,33 @@ def siterankdata(site):
     except:
         return False
         
+def instagram(username):
+    headers = {'User-Agent': 'Mozilla'}
+
+    url = "https://www.instagram.com/"
+
+    r = requests.get(url + username + '/?__a=1', headers=headers)
+
+    if r.status_code != 200:
+        return False
+    
+    data = r.json()
+
+    if 'graphql' not in data.keys():
+        return False
+
+    try:
+        followers = data['graphql']['user']['edge_followed_by']['count']
+    except KeyError:
+        followers = None
+
+    try:
+        fullname = data['graphql']['user']['full_name']
+    except KeyError:
+        fullname = None
+
+    return {'followers': followers, 'fullname': fullname}
+    
+
+
+
