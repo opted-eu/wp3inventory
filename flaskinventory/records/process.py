@@ -39,6 +39,8 @@ class EntryProcessor():
 
         if self.json.get('channel') == 'print':
             self.process_print()
+        elif self.json.get('channel') == 'website':
+            self.process_website()
 
     def add_entry_meta(self, entry):
         if self.user.is_authenticated:
