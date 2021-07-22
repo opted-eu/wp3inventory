@@ -1,31 +1,44 @@
-from enum import unique
-from hmac import new
 from flaskinventory.records.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.records.external import geocode
+from flaskinventory.records.external import geocode, parse_meta, siterankdata, find_sitemaps, find_feeds
 from flaskinventory import dgraph
 from slugify import slugify
 import secrets
 
 import datetime
 
+
 class EntryProcessor():
+    """ Class for validating data and generating mutation object
+        takes dict (from json) as input and validates all entries accordingly
+        also keeps track of user & ip address
+        relevant return attribute is 'mutation' (list)
+    """
 
     payment_model = ['free', 'soft paywall', 'subscription', 'none']
     contains_ads = ['yes', 'no', 'non subscribers', 'none']
-    ownership_kind = ['public ownership', 'private ownership', 'unknown', 'none']
+    ownership_kind = ['public ownership',
+                      'private ownership', 'unknown', 'none']
     special_interest = ['yes', 'no']
     publication_cycle = ['continuous', 'daily', 'multiple times per week',
-                        'weekly', 'twice a month', 'monthly', 'none']
+                         'weekly', 'twice a month', 'monthly', 'none']
     geographic_scope = ['multinational', 'national', 'subnational', 'none']
+    transcript_kind = ['tv', 'radio', 'podcast', 'none']
+    channel_comments = ['no comments', 'user comments with registration',
+                        'user comments without registration', 'none']
 
     def __init__(self, json, user, ip):
         self.json = json
         self.user = user
         self.user_ip = ip
+        self.new_source = {'uid': '_:newsource',
+                           'channel': {},
+                           'other_names': [],
+                           'related': []}
+        self.mutation = []
 
         if self.json.get('channel') == 'print':
-            self.processed = self.process_print()
+            self.process_print()
 
     def add_entry_meta(self, entry):
         if self.user.is_authenticated:
@@ -37,94 +50,212 @@ class EntryProcessor():
 
         return entry
 
-
     def process_print(self):
 
-        new_print = {
-            'uid': "_:newsource",
-            'channel': {}
-        }
-    
-        mutation = []
+        # general info
+        self.parse_name()
+        self.parse_channel()
+        self.parse_other_names()
+        self.parse_epaper()
+        self.parse_founded()
 
+        # economic
+        self.parse_payment_model()
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interset()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+        self.parse_audience_size()
+
+        # access to data
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other information
+        self.parse_entry_notes()
+        self.parse_related()
+
+        # generate unique name
+        self.generate_unique_name()
+
+        self.new_source = self.add_entry_meta(self.new_source)
+
+        self.mutation.append(self.new_source)
+
+    def process_transcript(self):
+        self.parse_name()
+
+    def process_website(self):
+
+        # general information
+        self.parse_channel()
+        self.resolve_website()  # check if website exists / parse url
+        self.parse_other_names()
+        self.parse_channel_comments()
+        self.parse_founded()
+
+        # economic
+        self.parse_payment_model()
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interset()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # get audience size from siterankdata.com
+        self.fetch_siterankdata()
+
+        # access to data
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other information
+        self.parse_entry_notes()
+        self.parse_related()
+
+        # get feeds
+        self.fetch_feeds()
+
+        self.generate_unique_name()
+
+        self.new_source = self.add_entry_meta(self.new_source)
+
+        self.mutation.append(self.new_source)
+
+    def parse_name(self):
         if self.json.get('name'):
-            new_print['name'] = self.json.get('name')
+            self.new_source['name'] = self.json.get('name')
         else:
-            raise InventoryValidationError('Invalid data! "name" not specified.')
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
 
+    def parse_channel(self):
         if self.json.get('channel_uid').startswith('0x'):
-            new_print['channel']['uid'] = self.json.get('channel_uid')
+            self.new_source['channel']['uid'] = self.json.get('channel_uid')
         else:
             raise InventoryValidationError(
                 'Invalid data! uid of channel not defined')
 
+    def parse_other_names(self):
         if self.json.get('other_names'):
-            new_print['other_names'] = self.json.get('other_names').split(',')
+            self.new_source['other_names'] = self.json.get(
+                'other_names').split(',')
 
+    def parse_epaper(self):
         if self.json.get('channel_epaper'):
-            new_print['channel_epaper'] = self.json.get('channel_epaper')
+            self.new_source['channel_epaper'] = self.json.get('channel_epaper')
 
+    def resolve_website(self):
+        if self.json.get('name'):
+
+            urls, names = parse_meta(self.json.get('name'))
+            if urls == False:
+                raise InventoryValidationError(
+                    f"Could not resolve website! URL provided does not exist: {self.json.get('name')}")
+
+            self.new_source['name'] = self.json.get('name').replace(
+                'http://', '').replace('https://', '').lower()
+
+            if len(names) > 0:
+                self.new_source['other_names'] += names
+            if len(urls) > 0:
+                self.new_source['other_names'] += urls
+
+        else:
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
+
+    def parse_channel_comments(self):
+        if self.json.get('channel_comments'):
+            if self.json.get('channel_comments').lower() in self.channel_comments:
+                self.new_source['channel_comments'] = self.json.get(
+                    'channel_comments').lower()
+            else:
+                raise InventoryValidationError(
+                    f"Invalid data! Provided value for 'channel_comments' does not match: {self.json.get('channel_comments')}")
+        else:
+            self.new_source['channel_comments'] = 'none'
+
+    def parse_founded(self):
         if self.json.get('founded'):
             try:
                 founded = int(self.json.get('founded'))
                 if founded < 1700:
                     raise InventoryValidationError(
-                        'Invalid data! "founded" too small')
+                        f'Invalid data! "founded" too small: {founded}')
                 if founded > 2100:
                     raise InventoryValidationError(
-                        'Invalid data! "founded" too large')
-                new_print['founded'] = founded
+                        f'Invalid data! "founded" too large: {founded}')
+                self.new_source['founded'] = founded
             except ValueError:
                 raise InventoryValidationError(
-                    'Invalid Data! Cannot parse "founded" to int.')
+                    f'Invalid Data! Cannot parse value for "founded" to int: {self.json.get("founded")}')
 
+    def parse_payment_model(self):
         if self.json.get('payment_model'):
             if self.json.get('payment_model').lower() in self.payment_model:
-                new_print['payment_model'] = self.json.get('payment_model').lower()
+                self.new_source['payment_model'] = self.json.get(
+                    'payment_model').lower()
             else:
                 raise InventoryValidationError(
-                    'Invalid data! Unknown value in "payment_model"')
+                    f'Invalid data! Unknown value in "payment_model": {self.json.get("payment_model")}')
 
+    def parse_contains_ads(self):
         if self.json.get('contains_ads'):
             if self.json.get('contains_ads').lower() in self.contains_ads:
-                new_print['contains_ads'] = self.json.get('contains_ads').lower()
+                self.new_source['contains_ads'] = self.json.get(
+                    'contains_ads').lower()
             else:
                 raise InventoryValidationError(
-                    'Invalid data! Unknown value in "contains_ads"')
+                    f'Invalid data! Unknown value in "contains_ads": {self.json.get("contains_ads")}')
 
-        # add relationship: publishes_org
-        mutation += self.parse_org(self.json)
-        mutation += self.parse_person(self.json)
-
+    def parse_publication_kind(self):
         if self.json.get('publication_kind'):
             if type(self.json.get('publication_kind')) == list:
-                new_print['publication_kind'] = [item.lower()
-                                                for item in self.json.get('publication_kind')]
+                self.new_source['publication_kind'] = [item.lower()
+                                                       for item in self.json.get('publication_kind')]
             else:
-                new_print['publication_kind'] = self.json.get(
+                self.new_source['publication_kind'] = self.json.get(
                     'publication_kind').lower()
 
+    def parse_special_interset(self):
         if self.json.get('special_interest'):
             if self.json.get('special_interest').lower() in self.special_interest:
-                new_print['special_interest'] = self.json.get(
+                self.new_source['special_interest'] = self.json.get(
                     'special_interest').lower()
                 if self.json.get('special_interest') == 'yes':
                     if self.json.get('topical_focus'):
                         if type(self.json.get('topical_focus')) == list:
-                            new_print['topical_focus'] = [item.lower()
-                                                        for item in self.json.get('topical_focus')]
+                            self.new_source['topical_focus'] = [item.lower()
+                                                                for item in self.json.get('topical_focus')]
                         else:
-                            new_print['topical_focus'] = self.json.get(
+                            self.new_source['topical_focus'] = self.json.get(
                                 'topical_focus').lower()
             else:
                 raise InventoryValidationError(
-                    'Invalid data! Unknown value in "special_interest"')
+                    f'Invalid data! Unknown value in "special_interest": {self.json.get("special_interest")}')
 
+    def parse_publication_cycle(self):
         if self.json.get('publication_cycle'):
             if self.json.get('publication_cycle').lower() in self.publication_cycle:
-                new_print['publication_cycle'] = self.json.get(
+                self.new_source['publication_cycle'] = self.json.get(
                     'publication_cycle').lower()
-                if new_print['publication_cycle'] in ["multiple times per week", "weekly"]:
+                if self.new_source['publication_cycle'] in ["multiple times per week", "weekly"]:
                     days_list = []
                     for item in self.json.keys():
                         if item.startswith('publication_cycle_weekday_'):
@@ -134,130 +265,101 @@ class EntryProcessor():
                                     break
                                 days_list.append(
                                     int(item.replace('publication_cycle_weekday_', '')))
-                    new_print["publication_cycle_weekday"] = days_list
+                    self.new_source["publication_cycle_weekday"] = days_list
             else:
                 raise InventoryValidationError(
-                    'Invalid data! Unknown value in "publication_cycle"')
+                    f'Invalid data! Unknown value in "publication_cycle": {self.json.get("publication_cycle")}')
 
+    def parse_geographic_scope(self):
         if self.json.get('geographic_scope'):
             if self.json.get('geographic_scope').lower() in self.geographic_scope:
-                new_print['geographic_scope'] = self.json.get(
+                self.new_source['geographic_scope'] = self.json.get(
                     'geographic_scope').lower()
-                if new_print['geographic_scope'] == 'multinational':
+                if self.new_source['geographic_scope'] == 'multinational':
                     if self.json.get('geographic_scope_multiple'):
                         if self.json.get('geographic_scope_countries'):
-                            new_print['geographic_scope_countries'] = []
+                            self.new_source['geographic_scope_countries'] = []
                             for country in self.json.get('geographic_scope_countries').split(','):
                                 if country.startswith('0x'):
-                                    new_print['geographic_scope_countries'].append(
+                                    self.new_source['geographic_scope_countries'].append(
                                         {'uid': country})
                                 else:
+                                    # discard other data
                                     continue
                         if self.json.get('geographic_scope_subunits'):
-                            new_print['geographic_scope_subunit'] = []
+                            self.new_source['geographic_scope_subunit'] = []
                             for subunit in self.json.get('geographic_scope_subunits').split(','):
-                                if subunit == '': continue
+                                if subunit == '':
+                                    continue
                                 elif subunit.startswith('0x'):
-                                    new_print['geographic_scope_subunit'].append(
+                                    self.new_source['geographic_scope_subunit'].append(
                                         {'uid': subunit})
                                 else:
                                     geo_query = self.resolve_subunit(subunit)
                                     if geo_query:
-                                        new_print['geographic_scope_subunit'].append(geo_query)
+                                        self.new_source['geographic_scope_subunit'].append(
+                                            geo_query)
 
-                elif new_print['geographic_scope'] == 'national':
+                elif self.new_source['geographic_scope'] == 'national':
                     if self.json.get('geographic_scope_single'):
                         if self.json.get('geographic_scope_single').startswith('0x'):
-                            new_print['geographic_scope_countries'] = [
+                            self.new_source['geographic_scope_countries'] = [
                                 {'uid': self.json.get('geographic_scope_single')}]
                         else:
                             raise InventoryValidationError(
-                                'Invalid Data! "geographic_scope_single" not uid')
-                elif new_print['geographic_scope'] == 'subnational':
+                                f'Invalid Data! "geographic_scope_single" not uid: {self.json.get("geographic_scope_single")}')
+                elif self.new_source['geographic_scope'] == 'subnational':
                     if self.json.get('geographic_scope_single'):
                         if self.json.get('geographic_scope_single').startswith('0x'):
-                            new_print['geographic_scope_countries'] = [
+                            self.new_source['geographic_scope_countries'] = [
                                 {'uid': self.json.get('geographic_scope_single')}]
                         else:
                             raise InventoryValidationError(
-                                'Invalid Data! "geographic_scope_single" not uid')
+                                f'Invalid Data! "geographic_scope_single" not uid: {self.json.get("geographic_scope_single")}')
                     else:
                         raise InventoryValidationError(
                             'Invalid Data! need to specify at least one country!')
-                    new_print['geographic_scope_subunit'] = self.parse_subunit(self.json)
+                    self.new_source['geographic_scope_subunit'] = self.parse_subunit(
+                        self.json)
             else:
                 raise InventoryValidationError(
-                    'Invalid data! Unknown value in "geographic_scope"')
+                    f'Invalid data! Unknown value in "geographic_scope": {self.json.get("geographic_scope")}')
         else:
             raise InventoryValidationError(
                 'Invalid data! "geographic_scope" is required')
 
+    def parse_languages(self):
         if self.json.get('languages'):
             if type(self.json.get('languages')) == list:
-                new_print['languages'] = [item.lower() for item in self.json.get(
+                self.new_source['languages'] = [item.lower() for item in self.json.get(
                     'languages') if item.lower() in icu_codes.keys()]
             else:
                 if self.json.get('languages').lower() in icu_codes.keys():
-                    new_print['languages'] = [self.json.get('languages').lower()]
+                    self.new_source['languages'] = [
+                        self.json.get('languages').lower()]
 
+    def parse_audience_size(self):
         if self.json.get('audience_size_subscribers'):
-            new_print['audience_size|subscribers'] = int(
+            self.new_source['audience_size|subscribers'] = int(
                 self.json.get('audience_size_subscribers'))
             if self.json.get('audience_size_year'):
-                new_print['audience_size'] = str(
+                self.new_source['audience_size'] = str(
                     int(self.json.get('audience_size_year')))
             else:
-                new_print['audience_size'] = str(datetime.date.today())
+                self.new_source['audience_size'] = str(datetime.date.today())
             if self.json.get('audience_size_datafrom'):
-                new_print['audience_size|datafrom'] = self.json.get(
+                self.new_source['audience_size|datafrom'] = self.json.get(
                     'audience_size_datafrom')
             else:
-                new_print['audience_size|datafrom'] = "unknown"
+                self.new_source['audience_size|datafrom'] = "unknown"
 
-        mutation += self.parse_archives(self.json)
-        mutation += self.parse_datasets(self.json)
+    def fetch_siterankdata(self):
+        daily_visitors = siterankdata(self.new_source['name'])
 
-        if self.json.get('entry_notes'):
-            new_print['entry_notes'] = self.json.get('entry_notes')
-
-        mutation += self.parse_related(self.json)
-        if self.json.get('related_sources'):
-            if type(self.json.get('related_sources')) != list:
-                related_list = [self.json.get('related_sources')]
-            else:
-                related_list = self.json.get('related_sources')
-            new_print['related'] = []
-            for item in related_list:
-                if item.startswith('0x'):
-                    new_print['related'].append({'uid': item})
-                else:
-                    related_src_channel, _ = self.json.get('newsource_' + item).split(',')
-                    new_print['related'].append({'uid': f'_:{slugify(item, separator="_")}_{related_src_channel}'})
-
-        # generate unique name
-
-        if new_print.get('geographic_scope_subunit'):
-            print(new_print['geographic_scope_subunit'])
-            if 'uid' in new_print['geographic_scope_subunit'][0].keys():
-                new_print["unique_name"] = self.source_unique_name(
-                    self.json['name'], channel = self.json['channel'], country_uid=new_print['geographic_scope_subunit'][0]['uid'])
-            else:
-                new_print["unique_name"] = self.source_unique_name(
-                    self.json['name'], channel = self.json['channel'], country=new_print['geographic_scope_subunit'][0]['name'])
-
-        elif 'uid' in new_print['geographic_scope_countries'][0].keys():
-            new_print["unique_name"] = self.source_unique_name(
-                self.json['name'], self.json['channel'], country_uid=new_print['geographic_scope_countries'][0]['uid'])
-        else:
-            new_print["unique_name"] = self.source_unique_name(
-                self.json['name'], self.json['channel'], country="unknown")
-
-        new_print = self.add_entry_meta(new_print)
-
-        mutation.append(new_print)
-
-        return mutation
-
+        if daily_visitors:
+            self.new_source['audience_size'] = str(datetime.date.today())
+            self.new_source['audience_size|daily_visitors'] = daily_visitors
+            self.new_source['audience_size|datafrom'] = f"https://siterankdata.com/{self.new_source['name'].replace('www.', '')}" 
 
     def source_unique_name(self, name, channel=None, channel_uid=None, country=None, country_uid=None):
         name = slugify(name, separator="_")
@@ -298,18 +400,34 @@ class EntryProcessor():
         else:
             return f'{name}_{country}_{channel}_{secrets.token_urlsafe(4)}'
 
-
-    def parse_org(self, data):
-        orgs = []
-        if data.get('publishes_org'):
-            if type(data.get('publishes_org')) != list:
-                org_list = [data.get('publishes_org')]
+    def generate_unique_name(self):
+        if self.new_source.get('geographic_scope_subunit'):
+            print(self.new_source['geographic_scope_subunit'])
+            if 'uid' in self.new_source['geographic_scope_subunit'][0].keys():
+                self.new_source["unique_name"] = self.source_unique_name(
+                    self.json['name'], channel=self.json['channel'], country_uid=self.new_source['geographic_scope_subunit'][0]['uid'])
             else:
-                org_list = data.get('publishes_org')
+                self.new_source["unique_name"] = self.source_unique_name(
+                    self.json['name'], channel=self.json['channel'], country=self.new_source['geographic_scope_subunit'][0]['name'])
+
+        elif 'uid' in self.new_source['geographic_scope_countries'][0].keys():
+            self.new_source["unique_name"] = self.source_unique_name(
+                self.json['name'], self.json['channel'], country_uid=self.new_source['geographic_scope_countries'][0]['uid'])
+        else:
+            self.new_source["unique_name"] = self.source_unique_name(
+                self.json['name'], self.json['channel'], country="unknown")
+
+    def parse_org(self):
+        orgs = []
+        if self.json.get('publishes_org'):
+            if type(self.json.get('publishes_org')) != list:
+                org_list = [self.json.get('publishes_org')]
+            else:
+                org_list = self.json.get('publishes_org')
 
             for item in org_list:
                 org = {'publishes': [{'uid': "_:newsource"}],
-                    'is_person': False}
+                       'is_person': False}
                 if item.startswith('0x'):
                     org['uid'] = item
 
@@ -321,23 +439,24 @@ class EntryProcessor():
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     org['unique_name'] = unique_name
-                if data.get('ownership_kind'):
-                    if data.get('ownership_kind').lower() in self.ownership_kind:
-                        org["ownership_kind"] = data.get('ownership_kind').lower()
+                if self.json.get('ownership_kind'):
+                    if self.json.get('ownership_kind').lower() in self.ownership_kind:
+                        org["ownership_kind"] = self.json.get(
+                            'ownership_kind').lower()
                     else:
                         raise InventoryValidationError(
-                            'Invalid data! Unknown value in "ownership_kind"')
+                            f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
                 orgs.append(org)
-        return orgs
+        if len(orgs) > 0:
+            self.mutation += orgs
 
-
-    def parse_person(self, data):
+    def parse_person(self):
         persons = []
-        if data.get('publishes_person'):
-            if type(data.get('publishes_person')) != list:
-                person_list = [data.get('publishes_person')]
+        if self.json.get('publishes_person'):
+            if type(self.json.get('publishes_person')) != list:
+                person_list = [self.json.get('publishes_person')]
             else:
-                person_list = data.get('publishes_person')
+                person_list = self.json.get('publishes_person')
 
             for item in person_list:
                 pers = {'publishes': [{'uid': "_:newsource"}],
@@ -352,23 +471,24 @@ class EntryProcessor():
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     pers['unique_name'] = unique_name
-                if data.get('ownership_kind'):
-                    if data.get('ownership_kind').lower() in self.ownership_kind:
-                        pers["ownership_kind"] = data.get('ownership_kind').lower()
+                if self.json.get('ownership_kind'):
+                    if self.json.get('ownership_kind').lower() in self.ownership_kind:
+                        pers["ownership_kind"] = self.json.get(
+                            'ownership_kind').lower()
                     else:
                         raise InventoryValidationError(
-                            'Invalid data! Unknown value in "ownership_kind"')
+                            f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
                 persons.append(pers)
-        return persons
+        if len(persons) > 0:
+            self.mutation += persons
 
-
-    def parse_archives(self, data):
+    def parse_archives(self):
         archives = []
-        if data.get('archive_sources_included'):
-            if type(data.get('archive_sources_included')) != list:
-                archive_list = [data.get('archive_sources_included')]
+        if self.json.get('archive_sources_included'):
+            if type(self.json.get('archive_sources_included')) != list:
+                archive_list = [self.json.get('archive_sources_included')]
             else:
-                archive_list = data.get('archive_sources_included')
+                archive_list = self.json.get('archive_sources_included')
 
             for item in archive_list:
                 arch = {'sources_included': [{'uid': '_:newsource'}]}
@@ -380,16 +500,16 @@ class EntryProcessor():
                     arch['name'] = item,
                     arch['dgraph.type'] = "Archive"
                 archives.append(arch)
-        return archives
+        if len(archives) > 0:
+            self.mutation += archives
 
-
-    def parse_datasets(self, data):
+    def parse_datasets(self):
         datasets = []
-        if data.get('dataset_sources_included'):
-            if type(data.get('dataset_sources_included')) != list:
-                dataset_list = [data.get('dataset_sources_included')]
+        if self.json.get('dataset_sources_included'):
+            if type(self.json.get('dataset_sources_included')) != list:
+                dataset_list = [self.json.get('dataset_sources_included')]
             else:
-                dataset_list = data.get('dataset_sources_included')
+                dataset_list = self.json.get('dataset_sources_included')
 
             for item in dataset_list:
                 dset = {'sources_included': [{'uid': '_:newsource'}]}
@@ -401,23 +521,29 @@ class EntryProcessor():
                     dset['name'] = item
                     dset['dgraph.type'] = "Dataset"
                 datasets.append(dset)
-        return datasets
+        if len(datasets) > 0:
+            self.mutation += datasets
 
+    def parse_entry_notes(self):
+        if self.json.get('entry_notes'):
+            self.new_source['entry_notes'] = self.json.get('entry_notes')
 
-    def parse_related(self, data):
+    def parse_related(self):
         related = []
-        if data.get('related_sources'):
-            if type(data.get('related_sources')) != list:
-                related_list = [data.get('related_sources')]
+        if self.json.get('related_sources'):
+            if type(self.json.get('related_sources')) != list:
+                related_list = [self.json.get('related_sources')]
             else:
-                related_list = data.get('related_sources')
+                related_list = self.json.get('related_sources')
             for item in related_list:
                 rel_source = {'related': [{'uid': '_:newsource'}]}
                 if item.startswith('0x'):
                     rel_source['uid'] = item
+                    self.new_source['related'].append({'uid', item})
                 else:
-                    if data.get(f'newsource_{item}'):
-                        channel_name, channel_uid = data.get('newsource_' + item).split(',')
+                    if self.json.get(f'newsource_{item}'):
+                        channel_name, channel_uid = self.json.get(
+                            'newsource_' + item).split(',')
                         rel_source = self.add_entry_meta(rel_source)
                         rel_source['name'] = item
                         rel_source['uid'] = f'_:{slugify(item, separator="_")}_{channel_name}'
@@ -425,13 +551,14 @@ class EntryProcessor():
                         rel_source['dgraph.type'] = 'Source'
                         rel_source['channel'] = {
                             'uid': channel_uid}
+                        self.new_source['related'].append(
+                            {'uid', f'_:{slugify(item, separator="_")}_{channel_name}'})
                     else:
                         # just discard data if no channel is defined
                         continue
                 related.append(rel_source)
-
-        return related
-
+            if len(related) > 0:
+                self.mutation += related
 
     def resolve_geographic_name(self, query):
         geo_result = geocode(query)
@@ -441,17 +568,19 @@ class EntryProcessor():
             try:
                 country_uid = dql_result['q'][0]['uid']
             except Exception:
-                raise InventoryValidationError('Country not found in inventory!')
+                raise InventoryValidationError(
+                    'Country not found in inventory!')
             geo_data = {'type': 'point', 'coordinates': [
                 geo_result.get('lon'), geo_result.get('lat')]}
-            
-            other_names = list({query, geo_result['namedetails']['name'], geo_result['namedetails']['name:en']})
 
-            return {'name': geo_result['namedetails']['name:en'], 
-                        'country': [{'uid': country_uid}], 
-                        'other_names': other_names, 
-                        'location_point': geo_data, 
-                        'country_code': geo_result['address']['country_code']}
+            other_names = list(
+                {query, geo_result['namedetails']['name'], geo_result['namedetails']['name:en']})
+
+            return {'name': geo_result['namedetails']['name:en'],
+                    'country': [{'uid': country_uid}],
+                    'other_names': other_names,
+                    'location_point': geo_data,
+                    'country_code': geo_result['address']['country_code']}
         else:
             return False
 
@@ -463,7 +592,8 @@ class EntryProcessor():
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
             return geo_query
         else:
-            raise InventoryValidationError(f'Invalid Data! Could not resolve geographic subunit {subunit}')
+            raise InventoryValidationError(
+                f'Invalid Data! Could not resolve geographic subunit {subunit}')
 
     def parse_subunit(self, data):
         subunits = []
@@ -481,6 +611,37 @@ class EntryProcessor():
                     if geo_query:
                         subunits.append(geo_query)
         return subunits
+
+    def parse_transcriptkind(self):
+        if self.json.get('transcript_kind'):
+            if self.json.get('transcript_kind') in self.transcript_kind:
+                self.new_source['transcript_kind'] = self.json.get(
+                    'transcript_kind')
+            else:
+                raise InventoryValidationError(
+                    f"Invalid Data! Unknown value for transcript_kind: {self.json.get('transcript_kind')}")
+        else:
+            raise InventoryValidationError(
+                f"Missing Data! transcript_kind is required!")
+
+    def fetch_feeds(self):
+        self.new_source['channel_feeds'] = []
+        self.new_source['channel_feeds|kind'] = {}
+        sitemaps = find_sitemaps(self.new_source['name'])
+        if len(sitemaps) > 0:
+            for i, sitemap in enumerate(sitemaps):
+                self.new_source['channel_feeds'].append(sitemap)
+                self.new_source['channel_feeds|kind'][i] = 'sitemap'
+        
+        feeds = find_feeds(self.new_source['name'])
+
+        if len(feeds) > 0:
+            for i, feed in enumerate(feeds, start=len(sitemaps)):
+                self.new_source['channel_feeds'].append(feed)
+                self.new_source['channel_feeds|kind'][i] = 'rss'
+
+
+
 
 
     # unique names of related & new sources are generated later (after reviewed)

@@ -64,7 +64,7 @@ def fieldoptions():
 def echo_json():
     try:
         processor = EntryProcessor(request.json, current_user, request.remote_addr)
-        return jsonify(processor.processed)
+        return jsonify(processor.mutation)
     except Exception as e:
         error = {'error': f'{e}'}
         return jsonify(error)
