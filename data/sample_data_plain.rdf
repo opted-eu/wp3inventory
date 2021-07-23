@@ -54,9 +54,8 @@ _:twitter <form_name_addon> "@" .
 _:website <form_name_question> "What is the address of the self-hosted news website?" .
 _:website <form_name_placeholder> "e.g. 'http://www.thedailynews.com'" .
 
-_:transcript <form_name_question> "What is the name of the website that provides tv, radio, or podcast scripts?" .
-_:transcript <form_name_placeholder> "e.g. 'http://www.theweeklypodcast.com/transcript'" .
-_:transcript <form_name_helptext> "Please specify the URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)" .
+_:transcript <form_name_question> "What is the name of the show that is being transcribed?" .
+_:transcript <form_name_placeholder> "e.g. 'CNN News'" .
 
 _:derstandardat <dgraph.type> "Source" .
 _:derstandardat <unique_name> "www.derstandard.at" .
