@@ -2,6 +2,7 @@ from flaskinventory.records.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.records.external import geocode, instagram, parse_meta, siterankdata, find_sitemaps, find_feeds, build_url
 from flaskinventory import dgraph
+from flask import current_app
 from slugify import slugify
 import secrets
 
@@ -32,7 +33,8 @@ class EntryProcessor():
         self.user = user
         self.user_ip = ip
         self.new_source = {'uid': '_:newsource',
-                           'channel': {},
+                            'dgraph.type': 'Source',
+                           'channel': dict(),
                            'other_names': [],
                            'related': []}
         self.mutation = []
@@ -41,6 +43,10 @@ class EntryProcessor():
             self.process_print()
         elif self.json.get('channel') == 'website':
             self.process_website()
+        elif self.json.get('channel') == 'instagram':
+            self.process_instagram()
+        elif self.json.get('channel') == 'transcript':
+            self.process_transcript()
 
     def add_entry_meta(self, entry):
         if self.user.is_authenticated:
@@ -69,7 +75,7 @@ class EntryProcessor():
 
         # journalistic routines
         self.parse_publication_kind()
-        self.parse_special_interset()
+        self.parse_special_interest()
         self.parse_publication_cycle()
 
         # audience related
@@ -93,7 +99,43 @@ class EntryProcessor():
         self.mutation.append(self.new_source)
 
     def process_transcript(self):
+        self.parse_channel()
         self.parse_name()
+        self.parse_channel_url()
+        self.parse_transcriptkind()
+        self.parse_other_names()
+        self.parse_founded()
+
+        # economic
+        self.parse_payment_model()
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interest()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # access to data
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other information
+        self.parse_entry_notes()
+        self.parse_related()
+
+        self.generate_unique_name()
+
+        self.new_source = self.add_entry_meta(self.new_source)
+
+        self.mutation.append(self.new_source)
+
+
 
     def process_website(self):
 
@@ -112,7 +154,7 @@ class EntryProcessor():
 
         # journalistic routines
         self.parse_publication_kind()
-        self.parse_special_interset()
+        self.parse_special_interest()
         self.parse_publication_cycle()
 
         # audience related
@@ -142,6 +184,7 @@ class EntryProcessor():
     def process_instagram(self):
 
         # general info
+        self.parse_channel()
         self.fetch_instagram()
         self.parse_other_names()
         self.parse_founded()
@@ -153,7 +196,7 @@ class EntryProcessor():
 
         # journalistic routines
         self.parse_publication_kind()
-        self.parse_special_interset()
+        self.parse_special_interest()
         self.parse_publication_cycle()
 
         # audience related
@@ -172,6 +215,73 @@ class EntryProcessor():
         self.new_source = self.add_entry_meta(self.new_source)
         self.mutation.append(self.new_source)
 
+    def process_twitter(self):
+        self.parse_channel()
+        self.fetch_twitter()
+
+        self.parse_other_names()
+
+        # economic
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interest()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # data access
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other
+        self.parse_entry_notes()
+        self.parse_related()
+
+        self.generate_unique_name()
+        self.new_source = self.add_entry_meta(self.new_source)
+        self.mutation.append(self.new_source)
+
+    def process_facebook(self):
+        self.parse_channel()
+        self.fetch_facebook()
+
+        self.parse_other_names()
+        self.parse_founded()
+
+        # economic
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interest()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # data access
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other
+        self.parse_entry_notes()
+        self.parse_related()
+
+        self.generate_unique_name()
+        self.new_source = self.add_entry_meta(self.new_source)
+        self.mutation.append(self.new_source)
+
+
+
     def parse_name(self):
         if self.json.get('name'):
             self.new_source['name'] = self.json.get('name')
@@ -185,6 +295,10 @@ class EntryProcessor():
         else:
             raise InventoryValidationError(
                 'Invalid data! uid of channel not defined')
+
+    def parse_channel_url(self):
+        if self.json.get('channel_url'):
+            self.new_source['channel_url'] = self.json.get('channel_url')
 
     def parse_other_names(self):
         if self.json.get('other_names'):
@@ -272,12 +386,14 @@ class EntryProcessor():
                 self.new_source['publication_kind'] = self.json.get(
                     'publication_kind').lower()
 
-    def parse_special_interset(self):
+    def parse_special_interest(self):
         if self.json.get('special_interest'):
             if self.json.get('special_interest').lower() in self.special_interest:
-                self.new_source['special_interest'] = self.json.get(
-                    'special_interest').lower()
-                if self.json.get('special_interest') == 'yes':
+                if self.json.get('special_interest').lower() == 'yes':
+                    self.new_source['special_interest'] = True
+                else:
+                    self.new_source['special_interest'] = False
+                if self.json.get('special_interest').lower() == 'yes':
                     if self.json.get('topical_focus'):
                         if type(self.json.get('topical_focus')) == list:
                             self.new_source['topical_focus'] = [item.lower()
@@ -442,8 +558,8 @@ class EntryProcessor():
 
     def generate_unique_name(self):
         if self.new_source.get('geographic_scope_subunit'):
-            print(self.new_source['geographic_scope_subunit'])
-            if 'uid' in self.new_source['geographic_scope_subunit'][0].keys():
+            current_app.logger.debug(self.new_source['geographic_scope_subunit'])
+            if self.new_source['geographic_scope_subunit'][0]['uid'].startswith('0x'):
                 self.new_source["unique_name"] = self.source_unique_name(
                     self.json['name'], channel=self.json['channel'], country_uid=self.new_source['geographic_scope_subunit'][0]['uid'])
             else:
@@ -479,13 +595,13 @@ class EntryProcessor():
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     org['unique_name'] = unique_name
-                if self.json.get('ownership_kind'):
-                    if self.json.get('ownership_kind').lower() in self.ownership_kind:
-                        org["ownership_kind"] = self.json.get(
-                            'ownership_kind').lower()
-                    else:
-                        raise InventoryValidationError(
-                            f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
+                    if self.json.get('ownership_kind'):
+                        if self.json.get('ownership_kind').lower() in self.ownership_kind:
+                            org["ownership_kind"] = self.json.get(
+                                'ownership_kind').lower()
+                        else:
+                            raise InventoryValidationError(
+                                f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
                 orgs.append(org)
         if len(orgs) > 0:
             self.mutation += orgs
@@ -511,13 +627,13 @@ class EntryProcessor():
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     pers['unique_name'] = unique_name
-                if self.json.get('ownership_kind'):
-                    if self.json.get('ownership_kind').lower() in self.ownership_kind:
-                        pers["ownership_kind"] = self.json.get(
-                            'ownership_kind').lower()
-                    else:
-                        raise InventoryValidationError(
-                            f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
+                # if self.json.get('ownership_kind'):
+                #     if self.json.get('ownership_kind').lower() in self.ownership_kind:
+                #         pers["ownership_kind"] = self.json.get(
+                #             'ownership_kind').lower()
+                #     else:
+                #         raise InventoryValidationError(
+                #             f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
                 persons.append(pers)
         if len(persons) > 0:
             self.mutation += persons
@@ -579,7 +695,7 @@ class EntryProcessor():
                 rel_source = {'related': [{'uid': '_:newsource'}]}
                 if item.startswith('0x'):
                     rel_source['uid'] = item
-                    self.new_source['related'].append({'uid', item})
+                    self.new_source['related'].append({'uid': item})
                 else:
                     if self.json.get(f'newsource_{item}'):
                         channel_name, channel_uid = self.json.get(
@@ -592,7 +708,7 @@ class EntryProcessor():
                         rel_source['channel'] = {
                             'uid': channel_uid}
                         self.new_source['related'].append(
-                            {'uid', f'_:{slugify(item, separator="_")}_{channel_name}'})
+                            {'uid': f'_:{slugify(item, separator="_")}_{channel_name}'})
                     else:
                         # just discard data if no channel is defined
                         continue
@@ -609,18 +725,29 @@ class EntryProcessor():
                 country_uid = dql_result['q'][0]['uid']
             except Exception:
                 raise InventoryValidationError(
-                    'Country not found in inventory!')
-            geo_data = {'type': 'point', 'coordinates': [
-                geo_result.get('lon'), geo_result.get('lat')]}
+                    f"Country not found in inventory: {geo_result['address']['country_code']}")
+            geo_data = {'type': 'Point', 'coordinates': [
+                float(geo_result.get('lon')), float(geo_result.get('lat'))]}
 
             other_names = list(
                 {query, geo_result['namedetails']['name'], geo_result['namedetails']['name:en']})
 
-            return {'name': geo_result['namedetails']['name:en'],
+            new_subunit = {'name': geo_result['namedetails']['name:en'],
                     'country': [{'uid': country_uid}],
                     'other_names': other_names,
                     'location_point': geo_data,
                     'country_code': geo_result['address']['country_code']}
+            if geo_result.get('extratags'):
+                if geo_result.get('extratags').get('wikidata'):
+                    if geo_result.get('extratags').get('wikidata').lower().startswith('q'):
+                        try:
+                            new_subunit['wikidataID'] = int(geo_result.get('extratags').get('wikidata').lower().replace('q', ''))
+                        except Exception as e:
+                            current_app.logger.debug(f'Could not parse wikidata ID in subunit: {e}')
+                            pass
+
+
+            return new_subunit
         else:
             return False
 
@@ -630,6 +757,7 @@ class EntryProcessor():
             geo_query = self.add_entry_meta(geo_query)
             geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
+            geo_query['uid'] = f"_:{slugify(secrets.token_urlsafe(8))}"
             return geo_query
         else:
             raise InventoryValidationError(
@@ -666,7 +794,7 @@ class EntryProcessor():
 
     def fetch_feeds(self):
         self.new_source['channel_feeds'] = []
-        self.new_source['channel_feeds|kind'] = {}
+        self.new_source['channel_feeds|kind'] = dict()
         sitemaps = find_sitemaps(self.new_source['name'])
         if len(sitemaps) > 0:
             for i, sitemap in enumerate(sitemaps):
@@ -685,16 +813,61 @@ class EntryProcessor():
             profile = instagram(self.json.get('name'))
             if profile:
                 self.new_source['name'] = self.json.get('name').lower()
+                self.new_source['channel_url'] = self.json.get('name').lower()
             else:
                 raise InventoryValidationError(
                     f"Instagram profile not found: {self.json.get('name')}")
 
-            if profile['full_name']:
-                self.new_source['other_names'].append(profile['full_name'])
+            if profile['fullname']:
+                self.new_source['other_names'].append(profile['fullname'])
             if profile['followers']:
                 self.new_source['audience_size'] = str(datetime.date.today())
                 self.new_source['audience_size|followers'] = int(
                     profile['followers'])
+
+        else:
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
+    
+    def fetch_twitter(self):
+        if self.json.get('name'):
+            self.new_source['name'] = self.json.get('name')
+            self.new_source['channel_url'] = self.json.get('name')
+            # profile = instagram(self.json.get('name'))
+            # if profile:
+            #     self.new_source['name'] = self.json.get('name').lower()
+            # else:
+            #     raise InventoryValidationError(
+            #         f"Instagram profile not found: {self.json.get('name')}")
+
+            # if profile['fullname']:
+            #     self.new_source['other_names'].append(profile['fullname'])
+            # if profile['followers']:
+            #     self.new_source['audience_size'] = str(datetime.date.today())
+            #     self.new_source['audience_size|followers'] = int(
+            #         profile['followers'])
+
+        else:
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
+
+    def fetch_facebook(self):
+        if self.json.get('name'):
+            self.new_source['name'] = self.json.get('name')
+            self.new_source['channel_url'] = self.json.get('name')
+            # profile = instagram(self.json.get('name'))
+            # if profile:
+            #     self.new_source['name'] = self.json.get('name').lower()
+            # else:
+            #     raise InventoryValidationError(
+            #         f"Instagram profile not found: {self.json.get('name')}")
+
+            # if profile['fullname']:
+            #     self.new_source['other_names'].append(profile['fullname'])
+            # if profile['followers']:
+            #     self.new_source['audience_size'] = str(datetime.date.today())
+            #     self.new_source['audience_size|followers'] = int(
+            #         profile['followers'])
 
         else:
             raise InventoryValidationError(

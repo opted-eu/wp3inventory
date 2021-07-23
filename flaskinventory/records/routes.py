@@ -1,5 +1,4 @@
-from logging import error
-from flask import (Blueprint, json, render_template, url_for,
+from flask import (current_app, Blueprint, json, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
@@ -8,6 +7,7 @@ from flaskinventory import dgraph
 from flaskinventory.records.forms import NewEntry
 from flaskinventory.records.utils import database_check_table
 from flaskinventory.records.process import EntryProcessor
+import traceback
 
 records = Blueprint('records', __name__)
 
@@ -60,13 +60,46 @@ def confirmation():
 def fieldoptions():
     return jsonify(dgraph.generate_fieldoptions())
 
+
+@records.route('/new/submit', methods=['POST'])
+def submit():
+    try:
+        processor = EntryProcessor(request.json, current_user, request.remote_addr)
+        current_app.logger.debug(f'Mutation Object: {processor.mutation}')
+    except Exception as e:
+        error = {'error': f'{e}'}
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        current_app.logger.error(tb_str)
+        return jsonify(error)
+    
+    try:
+        result = dgraph.mutation(processor.mutation)
+    except Exception as e:
+        error = {'error': f'{e}'}
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        current_app.logger.error(tb_str)
+        return jsonify(error)
+
+    if result:
+        result = dict(result.uids)
+        result['redirect'] = url_for('inventory.view_source', uid=result['newsource'])
+        return jsonify(result)
+    else:
+        return jsonify({'error': 'DGraph Error - Could not perform mutation'})
+
+    
+
+
 @records.route('/new/echo', methods=['POST'])
 def echo_json():
     try:
         processor = EntryProcessor(request.json, current_user, request.remote_addr)
+        current_app.logger.debug(f'Mutation Object: {processor.mutation}')
         return jsonify(processor.mutation)
     except Exception as e:
         error = {'error': f'{e}'}
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        current_app.logger.error(tb_str)
         return jsonify(error)
 
 
@@ -114,8 +147,3 @@ def sourcelookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
-
-
-@records.route('/new/submit', methods=['POST'])
-def submit():
-    return render_template('not_implemented')
