@@ -56,9 +56,15 @@ def search():
     result['status'] = True
     return jsonify(result)
 
+@inventory.route("/view/source/uid/<string:uid>")
 @inventory.route("/view/source/<string:unique_name>")
-def view_source(unique_name):
-    unique_item = dgraph.get_source(unique_name=unique_name)
+def view_source(unique_name=None, uid=None):
+    if uid:
+        unique_item = dgraph.get_source(uid=uid)
+    elif unique_name:
+        unique_item = dgraph.get_source(unique_name=unique_name)
+    else:
+        return abort(404)
     if unique_item:
         if "Source" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
@@ -98,7 +104,6 @@ def view_archive(unique_name):
         return abort(404)
 
 @inventory.route("/view/organisation/<string:unique_name>")
-@inventory.route("/view/organization/<string:unique_name>")
 def view_organization(unique_name):
     unique_item = dgraph.get_organization(unique_name=unique_name)
     if unique_item:
