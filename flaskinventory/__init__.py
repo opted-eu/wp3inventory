@@ -21,7 +21,7 @@ mail = Mail()
 
 def create_app(config_class=Config, config_json=None):
     app = Flask(__name__)
-    # app.logger.setLevel(logging.DEBUG)
+    app.logger.setLevel(logging.DEBUG)
     if config_json:
         app.config.from_json(config_json)
     else:
