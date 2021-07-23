@@ -9,13 +9,15 @@ import re
 import json
 from requests.api import head
 import validators
+import instaloader
 
 def geocode(address):
     payload = {'q': address, 
         'format': 'jsonv2', 
         'addressdetails': 1, 
         'limit': 1, 
-        'namedetails': 1}
+        'namedetails': 1,
+        'extratags': 1}
     api = "https://nominatim.openstreetmap.org/search"
     r = requests.get(api, params=payload)
     if r.status_code != 200:
@@ -196,27 +198,21 @@ def siterankdata(site):
         return False
         
 def instagram(username):
-    headers = {'User-Agent': 'Mozilla'}
-
-    url = "https://www.instagram.com/"
-
-    r = requests.get(url + username.lower() + '/?__a=1', headers=headers)
-
-    if r.status_code != 200:
-        return False
     
-    data = r.json()
+    L = instaloader.Instaloader()
 
-    if 'graphql' not in data.keys():
+    try:
+        profile = instaloader.Profile.from_username(L.context, username.lower())
+    except:
         return False
 
     try:
-        followers = data['graphql']['user']['edge_followed_by']['count']
+        followers = profile.followers
     except KeyError:
         followers = None
 
     try:
-        fullname = data['graphql']['user']['full_name']
+        fullname = profile.full_name
     except KeyError:
         fullname = None
 
