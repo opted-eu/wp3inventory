@@ -112,7 +112,7 @@ class DGraph(object):
     """
 
     def query(self, query_string, variables=None):
-        current_app.logger.debug(f"Sending dgraph query.")
+        current_app.logger.debug(f"Sending dgraph query: {query_string}")
         if variables is None:
             res = self.client.txn(read_only=True).query(query_string)
         else:
@@ -128,6 +128,32 @@ class DGraph(object):
         if len(data['q']) == 0:
             return None
         return data['q'][0]['uid']
+
+    """
+        New Entries
+    """
+
+    def mutation(self, data):
+        # if type(data) is not dict or type(data) is not list:
+        #     raise TypeError()
+
+        txn = self.client.txn()
+
+        try:
+            response = txn.mutate(set_obj=data)
+            txn.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return response
+        else:
+            return False
+
+    
 
     """ 
         User Related Methods 
