@@ -10,8 +10,14 @@ from flaskinventory.users.constants import USER_ROLES
 class RegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+    
+    password = PasswordField('Password',
+                             validators=[DataRequired(), Length(min=6)])
 
-    submit = SubmitField('Request Account')
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), Length(min=6), EqualTo('password')])
+
+    submit = SubmitField('Create Account')
 
     def validate_email(self, email):
         if dgraph.get_uid('email', f'"{email.data}"'):

@@ -2,6 +2,7 @@ import json
 import datetime
 from dateutil.parser import isoparse
 import os
+import secrets
 
 from flask import current_app, _app_ctx_stack, Markup
 import pydgraph
@@ -171,7 +172,7 @@ class DGraph(object):
         else:
             raise ValueError()
 
-        query_fields = f'{{ uid email pw_reset user_displayname	user_orcid date_joined user_role user_affiliation }} }}'
+        query_fields = f'{{ uid email pw_reset @facets user_displayname user_orcid date_joined user_role user_affiliation }} }}'
         query_string = query_func + query_fields
         data = self.query(query_string)
         if len(data['q']) == 0:
@@ -198,10 +199,9 @@ class DGraph(object):
         user_data['uid'] = '_:newuser'
         user_data['dgraph.type'] = 'User'
         user_data['user_role'] = USER_ROLES.User
-        user_data['user_displayname'] = user_data['email'].split('@')[0][:10]
+        user_data['user_displayname'] = secrets.token_urlsafe(6)
         user_data['date_joined'] = datetime.datetime.now(
             datetime.timezone.utc).isoformat()
-        user_data['pw_reset'] = True
 
         txn = self.client.txn()
 

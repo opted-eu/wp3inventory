@@ -67,7 +67,7 @@
         <ul class="nav nav-pills">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.under_development') }}" tabindex="-1"><i class="fas fa-plus-circle me-2"></i>Add Entry</a>
+                <a class="nav-link" href="{{ url_for('records.new_entry') }}" tabindex="-1"><i class="fas fa-plus-circle me-2"></i>Add Entry</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
@@ -89,6 +89,9 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('users.login') }}" tabindex="-1">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.register') }}" tabindex="-1">Register</a>
             </li>
             {% endif %}
         </ul>

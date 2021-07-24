@@ -266,7 +266,6 @@ _:paper1 <country> _:austria .
 _:admin <dgraph.type> "User" .
 _:admin <email> "wp3@opted.eu" .
 _:admin <pw> "admin123" .
-_:admin <pw_reset> "False" .
 _:admin <user_displayname> "Admin" .
 _:admin <date_joined> "2020-05-20" .
 _:admin <user_role> "10" .

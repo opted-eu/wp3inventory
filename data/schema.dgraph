@@ -176,7 +176,7 @@ username: string @index(hash) .
 display_name: string . 
 email: string @index(hash) @upsert .
 pw: password .
-pw_reset: bool .
+pw_reset: string .
 date_joined: dateTime .
 user_displayname: string @index(term) .
 user_orcid: string @index(hash) .

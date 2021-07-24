@@ -14,27 +14,19 @@ from secrets import token_hex
 users = Blueprint('users', __name__)
 
 
-# registration deactivated
-# @users.route('/register', methods=['GET', 'POST'])
-# def register():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('main.home'))
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         # hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-#         new_user = {'email': form.email.data,
-#                     'pw': form.password.data}
-#         new_uid = dgraph.create_user(new_user)
-
-#         flash(f'Accounted created for {new_uid}!', 'success')
-#         return redirect(url_for('users.login'))
-#     return render_template('users/register.html', title='Register', form=form)
-
-@users.route('/register')
+@users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    return render_template('users/register.html', title='Register')
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        new_user = {'email': form.email.data,
+                    'pw': form.password.data}
+        new_uid = dgraph.create_user(new_user)
+
+        flash(f'Accounted created for {form.email.data} ({new_uid})!', 'success')
+        return redirect(url_for('users.login'))
+    return render_template('users/register.html', title='Register', form=form)
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -64,7 +56,7 @@ def logout():
 @users.route('/profile')
 @login_required
 def profile():
-    return render_template('users/profile.html', title='Profile')
+    return render_template('users/profile.html', title='Profile', show_sidebar=True)
 
 
 @users.route('/profile/update', methods=['GET', 'POST'])

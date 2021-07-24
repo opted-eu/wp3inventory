@@ -1,17 +1,25 @@
 {% extends "layout.html" %} {% block content %}
 
-<div class="content-section">
+
+<div class="content-section pt-4">
+<div class="row justify-content-center">
+<div class="col-6">
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <fieldset class="form-floating">
             <legend class="border-bottom mb-4">Log In</legend>
             <div class="form-floating mb-3">
-                {% if form.email.errors %} {{ form.email(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.email.errors %}
-                    <span>{{ error }}</span> {% endfor %}
-                </div>
-                {% else %} {{ form.email(class="form-control form-control-lg", placeholder="name@example.com") }} {% endif %} {{ form.email.label() }}
+                {% if form.email.errors %} 
+                    {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                        <span>{{ error }}</span> 
+                        {% endfor %}
+                    </div>
+                {% else %} 
+                    {{ form.email(class="form-control form-control-lg", placeholder="name@example.com") }} 
+                {% endif %} 
+                {{ form.email.label() }}
             </div>
 
             <div class="form-floating mb-3">
@@ -38,8 +46,10 @@
         <small class="text-muted">
         Need an Account? <a class="ml-2" href="{{ url_for('users.register') }}">Sign Up</a>
     </small>
-
     </div>
+
+</div>
+</div>
 </div>
 
 {% endblock content %}

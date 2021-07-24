@@ -21,6 +21,8 @@ class User(UserMixin):
             for k, v in user_data.items():
                 if k == 'uid':
                     self.id = v
+                if '|' in k:
+                    k = k.replace('|', '_')
                 setattr(self, k, v)
 
     def update_profile(self, form_data):
@@ -40,7 +42,8 @@ class User(UserMixin):
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        dgraph.update_entry(self.id, {'pw_reset': True})
+        dgraph.update_entry(self.id, {'pw_reset': s.dumps({'user_id': self.id}).decode('utf-8'),
+                                         'pw_reset|used': False})
         return s.dumps({'user_id': self.id}).decode('utf-8')
     
     def get_invite_token(self, expires_days=7):
@@ -56,7 +59,10 @@ class User(UserMixin):
         except:
             return None
         user = User(uid=user_id)
-        if user.pw_reset:
-            return user
-        else:
+        if user.pw_reset_used:
             return None
+        elif user.pw_reset != token:
+            return None
+        else:
+            dgraph.update_entry(user_id, {'pw_reset|used': True})
+            return user
