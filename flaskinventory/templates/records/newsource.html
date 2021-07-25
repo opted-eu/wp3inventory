@@ -1,265 +1,262 @@
 {% extends "layout.html" %} {% block content %}
-
 <div class="row align-items-center justify-content-center" id="loading-form">
     <div class="card text-center w-25" id="loading-card">
         <div class="card-top">
             <div class="spinner-border text-primary my-5" role="status" id="loading-spinner">
-            <span class="visually-hidden">Loading...</span>
-            </div>  
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
         <div class="card-body">
             <h5 class="card-title" id="loading-status">Loading...</h5>
             <p class="card-text" id="loading-status-message">We are getting the form ready</p>
-        <a href="#" class="btn btn-light" id="btn-fail-goback" hidden>Go back and edit</a>
+            <a href="#" class="btn btn-light" id="btn-fail-goback" hidden>Go back and edit</a>
         </div>
     </div>
 </div>
 <form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden>
     <div class="progress my-4">
         <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
+    </div>
     <fieldset id="section-general">
-                <h3 class="mb-4">General Information</h3>
-                <div class="mb-3 form-group">
-                    <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
-                    <select name="channel" id="channel-select" class="form-select" aria-describedby="channel-select-feedback" required>
+        <h3 class="mb-4">General Information</h3>
+        <div class="mb-3 form-group">
+            <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
+            <select name="channel" id="channel-select" class="form-select" aria-describedby="channel-select-feedback" required>
                         <option value="" selected>Select Channel...</option>
                     </select>
-                    <div id="channel-select-feedback"></div>
-                    <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
+            <div id="channel-select-feedback"></div>
+            <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
+        </div>
+        <div id="group-channel-new" class="mb-3" hidden>
+            <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
+            <input type="text" name="channel_new" class="form-control" id="channel-new" aria-describedby="channel-new-feedback">
+            <div id="channel-new-feedback"></div>
+        </div>
+        <div class="mb-3">
+            <div id="group-name" class="form-group">
+                <label for="name" class="form-label">What is the name of the print news source?</label>
+                <small id="name-helptext"></small>
+                <div class="input-group">
+                    <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
+                    <input name="name" type="text" class="form-control" id="name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
                 </div>
-                <div id="group-channel-new" class="mb-3" hidden>
-                    <label for="channel-new" class="form-label">Please specify the channel that is not listed above:</label>
-                    <input type="text" name="channel_new" class="form-control" id="channel-new" aria-describedby="channel-new-feedback">
-                    <div id="channel-new-feedback"></div>
+                <div id="name-feedback"></div>
+            </div>
+            <div id="group-transcript-kind" class="my-3 form-group">
+                <div class="form-group mb-3">
+                    <label for="channel_url" class="form-label">What is the name of the website that provides tv, radio, or podcast scripts?</label>
+                    <small id="channel_url-helptext">Please specify the archive name or the direct URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)</small>
+                    <input name="channel_url" type="text" class="form-control" id="channel_url" placeholder="e.g. 'The Royal Gazette'" aria-describedby="channel_url-feedback" autocomplete="off">
                 </div>
-                <div class="mb-3">
-                    <div id="group-name" class="form-group">
-                        <label for="name" class="form-label">What is the name of the print news source?</label>
-                        <small id="name-helptext"></small>
-                    <div class="input-group">
-                        <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
-                        <input name="name" type="text" class="form-control" id="name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
-                    </div>
-                    <div id="name-feedback"></div>
-                    </div>
-                    <div id="group-transcript-kind" class="my-3 form-group">
-                        <div class="form-group mb-3">
-                            <label for="channel_url" class="form-label">What is the name of the website that provides tv, radio, or podcast scripts?</label>
-                            <small id="channel_url-helptext">Please specify the archive name or the direct URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)</small>
-                            <input name="channel_url" type="text" class="form-control" id="channel_url" placeholder="e.g. 'The Royal Gazette'" aria-describedby="channel_url-feedback" autocomplete="off">
-                        </div>
-                        <div id="channel_url-feedback"></div>
+                <div id="channel_url-feedback"></div>
 
-                        <p class="form-label">What kind of show is transcribed?</p>
+                <p class="form-label">What kind of show is transcribed?</p>
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind1" value="tv"  aria-describedby="transcript-kind-feedback">
-                            <label class="form-check-label" for="transcript_kind1">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind1" value="tv" aria-describedby="transcript-kind-feedback">
+                    <label class="form-check-label" for="transcript_kind1">
                                 TV (broadcast, cable, satellite, etc)
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind2" value="radio"  aria-describedby="transcript-kind-feedback">
-                            <label class="form-check-label" for="transcript_kind2">
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind2" value="radio" aria-describedby="transcript-kind-feedback">
+                    <label class="form-check-label" for="transcript_kind2">
                                 Radio
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind3" value="podcast"  aria-describedby="transcript-kind-feedback">
-                            <label class="form-check-label" for="transcript_kind3">
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind3" value="podcast" aria-describedby="transcript-kind-feedback">
+                    <label class="form-check-label" for="transcript_kind3">
                                 Podcast
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind4" value="none"  aria-describedby="transcript-kind-feedback">
-                            <label class="form-check-label" for="transcript_kind4">
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="transcript_kind" id="transcript_kind4" value="none" aria-describedby="transcript-kind-feedback">
+                    <label class="form-check-label" for="transcript_kind4">
                                 Don't know
                             </label>
-                            <div id="transcript-kind-feedback"></div>
-                        </div>
-                    </div>
+                    <div id="transcript-kind-feedback"></div>
+                </div>
             </div>
-            
-            <div id="group-other-names" class="mb-3 form-group">
-                <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
-                <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></input>
-            </div>
+        </div>
 
-            <div id="group-epaper" class="mb-3 form-group" hidden>
-                <label for="channel-epaper" class="form-label">Does the print news source have an e-paper version? Please insert the url here:</label>
-                <input name="channel_epaper" type="text" class="form-control" id="channel-epaper" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-epaper-feedback">
-                <div id="channel-epaper-feedback"></div>
+        <div id="group-other-names" class="mb-3 form-group">
+            <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
+            <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></input>
+        </div>
 
-            </div>
+        <div id="group-epaper" class="mb-3 form-group" hidden>
+            <label for="channel-epaper" class="form-label">Does the print news source have an e-paper version? Please insert the url here:</label>
+            <input name="channel_epaper" type="text" class="form-control" id="channel-epaper" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-epaper-feedback">
+            <div id="channel-epaper-feedback"></div>
 
-            <div id="group-channel-comments" class="mb-3 form-group" hidden>
-                <p class="form-label">Does the online news source have user comments below individual news articles?</p>
+        </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments1" value="no comments"  aria-describedby="channel-comments-feedback">
-                    <label class="form-check-label" for="channel_comments1">
+        <div id="group-channel-comments" class="mb-3 form-group" hidden>
+            <p class="form-label">Does the online news source have user comments below individual news articles?</p>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments1" value="no comments" aria-describedby="channel-comments-feedback">
+                <label class="form-check-label" for="channel_comments1">
                         No comments
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments2" value="user comments with registration"  aria-describedby="channel-comments-feedback">
-                    <label class="form-check-label" for="channel_comments2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments2" value="user comments with registration" aria-describedby="channel-comments-feedback">
+                <label class="form-check-label" for="channel_comments2">
                         Registration required
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments3" value="user comments without registration"  aria-describedby="channel-comments-feedback">
-                    <label class="form-check-label" for="channel_comments3">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments3" value="user comments without registration" aria-describedby="channel-comments-feedback">
+                <label class="form-check-label" for="channel_comments3">
                         Anyone
                     </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments4" value="none"  aria-describedby="channel-comments-feedback">
-                    <label class="form-check-label" for="channel_comments4">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments4" value="none" aria-describedby="channel-comments-feedback">
+                <label class="form-check-label" for="channel_comments4">
                         Don't know
                     </label>
-                    <div id="channel-comments-feedback"></div>
-                </div>
+                <div id="channel-comments-feedback"></div>
             </div>
-            
-            <div id="group-source-founded" class="mb-3 form-group">
-                <label for="source-founded" class="form-label">What year was the news source founded?</label>
-                <input name="founded" type="number" step="1" min="1700" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
-                <div id="founded-feedback"></div>
-            </div>
+        </div>
 
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
+        <div id="group-source-founded" class="mb-3 form-group">
+            <label for="source-founded" class="form-label">What year was the news source founded?</label>
+            <input name="founded" type="number" step="1" min="1700" max="2100" class="form-control" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
+            <div id="founded-feedback"></div>
+        </div>
+
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
 
 
-         <!-- SECTION: ECONOMIC VARIABLES -->
-            <fieldset id="section-economic" hidden>
-                <h3 class="mb-4">Economic Properties</h3>
-                <div id="group-payment-model" class="mb-3 form-group">
-                        <p class="form-label">Is the content produced by the news source accessible free of charge?</p>
+    <!-- SECTION: ECONOMIC VARIABLES -->
+    <fieldset id="section-economic" hidden>
+        <h3 class="mb-4">Economic Properties</h3>
+        <div id="group-payment-model" class="mb-3 form-group">
+            <p class="form-label">Is the content produced by the news source accessible free of charge?</p>
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free"  aria-describedby="payment-model-feedback" required>
-                            <label class="form-check-label" for="payment_model1">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model1">
                                Free
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="soft paywall"  aria-describedby="payment-model-feedback" required>
-                            <label class="form-check-label" for="payment_model2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="soft paywall" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model2">
                                 Soft paywall
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="subscription"  aria-describedby="payment-model-feedback" required>
-                            <label class="form-check-label" for="payment_model3">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="subscription" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model3">
                                 Subscription
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_model" id="payment_model4" value="none"  aria-describedby="payment-model-feedback" required>
-                            <label class="form-check-label" for="payment_model4">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model4" value="none" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model4">
                                 Don't know
                             </label>
-                        </div>
-                        <div id="payment-model-feedback"></div>
-                </div>
+            </div>
+            <div id="payment-model-feedback"></div>
+        </div>
 
 
 
 
-                <div id="group-contains-ads" class="mb-3 form-group">
+        <div id="group-contains-ads" class="mb-3 form-group">
 
-                    <p for="contains_ads" class="form-label">Does the news source contain advertisements?</p>
+            <p for="contains_ads" class="form-label">Does the news source contain advertisements?</p>
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes"  aria-describedby="contains-ads-feedback" required>
-                            <label class="form-check-label" for="contains_ads1">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads1">
                                Yes
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads2" value="no"  aria-describedby="contains-ads-feedback" required>
-                            <label class="form-check-label" for="contains_ads2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads2" value="no" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads2">
                                 No
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads3" value="non subscribers"  aria-describedby="contains-ads-feedback" required>
-                            <label class="form-check-label" for="contains_ads3">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads3" value="non subscribers" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads3">
                                 Only for non-paying users
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads4" value="none"  aria-describedby="contains-ads-feedback" required>
-                            <label class="form-check-label" for="contains_ads4">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads4" value="none" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads4">
                                 Don't know
                             </label>
-                            <div id="contains-ads-feedback"></div>
-                        </div>
-                </div>
+                <div id="contains-ads-feedback"></div>
+            </div>
+        </div>
 
-                <div id="group-publishes" class="mb-3 form-group">
-                    <p class="form-label">Which organization or person owns the news source?</p>
-                    <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text">Organization</span>
-                        <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-text">Person</span>
-                        <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
-                    </div>
-                </div>
+        <div id="group-publishes" class="mb-3 form-group">
+            <p class="form-label">Which organization or person owns the news source?</p>
+            <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
+            <div class="input-group mb-2">
+                <span class="input-group-text">Organization</span>
+                <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Person</span>
+                <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+            </div>
+        </div>
 
-                <div id="group-ownership-kind" class="mb-3 form-group">
-                    <p class="form-label">Is the news source funded mainly public or mainly private?</p>
-                    <small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small>
+        <div id="group-ownership-kind" class="mb-3 form-group">
+            <p class="form-label">Is the news source funded mainly public or mainly private?</p>
+            <small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small>
 
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind1" value="public ownership"  aria-describedby="ownership-kind-feedback" required>
-                            <label class="form-check-label" for="ownership_kind1">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind1" value="public ownership" aria-describedby="ownership-kind-feedback" required>
+                <label class="form-check-label" for="ownership_kind1">
                                Mainly public
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind2" value="private ownership"  aria-describedby="ownership-kind-feedback" required>
-                            <label class="form-check-label" for="ownership_kind2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind2" value="private ownership" aria-describedby="ownership-kind-feedback" required>
+                <label class="form-check-label" for="ownership_kind2">
                                 Mainly private
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind3" value="unknown"  aria-describedby="ownership-kind-feedback" required>
-                            <label class="form-check-label" for="ownership_kind3">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind3" value="unknown" aria-describedby="ownership-kind-feedback" required>
+                <label class="form-check-label" for="ownership_kind3">
                                 News source does not mention the type of funding
                             </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind4" value="none"  aria-describedby="ownership-kind-feedback" required>
-                            <label class="form-check-label" for="ownership_kind4">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind4" value="none" aria-describedby="ownership-kind-feedback" required>
+                <label class="form-check-label" for="ownership_kind4">
                                 Don't know
                             </label>
-                            <div id="ownership-kind-feedback"></div>
-                        </div>
-                </div>
+                <div id="ownership-kind-feedback"></div>
+            </div>
+        </div>
 
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
 
+    <!-- SECTION JOURNALISTIC ROUTINE -->
 
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
+    <fieldset id="section-routines" hidden>
+        <h3 class="mb-4">Journalistic Routines</h3>
 
-            <!-- SECTION JOURNALISTIC ROUTINE -->
-
-            <fieldset id="section-routines" hidden>
-                <h3 class="mb-4">Journalistic Routines</h3>
-
-                <div id="group-publication-kind" class="mb-3 form-group">
-                    <label for="publication-kind" class="form-label">What label or labels describe the source?</label>
-                    <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
-                    <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" required multiple>
+        <div id="group-publication-kind" class="mb-3 form-group">
+            <label for="publication-kind" class="form-label">What label or labels describe the source?</label>
+            <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
+            <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" required multiple>
                         <option value="" selected>Choose...</option>
                         <option value="newspaper">Newspaper</option>
                         <option value="news agency">News Agency</option>
@@ -271,32 +268,32 @@
                         <option value="alternative media">Alternative Media</option>
                         <option value="none">Don't know</option>
                     </select>
-                    <div id="publication-kind-feedback"></div>
-                    
-                </div>
+            <div id="publication-kind-feedback"></div>
+
+        </div>
 
 
 
-                <div id="group-special-interest" class="mb-3 mt-4 form-group">
-                    <p class="form-label">Does the news source have one main topical focus?</p>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no"  aria-describedby="special-interest-feedback" checked>
-                            <label class="form-check-label" for="special_interest1">
+        <div id="group-special-interest" class="mb-3 mt-4 form-group">
+            <p class="form-label">Does the news source have one main topical focus?</p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no" aria-describedby="special-interest-feedback" checked>
+                <label class="form-check-label" for="special_interest1">
                                 No, it is a general interest news source (i.e., general news) 
                             </label>
-                        </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback" >
-                        <label class="form-check-label" for="special_interest2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback">
+                <label class="form-check-label" for="special_interest2">
                             Yes, is a special interest news source (i.e., clear focus on one topic) 
                         </label>
-                      </div>
-                      <div id="special-interest-feedback"></div>
-                </div>
+            </div>
+            <div id="special-interest-feedback"></div>
+        </div>
 
-                <div id="group-topical-focus" class="mb-3 form-group" hidden>
-                    <label for="topical-focus" class="form-label">What is the main topical focus of the news source?</label>
-                    <select name="topical_focus" class="form-select" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
+        <div id="group-topical-focus" class="mb-3 form-group" hidden>
+            <label for="topical-focus" class="form-label">What is the main topical focus of the news source?</label>
+            <select name="topical_focus" class="form-select" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
                         <option value="" selected>Choose...</option>
                         <option value="politics">Politics</option>
                         <option value="society">Society & Panorama</option>
@@ -308,13 +305,13 @@
                         <option value="education">Education</option>
                         <option value="none">Don't know</option>
                     </select>
-                    <div id="topical-focus-feedback"></div>
-                    <small id="topical-focus-helptext"></small>
-                </div>
+            <div id="topical-focus-feedback"></div>
+            <small id="topical-focus-helptext"></small>
+        </div>
 
-                <div id="group-publication-cycle" class="mb-3 form-group">
-                    <label for="publication-cycle" class="form-label">What is the publication cycle of the source?</label>
-                    <select name="publication_cycle" class="form-select" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
+        <div id="group-publication-cycle" class="mb-3 form-group">
+            <label for="publication-cycle" class="form-label">What is the publication cycle of the source?</label>
+            <select name="publication_cycle" class="form-select" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
                         <option value="" selected>Choose...</option>
                         <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
                         <option value="daily">Daily (7 times a week)</option>
@@ -324,203 +321,204 @@
                         <option value="monthly">Monthly</option>
                         <option value="none">Don't know</option>
                     </select>
-                    <div id="publication-cycle-feedback"></div>
-                    <small id="publication-cycle-helptext"></small>
-                </div>
+            <div id="publication-cycle-feedback"></div>
+            <small id="publication-cycle-helptext"></small>
+        </div>
 
-                <div id="group-publication-cycle-weekday" class="mb-3" hidden>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
-                        <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
-                    </div>
-                    <div id="publication-cycle-weekday-feedback"></div>
-                </div>
+        <div id="group-publication-cycle-weekday" class="mb-3" hidden>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
+            </div>
+            <div id="publication-cycle-weekday-feedback"></div>
+        </div>
 
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
 
-            <!-- SECTION AUDIENCE RELATED -->
+    <!-- SECTION AUDIENCE RELATED -->
 
-            <fieldset id="section-audience" hidden>
-                <h3 class="mb-4">Audience Related</h3>
+    <fieldset id="section-audience" hidden>
+        <h3 class="mb-4">Audience Related</h3>
 
-                <div id="group-geographic-scope" class="mb-3 mt-4 form-group">
-                    <div class="form-label">
-                        <p>What is the geographic scope of the news source? Who is the audience that the source is primarily addressing? </p>
-                        <small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope1" value="multinational">
-                        <label class="form-check-label" for="geographic_scope1">
+        <div id="group-geographic-scope" class="mb-3 mt-4 form-group">
+            <div class="form-label">
+                <p>What is the geographic scope of the news source? Who is the audience that the source is primarily addressing? </p>
+                <small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope1" value="multinational">
+                <label class="form-check-label" for="geographic_scope1">
                             Multinational (e.g., EU in general, German-speaking countries)
                         </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope2" value="national">
-                        <label class="form-check-label" for="geographic_scope2">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope2" value="national">
+                <label class="form-check-label" for="geographic_scope2">
                             National (consumed mainly in one country) 
                         </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope3" value="subnational">
-                        <label class="form-check-label" for="geographic_scope3">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope3" value="subnational">
+                <label class="form-check-label" for="geographic_scope3">
                             Subnational (consumed in a city/county/province/department)
                         </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope4" value="none">
-                        <label class="form-check-label" for="geographic_scope4">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope4" value="none">
+                <label class="form-check-label" for="geographic_scope4">
                             Don't know
                         </label>
-                      </div>
-                      <div id="geographic-scope-feedback"></div>
-                </div>
-
-                <div id="group-geographic-scope-multiple" class="mb-3 form-group">
-                    <label for="geographic-scope-multiple" class="form-label">What is the multinational scope?</label>
-                    <small id="geographic-scope-multiple-helptext"></small>
-                    <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
-                    <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly>
-                    <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly> 
-                    <div id="geographic-scope-multiple-feedback"></div>
-                </div>
-
-                <div id="group-geographic-scope-single" class="mb-3 form-group" hidden>
-                    <label for="geographic-scope-single" class="form-label">What is the national scope?</label>
-                    <select name="geographic_scope_single" id="geographic-scope-single" class="form-select form-select-lg" aria-describedby="geographic-scope-single-feedback" placeholder="Select one..." autocomplete="off"></select>
-                    <small id="geographic-scope-single-helptext"></small>
-                    <div id="geographic-scope-single-feedback"></div>
-                </div>
-
-                <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
-                    <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
-                    <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
-                    <div id="geographic-scope-subunit-feedback"></div>
-                </div>
-
-                <div id="group-languages" class="mb-3 form-group">
-                    <label for="languages" class="form-label">In which language(s) does the news source publish its news texts?</label>
-                    <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Select multiple..." aria-describedby="languages-feedback" multiple required></select>
-                    <small id="languages-helptext"></small>
-                    <div id="languages-feedback"></div>
-                </div>
-
-                <div id="group-audience-size" class="mb-3 mt-4">
-                    <div id="group-audience-size-subscribers" class="mb-3">
-                        <label for="audience-size-subscribers" class="form-label">How many people subscribe to this newspaper? <span class="text-muted">Please specify an absolute number (no percentage)</span></label>
-                        <input name="audience_size_subscribers" type="number" step="1" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
-                        <div id="audience-size-subscribers-feedback"></div>
-                    </div>
-                    <div id="group-audience-size-year" class="mb-3">
-                        <label for="audience-size-year" class="form-label">For which year is this information?<span class="text-muted mx-1">(i.e., number of subscribers)</span></label>
-                        <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
-                        <div id="audience-size-year-feedback"></div>
-                    </div>
-                    <div id="group-audience-size-datafrom" class="mb-3">
-                        <label for="audience-size-datafrom" class="form-label">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted"></span></label>
-                        <input name="audience_size_datafrom" type="text" class="form-control" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
-                        <div id="audience-size-datafrom-feedback"></div>
-                    </div>
-
-                    <small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small>
-                </div>
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
-
-            <!-- SECTION ACCESS TO RAW TEXT AND ANNOTATION -->
-
-            <fieldset id="section-annotations" hidden>
-                <h3 class="mb-4">Access to Raw Text and Annotations</h3>
-
-                <div id="group-archive-sources-included" class="mb-3 form-group">
-                    <label for="archive-sources-included" class="form-label">Are texts from the news source available for download in one or several of the following data archives?</label>
-                    <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
-                    <small id="archive-sources-included-helptext"></small>
-                    <div id="archive-sources-included-feedback"></div>
-                </div>
-
-                <div id="group-dataset-sources-included" class="mb-3 form-group">
-                    <label for="dataset-sources-included" class="form-label">Is the news source included in one or several of the following annotated media text data sets?</label>
-                    <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
-                    <small id="dataset-sources-included-helptext"></small>
-                    <div id="dataset-sources-included-feedback"></div>
-                </div>
-
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" class="btn btn-primary next" value="Next Step">
-            </fieldset>
-
-            <!-- SECTION OTHER -->
-
-            <fieldset id="section-other" hidden>
-                <h3 class="mb-4">Other Information</h3>
-
-                <div id="group-entry-notes" class="mb-3 form-group">
-                    <label for="entry-notes" class="form-label">Do you have any other notes on the source that you just coded?<span class="text-muted mx-1">(optional)</span></label>
-                    <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" aria-describedby="entry-notes-feedback" placeholder="">
-                    <small id="entry-notes-helptext"></small>
-                    <div id="entry-notes-feedback"></div>
-                </div>
-
-                <div id="group-related-sources" class="mb-3 form-group">
-                    <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below</label>
-                    <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
-                    <small id="related-sources-helptext"></small>
-                    <div id="related-sources-feedback"></div>
-                    
-                </div>
-
-                <div id="group-newrelated-container">
-
-                </div>
-
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" onclick="generateSummary()" class="btn btn-primary next" value="Next Step">
-            </fieldset>
-            
-            
-            <fieldset id="section-final" hidden>
-                <h3>Summary</h3>
-    
-                <div id='summary-container'>
-
-                </div>
-                <input type="button" class="btn btn-primary prev" value="Previous Step">
-                <input type="button" id="submit-button" class="btn btn-success" value="Submit" />
-            </fieldset>
-            <div class="mb-3 d-flex flex-row-reverse">
-                <!-- <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" /> -->
             </div>
+            <div id="geographic-scope-feedback"></div>
+        </div>
+
+        <div id="group-geographic-scope-multiple" class="mb-3 form-group">
+            <label for="geographic-scope-multiple" class="form-label">What is the multinational scope?</label>
+            <small id="geographic-scope-multiple-helptext"></small>
+            <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
+            <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly>
+            <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly>
+            <div id="geographic-scope-multiple-feedback"></div>
+        </div>
+
+        <div id="group-geographic-scope-single" class="mb-3 form-group" hidden>
+            <label for="geographic-scope-single" class="form-label">What is the national scope?</label>
+            <select name="geographic_scope_single" id="geographic-scope-single" class="form-select form-select-lg" aria-describedby="geographic-scope-single-feedback" placeholder="Select one..." autocomplete="off"></select>
+            <small id="geographic-scope-single-helptext"></small>
+            <div id="geographic-scope-single-feedback"></div>
+        </div>
+
+        <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
+            <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
+            <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
+            <div id="geographic-scope-subunit-feedback"></div>
+        </div>
+
+        <div id="group-languages" class="mb-3 form-group">
+            <label for="languages" class="form-label">In which language(s) does the news source publish its news texts?</label>
+            <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Select multiple..." aria-describedby="languages-feedback" multiple required></select>
+            <small id="languages-helptext"></small>
+            <div id="languages-feedback"></div>
+        </div>
+
+        <div id="group-audience-size" class="mb-3 mt-4">
+            <div id="group-audience-size-subscribers" class="mb-3">
+                <label for="audience-size-subscribers" class="form-label">How many people subscribe to this newspaper? <span class="text-muted">Please specify an absolute number (no percentage)</span></label>
+                <input name="audience_size_subscribers" type="number" step="1" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                <div id="audience-size-subscribers-feedback"></div>
+            </div>
+            <div id="group-audience-size-year" class="mb-3">
+                <label for="audience-size-year" class="form-label">For which year is this information?<span class="text-muted mx-1">(i.e., number of subscribers)</span></label>
+                <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
+                <div id="audience-size-year-feedback"></div>
+            </div>
+            <div id="group-audience-size-datafrom" class="mb-3">
+                <label for="audience-size-datafrom" class="form-label">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted"></span></label>
+                <input name="audience_size_datafrom" type="text" class="form-control" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
+                <div id="audience-size-datafrom-feedback"></div>
+            </div>
+
+            <small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small>
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
+    <!-- SECTION ACCESS TO RAW TEXT AND ANNOTATION -->
+
+    <fieldset id="section-annotations" hidden>
+        <h3 class="mb-4">Access to Raw Text and Annotations</h3>
+
+        <div id="group-archive-sources-included" class="mb-3 form-group">
+            <label for="archive-sources-included" class="form-label">Are texts from the news source available for download in one or several of the following data archives?</label>
+            <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
+            <small id="archive-sources-included-helptext"></small>
+            <div id="archive-sources-included-feedback"></div>
+        </div>
+
+        <div id="group-dataset-sources-included" class="mb-3 form-group">
+            <label for="dataset-sources-included" class="form-label">Is the news source included in one or several of the following annotated media text data sets?</label>
+            <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
+            <small id="dataset-sources-included-helptext"></small>
+            <div id="dataset-sources-included-feedback"></div>
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
+    <!-- SECTION OTHER -->
+
+    <fieldset id="section-other" hidden>
+        <h3 class="mb-4">Other Information</h3>
+
+        <div id="group-entry-notes" class="mb-3 form-group">
+            <label for="entry-notes" class="form-label">Do you have any other notes on the source that you just coded?<span class="text-muted mx-1">(optional)</span></label>
+            <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" aria-describedby="entry-notes-feedback" placeholder="">
+            <small id="entry-notes-helptext"></small>
+            <div id="entry-notes-feedback"></div>
+        </div>
+
+        <div id="group-related-sources" class="mb-3 form-group">
+            <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below</label>
+            <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
+            <small id="related-sources-helptext"></small>
+            <div id="related-sources-feedback"></div>
+
+        </div>
+
+        <div id="group-newrelated-container">
+
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" onclick="generateSummary()" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
+
+    <fieldset id="section-final" hidden>
+        <h3>Summary</h3>
+
+        <div id='summary-container'>
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" id="submit-button" class="btn btn-success" value="Submit" />
+    </fieldset>
+    <div class="mb-3 d-flex flex-row-reverse">
+        <!-- <input type="reset" class="btn btn-danger" id="reset-form" value="Reset form" /> -->
+    </div>
 </form>
 
 <script>
