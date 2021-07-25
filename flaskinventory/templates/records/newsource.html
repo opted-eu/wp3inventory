@@ -1,23 +1,27 @@
 {% extends "layout.html" %} {% block content %}
-    <div class="d-flex justify-content-center" id="loading-form">
-        <div class="align-self-start">
-                <div class="spinner-border text-primary my-5" role="status" id="loading-spinner">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
+
+<div class="row align-items-center justify-content-center" id="loading-form">
+    <div class="card text-center w-25" id="loading-card">
+        <div class="card-top">
+            <div class="spinner-border text-primary my-5" role="status" id="loading-spinner">
+            <span class="visually-hidden">Loading...</span>
+            </div>  
         </div>
-        <div class="ms-3 align-self-center">
-            <p id="loading-status" class="mb-0">Loading...</p>
+        <div class="card-body">
+            <h5 class="card-title" id="loading-status">Loading...</h5>
+            <p class="card-text" id="loading-status-message">We are getting the form ready</p>
+        <a href="#" class="btn btn-light" id="btn-fail-goback" hidden>Go back and edit</a>
         </div>
     </div>
-        <form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden>
-            <div class="progress my-4">
-                <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <fieldset id="section-general">
+</div>
+<form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden>
+    <div class="progress my-4">
+        <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    <fieldset id="section-general">
                 <h3 class="mb-4">General Information</h3>
                 <div class="mb-3 form-group">
                     <label for="channel-select" class="form-label">Through which channel is the news source distributed?</label>
-                    <!-- <input class="form-control" list="channel-options" id="channel-select" placeholder="Type to search..."> -->
                     <select name="channel" id="channel-select" class="form-select" aria-describedby="channel-select-feedback" required>
                         <option value="" selected>Select Channel...</option>
                     </select>
@@ -1105,20 +1109,43 @@
 
     }
 
+    // button to go back after failed submission
+
+    var submitFailButton = document.getElementById('btn-fail-goback') 
+    submitFailButton.addEventListener('click', function() {
+        document.getElementById('loading-form').hidden = true
+        document.getElementById('loading-card').classList.remove('text-white')
+        document.getElementById('loading-card').classList.remove('bg-danger')
+        document.getElementById('loading-spinner').hidden = true
+        document.getElementById('loading-spinner').removeAttribute('style')
+        document.getElementById('loading-spinner').classList.add('text-primary')
+        document.getElementById('btn-fail-goback').hidden = true
+
+        document.getElementById('loading-status').innerText = "Processing data..."
+        document.getElementById('loading-status-message').innerText = "Please be patient for a short while"
+        document.getElementById('loading-status').hidden = true
+        document.getElementById('new-source').hidden = false
+
+    })
+
     function formResult(success, data) {
         if (success) {
 
                 if ("error" in data) {
-
-                    document.getElementById('loading-spinner').classList.add('text-danger')
+                    document.getElementById('loading-card').classList.add('text-white', 'bg-danger')
+                    document.getElementById('loading-spinner').setAttribute('style', 'animation: unset;')
                     document.getElementById('loading-spinner').classList.remove('text-primary')
-                    document.getElementById('loading-status').innerText = "We have a problem: " + data.error
+                    document.getElementById('loading-status').innerText = "We got a problem"
+                    document.getElementById('loading-status-message').innerText = data.error
+                    document.getElementById('btn-fail-goback').hidden = false
+
 
                 }
                 else {
                     document.getElementById('loading-spinner').classList.add('text-success')
                     document.getElementById('loading-spinner').classList.remove('text-primary')
                     document.getElementById('loading-status').innerText = "Success!"
+                    document.getElementById('loading-status-message').innerText = "Everything looks good"
                     successRedirect(data.redirect)
 
                 }
@@ -1126,9 +1153,12 @@
                 
             }
             else {
-                document.getElementById('loading-spinner').classList.add('text-danger')
+                document.getElementById('loading-card').classList.add('text-white', 'bg-danger')
+                document.getElementById('loading-spinner').setAttribute('style', 'animation: unset;')
                 document.getElementById('loading-spinner').classList.remove('text-primary')
-                document.getElementById('loading-status').innerText = "Failed!"
+                document.getElementById('loading-status').innerText = "Failed"
+                document.getElementById('loading-status-message').innerText = Server not responding!
+                document.getElementById('btn-fail-goback').hidden = false
             }
 
     }
@@ -1143,6 +1173,7 @@
             document.getElementById('loading-form').hidden = false
             document.getElementById('loading-spinner').hidden = false
             document.getElementById('loading-status').innerText = "Processing data..."
+            document.getElementById('loading-status-message').innerText = "Please be patient for a short while"
             document.getElementById('loading-status').hidden = false
             submitForm('{{ url_for("records.submit") }}', form, formResult);
 
