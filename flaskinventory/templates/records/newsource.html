@@ -897,6 +897,10 @@
                     },
                     onChange: function(){ // invoke validation on change
                         setFieldValidity(this.input);
+                    },
+                    onItemAdd:function(){ // clear input after item was selected
+                        this.setTextboxValue();
+                        this.refreshOptions();
                     }
                 };
                 var TomSelectCountryConfig = {
@@ -919,6 +923,10 @@
                     },
                     onChange: function(){ // invoke validation on change
                         setFieldValidity(this.input);
+                    },
+                    onItemAdd:function(){ // clear input after item was selected
+                        this.setTextboxValue();
+                        this.refreshOptions();
                     }
                 };
      
@@ -936,6 +944,10 @@
                     },
                     onChange: function(){ // invoke validation on change
                         setFieldValidity(this.input);
+                    },
+                    onItemAdd:function(){ // clear input after item was selected
+                        this.setTextboxValue();
+                        this.refreshOptions();
                     }
                 };
 
@@ -944,7 +956,11 @@
                 var TomSelectDatasetConfig = { 
                     selectOnTab: true,
                     plugins: ['remove_button'],
-                    create: true
+                    create: true,
+                    onItemAdd:function(){ // clear input after item was selected
+                        this.setTextboxValue();
+                        this.refreshOptions();
+                    }
                  }
 
                 const archiveSelect = new TomSelect('#archive-sources-included', TomSelectDatasetConfig)
@@ -1348,7 +1364,11 @@
                 };
                 return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
             }
-	    }
+	    },
+        onItemAdd:function(){ // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+        }
     };
     new TomSelect('#publishes_org', TomSelectOrganizationConfig);
 
@@ -1395,7 +1415,11 @@
             item: function(data, escape) {
                 return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
             }
-	    }
+	    },
+        onItemAdd:function(){ // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+        }
     };
     new TomSelect('#publishes_person', TomSelectPersonConfig);
 
@@ -1520,7 +1544,11 @@
                 };
                 return '<div>' + escape(data.name) + channel_label + ' <small class="mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small></div>';
             }
-	    }
+	    },
+        onItemAdd:function(){ // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+        }
     };
     new TomSelect('#related-sources', TomSelectRelatedSourcesConfig);
 
