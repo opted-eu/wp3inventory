@@ -32,3 +32,4 @@ WTForms==2.3.3
 feedparser
 validators
 instaloader
+bs4
