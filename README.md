@@ -8,13 +8,16 @@ WP3 Inventory
 ## Before Public Repository
 
 - [x] User Registration
+- [ ] Improve email settings
 - [ ] Implement Twitter API
 - [ ] Implement Pseudo FB API
 - [ ] Cosmetic improvements
+  - [ ] Viewing sources: subunits need parsing
 - [ ] Tidy up source code
   - [ ] standardize dgraph query method and usage in other functions
   - [ ] remove unnecessary methods
   - [ ] move non-generic dgraph methods outside of class, move into respective modules
+  - [ ] Turn dgraph into flask extension
   - [ ] rename modules ('records' -> 'add', 'inventory' -> 'view')
   - [x] dateparsing for dgraph objects
   - [ ] divorce HTML from JS ('newsource.html')
@@ -27,6 +30,8 @@ WP3 Inventory
 
 ### Data entry views
 - [x] new source
+- [ ] New / Pending entries: only visible for reviewers and user who added entry
+  - [ ] should also not appear in other queries
 - [ ] new organization
 - [ ] new paper
 - [ ] new archive
