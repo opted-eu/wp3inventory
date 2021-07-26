@@ -18,6 +18,10 @@ ufw enable
 
 curl https://get.dgraph.io -sSf | bash -s -- --systemd
 
+# in some cases need to fix systemd config:
+
+https://discuss.dgraph.io/t/automatic-download-installation-with-systemd-throws-error/15080/2
+
 # add new user
 
 adduser ava
