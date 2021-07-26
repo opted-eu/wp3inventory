@@ -66,13 +66,13 @@ _:derstandardat <wikidataID> "1192004" .
 _:derstandardat <founded> "1995-02-02" .
 _:derstandardat <channel> _:website .
 _:derstandardat <channel_url> "https://www.derstandard.at/" .
-_:derstandardat <channel_comments> "Registration required" .
+_:derstandardat <channel_comments> "registration required" .
 _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml" (kind="sitemap") .
 _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/sitemap.xml" (kind="sitemap") .
 _:derstandardat <channel_feeds> "https://www.derstandard.at/rss" (kind="rss") .
 _:derstandardat <payment_model> "soft paywall" .
-_:derstandardat <contains_ads> "Non subscribers" .
-_:derstandardat <publication_kind> "Newspaper" .
+_:derstandardat <contains_ads> "non subscribers" .
+_:derstandardat <publication_kind> "newspaper" .
 _:derstandardat <special_interest> "false" .
 _:derstandardat <publication_cycle> "continuous" .
 _:derstandardat <geographic_scope> "national" .
@@ -91,7 +91,7 @@ _:derstandardprint <founded> "1988-10-19" .
 _:derstandardprint <channel> _:print .
 _:derstandardprint <payment_model> "subscription" .
 _:derstandardprint <contains_ads> "yes" .
-_:derstandardprint <publication_kind> "Newspaper" .
+_:derstandardprint <publication_kind> "newspaper" .
 _:derstandardprint <special_interest> "false" .
 _:derstandardprint <publication_cycle> "daily" .
 _:derstandardprint <geographic_scope> "national" .
@@ -108,7 +108,7 @@ _:derstandardinstagram <wikidataID> "128660" .
 _:derstandardinstagram <founded> "2012-06-22" .
 _:derstandardinstagram <channel> _:instagram .
 _:derstandardinstagram <channel_url> "derstandardat" .
-_:derstandardinstagram <publication_kind> "Newspaper" .
+_:derstandardinstagram <publication_kind> "newspaper" .
 _:derstandardinstagram <special_interest> "false" .
 _:derstandardinstagram <publication_cycle> "continuous" .
 _:derstandardinstagram <geographic_scope> "national" .
@@ -124,7 +124,7 @@ _:derstandardtwitter <wikidataID> "128660" .
 _:derstandardtwitter <founded> "2009-03" .
 _:derstandardtwitter <channel> _:twitter .
 _:derstandardtwitter <channel_url> "derStandardat" .
-_:derstandardtwitter <publication_kind> "Newspaper" .
+_:derstandardtwitter <publication_kind> "newspaper" .
 _:derstandardtwitter <special_interest> "false" .
 _:derstandardtwitter <publication_cycle> "continuous" .
 _:derstandardtwitter <geographic_scope> "national" .
@@ -140,7 +140,7 @@ _:derstandardfacebook <wikidataID> "128660" .
 _:derstandardfacebook <founded> "2010-09-04" .
 _:derstandardfacebook <channel> _:facebook .
 _:derstandardfacebook <channel_url> "derStandardat" .
-_:derstandardfacebook <publication_kind> "Newspaper" .
+_:derstandardfacebook <publication_kind> "newspaper" .
 _:derstandardfacebook <special_interest> "false" .
 _:derstandardfacebook <publication_cycle> "continuous" .
 _:derstandardfacebook <geographic_scope> "national" .
@@ -178,7 +178,7 @@ _:mbhderstandard <unique_name> "derstandard_mbh" .
 _:mbhderstandard <name> "STANDARD Verlagsgesellschaft m.b.H." .
 _:mbhderstandard <founded> "1995-04-28" .
 _:mbhderstandard <is_person> "false" .
-_:mbhderstandard <ownership_kind> "Private ownership" .
+_:mbhderstandard <ownership_kind> "private ownership" .
 _:mbhderstandard <country> _:austria .
 _:mbhderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
 _:mbhderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
@@ -193,7 +193,7 @@ _:agderstandard <unique_name> "derstandard_medien_ag" .
 _:agderstandard <name> "STANDARD Medien AG" .
 _:agderstandard <founded> "2000-08-05" .
 _:agderstandard <is_person> "false" .
-_:agderstandard <ownership_kind> "Private ownership" .
+_:agderstandard <ownership_kind> "private ownership" .
 _:agderstandard <country> _:austria .
 _:agderstandard <address_string> "Vordere Zollamtsstraße 13, 1030 Wien" .
 _:agderstandard <address_geo> "{'type':'Point','coordinates':[16.38381884235059, 48.20717038122307]}"^^<geo:geojson> .
@@ -207,7 +207,7 @@ _:falterprint <founded> "1977-05-25" .
 _:falterprint <channel> _:print .
 _:falterprint <payment_model> "subscription" .
 _:falterprint <contains_ads> "yes" .
-_:falterprint <publication_kind> "Newspaper" .
+_:falterprint <publication_kind> "newspaper" .
 _:falterprint <special_interest> "false" .
 _:falterprint <publication_cycle> "weekly" .
 _:falterprint <publication_cycle_weekday> "3" .
@@ -222,7 +222,7 @@ _:falterverlag <unique_name> "falter_mbh" .
 _:falterverlag <name> "Falter - Zeitschriften Gesellschaft m.b.H." .
 _:falterverlag <founded> "1987-09-28" .
 _:falterverlag <is_person> "false" .
-_:falterverlag <ownership_kind> "Private ownership" .
+_:falterverlag <ownership_kind> "private ownership" .
 _:falterverlag <country> _:austria .
 _:falterverlag <address_string> "Marc-Aurel-Str. 9, 1010 Wien" .
 _:falterverlag <address_geo> "{'type':'Point','coordinates':[16.37364, 48.21255]}"^^<geo:geojson> .
@@ -233,7 +233,7 @@ _:stverlag <unique_name> "st_verlagmbh" .
 _:stverlag <name> "ST Verlagsbeteiligungs­gesellschaft m.b.H." .
 _:stverlag <founded> "1999-11-30" .
 _:stverlag <is_person> "false" .
-_:stverlag <ownership_kind> "Private ownership" .
+_:stverlag <ownership_kind> "private ownership" .
 _:stverlag <country> _:austria .
 _:stverlag <address_string> "Marc-Aurel-Str. 9, 1010 Wien" .
 _:stverlag <address_geo> "{'type':'Point','coordinates':[16.37364, 48.21255]}"^^<geo:geojson> .
