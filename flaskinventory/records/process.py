@@ -354,7 +354,7 @@ class EntryProcessor():
                 if founded > 2100:
                     raise InventoryValidationError(
                         f'Invalid data! "founded" too large: {founded}')
-                self.new_source['founded'] = founded
+                self.new_source['founded'] = str(founded)
             except ValueError:
                 raise InventoryValidationError(
                     f'Invalid Data! Cannot parse value for "founded" to int: {self.json.get("founded")}')
