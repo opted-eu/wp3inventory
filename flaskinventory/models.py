@@ -30,7 +30,7 @@ class User(UserMixin):
         for k, v in form_data.data.items():
             if k in ['submit', 'csrf_token']: continue
             else: user_data[k] = v
-        result = dgraph.update_entry(self.id, user_data)
+        result = dgraph.update_entry(user_data, uid=self.id)
         if result:
             for k, v in user_data.items():
                 setattr(self, k, v)
@@ -42,8 +42,8 @@ class User(UserMixin):
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        dgraph.update_entry(self.id, {'pw_reset': s.dumps({'user_id': self.id}).decode('utf-8'),
-                                         'pw_reset|used': False})
+        dgraph.update_entry({'pw_reset': s.dumps({'user_id': self.id}).decode('utf-8'),
+                                         'pw_reset|used': False}, uid=self.id)
         return s.dumps({'user_id': self.id}).decode('utf-8')
     
     def get_invite_token(self, expires_days=7):
@@ -64,5 +64,5 @@ class User(UserMixin):
         elif user.pw_reset != token:
             return None
         else:
-            dgraph.update_entry(user_id, {'pw_reset|used': True})
+            dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
             return user
