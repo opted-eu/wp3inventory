@@ -2,10 +2,9 @@ from flask import (current_app, Blueprint, json, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
-from flaskinventory.posts.forms import PostForm
 from flaskinventory import dgraph
-from flaskinventory.records.forms import NewEntry
-from flaskinventory.records.utils import database_check_table
+from flaskinventory.records.forms import NewEntry, OrganizationForm
+from flaskinventory.records.utils import database_check_table, sanitize_edit_org
 from flaskinventory.records.process import EntryProcessor
 import traceback
 
@@ -147,3 +146,47 @@ def sourcelookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
+
+@records.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
+@records.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
+def edit_organization(unique_name):
+    form = OrganizationForm()
+    countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
+    c_choices = [(country.get('uid'), country.get('name')) for country in countries['q']]
+    c_choices = sorted(c_choices, key= lambda x: x[1])
+    
+    form.country.choices = c_choices
+    if form.validate_on_submit():
+        print(form.data)
+        try:
+            sanitize_edit_org(form.data)
+            flash(f'Organization has been updated', 'success')
+            return redirect(url_for('inventory.view_organization', unique_name=form.unique_name.data))
+        except Exception as e:
+            flash(f'Organization could not be updated: {e}', 'danger')
+            return redirect(url_for('records.edit_organization', unique_name=form.unique_name.data))
+
+
+    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
+		uid expand(_all_) {{ unique_name uid }}
+         }} }}'''
+
+    result = dgraph.query(query_string)
+    if result:
+        for key, value in result['q'][0].items():
+            if type(value) is list:
+                if type(value[0]) is str:
+                    value = ", ".join(value)
+                elif key != 'country':
+                    value_unique_name = ", ".join([subval['unique_name'] for subval in value])
+                    value = ", ".join([subval['uid'] for subval in value])
+                    setattr(getattr(form, key + '_unique_name'), 'data', value_unique_name)
+            setattr(getattr(form, key), 'data', value)
+        
+        
+
+        return render_template('edit/organization.html', title='Edit Organization', form=form)
+    else:
+        return abort(404)
+
+
