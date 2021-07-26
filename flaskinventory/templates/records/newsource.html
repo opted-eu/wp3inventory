@@ -1332,13 +1332,21 @@
         },
         render: {
             option: function(data, escape) {
+                var country_label = ' '
+                if ('country' in data) {
+                    country_label = ' (' + escape(data.country[0].name) + ') '
+                };
                 return '<div>' +
                         '<span class="title">' + escape(data.name) + '</span>' +
-                        '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>' +
+                        '<small class="text-muted mx-1">' + country_label + '</small>' +
                     '</div>';
             },
             item: function(data, escape) {
-                return '<div>' + escape(data.name) + ' <small class="mx-1"> (' + escape(data.country[0].name) + ')</small></div>';
+                var country_label = ' '
+                if ('country' in data) {
+                    country_label = ' (' + escape(data.country[0].name) + ') '
+                };
+                return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
             }
 	    }
     };
@@ -1376,13 +1384,16 @@
         },
         render: {
             option: function(data, escape) {
+                if ('country' in data) {
+                    country_label = ' (' + escape(data.country[0].name) + ') '
+                };
                 return '<div>' +
                         '<span class="title">' + escape(data.name) + '</span>' +
-                        '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>' +
+                        '<small class="text-muted mx-1">' + country_label + '</small>' +
                     '</div>';
             },
             item: function(data, escape) {
-                return '<div>' + escape(data.name) + ' <small class="mx-1"> (' + escape(data.country[0].name) + ')</small></div>';
+                return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
             }
 	    }
     };
