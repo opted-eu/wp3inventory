@@ -7,7 +7,7 @@ After=network.target
 Type=simple
 User=ava
 WorkingDirectory=/home/ava/wp3inventory
-ExecStart=/home/ava/venv/bin/waitress-serve --listen=*:5000 --call 'flaskinventory:create_app'
+ExecStart=/home/ava/environments/wp3/bin/waitress-serve --listen=*:5000 --call 'flaskinventory:create_app'
 Restart=always
 Environment="flaskinventory_SECRETKEY=123456789"
 

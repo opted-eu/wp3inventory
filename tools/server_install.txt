@@ -19,8 +19,43 @@ ufw enable
 curl https://get.dgraph.io -sSf | bash -s -- --systemd
 
 # in some cases need to fix systemd config:
-
 https://discuss.dgraph.io/t/automatic-download-installation-with-systemd-throws-error/15080/2
+
+# to set systemd manually, do the following
+
+## Install Dgraph 
+
+curl https://get.dgraph.io -sSf | bash
+
+## Create Dgraph user
+groupadd --system dgraph
+useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
+
+## Create Directories & set permissions
+mkdir -p /var/lib/dgraph/{p,w,zw}
+mkdir -p /var/log/dgraph
+
+chown -R dgraph:dgraph /var/{lib,log}/dgraph
+
+## Create systemd service files
+nano /etc/systemd/system/dgraph-zero.service
+nano /etc/systemd/system/dgraph-alpha.service
+
+## Reload Daemon
+
+systemctl daemon-reload
+
+## Enable services
+systemctl enable dgraph-zero
+systemctl status dgraph-zero
+
+
+
+
+
+# if this fails, try using docker
+docker run -it -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 -p 8000:8000 -v ~/dgraph:/dgraph --name dgraph dgraph/standalone:v21.03.0
+
 
 # add new user
 
@@ -44,13 +79,12 @@ python -m pip install -r requirements.txt
 export flaskinventory_SECRETKEY=123456789
 
 # setup dgraph schema
-curl localhost:8080/alter?runInBackground=true -XPOST -d "$(cat wp3inventory/data/schema.dgraph)"
+python tools/setschema.py
 
 # upload sample data
-curl -H "Content-Type: application/rdf" -X POST localhost:8080/mutate?commitNow=true -d "$(cat wp3inventory/data/sample_data.rdf)"
-curl -H "Content-Type: application/json" -X POST localhost:8080/mutate?commitNow=true -d "$(cat wp3inventory/data/countries_noaustria.json)"
+python tools/sample_data.py
 
-# Run flask with waitress
+# Run flask with waitress to test installation
 waitress-serve --call --listen "*:5000" 'flaskinventory:create_app'
 
 # run flask as systemd service
