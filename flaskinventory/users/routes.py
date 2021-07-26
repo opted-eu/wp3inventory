@@ -103,7 +103,7 @@ def reset_token(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         new_password = {'pw': form.password.data, 'pw_reset': False}
-        new_uid = dgraph.update_entry(user.id, new_password)
+        new_uid = dgraph.update_entry(new_password, uid=user.id)
 
         flash(f'Password updated for {user.id}!', 'success')
         return redirect(url_for('users.login'))
@@ -126,7 +126,7 @@ def accept_invitation(token):
                         'pw_reset': False,
                         'date_joined': datetime.now(
                             datetime.timezone.utc).isoformat()}
-        new_uid = dgraph.update_entry(user.id, new_password)
+        new_uid = dgraph.update_entry(new_password, uid=user.id)
 
         flash(f'Password updated for {user.email} ({user.id})!', 'success')
         return redirect(url_for('users.login'))
@@ -175,7 +175,7 @@ def edit_user(uid):
             else:
                 user_data[k] = v
         try:
-            result = dgraph.update_entry(uid, user_data)
+            result = dgraph.update_entry(user_data, uid=uid)
         except Exception as e:
             return f'Database error {e}'
         flash(f'User {uid} has been updated', 'success')
