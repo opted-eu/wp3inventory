@@ -9,4 +9,4 @@ class Config:
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER', None)
     MAIL_PASSWORD = os.environ.get('EMAIL_PW', None)
-    APP_VERSION = "0.1"
+    APP_VERSION = "0.2"
