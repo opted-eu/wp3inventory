@@ -154,7 +154,57 @@ class DGraph(object):
         else:
             return False
 
-    
+    """
+        Update Methods
+    """
+
+    def update_entry(self, input_data, uid=None):
+        current_app.logger.debug("Performing mutation:")
+        current_app.logger.debug(input_data)
+        if type(input_data) is not dict:
+            raise TypeError()
+
+        if uid:
+            input_data['uid'] = uid
+
+        txn = self.client.txn()
+
+        try:
+            response = txn.mutate(set_obj=input_data)
+            txn.commit()
+        except Exception as e:
+            current_app.logger.warning(e)
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return True
+        else:
+            return False
+
+    def upsert(self, query, nquad):
+        current_app.logger.debug("Performing upsert:")
+        current_app.logger.debug(f'Query: {query}')
+        current_app.logger.debug(f'nquad: {nquad}')
+
+        txn = self.client.txn()
+        mutation = txn.create_mutation(set_nquads=nquad)
+        request = txn.create_request(query=query, mutations=[mutation], commit_now=True)
+
+        try:
+            response = txn.do_request(request)
+        except Exception as e:
+            current_app.logger.warning(e)
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return True
+        else:
+            return False
+
 
     """ 
         User Related Methods 
@@ -486,27 +536,6 @@ class DGraph(object):
     """ 
         Misc Methods (unused)
     """
-
-    def update_entry(self, uid, input_data):
-        if type(input_data) is not dict:
-            raise TypeError()
-
-        input_data['uid'] = uid
-
-        txn = self.client.txn()
-
-        try:
-            response = txn.mutate(set_obj=input_data)
-            txn.commit()
-        except:
-            response = False
-        finally:
-            txn.discard()
-
-        if response:
-            return True
-        else:
-            return False
 
     def delete_entry(self, uid):
 
