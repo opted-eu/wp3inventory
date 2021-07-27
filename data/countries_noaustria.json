@@ -242,6 +242,14 @@
             "name": "Switzerland",
             "wikidataID": 39,
             "country_code": "ch"
+        },
+        {
+            "uid": "_:palestine",
+            "unique_name": "palestine",
+            "dgraph.type": "Country",
+            "name": "Palestinian Territories",
+            "wikidataID": 407199,
+            "country_code": "ps"
         }
 
     ]
