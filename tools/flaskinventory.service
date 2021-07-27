@@ -10,6 +10,14 @@ WorkingDirectory=/home/ava/wp3inventory
 ExecStart=/home/ava/environments/wp3/bin/waitress-serve --listen=*:5000 --call 'flaskinventory:create_app'
 Restart=always
 Environment="flaskinventory_SECRETKEY=123456789"
+Environment="EMAIL_USER="
+Environment="EMAIL_PW="
+Environment="TWITTER_CONSUMER_KEY="
+Environment="TWITTER_CONSUMER_SECRET="
+Environment="TWITTER_ACCESS_TOKEN="
+Environment="TWITTER_ACCESS_SECRET="
+
+
 
 [Install]
 WantedBy=multi-user.target
