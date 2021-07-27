@@ -10,19 +10,20 @@ WP3 Inventory
 - [x] User Registration
 - [ ] Improve email settings
 - [x] Implement Twitter API
-- [ ] Implement Pseudo FB API
+- [-] ~~Implement Pseudo FB API~~ *Too unreliable*
 - [ ] Cosmetic improvements
   - [ ] Viewing sources: subunits need parsing
 - [ ] Tidy up source code
   - [ ] standardize dgraph query method and usage in other functions
-  - [ ] remove unnecessary methods
-  - [ ] move non-generic dgraph methods outside of class, move into respective modules
-  - [ ] Turn dgraph into flask extension
+  - [x] remove unnecessary methods
+  - [x] move non-generic dgraph methods outside of class, move into respective modules
+  - [x] Turn dgraph into flask extension
   - [ ] rename modules ('records' -> 'add', 'inventory' -> 'view')
   - [x] dateparsing for dgraph objects
   - [ ] divorce HTML from JS ('newsource.html')
   - [ ] Remove external JS dependencies and collect via yarn instead
   - [ ] get rid of JQuery
+- [ ] Implement Account Delete feature
 
 
 ## New Features
