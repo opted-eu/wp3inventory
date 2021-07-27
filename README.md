@@ -10,7 +10,7 @@ WP3 Inventory
 - [x] User Registration
 - [ ] Improve email settings
 - [x] Implement Twitter API
-- [-] ~~Implement Pseudo FB API~~ *Too unreliable*
+- [x] ~~Implement Pseudo FB API~~ *Too unreliable*
 - [ ] Cosmetic improvements
   - [ ] Viewing sources: subunits need parsing
 - [ ] Tidy up source code
