@@ -147,6 +147,7 @@ def sourcelookup():
     result['status'] = True
     return jsonify(result)
 
+@login_required
 @records.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
 @records.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
 def edit_organization(unique_name):
