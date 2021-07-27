@@ -205,6 +205,23 @@ class DGraph(object):
         else:
             return False
 
+    def delete(self, mutation):
+
+        txn = self.client.txn()
+
+        try:
+            response = txn.mutate(del_obj=mutation)
+            txn.commit()
+        except:
+            response = False
+        finally:
+            txn.discard()
+
+        if response:
+            return True
+        else:
+            return False
+
 
     """ 
         User Related Methods 
@@ -537,20 +554,4 @@ class DGraph(object):
         Misc Methods (unused)
     """
 
-    def delete_entry(self, uid):
 
-        mutation = {'uid': uid}
-        txn = self.client.txn()
-
-        try:
-            response = txn.mutate(del_obj=mutation)
-            txn.commit()
-        except:
-            response = False
-        finally:
-            txn.discard()
-
-        if response:
-            return True
-        else:
-            return False
