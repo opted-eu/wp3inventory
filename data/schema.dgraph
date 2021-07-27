@@ -55,6 +55,7 @@ type Source {
     audience_size
     audience_residency
     languages
+    verified_account
 }
 
 type Channel {
@@ -227,6 +228,7 @@ geographic_scope_subunit_geo: geo @index(geo) .
 languages: [string] @index(hash) .
 audience_size: [dateTime] .
 audience_residency: [dateTime] .
+verified_account: bool @index .
 
 # Organization Predicates
 is_person: bool .

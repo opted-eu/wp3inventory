@@ -117,6 +117,7 @@
         _:derstandardinstagram <geographic_scope_countries> _:austria .
         _:derstandardinstagram <languages> "de" .
         _:derstandardinstagram <audience_size> "2021-05-06" (followers=292000) .
+        _:derstandardinstagram <verified_account> "true" .
 
         _:derstandardtwitter <dgraph.type> "Source" .
         _:derstandardtwitter <unique_name> "derstandard_twitter" .
@@ -133,6 +134,7 @@
         _:derstandardtwitter <geographic_scope_countries> _:austria .
         _:derstandardtwitter <languages> "de" .
         _:derstandardtwitter <audience_size> "2021-05-06" (followers=333700) .
+        _:derstandardtwitter <verified_account> "true" .
 
         _:derstandardfacebook <dgraph.type> "Source" .
         _:derstandardfacebook <unique_name> "derstandard_facebook" .
@@ -149,6 +151,7 @@
         _:derstandardfacebook <geographic_scope_countries> _:austria .
         _:derstandardfacebook <languages> "de" .
         _:derstandardfacebook <audience_size> "2021-05-06" (followers=347671) .
+        _:derstandardfacebook <verified_account> "true" .
 
         _:derstandardat <related> _:derstandardprint .
         _:derstandardat <related> _:derstandardinstagram .

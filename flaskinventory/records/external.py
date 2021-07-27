@@ -222,7 +222,12 @@ def instagram(username):
     except KeyError:
         fullname = None
 
-    return {'followers': followers, 'fullname': fullname}
+    try:
+        verified = profile.is_verified
+    except:
+        verified = None
+
+    return {'followers': followers, 'fullname': fullname, 'verified': verified}
 
 
 def generate_twitter_api():
@@ -239,7 +244,7 @@ def twitter(username):
 
     user = api.get_user(username)
 
-    return {'followers': user.followers_count, 'fullname': user.screen_name, 'joined': user.created_at}
+    return {'followers': user.followers_count, 'fullname': user.screen_name, 'joined': user.created_at, 'verified': user.verified}
 
 
 def facebook(username):
