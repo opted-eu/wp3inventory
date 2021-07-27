@@ -5,7 +5,15 @@
             <h2><i class="icon-{{ entry.channel.unique_name }} color-{{ entry.channel.unique_name }}" alt="{{ entry.channel.name }}"></i></h2>
         </div>
         <div>
-            <h2>{% if entry.channel.unique_name in ['twitter', 'instagram'] %}@{% endif %}{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>
+            <h2>{% if entry.channel.unique_name in ['twitter', 'instagram'] %}@{% endif %}{{ entry.name }} 
+                {% if entry.verified_account %} 
+                <span class="fa-stack text-primary align-middle" style="font-size: 0.3em;">
+                    <i class="fas fa-certificate fa-stack-2x" aria-hidden="true"></i>
+                    <i class="fas fa-check fa-stack-1x fa-inverse" aria-hidden="true"></i>
+                    </span> 
+                {% endif %}
+                <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small>
+            </h2>
         </div>
         <div class="ms-auto text-muted"><a href="#"><i class="fas fa-exclamation-circle"> </i></a> </div>
     </div>
@@ -28,7 +36,10 @@
                     {% elif entry.channel.unique_name == 'facebook' %}
                 <a class="mx-4" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
                 {% endif %}<i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open External</a> {% endif %}</dd>
-            
+            {% if entry.verified_account %}
+            <dt class="col-sm-3">Verified Account</dt>
+            <dd class="col-sm-9 mb-4">{{ entry.verified_account }}</dd>
+            {% endif %}
             {% if entry.wikidataID %}
             <dt class="col-sm-3">Wikidata</dt>
             <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
