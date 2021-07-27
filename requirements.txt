@@ -33,3 +33,4 @@ feedparser
 validators
 instaloader
 bs4
+tweepy
