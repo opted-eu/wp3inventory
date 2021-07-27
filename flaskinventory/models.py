@@ -1,68 +1,7 @@
-from flask import current_app
-from flask_login import UserMixin
-from flaskinventory import dgraph, login_manager
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flaskinventory import login_manager
+from flaskinventory.users.dgraph import User
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User(uid=user_id)
-
-class User(UserMixin):
-    
-    id = None
-
-    def __init__(self, **kwargs):
-        if 'uid' or 'email' in kwargs.keys():
-            self.get_user(**kwargs)
-
-    def get_user(self, **kwargs):
-        user_data = dgraph.get_user(**kwargs)
-        if user_data:
-            for k, v in user_data.items():
-                if k == 'uid':
-                    self.id = v
-                if '|' in k:
-                    k = k.replace('|', '_')
-                setattr(self, k, v)
-
-    def update_profile(self, form_data):
-        user_data = {}
-        for k, v in form_data.data.items():
-            if k in ['submit', 'csrf_token']: continue
-            else: user_data[k] = v
-        result = dgraph.update_entry(user_data, uid=self.id)
-        if result:
-            for k, v in user_data.items():
-                setattr(self, k, v)
-            return True
-        else: return False
-
-    def __repr__(self):
-        return f'<DGraph User.uid {self.id}>'
-
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        dgraph.update_entry({'pw_reset': s.dumps({'user_id': self.id}).decode('utf-8'),
-                                         'pw_reset|used': False}, uid=self.id)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-    
-    def get_invite_token(self, expires_days=7):
-        expires_sec = expires_days * 24 * 60 * 60 
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    @staticmethod
-    def verify_reset_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        user = User(uid=user_id)
-        if user.pw_reset_used:
-            return None
-        elif user.pw_reset != token:
-            return None
-        else:
-            dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
-            return user

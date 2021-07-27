@@ -1,14 +1,16 @@
-from flask import (current_app, Blueprint, json, render_template, url_for,
+from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
-from flask_login import login_user, current_user, logout_user, login_required
-import requests
+from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.records.forms import NewEntry, OrganizationForm
 from flaskinventory.records.utils import database_check_table, sanitize_edit_org
 from flaskinventory.records.process import EntryProcessor
+from flaskinventory.records.dgraph import generate_fieldoptions
+
 import traceback
 
 records = Blueprint('records', __name__)
+
 
 @login_required
 @records.route("/new", methods=['GET', 'POST'])
@@ -57,20 +59,21 @@ def confirmation():
 
 @records.route("/new/fieldoptions")
 def fieldoptions():
-    return jsonify(dgraph.generate_fieldoptions())
+    return jsonify(generate_fieldoptions())
 
 
 @records.route('/new/submit', methods=['POST'])
 def submit():
     try:
-        processor = EntryProcessor(request.json, current_user, request.remote_addr)
+        processor = EntryProcessor(
+            request.json, current_user, request.remote_addr)
         current_app.logger.debug(f'Mutation Object: {processor.mutation}')
     except Exception as e:
         error = {'error': f'{e}'}
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
         current_app.logger.error(tb_str)
         return jsonify(error)
-    
+
     try:
         result = dgraph.mutation(processor.mutation)
     except Exception as e:
@@ -81,18 +84,18 @@ def submit():
 
     if result:
         result = dict(result.uids)
-        result['redirect'] = url_for('inventory.view_source', uid=result['newsource'])
+        result['redirect'] = url_for(
+            'inventory.view_source', uid=result['newsource'])
         return jsonify(result)
     else:
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
-
-    
 
 
 @records.route('/new/echo', methods=['POST'])
 def echo_json():
     try:
-        processor = EntryProcessor(request.json, current_user, request.remote_addr)
+        processor = EntryProcessor(
+            request.json, current_user, request.remote_addr)
         current_app.logger.debug(f'Mutation Object: {processor.mutation}')
         return jsonify(processor.mutation)
     except Exception as e:
@@ -147,15 +150,17 @@ def sourcelookup():
     result['status'] = True
     return jsonify(result)
 
+
 @login_required
 @records.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
 @records.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
 def edit_organization(unique_name):
     form = OrganizationForm()
     countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
-    c_choices = [(country.get('uid'), country.get('name')) for country in countries['q']]
-    c_choices = sorted(c_choices, key= lambda x: x[1])
-    
+    c_choices = [(country.get('uid'), country.get('name'))
+                 for country in countries['q']]
+    c_choices = sorted(c_choices, key=lambda x: x[1])
+
     form.country.choices = c_choices
     if form.validate_on_submit():
         print(form.data)
@@ -166,7 +171,6 @@ def edit_organization(unique_name):
         except Exception as e:
             flash(f'Organization could not be updated: {e}', 'danger')
             return redirect(url_for('records.edit_organization', unique_name=form.unique_name.data))
-
 
     query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
 		uid expand(_all_) {{ unique_name uid }}
@@ -179,15 +183,13 @@ def edit_organization(unique_name):
                 if type(value[0]) is str:
                     value = ", ".join(value)
                 elif key != 'country':
-                    value_unique_name = ", ".join([subval['unique_name'] for subval in value])
+                    value_unique_name = ", ".join(
+                        [subval['unique_name'] for subval in value])
                     value = ", ".join([subval['uid'] for subval in value])
-                    setattr(getattr(form, key + '_unique_name'), 'data', value_unique_name)
+                    setattr(getattr(form, key + '_unique_name'),
+                            'data', value_unique_name)
             setattr(getattr(form, key), 'data', value)
-        
-        
 
         return render_template('edit/organization.html', title='Edit Organization', form=form)
     else:
         return abort(404)
-
-

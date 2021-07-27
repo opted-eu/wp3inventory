@@ -9,6 +9,7 @@ from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginF
                                         EditUserForm, AcceptInvitationForm)
 from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table
 from flaskinventory.users.constants import USER_ROLES
+from flaskinventory.users.dgraph import get_user_data, user_login, create_user, list_users
 from secrets import token_hex
 
 users = Blueprint('users', __name__)
@@ -22,9 +23,10 @@ def register():
     if form.validate_on_submit():
         new_user = {'email': form.email.data,
                     'pw': form.password.data}
-        new_uid = dgraph.create_user(new_user)
+        new_uid = create_user(new_user)
 
-        flash(f'Accounted created for {form.email.data} ({new_uid})!', 'success')
+        flash(
+            f'Accounted created for {form.email.data} ({new_uid})!', 'success')
         return redirect(url_for('users.login'))
     return render_template('users/register.html', title='Register', form=form)
 
@@ -36,7 +38,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User(email=form.email.data)
-        if user and dgraph.user_login(form.email.data, form.password.data):
+        if user and user_login(form.email.data, form.password.data):
             login_user(user, remember=form.remember.data)
             flash(f'You have been logged in', 'success')
             next_page = request.args.get('next')
@@ -140,7 +142,7 @@ def invite():
     if form.validate_on_submit():
         new_user = {'email': form.email.data,
                     'pw': token_hex(32)}
-        new_uid = dgraph.create_user(new_user, invited_by=current_user.id)
+        new_uid = create_user(new_user, invited_by=current_user.id)
         NewUser = User(uid=new_uid)
         send_invite_email(NewUser)
         flash(
@@ -153,7 +155,7 @@ def invite():
 @login_required
 @requires_access_level(USER_ROLES.Admin)
 def admin_view():
-    user_list = dgraph.list_users()
+    user_list = list_users()
     if user_list:
         users_table = make_users_table(user_list)
     return render_template('users/admin.html', title='Manage Users', users=users_table)
@@ -163,7 +165,7 @@ def admin_view():
 @login_required
 @requires_access_level(USER_ROLES.Admin)
 def edit_user(uid):
-    editable_user = dgraph.get_user(uid=uid)
+    editable_user = get_user_data(uid=uid)
     if editable_user is None:
         return abort(404)
     form = EditUserForm()
