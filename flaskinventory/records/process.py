@@ -1,6 +1,6 @@
 from flaskinventory.records.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.records.external import geocode, instagram, parse_meta, siterankdata, find_sitemaps, find_feeds, build_url
+from flaskinventory.records.external import (geocode, instagram, parse_meta, siterankdata, find_sitemaps, find_feeds, build_url, twitter)
 from flaskinventory import dgraph
 from flask import current_app
 from slugify import slugify
@@ -47,6 +47,8 @@ class EntryProcessor():
             self.process_instagram()
         elif self.json.get('channel') == 'transcript':
             self.process_transcript()
+        elif self.json.get('channel') == 'twitter':
+            self.process_twitter()
 
     def add_entry_meta(self, entry):
         if self.user.is_authenticated:
@@ -818,9 +820,9 @@ class EntryProcessor():
                 raise InventoryValidationError(
                     f"Instagram profile not found: {self.json.get('name')}")
 
-            if profile['fullname']:
+            if profile.get('fullname'):
                 self.new_source['other_names'].append(profile['fullname'])
-            if profile['followers']:
+            if profile.get('followers'):
                 self.new_source['audience_size'] = str(datetime.date.today())
                 self.new_source['audience_size|followers'] = int(
                     profile['followers'])
@@ -831,21 +833,24 @@ class EntryProcessor():
     
     def fetch_twitter(self):
         if self.json.get('name'):
-            self.new_source['name'] = self.json.get('name')
             self.new_source['channel_url'] = self.json.get('name')
-            # profile = instagram(self.json.get('name'))
-            # if profile:
-            #     self.new_source['name'] = self.json.get('name').lower()
-            # else:
-            #     raise InventoryValidationError(
-            #         f"Instagram profile not found: {self.json.get('name')}")
+            try:
+                profile = twitter(self.json.get('name'))
+            except Exception as e:
+                raise InventoryValidationError(
+                    f"Twitter profile not found: {self.json.get('name')}. {e}")
+            
+            self.new_source['name'] = self.json.get('name').lower()
+               
 
-            # if profile['fullname']:
-            #     self.new_source['other_names'].append(profile['fullname'])
-            # if profile['followers']:
-            #     self.new_source['audience_size'] = str(datetime.date.today())
-            #     self.new_source['audience_size|followers'] = int(
-            #         profile['followers'])
+            if profile.get('fullname'):
+                self.new_source['other_names'].append(profile['fullname'])
+            if profile.get('followers'):
+                self.new_source['audience_size'] = str(datetime.date.today())
+                self.new_source['audience_size|followers'] = int(
+                    profile['followers'])
+            if profile.get('joined'):
+                self.new_source['founded'] = profile.get('joined').isoformat()
 
         else:
             raise InventoryValidationError(

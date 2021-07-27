@@ -1,5 +1,4 @@
-from os import name
-import time
+from flask import current_app
 import requests
 import feedparser
 from urllib.robotparser import RobotFileParser
@@ -7,25 +6,26 @@ import urllib.parse
 from bs4 import BeautifulSoup as bs4
 import re
 import json
-from requests.api import head
 import validators
 import instaloader
+import tweepy
+
 
 def geocode(address):
-    payload = {'q': address, 
-        'format': 'jsonv2', 
-        'addressdetails': 1, 
-        'limit': 1, 
-        'namedetails': 1,
-        'extratags': 1}
+    payload = {'q': address,
+               'format': 'jsonv2',
+               'addressdetails': 1,
+               'limit': 1,
+               'namedetails': 1,
+               'extratags': 1}
     api = "https://nominatim.openstreetmap.org/search"
     r = requests.get(api, params=payload)
     if r.status_code != 200:
         return False
     elif len(r.json()) == 0:
         return False
-    else: 
-        return r.json()[0] 
+    else:
+        return r.json()[0]
 
 
 # Sitemaps & RSS/XML/Atom Feeds
@@ -48,12 +48,13 @@ def find_sitemaps(site):
         site = site[:-1]
     if site.startswith('http'):
         validators.url(site)
-    else:        
+    else:
         site = 'https://' + site
-    
+
     r = requests.get(site)
     if r.status_code != 200:
-        raise requests.RequestException(f'Could not reach {site}. Status: {r.status_code}')
+        raise requests.RequestException(
+            f'Could not reach {site}. Status: {r.status_code}')
 
     rp = RobotFileParser()
     rp.set_url(site + '/robots.txt')
@@ -100,16 +101,19 @@ def find_feeds(site):
         parsed_feed_url = urllib.parse.urlparse(url)
         if parsed_feed_url.scheme == '':
             scheme = 'https'
-        else: scheme = parsed_feed_url.scheme
+        else:
+            scheme = parsed_feed_url.scheme
         if parsed_feed_url.netloc == '':
             netloc = parsed_url.hostname
-        else: netloc = parsed_feed_url.netloc
+        else:
+            netloc = parsed_feed_url.netloc
         feed_url = scheme + '://' + netloc + parsed_feed_url.path
         f = feedparser.parse(feed_url)
         if len(f.entries) > 0:
             if feed_url not in result:
                 result.append(feed_url)
     return result
+
 
 def parse_meta(url):
 
@@ -136,14 +140,11 @@ def parse_meta(url):
 
     if ogurl:
         urls.append(ogurl)
-    
+
     if schema_url:
         urls.append(schema_url)
 
-
     return list(set(names)), list(set(urls))
-
-
 
 
 def opengraph(soup):
@@ -151,7 +152,7 @@ def opengraph(soup):
         title = soup.find('meta', property='og:title')['content']
     else:
         title = None
-    
+
     if soup.find('meta', property='og:url'):
         url = soup.find('meta', property='og:url')['content']
     else:
@@ -164,10 +165,10 @@ def schemaorg(soup):
     schemas = soup.find_all('script', type=re.compile(r'json'))
     if len(schemas) == 0:
         return False
-    
+
     name = None
     url = None
-    
+
     for item in schemas:
         parsed = json.loads(item.string)
         if parsed.get('@type').lower() == "webpage":
@@ -176,11 +177,13 @@ def schemaorg(soup):
 
     return name, url
 
+
 def siterankdata(site):
-    site = site.replace('http://', '').replace('https://', '').replace('www.', '')
+    site = site.replace('http://', '').replace('https://',
+                                               '').replace('www.', '')
     if site.endswith('/'):
         site = site[:-1]
-    
+
     r = requests.get("https://siterankdata.com/" + site)
 
     if r.status_code != 200:
@@ -193,16 +196,18 @@ def siterankdata(site):
         visitors = visitor_string.parent.parent.h3.getText(strip=True)
         visitors = int(visitors.replace(',', ''))
         return visitors
-    
+
     except:
         return False
-        
+
+
 def instagram(username):
-    
+
     L = instaloader.Instaloader()
 
     try:
-        profile = instaloader.Profile.from_username(L.context, username.lower())
+        profile = instaloader.Profile.from_username(
+            L.context, username.lower())
     except:
         return False
 
@@ -217,7 +222,20 @@ def instagram(username):
         fullname = None
 
     return {'followers': followers, 'fullname': fullname}
-    
 
 
+def generate_twitter_api():
+    twitter_auth = tweepy.OAuthHandler(current_app.config["TWITTER_CONSUMER_KEY"],
+                                       current_app.config["TWITTER_CONSUMER_SECRET"])
+    twitter_auth.set_access_token(current_app.config["TWITTER_ACCESS_TOKEN"],
+                                  current_app.config["TWITTER_ACCESS_SECRET"])
 
+    return tweepy.API(twitter_auth)
+
+
+def twitter(username):
+    api = generate_twitter_api()
+
+    user = api.get_user(username)
+
+    return {'followers': user.followers_count, 'fullname': user.screen_name, 'joined': user.created_at}
