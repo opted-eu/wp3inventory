@@ -830,6 +830,8 @@ class EntryProcessor():
                 self.new_source['audience_size'] = str(datetime.date.today())
                 self.new_source['audience_size|followers'] = int(
                     profile['followers'])
+            if profile.get('verified'):
+                self.new_source['verified_account'] = profile['verified']
 
         else:
             raise InventoryValidationError(
@@ -854,6 +856,9 @@ class EntryProcessor():
                     profile['followers'])
             if profile.get('joined'):
                 self.new_source['founded'] = profile.get('joined').isoformat()
+            if profile.get('verified'):
+                self.new_source['verified_account'] = profile.get('verified')
+
 
         else:
             raise InventoryValidationError(
@@ -862,22 +867,23 @@ class EntryProcessor():
     def fetch_facebook(self):
         if self.json.get('name'):
             self.new_source['channel_url'] = self.json.get('name')
-            try:
-                profile = facebook(self.json.get('name'))
-            except Exception as e:
-                raise InventoryValidationError(
-                    f"Facebook profile not found: {self.json.get('name')}. {e}")
+            self.new_source['name'] = self.json.get('name')
+            # try:
+            #     profile = facebook(self.json.get('name'))
+            # except Exception as e:
+            #     raise InventoryValidationError(
+            #         f"Facebook profile not found: {self.json.get('name')}. {e}")
 
-            self.new_source['name'] = self.json.get('name').lower()
+            # self.new_source['name'] = self.json.get('name').lower()
 
-            if profile.get('fullname'):
-                self.new_source['other_names'].append(profile['fullname'])
-            if profile.get('followers'):
-                self.new_source['audience_size'] = str(datetime.date.today())
-                self.new_source['audience_size|followers'] = int(
-                    profile['followers'])
-            if profile.get('joined'):
-                self.new_source['founded'] = profile.get('joined').isoformat()
+            # if profile.get('fullname'):
+            #     self.new_source['other_names'].append(profile['fullname'])
+            # if profile.get('followers'):
+            #     self.new_source['audience_size'] = str(datetime.date.today())
+            #     self.new_source['audience_size|followers'] = int(
+            #         profile['followers'])
+            # if profile.get('joined'):
+            #     self.new_source['founded'] = profile.get('joined').isoformat()
 
         else:
             raise InventoryValidationError(
