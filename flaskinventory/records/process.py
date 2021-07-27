@@ -1,6 +1,8 @@
 from flaskinventory.records.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.records.external import (geocode, instagram, parse_meta, siterankdata, find_sitemaps, find_feeds, build_url, twitter)
+from flaskinventory.records.external import (geocode, instagram,
+                                             parse_meta, siterankdata, find_sitemaps, find_feeds,
+                                             build_url, twitter, facebook)
 from flaskinventory import dgraph
 from flask import current_app
 from slugify import slugify
@@ -33,7 +35,7 @@ class EntryProcessor():
         self.user = user
         self.user_ip = ip
         self.new_source = {'uid': '_:newsource',
-                            'dgraph.type': 'Source',
+                           'dgraph.type': 'Source',
                            'channel': dict(),
                            'other_names': [],
                            'related': []}
@@ -49,6 +51,10 @@ class EntryProcessor():
             self.process_transcript()
         elif self.json.get('channel') == 'twitter':
             self.process_twitter()
+        elif self.json.get('channel') == 'facebook':
+            self.process_facebook()
+        else:
+            raise NotImplementedError('Cannot process submitted news source.')
 
     def add_entry_meta(self, entry):
         if self.user.is_authenticated:
@@ -136,8 +142,6 @@ class EntryProcessor():
         self.new_source = self.add_entry_meta(self.new_source)
 
         self.mutation.append(self.new_source)
-
-
 
     def process_website(self):
 
@@ -281,8 +285,6 @@ class EntryProcessor():
         self.generate_unique_name()
         self.new_source = self.add_entry_meta(self.new_source)
         self.mutation.append(self.new_source)
-
-
 
     def parse_name(self):
         if self.json.get('name'):
@@ -560,7 +562,8 @@ class EntryProcessor():
 
     def generate_unique_name(self):
         if self.new_source.get('geographic_scope_subunit'):
-            current_app.logger.debug(self.new_source['geographic_scope_subunit'])
+            current_app.logger.debug(
+                self.new_source['geographic_scope_subunit'])
             if self.new_source['geographic_scope_subunit'][0]['uid'].startswith('0x'):
                 self.new_source["unique_name"] = self.source_unique_name(
                     self.json['name'], channel=self.json['channel'], country_uid=self.new_source['geographic_scope_subunit'][0]['uid'])
@@ -735,19 +738,20 @@ class EntryProcessor():
                 {query, geo_result['namedetails']['name'], geo_result['namedetails']['name:en']})
 
             new_subunit = {'name': geo_result['namedetails']['name:en'],
-                    'country': [{'uid': country_uid}],
-                    'other_names': other_names,
-                    'location_point': geo_data,
-                    'country_code': geo_result['address']['country_code']}
+                           'country': [{'uid': country_uid}],
+                           'other_names': other_names,
+                           'location_point': geo_data,
+                           'country_code': geo_result['address']['country_code']}
             if geo_result.get('extratags'):
                 if geo_result.get('extratags').get('wikidata'):
                     if geo_result.get('extratags').get('wikidata').lower().startswith('q'):
                         try:
-                            new_subunit['wikidataID'] = int(geo_result.get('extratags').get('wikidata').lower().replace('q', ''))
+                            new_subunit['wikidataID'] = int(geo_result.get(
+                                'extratags').get('wikidata').lower().replace('q', ''))
                         except Exception as e:
-                            current_app.logger.debug(f'Could not parse wikidata ID in subunit: {e}')
+                            current_app.logger.debug(
+                                f'Could not parse wikidata ID in subunit: {e}')
                             pass
-
 
             return new_subunit
         else:
@@ -830,7 +834,7 @@ class EntryProcessor():
         else:
             raise InventoryValidationError(
                 'Invalid data! "name" not specified.')
-    
+
     def fetch_twitter(self):
         if self.json.get('name'):
             self.new_source['channel_url'] = self.json.get('name')
@@ -839,9 +843,8 @@ class EntryProcessor():
             except Exception as e:
                 raise InventoryValidationError(
                     f"Twitter profile not found: {self.json.get('name')}. {e}")
-            
+
             self.new_source['name'] = self.json.get('name').lower()
-               
 
             if profile.get('fullname'):
                 self.new_source['other_names'].append(profile['fullname'])
@@ -858,21 +861,23 @@ class EntryProcessor():
 
     def fetch_facebook(self):
         if self.json.get('name'):
-            self.new_source['name'] = self.json.get('name')
             self.new_source['channel_url'] = self.json.get('name')
-            # profile = instagram(self.json.get('name'))
-            # if profile:
-            #     self.new_source['name'] = self.json.get('name').lower()
-            # else:
-            #     raise InventoryValidationError(
-            #         f"Instagram profile not found: {self.json.get('name')}")
+            try:
+                profile = facebook(self.json.get('name'))
+            except Exception as e:
+                raise InventoryValidationError(
+                    f"Facebook profile not found: {self.json.get('name')}. {e}")
 
-            # if profile['fullname']:
-            #     self.new_source['other_names'].append(profile['fullname'])
-            # if profile['followers']:
-            #     self.new_source['audience_size'] = str(datetime.date.today())
-            #     self.new_source['audience_size|followers'] = int(
-            #         profile['followers'])
+            self.new_source['name'] = self.json.get('name').lower()
+
+            if profile.get('fullname'):
+                self.new_source['other_names'].append(profile['fullname'])
+            if profile.get('followers'):
+                self.new_source['audience_size'] = str(datetime.date.today())
+                self.new_source['audience_size|followers'] = int(
+                    profile['followers'])
+            if profile.get('joined'):
+                self.new_source['founded'] = profile.get('joined').isoformat()
 
         else:
             raise InventoryValidationError(

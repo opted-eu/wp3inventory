@@ -9,6 +9,7 @@ import json
 import validators
 import instaloader
 import tweepy
+from dateutil.parser import isoparse
 
 
 def geocode(address):
@@ -239,3 +240,33 @@ def twitter(username):
     user = api.get_user(username)
 
     return {'followers': user.followers_count, 'fullname': user.screen_name, 'joined': user.created_at}
+
+
+def facebook(username):
+    r = requests.get('https://www.facebook.com/' + username)
+
+    if r.status_code != 200:
+        return False
+
+    soup = bs4(r.content, 'lxml')
+
+    for script in soup.find_all('script', type=re.compile('json')):
+        if 'interactionStatistic' in script.string:
+            if 'ProfilePage' in script.string:
+                meta = json.loads(script.string)
+                break
+
+    profile = {}
+
+    if meta:
+        profile['fullname'] = meta.get('author').get('name')
+        profile['joined'] = meta.get('author').get('foundingDate')
+        try:
+            profile['joined'] = isoparse(profile['joined'])
+        except:
+            profile['joined'] = None
+        profile['followers'] = meta.get('interactionStatistic')[
+            0].get('userInteractionCount')
+        return profile
+    else:
+        return None
