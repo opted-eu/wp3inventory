@@ -533,17 +533,13 @@
     // ********************
 
     // Get custom attribute (data-value) from all select and put them in hidden fields
-    (function($) {
-        $.fn.extend({
-            inputSelectToHidden: function() {
-                return this.change(function() {
-                    var option = $('option:selected', this).attr('data-value');
-                    var hidden = $("#" + this.id + "-hidden");
-                    hidden.val(option);
-                })
-                }
-        });
-    })(jQuery);
+    document.querySelectorAll('select').forEach(function(item) {
+        if (document.getElementById(item.id + '-hidden')) {
+            item.addEventListener('change', function() {
+                document.getElementById(this.id + '-hidden').value = this.options[this.selectedIndex].getAttribute('data-value')
+            })
+        }
+    })
 
     function compareName( a, b ) {
         console.log(a, b)
@@ -559,57 +555,64 @@
     function addFieldOptionsData(fieldOptions, key, selector) {
         var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
-            $(selector).append('<option value="' + item.unique_name + '" data-value="' + item.uid + '" data-index="' + i + '">' + item.name + '</option>');
+            let opt = document.createElement('option')
+            opt.setAttribute('value', item.unique_name)
+            opt.setAttribute('data-value', item.uid)
+            opt.setAttribute('data-index', i)
+            opt.innerText = item.name
+            document.querySelector(selector).append(opt);
         });
-        $(selector).append('<option value="other" data-value="new" data-index="99">Other</option>');
+        let optOther = document.createElement('option')
+        optOther.setAttribute('value', 'other')
+        optOther.setAttribute('data-value', 'new')
+        optOther.setAttribute('data-index', '99')
+        optOther.innerText = 'Other'
+        document.querySelector(selector).append(optOther);
     };
 
     function addFieldOptions(fieldOptions, key, selector, addother) {
         var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
-            $(selector).append('<option value="' + item.uid + '" data-value="' + item.unique_name + '" data-index="' + i + '">' + item.name + '</option>');
+            let opt = document.createElement('option')
+            opt.setAttribute('value', item.uid)
+            opt.setAttribute('data-value', item.unique_name)
+            opt.setAttribute('data-index', i)
+            opt.innerText = item.name
+            document.querySelector(selector).append(opt);
         });
         if (addother) {
-            $(selector).append('<option value="other" data-value="new" data-index="99">Other</option>');
-        };
+            let optOther = document.createElement('option')
+            optOther.setAttribute('value', 'other')
+            optOther.setAttribute('data-value', 'new')
+            optOther.setAttribute('data-index', '99')
+            optOther.innerText = 'Other'
+            document.querySelector(selector).append(optOther);
+        }
     };
 
     function addLanguages(fieldOptions, key, selector) {
         fieldOptions[key].forEach(function(item, i) {
-            $(selector).append('<option value="' + item.code + '">' + item.name + '</option>');
+            let opt = document.createElement('option')
+            opt.setAttribute('value', item.code)
+            opt.innerText = item.name
+            document.querySelector(selector).append(opt);
         });
-    };
+    }
+
+
 
     function getFieldOptions(targetUrl) {
-
-            // TODO: WITHOUT AJAX
-            //         fetch('fieldoptions')
-            // .then(response => response.json())
-            // .then((json) => {
-            //     console.log(json.subunit)
-            //     var countries = json.country
-            //     var subunits = json.subunit
-            //     countries.forEach((c) => c.class = 'country')
-            //     subunits.forEach((su) => su.class = 'subunit')
-            //     const optgroup = countries.concat(json.subunit)
-            //     console.log(optgroup)
-            // })
-
         return new Promise(function(resolve, reject) {
-            $.ajax({
-                url: targetUrl,
-                success: function(data) {
-                    resolve(data); // Resolve promise and go to then()
+            fetch(targetUrl)
+                .then(data => {
+                    resolve(data);
                     document.getElementById('loading-form').hidden = true
                     document.getElementById('loading-spinner').hidden = true
                     document.getElementById('loading-status').hidden = true
                     document.getElementById('new-source').hidden = false
-   
-                },
-                error: function(err) {
-                    reject(err) // Reject the promise and go to catch()
-                }
-            });
+                }).catch(error => {
+                    reject(error)
+                })
         });
     }
 
@@ -796,12 +799,18 @@
     function setProgressBar(curStep, steps) {
         var percent = parseFloat(100 / steps) * curStep;
         percent = percent.toFixed();
-        $("#questionnaire-progress").css("width", percent + "%")
-        $("#questionnaire-progress").attr('aria-valuenow', percent + "%")
+        document.getElementById('questionnaire-progress').style.width = percent + '%'
+        document.getElementById('questionnaire-progress').setAttribute('aria-valuenow', percent + '%')
     };
 
+    // document ready function
+    var ready = (callback) => {
+        if (document.readyState != "loading") callback();
+        else document.addEventListener("DOMContentLoaded", callback);
+    }
 
-    $(document).ready(function() {
+
+    ready(() => {
 
         // declare constants
         const formId = "new-source";
@@ -810,7 +819,9 @@
         // var persistentForm = document.querySelector(`#${formId}`)
 
         // Load Select options from json api
-        getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function(data) {
+        getFieldOptions('{{ url_for("records.fieldoptions") }}')
+        .then(response => response.json())
+        .then(function(data) {
 
             addFieldOptionsData(data, 'channel', '#channel-select');
             addLanguages(data, 'language', '#languages', false);
@@ -1040,8 +1051,6 @@
                 console.log(err)
             })       
 
-        // Get custom attribute (data-value) from all select and put them in hidden fields
-        $('select').inputSelectToHidden();
 
         // persistence: save changes in form
 
@@ -1257,15 +1266,6 @@
 
 
     // submit form
-    
-    $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken)
-        }
-        }
-    });
-
 
     function serializeForm(f) {
         var obj = {};
@@ -1283,9 +1283,6 @@
 
         return obj;
         };
-
-    
-
 
     function submitForm(endpoint, form, callback) {
         var xhr = new XMLHttpRequest();
