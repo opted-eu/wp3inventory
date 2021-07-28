@@ -570,14 +570,20 @@
         document.querySelector(selector).append(optOther);
     };
 
-    function addFieldOptions(fieldOptions, key, selector, addother) {
+    function addFieldOptions(fieldOptions, key, selector, addother, othernames=false) {
         var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
             let opt = document.createElement('option')
             opt.setAttribute('value', item.uid)
             opt.setAttribute('data-value', item.unique_name)
             opt.setAttribute('data-index', i)
-            opt.innerText = item.name
+            let item_label = item.name
+            if (othernames) {
+                if ('other_names' in item) {
+                    item_label += ' (' + item.other_names.join(', ') + ')'
+                }
+            }
+            opt.innerText = item_label
             document.querySelector(selector).append(opt);
         });
         if (addother) {
@@ -826,7 +832,7 @@
             addFieldOptionsData(data, 'channel', '#channel-select');
             addLanguages(data, 'language', '#languages', false);
             addFieldOptions(data, 'country', '#geographic-scope-single', false);
-            addFieldOptions(data, 'subunit', '#geographic-scope-subunit', false);            
+            addFieldOptions(data, 'subunit', '#geographic-scope-subunit', false, true);            
             
             addFieldOptions(data, 'archive', '#archive-sources-included', false);
             addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
@@ -857,7 +863,11 @@
                 opt.setAttribute('value', item.unique_name)
                 opt.setAttribute('data-uid', item.uid)
                 opt.setAttribute('data-type', 'subunit')
-                opt.innerText = item.name
+                let item_label = item.name
+                if ('other_names' in item) {
+                    item_label += ' (' + item.other_names.join(', ') + ')'
+                }
+                opt.innerText = item_label
                 optgroupSubunits.append(opt)
             });
 

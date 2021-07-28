@@ -186,7 +186,7 @@ user_affiliation: string @index(term) .
 invited_by: [uid] @reverse .
 
 # Generic Predicates 
-unique_name: string @index(hash, trigram) .
+unique_name: string @index(hash, trigram) @upsert .
 name: string @index(term, trigram) . 
 entry_added: uid @reverse .
 entry_edit_history: [uid] @reverse .
