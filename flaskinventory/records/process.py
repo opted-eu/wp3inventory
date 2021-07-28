@@ -816,10 +816,10 @@ class EntryProcessor():
 
     def fetch_instagram(self):
         if self.json.get('name'):
-            profile = instagram(self.json.get('name'))
+            profile = instagram(self.json.get('name').replace('@', ''))
             if profile:
-                self.new_source['name'] = self.json.get('name').lower()
-                self.new_source['channel_url'] = self.json.get('name').lower()
+                self.new_source['name'] = self.json.get('name').lower().replace('@', '')
+                self.new_source['channel_url'] = self.json.get('name').lower().replace('@', '')
             else:
                 raise InventoryValidationError(
                     f"Instagram profile not found: {self.json.get('name')}")
@@ -839,14 +839,14 @@ class EntryProcessor():
 
     def fetch_twitter(self):
         if self.json.get('name'):
-            self.new_source['channel_url'] = self.json.get('name')
+            self.new_source['channel_url'] = self.json.get('name').replace('@', '')
             try:
-                profile = twitter(self.json.get('name'))
+                profile = twitter(self.json.get('name').replace('@', ''))
             except Exception as e:
                 raise InventoryValidationError(
                     f"Twitter profile not found: {self.json.get('name')}. {e}")
 
-            self.new_source['name'] = self.json.get('name').lower()
+            self.new_source['name'] = self.json.get('name').lower().replace('@', '')
 
             if profile.get('fullname'):
                 self.new_source['other_names'].append(profile['fullname'])
