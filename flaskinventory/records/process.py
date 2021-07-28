@@ -763,7 +763,12 @@ class EntryProcessor():
             geo_query = self.add_entry_meta(geo_query)
             geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
-            geo_query['uid'] = f"_:{slugify(secrets.token_urlsafe(8))}"
+            # prevent duplicates
+            duplicate_check = dgraph.get_uid('unique_name', geo_query['unique_name'])
+            if duplicate_check:
+                geo_query = {'uid': duplicate_check}
+            else:
+                geo_query['uid'] = f"_:{slugify(secrets.token_urlsafe(8))}"
             return geo_query
         else:
             raise InventoryValidationError(
