@@ -32,3 +32,4 @@ validators
 instaloader
 bs4
 tweepy
+lxml

@@ -2,7 +2,7 @@
 
 apt update
 apt upgrade
-apt install curl git ufw nano htop python3-venv python3-pip -y
+apt install curl git ufw nano htop python3-venv python3-pip libxml2-dev libxslt-dev python-dev -y
 
 # change ssh port
 nano /etc/ssh/sshd_config
