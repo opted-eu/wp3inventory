@@ -163,7 +163,6 @@ def edit_organization(unique_name):
 
     form.country.choices = c_choices
     if form.validate_on_submit():
-        print(form.data)
         try:
             sanitize_edit_org(form.data)
             flash(f'Organization has been updated', 'success')
