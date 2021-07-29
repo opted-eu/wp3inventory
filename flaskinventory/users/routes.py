@@ -37,8 +37,8 @@ def login():
         return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data)
-        if user and user_login(form.email.data, form.password.data):
+        if user_login(form.email.data, form.password.data):
+            user = User(email=form.email.data)
             login_user(user, remember=form.remember.data)
             flash(f'You have been logged in', 'success')
             next_page = request.args.get('next')

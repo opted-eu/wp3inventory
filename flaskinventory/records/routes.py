@@ -12,8 +12,8 @@ import traceback
 records = Blueprint('records', __name__)
 
 
-@login_required
 @records.route("/new", methods=['GET', 'POST'])
+@login_required
 def new_entry():
     form = NewEntry()
     if form.validate_on_submit():

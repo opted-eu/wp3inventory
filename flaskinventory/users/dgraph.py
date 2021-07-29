@@ -23,6 +23,8 @@ class User(UserMixin):
                 if '|' in k:
                     k = k.replace('|', '_')
                 setattr(self, k, v)
+        else:
+            return None
 
     def update_profile(self, form_data):
         user_data = {}
@@ -67,6 +69,7 @@ class User(UserMixin):
             return user
 
 
+
 def get_user_data(**kwargs):
 
     uid = kwargs.get('uid', None)
@@ -87,11 +90,27 @@ def get_user_data(**kwargs):
     data = data['q'][0]
     return data
 
+def check_user(uid):
+
+    query_string = f'''{{ user(func: uid({uid})) @filter(type("User")) {{ uid }} }}'''
+    data = dgraph.query(query_string)
+    if len(data['user']) == 0:
+        return None
+    return data['user'][0]['uid']
+
+def check_user_by_email(email):
+    query_string = f'''{{ user(func: eq(email, "{email}")) @filter(type("User")) {{ uid }} }}'''
+    data = dgraph.query(query_string)
+    if len(data['user']) == 0:
+        return None
+    return data['user'][0]['uid']
+
+
 def user_login(email, pw):
     query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, {pw}) }} }}'
     result = dgraph.query(query_string)
     if len(result['login_attempt']) == 0:
-        return 'Invalid Email'
+        return False
     else:
         return result['login_attempt'][0]['checkpwd(pw)']
 
