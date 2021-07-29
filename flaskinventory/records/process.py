@@ -328,10 +328,8 @@ class EntryProcessor():
                 self.new_source['other_names'] += names
             if len(urls) > 0:
                 self.new_source['other_names'] += urls
-                self.new_source['channel_url'] = urls[0]
-            else:
-                self.new_source['channel_url'] = build_url(
-                    self.json.get('name'))
+            self.new_source['channel_url'] = build_url(
+                self.json.get('name'))
 
         else:
             raise InventoryValidationError(
@@ -764,7 +762,8 @@ class EntryProcessor():
             geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
             # prevent duplicates
-            duplicate_check = dgraph.get_uid('unique_name', geo_query['unique_name'])
+            duplicate_check = dgraph.get_uid(
+                'unique_name', geo_query['unique_name'])
             if duplicate_check:
                 geo_query = {'uid': duplicate_check}
             else:
@@ -823,8 +822,10 @@ class EntryProcessor():
         if self.json.get('name'):
             profile = instagram(self.json.get('name').replace('@', ''))
             if profile:
-                self.new_source['name'] = self.json.get('name').lower().replace('@', '')
-                self.new_source['channel_url'] = self.json.get('name').lower().replace('@', '')
+                self.new_source['name'] = self.json.get(
+                    'name').lower().replace('@', '')
+                self.new_source['channel_url'] = self.json.get(
+                    'name').lower().replace('@', '')
             else:
                 raise InventoryValidationError(
                     f"Instagram profile not found: {self.json.get('name')}")
@@ -844,14 +845,16 @@ class EntryProcessor():
 
     def fetch_twitter(self):
         if self.json.get('name'):
-            self.new_source['channel_url'] = self.json.get('name').replace('@', '')
+            self.new_source['channel_url'] = self.json.get(
+                'name').replace('@', '')
             try:
                 profile = twitter(self.json.get('name').replace('@', ''))
             except Exception as e:
                 raise InventoryValidationError(
                     f"Twitter profile not found: {self.json.get('name')}. {e}")
 
-            self.new_source['name'] = self.json.get('name').lower().replace('@', '')
+            self.new_source['name'] = self.json.get(
+                'name').lower().replace('@', '')
 
             if profile.get('fullname'):
                 self.new_source['other_names'].append(profile['fullname'])
@@ -863,7 +866,6 @@ class EntryProcessor():
                 self.new_source['founded'] = profile.get('joined').isoformat()
             if profile.get('verified'):
                 self.new_source['verified_account'] = profile.get('verified')
-
 
         else:
             raise InventoryValidationError(
