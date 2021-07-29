@@ -151,9 +151,9 @@ def sourcelookup():
     return jsonify(result)
 
 
-@login_required
 @records.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
 @records.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
+@login_required
 def edit_organization(unique_name):
     form = OrganizationForm()
     countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
