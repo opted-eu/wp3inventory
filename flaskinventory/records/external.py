@@ -172,9 +172,10 @@ def schemaorg(soup):
 
     for item in schemas:
         parsed = json.loads(item.string)
-        if parsed.get('@type').lower() == "webpage":
-            url = parsed.get('url')
-            name = parsed.get('name')
+        if parsed.get('@type'):
+            if parsed.get('@type').lower() == "webpage":
+                url = parsed.get('url')
+                name = parsed.get('name')
 
     return name, url
 
