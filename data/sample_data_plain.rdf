@@ -272,3 +272,4 @@ _:admin <pw> "admin123" .
 _:admin <user_displayname> "Admin" .
 _:admin <date_joined> "2020-05-20" .
 _:admin <user_role> "10" .
+_:admin <account_status> "active" .

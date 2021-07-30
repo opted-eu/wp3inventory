@@ -1,6 +1,7 @@
 from datetime import datetime
+import secrets
 from flask import (Blueprint, render_template, url_for,
-                   flash, redirect, request, abort)
+                   flash, redirect, request, abort, Markup)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.models import User
@@ -44,7 +45,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('users.profile'))
         else:
-            flash(f'Login unsuccessful. Please check username and password', 'danger')
+            flash(Markup(f'Login unsuccessful. Please check username and password. Do you need an account? <a href="{url_for("users.register")}" class="alert-link">You can register here</a>'), 'danger')
     return render_template('users/login.html', title='Login', form=form)
 
 
@@ -58,7 +59,8 @@ def logout():
 @users.route('/profile')
 @login_required
 def profile():
-    return render_template('users/profile.html', title='Profile', show_sidebar=True)
+    user_role = USER_ROLES.dict_reverse[current_user.user_role]
+    return render_template('users/profile.html', title='Profile', show_sidebar=True, user_role=user_role)
 
 
 @users.route('/profile/update', methods=['GET', 'POST'])
@@ -111,6 +113,24 @@ def reset_token(token):
         return redirect(url_for('users.login'))
     return render_template('users/reset_token.html', title='Reset Password', form=form)
 
+@users.route("/users/delete")
+@login_required
+def delete():
+    if current_user.user_role == USER_ROLES.Admin:
+        flash(f'Cannot delete admin accounts!', 'info')
+        return redirect(url_for('users.profile'))
+    mutation = {'account_status': 'deleted', 
+                'account_status|timestamp': datetime.now().isoformat(),
+                'display_name': 'Deleted User',
+                'email': secrets.token_urlsafe(8),
+                'pw': secrets.token_urlsafe(8),
+                'user_orcid': '',
+                'user_role': 1,
+                'user_affiliation': ''}
+    dgraph.update_entry(mutation, uid=current_user.id)
+    logout_user()
+    flash(f'Your account has been deleted!', 'info')
+    return redirect(url_for('main.home'))
 
 @users.route("/accept_invitation/<token>", methods=['GET', 'POST'])
 def accept_invitation(token):

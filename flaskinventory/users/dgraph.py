@@ -118,16 +118,20 @@ def create_user(user_data, invited_by=None):
     if type(user_data) is not dict:
         raise TypeError()
 
-    if invited_by:
-        user_data['invited_by'] = {'uid': invited_by,
-                                    'invited_by|date': datetime.datetime.now(datetime.timezone.utc).isoformat()}
 
     user_data['uid'] = '_:newuser'
     user_data['dgraph.type'] = 'User'
-    user_data['user_role'] = USER_ROLES.User
+    user_data['user_role'] = USER_ROLES.Contributor
     user_data['user_displayname'] = secrets.token_urlsafe(6)
     user_data['date_joined'] = datetime.datetime.now(
         datetime.timezone.utc).isoformat()
+    user_data['account_status'] = 'active'
+
+    if invited_by:
+        user_data['invited_by'] = {'uid': invited_by,
+                                    'invited_by|date': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+        user_data['account_status'] = 'invited'
+        
 
     txn = dgraph.connection.txn()
 

@@ -2,7 +2,7 @@ import inspect
 
 class UserRoles(object):
     Anon = 0
-    User = 1
+    Contributor = 1
     Reviewer = 2
     Admin = 10
 
@@ -11,6 +11,7 @@ class UserRoles(object):
         self.list_of_tuples = [a for a in attributes if not(a[0].startswith('__') and a[0].endswith('__'))]
         self.list_of_tuples_b = [(a, b) for b, a in self.list_of_tuples]
         self.dict = {key: value for key, value in attributes if not(key.startswith('__') and key.endswith('__'))}
+        self.dict_reverse = {value: key for key, value in attributes if not(key.startswith('__') and key.endswith('__'))}
 
     def __repr__(self) -> str:
         return '<Access Level>'
