@@ -8,11 +8,11 @@ WP3 Inventory
 ## Before Public Repository
 
 - [x] User Registration
-- [ ] Improve email settings
+- [ ] Improve server side email settings (send pw reset mails)
 - [x] Implement Twitter API
 - [x] ~~Implement Pseudo FB API~~ *Too unreliable*
 - [ ] Cosmetic improvements
-  - [ ] Viewing sources: subunits need parsing
+  - [x] Viewing sources: subunits need parsing
 - [ ] Tidy up source code
   - [ ] standardize dgraph query method and usage in other functions
   - [x] remove unnecessary methods
@@ -23,8 +23,9 @@ WP3 Inventory
   - [ ] divorce HTML from JS ('newsource.html')
   - [ ] Remove external JS dependencies and collect via yarn instead
   - [ ] get rid of JQuery
-- [ ] Implement Account Delete feature
-
+- [x] Implement Account Delete feature
+- [ ] Subset Fontawesome, do not load via CDN (because this sets a cookie)
+- [ ] Form field options generator functions all in one file, then use caching module
 
 ## New Features
 
@@ -70,7 +71,7 @@ WP3 Inventory
 Level | Name | Permissions
 ------|------|------------
 0     | Anonymous | View entries
-1     | User  | Add entries
-2     | Reviewer | + Review Entries, Invite Users
+1     | Contributor  | Add entries
+2     | Reviewer | + Review & Edit Entries, Invite Users
 10    | Admin   | + Change User Permissions 
 
