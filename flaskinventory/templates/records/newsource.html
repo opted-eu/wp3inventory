@@ -80,9 +80,11 @@
             </div>
         </div>
 
+        <!-- Optional Field -->
         <div id="group-other-names" class="mb-3 form-group">
             <label for="other-names" class="form-label">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:</label>
             <input type="text" name="other_names" class="form-control" id="other-names" placeholder="Separate by comma" multiple></input>
+            <div id="other-names-feedback"></div>
         </div>
 
         <div id="group-epaper" class="mb-3 form-group" hidden>
@@ -199,6 +201,7 @@
             </div>
         </div>
 
+        <!-- Optional Field -->
         <div id="group-publishes" class="mb-3 form-group">
             <p class="form-label">Which organization or person owns the news source?</p>
             <small id="publishes_org-helptext">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small>
@@ -256,8 +259,7 @@
         <div id="group-publication-kind" class="mb-3 form-group">
             <label for="publication-kind" class="form-label">What label or labels describe the source?</label>
             <small id="publication-kind-helptext">To identify this information please check the information in the learning module.</small>
-            <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" required multiple>
-                        <option value="" selected>Choose...</option>
+            <select name="publication_kind" class="form-select" id="publication-kind" aria-describedby="publication-kind-feedback" placeholder="Select multiple or add new..." required multiple>
                         <option value="newspaper">Newspaper</option>
                         <option value="news agency">News Agency</option>
                         <option value="magazine">Magazine</option>
@@ -326,6 +328,7 @@
         </div>
 
         <div id="group-publication-cycle-weekday" class="mb-3" hidden>
+                <p>Please indicate the specific days</p>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
                 <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
@@ -411,17 +414,17 @@
             <div id="geographic-scope-multiple-feedback"></div>
         </div>
 
+        <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
+            <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
+            <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
+            <div id="geographic-scope-subunit-feedback"></div>
+        </div>
+
         <div id="group-geographic-scope-single" class="mb-3 form-group" hidden>
             <label for="geographic-scope-single" class="form-label">What is the national scope?</label>
             <select name="geographic_scope_single" id="geographic-scope-single" class="form-select form-select-lg" aria-describedby="geographic-scope-single-feedback" placeholder="Select one..." autocomplete="off"></select>
             <small id="geographic-scope-single-helptext"></small>
             <div id="geographic-scope-single-feedback"></div>
-        </div>
-
-        <div id="group-geographic-scope-subunit" class="mb-3 form-group" hidden>
-            <label for="geographic-scope-subunit" class="form-label">What is the subnational scope?</label>
-            <select type="text" name="geographic_scope_subunit" class="form-control" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
-            <div id="geographic-scope-subunit-feedback"></div>
         </div>
 
         <div id="group-languages" class="mb-3 form-group">
@@ -460,13 +463,15 @@
     <fieldset id="section-annotations" hidden>
         <h3 class="mb-4">Access to Raw Text and Annotations</h3>
 
-        <div id="group-archive-sources-included" class="mb-3 form-group">
+        <!-- Optional Field -->
+        <div id="group-archive-sources-included" class="mb-3 form-group" hidden>
             <label for="archive-sources-included" class="form-label">Are texts from the news source available for download in one or several of the following data archives?</label>
             <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
             <small id="archive-sources-included-helptext"></small>
             <div id="archive-sources-included-feedback"></div>
         </div>
 
+        <!-- Optional Field -->
         <div id="group-dataset-sources-included" class="mb-3 form-group">
             <label for="dataset-sources-included" class="form-label">Is the news source included in one or several of the following annotated media text data sets?</label>
             <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
@@ -483,6 +488,7 @@
     <fieldset id="section-other" hidden>
         <h3 class="mb-4">Other Information</h3>
 
+        <!-- Optional Field -->
         <div id="group-entry-notes" class="mb-3 form-group">
             <label for="entry-notes" class="form-label">Do you have any other notes on the source that you just coded?<span class="text-muted mx-1">(optional)</span></label>
             <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" aria-describedby="entry-notes-feedback" placeholder="">
@@ -490,8 +496,9 @@
             <div id="entry-notes-feedback"></div>
         </div>
 
+        <!-- Optional Field -->
         <div id="group-related-sources" class="mb-3 form-group">
-            <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below</label>
+            <label for="related-sources" class="form-label">For the source that you just coded, does it have other closely related sources? Please type their names below and start a new entry</label>
             <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
             <small id="related-sources-helptext"></small>
             <div id="related-sources-feedback"></div>
@@ -553,7 +560,7 @@
     }
 
     function addFieldOptionsData(fieldOptions, key, selector) {
-        var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
+        var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
             let opt = document.createElement('option')
             opt.setAttribute('value', item.unique_name)
@@ -571,7 +578,7 @@
     };
 
     function addFieldOptions(fieldOptions, key, selector, addother, othernames=false) {
-        var opts = fieldOptions[key].sort((a, b) => a.name > b.name ? 1 : -1);
+        var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
             let opt = document.createElement('option')
             opt.setAttribute('value', item.uid)
@@ -663,6 +670,7 @@
         document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
             elem.removeAttribute('required')
         });
+        document.querySelector("#group-archive-sources-included").hidden = true
 
         if (value == 'other') {
             document.querySelector("#group-channel-new").hidden = false;
@@ -672,7 +680,9 @@
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
+                elem.parentElement.hidden = false
             })
+            document.querySelector("#group-archive-sources-included").hidden = false
 
         } else if (value == 'print') {
             document.querySelector("#group-epaper").hidden = false;
@@ -680,8 +690,15 @@
             document.querySelector("#group-source-founded").hidden = false;
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
-                elem.setAttribute('required', true);
+                if (elem.value == 'soft paywall') {
+                    elem.setAttribute('required', false);
+                    elem.parentElement.hidden = true
+                }
+                else {
+                    elem.setAttribute('required', true);
+                }
             })
+            document.querySelector("#group-archive-sources-included").hidden = false
 
 
         } else if (value == 'transcript') {
@@ -693,7 +710,9 @@
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
+                elem.parentElement.hidden = false
             })
+            document.querySelector("#group-archive-sources-included").hidden = false
 
 
         } else if (value == 'website') {
@@ -705,7 +724,9 @@
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
+                elem.parentElement.hidden = false
             })
+            document.querySelector("#group-archive-sources-included").hidden = false
 
 
         }
@@ -841,8 +862,8 @@
             var countries = data.country;
             var subunits = data.subunit;
             // Sort values alphabetically
-            countries.sort((a,b) => a.name > b.name ? 1 : -1);
-            subunits.sort((a,b) => a.name > b.name ? 1 : -1);
+            // countries.sort((a,b) => a.name > b.name ? 1 : -1);
+            // subunits.sort((a,b) => a.name > b.name ? 1 : -1);
 
             var inputGeographicScopeMultiple = document.getElementById('geographic-scope-multiple');
             var optgroupCountries = document.createElement('optgroup');
@@ -893,6 +914,11 @@
                 hiddenGeographicScopeCountry.value = selectedCountries.join()
                 hiddenGeographicScopeSubunits.value = selectedSubunits.join()
             });
+
+            // get url parameter to pre-fill fields
+            var currentUrl = new URL(window.location.href);
+            var entry_name = currentUrl.searchParams.get("entry_name");
+            document.getElementById('name').value = entry_name
 
 
 
@@ -1019,6 +1045,7 @@
 
                             document.getElementById('geographic-scope-single').required = true;
                             document.getElementById('geographic-scope-single-tomselected').required = true;
+                            document.getElementById('geographic-scope-single-ts-label').innerText = "What is the national scope?"
 
                             document.getElementById('geographic-scope-subunit').required = false;
                             document.getElementById('geographic-scope-subunit-tomselected').required = false;
@@ -1036,6 +1063,7 @@
 
                             document.getElementById('geographic-scope-single').required = true;
                             document.getElementById('geographic-scope-single-tomselected').required = true;
+                            document.getElementById('geographic-scope-single-ts-label').innerText = "To which national context does the subnational unit belong?"
 
                             document.getElementById('geographic-scope-subunit').required = true;
                             document.getElementById('geographic-scope-subunit-tomselected').required = true;
@@ -1434,6 +1462,7 @@
 
     var TomSelectOtherNamesConfig = {
         plugins: ['remove_button'],
+        selectOnTab: true,
         create: true,
         render: {
             no_results:function(data,escape){
