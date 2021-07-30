@@ -56,10 +56,12 @@ def confirmation():
 
 # API Endpoints
 
-
+# try using async here due to large db request
+# cache this route
 @records.route("/new/fieldoptions")
-def fieldoptions():
-    return jsonify(generate_fieldoptions())
+async def fieldoptions():
+    data = await generate_fieldoptions()
+    return jsonify(data)
 
 
 @records.route('/new/submit', methods=['POST'])
