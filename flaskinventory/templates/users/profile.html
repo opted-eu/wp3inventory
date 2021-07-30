@@ -3,14 +3,18 @@
     <div class="border rounded p-3">
         <dl class="row">
             <dt class="col-sm-3 mb-4"><h5>User Information</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted">We retain as little personal data as possible. Your Email is invisible for other users. Feel free to add some more information about yourself though.</small></dd>
+            <dd class="col-sm-9 mb-4"><small class="text-muted">We store as little personal data as possible. 
+                Only your user name is visible to other users. 
+                Your email address is stored for administrative purposes only and not visible for other users. 
+                However, feel free to add more information about yourself. 
+                <a href="{{ url_for('main.privacy') }}">More information on data storage and security can be found here</a>.</small></dd>
             <dt class="col-sm-3 mb-4">Email</dt>
             <dd class="col-sm-9">{{ current_user.email }}</dd>
             <dt class="col-sm-3 mb-4">Date joined</dt>
             <dd class="col-sm-9">{{ current_user.date_joined.strftime('%Y-%m-%d') }}</dd>
-            <dt class="col-sm-3 mb-4">User Level</dt>
-            <dd class="col-sm-9">{{ current_user.user_role }}</dd>
-            <dt class="col-sm-3 mb-4">Display Name</dt>
+            <dt class="col-sm-3 mb-4">User Role</dt>
+            <dd class="col-sm-9">{{ user_role }} <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<b>Contributor:</b> can add new entries.<br><b>Reviewer:</b> can review, edit and delete entries."><i class="fas mx-3 fa-question-circle"></i></a></dd>
+            <dt class="col-sm-3 mb-4">Username</dt>
             <dd class="col-sm-9">{{ current_user.user_displayname }}</dd>
             <dt class="col-sm-3 mb-4">Affiliation</dt>
             <dd class="col-sm-9">{{ current_user.user_affiliation }}</dd>
@@ -34,7 +38,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a type="button" href="{{ url_for('main.under_development') }}" class="btn btn-danger">Delete Account</a>
+                <a type="button" href="{{ url_for('users.delete') }}" class="btn btn-danger">Delete Account</a>
             </div>
         </div>
     </div>
