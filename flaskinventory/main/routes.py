@@ -22,8 +22,15 @@ def home():
 @main.route('/about')
 @main.route('/about/')
 def about():
-    return render_template('about.html', title="About Page")
+    return render_template('main/about.html', title="About Page")
 
+@main.route('/imprint')
+def imprint():
+    return render_template('main/imprint.html')
+
+@main.route('/privacy')
+def privacy():
+    return render_template('main/privacy.html')
 
 @main.route('/notimplemented')
 def under_development():
