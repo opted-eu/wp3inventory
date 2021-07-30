@@ -1,3 +1,4 @@
+from flask import current_app
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes
 import json
@@ -16,7 +17,7 @@ def get_source(unique_name=None, uid=None):
     else:
         return None
 
-    query_fields = '''{ uid dgraph.type expand(_all_)  { uid unique_name name channel { name } }
+    query_fields = '''{ uid dgraph.type expand(_all_)  { uid unique_name name channel { name unique_name } }
                         published_by: ~publishes { name unique_name uid } 
                         archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
                         papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors } } }'''
@@ -227,7 +228,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
     query_relation = ''
     if relation_filt:
         query_head += ' @cascade '
-        if 'Country' in relation_filt.keys() and fields is None:
+        if 'country' in relation_filt.keys() and fields is None:
             query_fields += ''' country { country: name } '''
 
         for key, val in relation_filt.items():
@@ -245,6 +246,8 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
 
     query_string = query_head + \
         ' { ' + query_fields + ' ' + query_relation + ' } }'
+
+    current_app.logger.debug(f'Sending query to dgraph: {query_string}')
 
     res = dgraph.connection.txn(read_only=True).query(query_string)
     data = json.loads(res.json, object_hook=dgraph.datetime_hook)

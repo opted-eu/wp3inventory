@@ -21,7 +21,7 @@
             <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a></p>
             </dd>{% endif %} {% if entry.founded %}
             <dt class="col-sm-3">Founded</dt>
-            <dd class="col-sm-9">{{ entry.founded.strftime('%Y-%m-%d') }}
+            <dd class="col-sm-9">{{ entry.founded.strftime('%Y') }}
             </dd>{% endif %}
             <dt class="col-sm-3">Country</dt>
             <dd class="col-sm-9">{% for country in entry.country %}
@@ -76,8 +76,8 @@
             <dd class="col-sm-9">
                 {% if entry.ownership_kind %}
                 <dt class="col-sm-3">Type of Organization</dt>
-            <dd class="col-sm-9">{{ entry.ownership_kind }}
-            </dd>{% endif %}{% if entry.employees %}
+                <dd class="col-sm-9">{{ entry.ownership_kind }}
+                </dd>{% endif %}{% if entry.employees %}
                 <p class="card-text">Employees: {{ entry.employees }}</p>{% endif %}
             </dd>
     </div>

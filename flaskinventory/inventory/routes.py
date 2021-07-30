@@ -78,18 +78,13 @@ def view_source(unique_name=None, uid=None):
         if unique_item.get('audience_residency'):
             unique_item['audience_residency_table'] = make_mini_table(
                 unique_item['audience_residency'])
-        if unique_item.get('related'):
-            sidebar_items = unique_item['related']
-            sidebar_title = 'Related Sources by Brand'
-        else:
-            sidebar_title = None
-            sidebar_items = None
-        return render_template('view_source.html',
+        related = unique_item.get('related', None)
+ 
+        return render_template('view/source.html',
                                title=unique_item.get('name'),
                                entry=unique_item,
                                show_sidebar=True,
-                               sidebar_title=sidebar_title,
-                               sidebar_items=sidebar_items)
+                               related=related)
     else:
         return abort(404)
 
@@ -102,7 +97,7 @@ def view_archive(unique_name):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
 
-        return render_template('view_archive.html',
+        return render_template('view/archive.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:
@@ -117,7 +112,7 @@ def view_organization(unique_name):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
 
-        return render_template('view_organization.html',
+        return render_template('view/organization.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:
@@ -132,7 +127,7 @@ def view_country(unique_name):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
 
-        return render_template('view_country.html',
+        return render_template('view/country.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:
@@ -147,7 +142,7 @@ def view_channel(unique_name):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
 
-        return render_template('view_channel.html',
+        return render_template('view/channel.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:
@@ -161,7 +156,7 @@ def view_researchpaper(uid):
         if "ResearchPaper" not in unique_item.get('dgraph.type'):
             return abort(404)
 
-        return render_template('view_paper.html',
+        return render_template('view/paper.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:
@@ -174,7 +169,10 @@ def query():
         if request.args.get('country') == 'all':
             relation_filt = None
         else:
-            relation_filt = {'country': {'uid': request.args.get('country')}}
+            if request.args.get('entity') == 'source':
+                relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
+            else:
+                relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
         data = list_by_type(
             request.args['entity'], relation_filt=relation_filt)
 
