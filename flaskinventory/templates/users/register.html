@@ -49,8 +49,20 @@
 
             </div>
         </fieldset>
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Data Privacy (summary)</h4>
+            <p> This platform respects the General Data Protection Regulation (GDPR, in German: Datenschutzgrundverordnung, DSGVO).</p>
+            <p>We save your email address and IP address locally on this server (hosted in the EU). Your data is not shared with third parties and retained until you decide to delete your account. Your email address is used for technical purposes (e.g. login). We reserve the right to process your IP address for creating anonymous usage statistics.</p>
+            <p><strong>By creating an account you agree that we store your email address and IP address.</strong></p>
+            <hr>
+
+            <h4 class="alert-heading">Informed Consent</h4>
+            <p><strong>By creating an account you confirm that you have read and acknowledged the <a class="alert-link" href="{{ url_for('main.privacy') }}" target="_blank">consent statement</a></strong></p>
+            <hr>
+            <p><em>You can read the full statements regarding data privacy and informed consent <a class="alert-link" href="{{ url_for('main.privacy') }}" target="_blank">here</a>.</em></p>
+        </div>
         <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info my-4") }}
+            {{ form.submit(class="btn btn-primary my-4") }}
         </div>
     </form>
     <div class="border-top pt-3">

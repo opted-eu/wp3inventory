@@ -30,7 +30,7 @@
             <dt class="col-sm-3">Channel</dt>
             <dd class="col-sm-9"><a href="{{ url_for('inventory.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
             {% if entry.channel_url %} 
-            <dt class="col-sm-3">Channel Link</dt>
+            <dt class="col-sm-3">Link to Source</dt>
             <dd class="col-sm-9 mb-4">
                     {% if entry.channel.unique_name == 'twitter' %}
                     <a class="" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
