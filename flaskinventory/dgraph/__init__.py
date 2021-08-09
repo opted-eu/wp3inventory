@@ -7,6 +7,8 @@ import pydgraph
 class DGraph(object):
     '''Class for dgraph database connection'''
 
+    _client = None
+
     def __init__(self, app=None):
         self.app = app
         if app is not None:
@@ -23,11 +25,14 @@ class DGraph(object):
 
     @property
     def connection(self):
-        ctx = _app_ctx_stack.top
-        if ctx is not None:
-            if not hasattr(ctx, 'dgraph'):
-                ctx.dgraph = self.connect()
-            return ctx.dgraph
+        # ctx = _app_ctx_stack.top
+        # if ctx is not None:
+        #     if not hasattr(ctx, 'dgraph'):
+        #         ctx.dgraph = self.connect()
+        #     return ctx.dgraph
+        if self._client is None:
+            self._client = self.connect()
+        return self._client
 
     def connect(self):
         current_app.logger.debug(
