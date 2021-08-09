@@ -12,6 +12,7 @@ Flask-Login
 Flask-Mail
 Flask-Table
 Flask-WTF
+Flask-Limiter
 grpcio
 idna
 itsdangerous
