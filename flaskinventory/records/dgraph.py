@@ -19,7 +19,9 @@ async def generate_fieldoptions():
     query_future = dgraph.connection.txn().async_query(query_string)
     res = Txn.handle_query_future(query_future)
 
-    # res = dgraph.connection.txn(read_only=True).query(query_string)
+    # data = dgraph.query(query_string)
+
+    res = dgraph.connection.txn(read_only=True).query(query_string)
     data = json.loads(res.json, object_hook=dgraph.datetime_hook)
 
     data['language'] = icu_codes_list
