@@ -6,6 +6,8 @@ from flask_mail import Mail
 from flaskinventory.config import Config
 import logging
 from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 dgraph = DGraph()
 
@@ -15,7 +17,7 @@ login_manager.login_message_category = 'info'
 
 mail = Mail()
 
-
+limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_class=Config, config_json=None):
     app = Flask(__name__)
@@ -40,6 +42,9 @@ def create_app(config_class=Config, config_json=None):
     login_manager.init_app(app)
     mail.init_app(app)
     csrf = CSRFProtect(app)
+
+    limiter.init_app(app)
+    
 
 
     return app
