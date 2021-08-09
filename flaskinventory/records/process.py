@@ -56,13 +56,13 @@ class EntryProcessor():
         else:
             raise NotImplementedError('Cannot process submitted news source.')
 
-    def add_entry_meta(self, entry):
+    def add_entry_meta(self, entry, entry_status="pending"):
         if self.user.is_authenticated:
             entry['entry_added'] = {'uid': self.user.uid}
         entry['entry_added|timestamp'] = datetime.datetime.now(
             datetime.timezone.utc).isoformat()
         entry['entry_added|ip'] = self.user_ip
-        entry['entry_review_status'] = "pending"
+        entry['entry_review_status'] = entry_status
 
         return entry
 
@@ -323,6 +323,8 @@ class EntryProcessor():
 
             self.new_source['name'] = self.json.get('name').replace(
                 'http://', '').replace('https://', '').lower()
+            if self.new_source['name'].endswith('/'):
+                self.new_source['name'] = self.new_source['name'][:-1]
 
             if len(names) > 0:
                 self.new_source['other_names'] += names
@@ -703,7 +705,7 @@ class EntryProcessor():
                     if self.json.get(f'newsource_{item}'):
                         channel_name, channel_uid = self.json.get(
                             'newsource_' + item).split(',')
-                        rel_source = self.add_entry_meta(rel_source)
+                        rel_source = self.add_entry_meta(rel_source, entry_status="draft")
                         rel_source['name'] = item
                         rel_source['uid'] = f'_:{slugify(item, separator="_")}_{channel_name}'
                         rel_source['unique_name'] = secrets.token_urlsafe(8)
