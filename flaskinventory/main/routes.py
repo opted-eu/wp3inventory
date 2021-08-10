@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort, current_app
 from flaskinventory import dgraph
-from flaskinventory.inventory.forms import SimpleQuery
+from flaskinventory.view.forms import SimpleQuery
 
 main = Blueprint('main', __name__)
 

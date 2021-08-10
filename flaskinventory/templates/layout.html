@@ -59,7 +59,7 @@
     </a>
     <div class="list-group list-group-flush border-bottom scrollarea">
         {% if sidebar_items %} {% for item in sidebar_items %}
-        <a href="{{ url_for('inventory.view_source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+        <a href="{{ url_for('view.view_source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">{{ item.name }} ({{item.channel.name}})</strong>
                 <small></small>
@@ -68,7 +68,7 @@
         </a>
         {% endfor %} {% else %} {% if sidebar_form %}
 
-        <form class="list-group-item py-3 lh-tight" method="GET" action="{{ url_for('inventory.query') }}">
+        <form class="list-group-item py-3 lh-tight" method="GET" action="{{ url_for('view.query') }}">
             {{ sidebar_form.entity.label(class="form-label") }}
             <div class="invalid-feedback">
                 Please select one type.
@@ -80,7 +80,7 @@
             {{ sidebar_form.country(class="form-select") }}
             <div class="col-md-5 d-flex align-content-end flex-wrap my-4">
                 <button class="btn btn-primary mx-2" type="submit">Query</button>
-                            <a class="mx-2 align-self-end" href="{{ url_for('inventory.advanced_query') }}">Advanced query</a>
+                            <a class="mx-2 align-self-end" href="{{ url_for('view.advanced_query') }}">Advanced query</a>
                         </div>
                         </form>
 

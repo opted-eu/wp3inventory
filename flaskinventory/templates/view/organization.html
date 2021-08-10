@@ -25,7 +25,7 @@
             </dd>{% endif %}
             <dt class="col-sm-3">Country</dt>
             <dd class="col-sm-9">{% for country in entry.country %}
-                <a href="{{ url_for('inventory.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
+                <a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
             </dd>{% if entry.address_string %}
             <dt class="col-sm-3">Primary Address</dt>
             <dd class="col-sm-9"><a href="https://www.openstreetmap.org/search?query={{ entry.address_string }}" target="_blank">{{ entry.address_string }}</a>
@@ -39,7 +39,7 @@
             <dt class="col-sm-3 mb-2"><h5>Publishes</h5></dt>
             <dd class="col-sm-9">
                 {% if entry.publishes %} {% for source in entry.publishes %}
-                <p class="card-text"><a href="{{ url_for('inventory.view_source', unique_name=source.unique_name) }}">{{ source.name }} ({{ source.channel.name }})</a></p>
+                <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{ source.name }} ({{ source.channel.name }})</a></p>
                 {% endfor %} {% else %}
                 <p class="card-text text-muted">None</p>
                 {% endif %}
@@ -51,7 +51,7 @@
             <dt class="col-sm-3 mb-2"><h5>Owns</h5></dt>
             <dd class="col-sm-9">
                 {% if entry.owns %} {% for org in entry.owns %}
-                <p class="card-text"><a href="{{ url_for('inventory.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+                <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
                 {% endfor %} {% else %}
                 <p class="card-text text-muted">None</p>
                 {% endif %}
@@ -63,7 +63,7 @@
             <dt class="col-sm-3 mb-2"><h5>Owned by</h5></dt>
             <dd class="col-sm-9">
                 {% if entry.owned_by %} {% for org in entry.owned_by %}
-                <p class="card-text"><a href="{{ url_for('inventory.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+                <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
                 {% endfor %} {% else %}
                 <p class="card-text text-muted">None</p>
                 {% endif %}

@@ -2,14 +2,14 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.inventory.dgraph import get_archive, get_channel, get_country, get_organization, get_paper, get_source, list_by_type
-from flaskinventory.inventory.utils import make_mini_table, make_results_table
-from flaskinventory.inventory.forms import SimpleQuery
+from flaskinventory.view.dgraph import get_archive, get_channel, get_country, get_organization, get_paper, get_source, list_by_type
+from flaskinventory.view.utils import make_mini_table, make_results_table
+from flaskinventory.view.forms import SimpleQuery
 
-inventory = Blueprint('inventory', __name__)
+view = Blueprint('view', __name__)
 
 
-@inventory.route('/_quicksearch')
+@view.route('/_quicksearch')
 def quicksearch():
     query = request.args.get('q')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
@@ -36,7 +36,7 @@ def quicksearch():
     return jsonify(result)
 
 
-@inventory.route('/search')
+@view.route('/search')
 def search():
     query = request.args.get('query')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
@@ -63,8 +63,8 @@ def search():
     return jsonify(result)
 
 
-@inventory.route("/view/source/uid/<string:uid>")
-@inventory.route("/view/source/<string:unique_name>")
+@view.route("/view/source/uid/<string:uid>")
+@view.route("/view/source/<string:unique_name>")
 def view_source(unique_name=None, uid=None):
     if uid:
         unique_item = get_source(uid=uid)
@@ -75,7 +75,7 @@ def view_source(unique_name=None, uid=None):
     if unique_item:
         if "Source" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
-            return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if unique_item.get('audience_size'):
             unique_item['audience_size_table'] = make_mini_table(
                 unique_item['audience_size'])
@@ -93,13 +93,13 @@ def view_source(unique_name=None, uid=None):
         return abort(404)
 
 
-@inventory.route("/view/archive/<string:unique_name>")
+@view.route("/view/archive/<string:unique_name>")
 def view_archive(unique_name):
     unique_item = get_archive(unique_name=unique_name)
     if unique_item:
         if "Archive" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
-            return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
 
         return render_template('view/archive.html',
                                title=unique_item.get('name'),
@@ -108,13 +108,13 @@ def view_archive(unique_name):
         return abort(404)
 
 
-@inventory.route("/view/organisation/<string:unique_name>")
+@view.route("/view/organisation/<string:unique_name>")
 def view_organization(unique_name):
     unique_item = get_organization(unique_name=unique_name)
     if unique_item:
         if "Organization" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
-            return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
 
         return render_template('view/organization.html',
                                title=unique_item.get('name'),
@@ -123,13 +123,13 @@ def view_organization(unique_name):
         return abort(404)
 
 
-@inventory.route("/view/country/<string:unique_name>")
+@view.route("/view/country/<string:unique_name>")
 def view_country(unique_name):
     unique_item = get_country(unique_name=unique_name)
     if unique_item:
         if "Country" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
-            return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
 
         return render_template('view/country.html',
                                title=unique_item.get('name'),
@@ -138,13 +138,13 @@ def view_country(unique_name):
         return abort(404)
 
 
-@inventory.route("/view/channel/<string:unique_name>")
+@view.route("/view/channel/<string:unique_name>")
 def view_channel(unique_name):
     unique_item = get_channel(unique_name=unique_name)
     if unique_item:
         if "Channel" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
-            return redirect(url_for('inventory.view_' + entry_type.lower(), unique_name=unique_name))
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
 
         return render_template('view/channel.html',
                                title=unique_item.get('name'),
@@ -153,7 +153,7 @@ def view_channel(unique_name):
         return abort(404)
 
 
-@inventory.route("/view/researchpaper/<string:uid>")
+@view.route("/view/researchpaper/<string:uid>")
 def view_researchpaper(uid):
     unique_item = get_paper(uid)
     if unique_item:
@@ -167,7 +167,7 @@ def view_researchpaper(uid):
         return abort(404)
 
 
-@inventory.route("/query", methods=['GET', 'POST'])
+@view.route("/query", methods=['GET', 'POST'])
 def query():
     if request.args:
         if request.args.get('country') == 'all':
@@ -199,6 +199,6 @@ def query():
     return redirect(url_for('main.home'))
 
 
-@inventory.route("/query/advanced")
+@view.route("/query/advanced")
 def advanced_query():
     return render_template('not_implemented.html')

@@ -842,7 +842,7 @@
         // var persistentForm = document.querySelector(`#${formId}`)
 
         // Load Select options from json api
-        getFieldOptions('{{ url_for("records.fieldoptions") }}')
+        getFieldOptions('{{ url_for("add.fieldoptions") }}')
         .then(response => response.json())
         .then(function(data) {
 
@@ -1243,10 +1243,10 @@
             document.getElementById('loading-status').innerText = "Processing data..."
             document.getElementById('loading-status-message').innerText = "Please be patient for a short while"
             document.getElementById('loading-status').hidden = false
-            submitForm('{{ url_for("records.submit") }}', form, formResult);
+            submitForm('{{ url_for("add.submit") }}', form, formResult);
 
 
-            // window.location.assign('{{ url_for("records.confirmation") }}')
+            // window.location.assign('{{ url_for("add.confirmation") }}')
         };
 
         event.preventDefault();
@@ -1381,7 +1381,7 @@
         // createFilter: function(input) { return input.length >= 3 },
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("records.orglookup") }}?person=false&q=' + encodeURIComponent(query);
+            var url = '{{ url_for("add.orglookup") }}?person=false&q=' + encodeURIComponent(query);
             fetch(url)
             .then(response => response.json())
             .then(json => {
@@ -1437,7 +1437,7 @@
         // createFilter: function(input) { return input.length >= 3 },
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("records.orglookup") }}?person=true&q=' + encodeURIComponent(query);
+            var url = '{{ url_for("add.orglookup") }}?person=true&q=' + encodeURIComponent(query);
             fetch(url)
             .then(response => response.json())
             .then(json => {
@@ -1573,7 +1573,7 @@
         },
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("records.sourcelookup") }}?q=' + encodeURIComponent(query);
+            var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
             fetch(url)
             .then(response => response.json())
             .then(json => {

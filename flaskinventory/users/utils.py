@@ -46,7 +46,7 @@ def requires_access_level(access_level):
     return decorator
 
 
-from flaskinventory.inventory.utils import InternalURLCol
+from flaskinventory.view.utils import InternalURLCol
 from flask_table import create_table, Col, DateCol, LinkCol
 from flask_table.html import element
 

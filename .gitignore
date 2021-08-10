@@ -135,3 +135,5 @@ flaskinventory/static/profile_pics
 
 tools/secrets.md
 logs/
+
+.vscode/

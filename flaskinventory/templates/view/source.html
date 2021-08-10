@@ -28,7 +28,7 @@
             </dd>
             {% endif %} 
             <dt class="col-sm-3">Channel</dt>
-            <dd class="col-sm-9"><a href="{{ url_for('inventory.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
+            <dd class="col-sm-9"><a href="{{ url_for('view.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
             {% if entry.channel_url %} 
             <dt class="col-sm-3">Link to Source</dt>
             <dd class="col-sm-9 mb-4">
@@ -145,7 +145,7 @@
             <dt class="col-sm-3">Countries</dt>
             <dd class="col-sm-9">
                 {% for country in entry.geographic_scope_countries %}
-                <a href="{{ url_for('inventory.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> 
+                <a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> 
                 {% endfor %}
             </dd>
             {% if entry.geographic_scope_subunit %}
@@ -174,7 +174,7 @@
             <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
             {% if entry.published_by %} {% for publisher in entry.published_by %}
             <dt class="col-sm-3"></dt>
-            <dd class="col-sm-9"><a href="{{ url_for('inventory.view_organization', unique_name=publisher.unique_name) }}">{{ publisher.name }}</a></dd>
+            <dd class="col-sm-9"><a href="{{ url_for('view.view_organization', unique_name=publisher.unique_name) }}">{{ publisher.name }}</a></dd>
             {% endfor %} {% else %}
             <dt class="col-sm-3"></dt>
             <dd class="col-sm-9 text-danger">Missing!</dd>
@@ -217,7 +217,7 @@
             <dd class="col-sm-9 mb-4"><small class="text-muted">Following data bases include full text data.</small></dd>
             {% if entry.archives %} {% for archive in entry.archives %}
             <dt class="col-sm-3"></dt>
-            <dd class="col-sm-9"><a href="{{ url_for('inventory.view_archive', unique_name=archive.unique_name) }}">{{archive.name}}</a> <span class="text-muted mx-3">{% if archive.get('archives|from') %} from: {{ archive.get('archives|from') }}</span>{%endif%} {% if archive.get('archives|to')
+            <dd class="col-sm-9"><a href="{{ url_for('view.view_archive', unique_name=archive.unique_name) }}">{{archive.name}}</a> <span class="text-muted mx-3">{% if archive.get('archives|from') %} from: {{ archive.get('archives|from') }}</span>{%endif%} {% if archive.get('archives|to')
                 %}
                 <span class="text-muted mx-3">to: {{ archive.get('archives|to') }}</span> {%endif%}{% endfor %}</dd>{% endif %}
         </dl>
@@ -231,7 +231,7 @@
             {% if entry.papers %} {% for paper in entry.papers %}
             <dt class="col-sm-3"></dt>
             <dd>
-                <a href="{{ url_for('inventory.view_researchpaper', uid=paper.uid) }}">
+                <a href="{{ url_for('view.view_researchpaper', uid=paper.uid) }}">
                     <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{paper.title}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if paper.authors is string %} {{ paper.authors }}{%else%}{{
                             paper.authors[0] }}{%endif%}</span>
                 </a> <span class="text-muted mx-3">{% if paper.get('papers|from') %} from: {{ paper.get('papers|from') }}</span>{%endif%} {% if paper.get('papers|to') %}

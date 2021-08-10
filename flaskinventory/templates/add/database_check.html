@@ -15,8 +15,8 @@
     <div class="col-md-6">
         <h4>Is your suggestion listed above or new?</h4>
         <div class="my-4 d-grid gap-2 d-md-flex">
-        <a class="btn btn-outline-secondary" href="{{ url_for('records.new_entry') }}" role="button">Already listed</a>
-        <a class="btn btn-outline-primary" href="{{ url_for('records.new_source') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+        <a class="btn btn-outline-secondary" href="{{ url_for('add.new_entry') }}" role="button">Already listed</a>
+        <a class="btn btn-outline-primary" href="{{ url_for('add.new_source') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
 </div>
 
 {% endblock content %}

@@ -1,6 +1,6 @@
-from flaskinventory.records.validators import InventoryValidationError
+from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.records.external import (geocode, instagram,
+from flaskinventory.add.external import (geocode, instagram,
                                              parse_meta, siterankdata, find_sitemaps, find_feeds,
                                              build_url, twitter, facebook)
 from flaskinventory import dgraph

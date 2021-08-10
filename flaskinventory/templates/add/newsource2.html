@@ -221,7 +221,7 @@
         };
 
 
-    request.open('GET', '{{ url_for("records.fieldoptions") }}', true);
+    request.open('GET', '{{ url_for("add.fieldoptions") }}', true);
     request.send();
 
     // submit form
@@ -247,7 +247,7 @@
     $(document).ready(function() {
         var form = $('#new-source');
         form.submit(function (e) {
-            var url = "{{ url_for('records.echo_json') }}"; // send the form data here.
+            var url = "{{ url_for('add.echo_json') }}"; // send the form data here.
             e.preventDefault(); // block the traditional submission of the form.
             $.ajax({
                 type: "POST",

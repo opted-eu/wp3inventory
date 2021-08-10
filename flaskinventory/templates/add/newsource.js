@@ -136,7 +136,7 @@ $(document).ready(function () {
     var persistentForm = document.querySelector(`#${formId}`)
 
     // Load Select options from json api
-    getFieldOptions('{{ url_for("records.fieldoptions") }}').then(function (data) {
+    getFieldOptions('{{ url_for("add.fieldoptions") }}').then(function (data) {
         console.log(data["channel"]);
         // add field options to multiple choice fields
         addFieldOptions(data, 'channel', '#channel-select');
@@ -218,7 +218,7 @@ form.addEventListener('submit', function handleFormSubmit(event) {
 
     if (isValid) {
         // POST form data to backend with fetch
-        submitForm('{{ url_for("records.echo_json") }}', form);
+        submitForm('{{ url_for("add.echo_json") }}', form);
     }
 
     event.preventDefault();

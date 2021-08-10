@@ -67,11 +67,11 @@ def make_results_table(table_data):
                 item['country'] = 'NA'
 
     if 'name' in cols:
-        TableCls.add_column('name', LinkCol('Name', 'inventory.view_source', url_kwargs=dict(unique_name='unique_name'), attr_list='name'))
+        TableCls.add_column('name', LinkCol('Name', 'view.view_source', url_kwargs=dict(unique_name='unique_name'), attr_list='name'))
         cols.remove('name')
         cols.remove('unique_name')
     elif 'title' in cols:
-        TableCls.add_column('title', LinkCol('Title', 'inventory.view_researchpaper', url_kwargs=dict(uid='uid'), attr_list='title'))
+        TableCls.add_column('title', LinkCol('Title', 'view.view_researchpaper', url_kwargs=dict(uid='uid'), attr_list='title'))
         cols.remove('title')
 
     cols.remove('uid')

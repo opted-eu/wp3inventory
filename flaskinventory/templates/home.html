@@ -5,7 +5,7 @@
     <p class="fs-5 col-md-8">Quickly and easily query our database of journalistic sources and organisations. Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
         already exists!</p>
     <div class="mb-5">
-        <form method="GET" action="{{ url_for('inventory.query') }}">
+        <form method="GET" action="{{ url_for('view.query') }}">
             <div class="row mb-4">
                 <div class="col-md-5">
                     {{ form.entity.label(class="form-label") }}
@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-md-5 d-flex align-content-end flex-wrap">
                     <button class="btn btn-primary btn-lg mx-2" type="submit">Query</button>
-                    <a class="mx-2 align-self-end" href="{{ url_for('inventory.advanced_query') }}">Advanced query</a>
+                    <a class="mx-2 align-self-end" href="{{ url_for('view.advanced_query') }}">Advanced query</a>
                 </div>
             </div>
         </form>
@@ -43,7 +43,7 @@
                 <li>Make <strong>your</strong> research paper more visible by adding it to the inventory and linking it to journalistic sources.</li>
                 <li>You know a data base or corpus that contains full-text data? Share it with the community by adding it here!</li>
             </ul>
-            <a href="{{ url_for('records.new_entry') }}" class="btn btn-primary px-4">Add entry</a>
+            <a href="{{ url_for('add.new_entry') }}" class="btn btn-primary px-4">Add entry</a>
         </div>
 
         <div class="col-md-6">

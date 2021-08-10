@@ -3,17 +3,17 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.records.forms import NewEntry, OrganizationForm
-from flaskinventory.records.utils import database_check_table, sanitize_edit_org
-from flaskinventory.records.process import EntryProcessor
-from flaskinventory.records.dgraph import generate_fieldoptions
+from flaskinventory.add.forms import NewEntry
+from flaskinventory.add.utils import database_check_table
+from flaskinventory.add.process import EntryProcessor
+from flaskinventory.add.dgraph import generate_fieldoptions
 
 import traceback
 
-records = Blueprint('records', __name__)
+add = Blueprint('add', __name__)
 
 
-@records.route("/new", methods=['GET', 'POST'])
+@add.route("/add", methods=['GET', 'POST'])
 @login_required
 def new_entry():
     form = NewEntry()
@@ -38,33 +38,33 @@ def new_entry():
                 if item.get('other_names'):
                     item['other_names'] = ", ".join(item['other_names'])
             table = database_check_table(result['data'])
-            return render_template('records/database_check.html', query=form.name.data, table=table)
-            # return redirect(url_for('records.database_check', result=result['data']))
+            return render_template('add/database_check.html', query=form.name.data, table=table)
+            # return redirect(url_for('add.database_check', result=result['data']))
         else:
-            return redirect(url_for('records.new_source', entry_name=form.name.data))
-    return render_template('records/newentry.html', form=form)
+            return redirect(url_for('add.new_source', entry_name=form.name.data))
+    return render_template('add/newentry.html', form=form)
 
 
-@records.route("/new/source")
+@add.route("/add/source")
 @login_required
 def new_source():
-    return render_template("records/newsource.html")
+    return render_template("add/newsource.html")
 
 
-@records.route("/new/confirmation")
+@add.route("/add/confirmation")
 def confirmation():
     return render_template("not_implemented.html")
 
 # API Endpoints
 
 # cache this route
-@records.route("/new/fieldoptions")
+@add.route("/add/fieldoptions")
 async def fieldoptions():
     data = await generate_fieldoptions()
     return jsonify(data)
 
 
-@records.route('/new/submit', methods=['POST'])
+@add.route('/new/submit', methods=['POST'])
 def submit():
     try:
         processor = EntryProcessor(
@@ -87,13 +87,13 @@ def submit():
     if result:
         result = dict(result.uids)
         result['redirect'] = url_for(
-            'inventory.view_source', uid=result['newsource'])
+            'view.view_source', uid=result['newsource'])
         return jsonify(result)
     else:
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
 
-@records.route('/new/echo', methods=['POST'])
+@add.route('/new/echo', methods=['POST'])
 def echo_json():
     try:
         processor = EntryProcessor(
@@ -107,7 +107,7 @@ def echo_json():
         return jsonify(error)
 
 
-@records.route('/_orglookup')
+@add.route('/_orglookup')
 def orglookup():
     query = request.args.get('q')
     person = request.args.get('person')
@@ -132,7 +132,7 @@ def orglookup():
     return jsonify(result)
 
 
-@records.route('/_sourcelookup')
+@add.route('/_sourcelookup')
 def sourcelookup():
     query = request.args.get('q')
     query_string = f'''{{
@@ -152,45 +152,3 @@ def sourcelookup():
     result['status'] = True
     return jsonify(result)
 
-
-@records.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
-@records.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
-@login_required
-def edit_organization(unique_name):
-    form = OrganizationForm()
-    countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
-    c_choices = [(country.get('uid'), country.get('name'))
-                 for country in countries['q']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
-
-    form.country.choices = c_choices
-    if form.validate_on_submit():
-        try:
-            sanitize_edit_org(form.data)
-            flash(f'Organization has been updated', 'success')
-            return redirect(url_for('inventory.view_organization', unique_name=form.unique_name.data))
-        except Exception as e:
-            flash(f'Organization could not be updated: {e}', 'danger')
-            return redirect(url_for('records.edit_organization', unique_name=form.unique_name.data))
-
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
-    if result:
-        for key, value in result['q'][0].items():
-            if type(value) is list:
-                if type(value[0]) is str:
-                    value = ", ".join(value)
-                elif key != 'country':
-                    value_unique_name = ", ".join(
-                        [subval['unique_name'] for subval in value])
-                    value = ", ".join([subval['uid'] for subval in value])
-                    setattr(getattr(form, key + '_unique_name'),
-                            'data', value_unique_name)
-            setattr(getattr(form, key), 'data', value)
-
-        return render_template('edit/organization.html', title='Edit Organization', form=form)
-    else:
-        return abort(404)
