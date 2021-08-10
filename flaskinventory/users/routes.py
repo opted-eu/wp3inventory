@@ -4,13 +4,12 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, Markup)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.models import User
 from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
 from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table
 from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.users.dgraph import get_user_data, user_login, create_user, list_users
+from flaskinventory.users.dgraph import User, get_user_data, user_login, create_user, list_users
 from secrets import token_hex
 
 users = Blueprint('users', __name__)

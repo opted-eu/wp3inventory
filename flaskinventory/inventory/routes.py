@@ -13,10 +13,12 @@ inventory = Blueprint('inventory', __name__)
 def quicksearch():
     query = request.args.get('q')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_string = f'''{{
-            field1 as var(func: anyofterms(name, "{query}"))
-            field2 as var(func: anyofterms(other_names, "{query}"))
-            field3 as var(func: anyofterms(title, "{query}"))
+    query_string = f'''
+            query quicksearch($name: string)
+            {{
+            field1 as var(func: anyofterms(name, $name))
+            field2 as var(func: anyofterms(other_names, $name))
+            field3 as var(func: anyofterms(title, $name))
             
             data(func: uid(field1, field2, field3)) 
                 @normalize {{
@@ -28,8 +30,8 @@ def quicksearch():
                     channel {{ channel: name }}
                 }}
             }}
-    '''
-    result = dgraph.query(query_string)
+        '''
+    result = dgraph.query(query_string, variables={'$name': query})
     result['status'] = True
     return jsonify(result)
 
@@ -38,10 +40,12 @@ def quicksearch():
 def search():
     query = request.args.get('query')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_string = f'''{{
-            field1 as var(func: anyofterms(name, "{query}"))
-            field2 as var(func: anyofterms(other_names, "{query}"))
-            field3 as var(func: anyofterms(title, "{query}"))
+    query_string = f'''
+            query search($name: string)
+            {{
+            field1 as var(func: anyofterms(name, $name))
+            field2 as var(func: anyofterms(other_names, $name))
+            field3 as var(func: anyofterms(title, $name))
             
             data(func: uid(field1, field2, field3)) 
                 @normalize {{
@@ -54,7 +58,7 @@ def search():
                 }}
             }}
     '''
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables={'$name': query})
     result['status'] = True
     return jsonify(result)
 

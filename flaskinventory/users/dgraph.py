@@ -68,6 +68,13 @@ class User(UserMixin):
             dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
             return user
 
+from flaskinventory import login_manager
+@login_manager.user_loader
+def load_user(user_id):
+    if not user_id.startswith('0x'): return 
+    if not check_user(user_id):
+        return 
+    return User(uid=user_id)
 
 
 def get_user_data(**kwargs):
@@ -133,15 +140,7 @@ def create_user(user_data, invited_by=None):
         user_data['account_status'] = 'invited'
         
 
-    txn = dgraph.connection.txn()
-
-    try:
-        response = txn.mutate(set_obj=user_data)
-        txn.commit()
-    except:
-        response = False
-    finally:
-        txn.discard()
+    response = dgraph.mutation(user_data)
 
     if response:
         return response.uids['newuser']

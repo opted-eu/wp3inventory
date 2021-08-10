@@ -24,9 +24,8 @@ def get_source(unique_name=None, uid=None):
 
     query = query_func + query_fields
 
-    res = dgraph.connection.txn(read_only=True).query(query)
+    data = dgraph.query(query)
 
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
     if len(data['source']) == 0:
         return False
 
@@ -71,8 +70,7 @@ def get_archive(unique_name=None, uid=None):
     query_fields = '''{ uid dgraph.type expand(_all_) num_sources: count(sources_included) } }'''
 
     query = query_func + query_fields
-    res = dgraph.connection.txn(read_only=True).query(query)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query)
 
     if len(data['archive']) == 0:
         return False
@@ -95,8 +93,7 @@ def get_organization(unique_name=None, uid=None):
 
     query = query_func + query_fields
 
-    res = dgraph.connection.txn(read_only=True).query(query)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query)
 
     if len(data['organization']) == 0:
         return False
@@ -118,8 +115,7 @@ def get_channel(unique_name=None, uid=None):
 
     query = query_func + query_fields
 
-    res = dgraph.connection.txn(read_only=True).query(query)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query)
 
     if len(data['channel']) == 0:
         return False
@@ -143,8 +139,7 @@ def get_country(unique_name=None, uid=None):
 
     query = query_func + query_fields
 
-    res = dgraph.connection.txn(read_only=True).query(query)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query)
 
     if len(data['country']) == 0:
         return False
@@ -160,8 +155,7 @@ def get_paper(uid):
 
     query = query_func + query_fields
 
-    res = dgraph.connection.txn(read_only=True).query(query)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query)
 
     if len(data['paper']) == 0:
         return False
@@ -247,10 +241,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
     query_string = query_head + \
         ' { ' + query_fields + ' ' + query_relation + ' } }'
 
-    current_app.logger.debug(f'Sending query to dgraph: {query_string}')
-
-    res = dgraph.connection.txn(read_only=True).query(query_string)
-    data = json.loads(res.json, object_hook=dgraph.datetime_hook)
+    data = dgraph.query(query_string)
 
     if len(data['q']) == 0:
         return False

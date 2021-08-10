@@ -41,6 +41,7 @@ def make_results_table(table_data):
     cols = list(table_data[0].keys())
     TableCls = create_table('Table')
     TableCls.classes = ['table']
+    TableCls.allow_empty = True
 
     if 'founded' in cols:
         for item in table_data:
@@ -59,6 +60,11 @@ def make_results_table(table_data):
             if item.get('authors'):
                 if item['authors'].startswith('['):
                     item['authors'] = item['authors'].replace('[', '').replace(']', '')
+
+    if 'country' in cols:
+        for item in table_data:
+            if not item.get('country'):
+                item['country'] = 'NA'
 
     if 'name' in cols:
         TableCls.add_column('name', LinkCol('Name', 'inventory.view_source', url_kwargs=dict(unique_name='unique_name'), attr_list='name'))
