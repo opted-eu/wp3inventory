@@ -1,13 +1,16 @@
-import os
+import logging
+
 from flask import Flask
+from .config import create_filehandler
+
 from flask_login import LoginManager
-from flaskinventory.dgraph import DGraph
 from flask_mail import Mail
 from flaskinventory.config import Config
-import logging
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+
+from flaskinventory.dgraph import DGraph
 
 dgraph = DGraph()
 
@@ -22,10 +25,14 @@ limiter = Limiter(key_func=get_remote_address)
 def create_app(config_class=Config, config_json=None):
     app = Flask(__name__)
     app.logger.setLevel(logging.DEBUG)
+    app.logger.addHandler(create_filehandler())
+
+
     if config_json:
         app.config.from_json(config_json)
     else:
         app.config.from_object(config_class)
+
     
     from flaskinventory.users.routes import users
     from flaskinventory.inventory.routes import inventory

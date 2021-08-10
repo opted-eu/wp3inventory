@@ -2,7 +2,7 @@ import asyncio
 from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
-from flaskinventory import dgraph, limiter
+from flaskinventory import dgraph
 from flaskinventory.records.forms import NewEntry, OrganizationForm
 from flaskinventory.records.utils import database_check_table, sanitize_edit_org
 from flaskinventory.records.process import EntryProcessor
