@@ -24,6 +24,7 @@ pydgraph
 python-dateutil
 python-slugify
 pytz
+waitress
 Werkzeug
 WTForms
 feedparser
