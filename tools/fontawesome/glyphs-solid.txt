@@ -1,0 +1,17 @@
+user
+plus-circle
+id-badge
+envelope-open-text
+power-off
+glasses
+users-cog
+database
+external-link-alt
+globe-europe
+building
+graduation-cap
+certificate
+check
+exclamation-circle
+newspaper
+globe
