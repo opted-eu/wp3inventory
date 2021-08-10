@@ -1,4 +1,3 @@
-from flaskinventory.records.routes import fieldoptions
 import json
 from dateutil.parser import isoparse
 from flask import current_app, _app_ctx_stack

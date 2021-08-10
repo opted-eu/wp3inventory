@@ -10,7 +10,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from flaskinventory.dgraph import DGraph
+from flaskinventory.flaskdgraph import DGraph
 
 dgraph = DGraph()
 
