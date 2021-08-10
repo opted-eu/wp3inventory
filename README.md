@@ -75,3 +75,10 @@ Level | Name | Permissions
 2     | Reviewer | + Review & Edit Entries, Invite Users
 10    | Admin   | + Change User Permissions 
 
+
+## Web Dependencies
+
+- Bootstrap 5
+- Font Awesome
+- Tom-Select
+- jquery typeahead
