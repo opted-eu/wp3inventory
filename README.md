@@ -21,10 +21,11 @@ WP3 Inventory
   - [x] rename modules ('records' -> 'add', 'inventory' -> 'view')
   - [x] dateparsing for dgraph objects
   - [ ] divorce HTML from JS ('newsource.html')
-  - [ ] Remove external JS dependencies and collect via yarn instead
+  - [ ] ~~Remove external JS dependencies and collect via yarn instead~~
+  - [x] repository contains JS/CSS dependencies
   - [ ] get rid of JQuery
 - [x] Implement Account Delete feature
-- [ ] Subset Fontawesome, do not load via CDN (because this sets a cookie)
+- [x] Subset Fontawesome, do not load via CDN (because this sets a cookie)
 - [ ] Form field options generator functions all in one file, then use caching module
 
 ## New Features
