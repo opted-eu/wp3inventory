@@ -94,3 +94,10 @@ fieldset {
     /* Opera < 12.1 */
     animation: fadein 200ms;
 }
+
+/* Layout tweaks */
+
+dt {
+    /* description lists need more spacing between rows */
+    margin-bottom: 0.5em;
+}
