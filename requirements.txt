@@ -1,11 +1,10 @@
 Babel
-blinker
 cffi
 click
 colorama
 dnspython
 email-validator
-Flask
+Flask[async]
 Flask-Babel
 Flask-Email
 Flask-Login
@@ -25,7 +24,6 @@ pydgraph
 python-dateutil
 python-slugify
 pytz
-six0
 Werkzeug
 WTForms
 feedparser
