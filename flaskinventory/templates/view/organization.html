@@ -12,7 +12,7 @@
     <div class="border rounded p-3">
         <dl class="row">
             <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted">Here is space for explanations.</small></dd>
+            <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
             {% if entry.other_names %}
             <dt class="col-sm-3">Also known as</dt>
             <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}

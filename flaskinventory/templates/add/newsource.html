@@ -802,18 +802,33 @@
 
 
     // populate form on page load
-    function populateForm(f, fID) {
-        if (localStorage.key(fID)) {
-            var savedData = JSON.parse(localStorage.getItem(fID));
-            for (var element of f.elements) {
-                if (element.name in savedData) {
-                    if (Array.isArray(element))
-                        {
-                            element.value = savedData[element.name].join()
-                        }
+    /*
+    function populateForm(f, jsonData) {
+        for (var element of f.elements) {
+            if (element.name in jsonData) {
+                console.log(jsonData[element.name])
+                if (Array.isArray(jsonData[element.name]))
+                    {
+                        console.log("array:", element)
+                        element.value = jsonData[element.name].join()
+                    }
 
-                    element.value = savedData[element.name];
-                }
+                element.value = jsonData[element.name];
+            }
+        }
+    };
+    */
+    function populateForm(f, jsonData) {
+        for (var element in jsonData) {
+            if (element.name in jsonData) {
+                console.log(jsonData[element.name])
+                if (Array.isArray(jsonData[element.name]))
+                    {
+                        console.log("array:", element)
+                        element.value = jsonData[element.name].join()
+                    }
+
+                element.value = jsonData[element.name];
             }
         }
     };
@@ -916,6 +931,13 @@
             var entry_name = currentUrl.searchParams.get("entry_name");
             document.getElementById('name').value = entry_name
 
+            // Populate form with draft data from embedded json
+            var embeddedJSON = document.getElementById('draft')
+            if (embeddedJSON) {
+                embeddedJSON = JSON.parse(embeddedJSON.innerHTML)
+                let form = document.getElementById(formId)
+                populateForm(form, embeddedJSON)
+            }
 
 
             // handle field visibility / dependency logic
@@ -928,6 +950,8 @@
             // Populate form with locally stored data
             // populateForm(persistentForm, formIdentifier);
             // document.getElementById('channel-select').dispatchEvent(new Event('change'))
+
+            
 
             // add Tom Select for dynamically loaded data
             var TomSelectCountriesConfig = {
@@ -1667,4 +1691,9 @@
 
 
 </script>
+{% if draft %}
+<script type="application/json" id="draft">
+{{ draft|safe }}
+</script>
+{% endif %}
 {% endblock content %} {% block sidebar %} {% endblock sidebar %}

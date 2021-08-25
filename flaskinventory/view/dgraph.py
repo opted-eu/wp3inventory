@@ -17,10 +17,12 @@ def get_source(unique_name=None, uid=None):
     else:
         return None
 
-    query_fields = '''{ uid dgraph.type expand(_all_)  { uid unique_name name channel { name unique_name } }
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname channel { name unique_name } }
                         published_by: ~publishes { name unique_name uid } 
                         archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
-                        papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors } } }'''
+                        datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid }
+                        papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors } 
+                        } }'''
 
     query = query_func + query_fields
 

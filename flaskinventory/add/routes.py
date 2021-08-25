@@ -1,4 +1,5 @@
 import asyncio
+import json
 from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
@@ -48,12 +49,35 @@ def new_entry():
 @add.route("/add/source")
 @login_required
 def new_source():
-    return render_template("add/newsource.html")
+    draft = None
+    if request.args.get('draft'):
+        query_string = f"""{{ q(func: uid({request.args.get('draft')})) {{
+                                expand(_all_) {{ uid unique_name name
+                                            }}
+                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
+                                    uid unique_name name }} 
+                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
+                                    uid unique_name name }} 
+                                }} }}"""
+        draft = dgraph.query(query_string)
+    if draft:
+        print(draft)
+        draft = json.dumps(draft['q'][0], default=str)
+    return render_template("add/newsource.html", draft=draft)
 
 
 @add.route("/add/confirmation")
 def confirmation():
     return render_template("not_implemented.html")
+
+
+@add.route("/add/draft/<string:entity>/<string:uid>")
+def from_draft(entity, uid):
+    return jsonify({"entity": entity, "uid": uid})
 
 # API Endpoints
 

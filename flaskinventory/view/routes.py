@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.view.dgraph import get_archive, get_channel, get_country, get_organization, get_paper, get_source, list_by_type
-from flaskinventory.view.utils import make_mini_table, make_results_table
+from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
 
 view = Blueprint('view', __name__)
@@ -21,7 +21,7 @@ def quicksearch():
             field3 as var(func: anyofterms(title, $name))
             
             data(func: uid(field1, field2, field3)) 
-                @normalize {{
+                @normalize @filter(eq(entry_review_status, "accepted")) {{
                     uid 
                     unique_name: unique_name 
                     name: name 
@@ -48,7 +48,7 @@ def search():
             field3 as var(func: anyofterms(title, $name))
             
             data(func: uid(field1, field2, field3)) 
-                @normalize {{
+                @normalize @filter(eq(entry_review_status, "accepted")) {{
                     uid 
                     unique_name: unique_name 
                     name: name 
@@ -76,6 +76,8 @@ def view_source(unique_name=None, uid=None):
         if "Source" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
         if unique_item.get('audience_size'):
             unique_item['audience_size_table'] = make_mini_table(
                 unique_item['audience_size'])
@@ -100,6 +102,8 @@ def view_archive(unique_name):
         if "Archive" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
 
         return render_template('view/archive.html',
                                title=unique_item.get('name'),
@@ -115,6 +119,8 @@ def view_organization(unique_name):
         if "Organization" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
 
         return render_template('view/organization.html',
                                title=unique_item.get('name'),
@@ -130,6 +136,8 @@ def view_country(unique_name):
         if "Country" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
 
         return render_template('view/country.html',
                                title=unique_item.get('name'),
@@ -145,7 +153,8 @@ def view_channel(unique_name):
         if "Channel" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
-
+        if not can_view(unique_item, current_user):
+            return abort(403)
         return render_template('view/channel.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
@@ -159,6 +168,8 @@ def view_researchpaper(uid):
     if unique_item:
         if "ResearchPaper" not in unique_item.get('dgraph.type'):
             return abort(404)
+        if not can_view(unique_item, current_user):
+            return abort(403)
 
         return render_template('view/paper.html',
                                title=unique_item.get('name'),
@@ -178,7 +189,7 @@ def query():
             else:
                 relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
         data = list_by_type(
-            request.args['entity'], relation_filt=relation_filt)
+            request.args['entity'], relation_filt=relation_filt, filt={'eq': {'entry_review_status': 'accepted'}})
 
         if data:
             table = make_results_table(data)

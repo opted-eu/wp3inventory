@@ -1,29 +1,27 @@
 {% extends "layout.html" %} {% block content %}
-<div class="content-section">
-    <div class="border rounded p-3">
-        <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>User Information</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted">We store as little personal data as possible. 
-                Only your user name is visible to other users. 
-                Your email address is stored for administrative purposes only and not visible for other users. 
-                However, feel free to add more information about yourself. 
-                <a href="{{ url_for('main.privacy') }}">More information on data storage and security can be found here</a>.</small></dd>
-            <dt class="col-sm-3 mb-4">Email</dt>
-            <dd class="col-sm-9">{{ current_user.email }}</dd>
-            <dt class="col-sm-3 mb-4">Date joined</dt>
-            <dd class="col-sm-9">{{ current_user.date_joined.strftime('%Y-%m-%d') }}</dd>
-            <dt class="col-sm-3 mb-4">User Role</dt>
-            <dd class="col-sm-9">{{ user_role }} <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<b>Contributor:</b> can add new entries.<br><b>Reviewer:</b> can review, edit and delete entries."><i class="fas mx-3 fa-question-circle"></i></a></dd>
-            <dt class="col-sm-3 mb-4">Username</dt>
-            <dd class="col-sm-9">{{ current_user.user_displayname }}</dd>
-            <dt class="col-sm-3 mb-4">Affiliation</dt>
-            <dd class="col-sm-9">{{ current_user.user_affiliation }}</dd>
-            <dt class="col-sm-3 mb-4">ORCID</dt>
-            <dd class="col-sm-9"><a href="https://orcid.org/{{ current_user.user_orcid }}" target="_blank">{{ current_user.user_orcid }}</a></dd>
-        </dl>
-        <a class="btn btn-outline-info" href="{{ url_for('users.update_profile') }}">Update Profile</a>
-        <button class="btn btn-sm btn-outline-danger mx-4" data-bs-toggle="modal" data-bs-target="#deleteAccount">Delete Account</button>
-    </div>
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>User Information</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">We store as little personal data as possible. 
+            Only your user name is visible to other users. 
+            Your email address is stored for administrative purposes only and not visible for other users. 
+            However, feel free to add more information about yourself. 
+            <a href="{{ url_for('main.privacy') }}">More information on data storage and security can be found here</a>.</small></dd>
+        <dt class="col-sm-3 mb-4">Email</dt>
+        <dd class="col-sm-9">{{ current_user.email }}</dd>
+        <dt class="col-sm-3 mb-4">Date joined</dt>
+        <dd class="col-sm-9">{{ current_user.date_joined.strftime('%Y-%m-%d') }}</dd>
+        <dt class="col-sm-3 mb-4">User Role</dt>
+        <dd class="col-sm-9">{{ user_role }} <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<b>Contributor:</b> can add new entries.<br><b>Reviewer:</b> can review, edit and delete entries."><i class="fas mx-3 fa-question-circle"></i></a></dd>
+        <dt class="col-sm-3 mb-4">Username</dt>
+        <dd class="col-sm-9">{{ current_user.user_displayname }}</dd>
+        <dt class="col-sm-3 mb-4">Affiliation</dt>
+        <dd class="col-sm-9">{{ current_user.user_affiliation }}</dd>
+        <dt class="col-sm-3 mb-4">ORCID</dt>
+        <dd class="col-sm-9"><a href="https://orcid.org/{{ current_user.user_orcid }}" target="_blank">{{ current_user.user_orcid }}</a></dd>
+    </dl>
+    <a class="btn btn-outline-info" href="{{ url_for('users.update_profile') }}">Update Profile</a>
+    <button class="btn btn-sm btn-outline-danger mx-4" data-bs-toggle="modal" data-bs-target="#deleteAccount">Delete Account</button>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">

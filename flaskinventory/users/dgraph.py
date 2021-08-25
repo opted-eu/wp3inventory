@@ -152,3 +152,20 @@ def list_users():
     if len(data['q']) == 0:
         return False
     return data['q']
+
+def list_entries(user):
+    query_string = f"""{{ q(func: uid({user})) {{
+    drafts: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "draft"))
+    {{ uid unique_name name dgraph.type entry_review_status }} 
+    pending: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "pending"))
+    {{ uid unique_name name dgraph.type entry_review_status }} 
+    accepted: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "accepted"))
+    {{ uid unique_name name dgraph.type entry_review_status }}
+    }} }}
+    """
+
+    data = dgraph.query(query_string)
+
+    if len(data['q']) == 0:
+        return False
+    return data['q']

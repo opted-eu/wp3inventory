@@ -37,7 +37,33 @@ def main():
         txn.mutate(set_obj=countries)
         txn.commit()
     finally:
-        txn.discard()    
+        txn.discard()
+
+    # change all object's entry_review_status to "accepted"
+    txn = client.txn()
+
+    query = """{
+        q(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql)) { v as uid } }"""
+    nquad = """
+        uid(v) <entry_review_status> "accepted" .
+        """
+    mutation = txn.create_mutation(set_nquads=nquad)
+    request = txn.create_request(query=query, mutations=[mutation], commit_now=True)
+    txn.do_request(request)    
+
+    # change all entry_added to Admin
+    txn = client.txn()
+
+    query = """{
+        q(func: eq(email, "wp3@opted.eu")) { v as uid }
+        s(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql)) { u as uid } }"""
+    nquad = """
+        uid(u) <entry_added> uid(v) .
+        """
+    mutation = txn.create_mutation(set_nquads=nquad)
+    request = txn.create_request(query=query, mutations=[mutation], commit_now=True)
+    txn.do_request(request)    
+
 
     print(Fore.GREEN + 'DONE!' + Style.RESET_ALL)
     deinit()
