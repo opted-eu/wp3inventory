@@ -1,7 +1,7 @@
 pyftsubset\
  webfonts/fa-solid-900.ttf \
  --output-file="fa-solid-subset-900.woff2" \
- --glyphs-file="glyphs-solid.txt"
+ --glyphs-file="glyphs-solid.txt" \
  --flavor="woff2"
 
 pyftsubset\
