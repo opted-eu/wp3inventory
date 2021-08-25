@@ -1,12 +1,13 @@
 from flask import current_app
 import requests
+from requests.models import PreparedRequest
+import requests.exceptions
 import feedparser
 from urllib.robotparser import RobotFileParser
 import urllib.parse
 from bs4 import BeautifulSoup as bs4
 import re
 import json
-import validators
 import instaloader
 import tweepy
 from dateutil.parser import isoparse
@@ -35,22 +36,37 @@ def geocode(address):
 def build_url(site):
     if site.endswith('/'):
         site = site[:-1]
-    if site.startswith('http'):
-        validators.url(site)
-    else:
-        # domain validator needs improvement
-        validators.domain(site)
+    if not site.startswith('http'):
         site = 'https://' + site
-    return site
+    prepared_request = PreparedRequest()
+    try:
+        prepared_request.prepare_url(site, None)
+        return prepared_request.url
+    except Exception as e:
+        return False
+
+def test_url(site):
+    site = build_url(site)
+    if not site:
+        return False
+    try:
+        r = requests.head(site, timeout=5)
+    except Exception as e:
+        return False
+    
+    if r.ok:
+        return True
+    
+    return False
 
 
 def find_sitemaps(site):
+    site = build_url(site)
+    if not site:
+        return []
+
     if site.endswith('/'):
         site = site[:-1]
-    if site.startswith('http'):
-        validators.url(site)
-    else:
-        site = 'https://' + site
 
     r = requests.get(site)
     if r.status_code != 200:
@@ -68,6 +84,11 @@ def find_sitemaps(site):
 
 def find_feeds(site):
     site = build_url(site)
+    if not site:
+        return []
+    
+    if site.endswith('/'):
+        site = site[:-1]
 
     # first: naive approach
     try:
@@ -122,10 +143,12 @@ def parse_meta(url):
     names = []
 
     site = build_url(url)
+    if not site:
+        return False, False
 
     r = requests.get(site)
 
-    if r.status_code != 200:
+    if not r.ok:
         return False, False
 
     soup = bs4(r.content, 'lxml')
@@ -165,7 +188,7 @@ def opengraph(soup):
 def schemaorg(soup):
     schemas = soup.find_all('script', type=re.compile(r'json'))
     if len(schemas) == 0:
-        return False
+        return False, False
 
     name = None
     url = None

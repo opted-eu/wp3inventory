@@ -294,11 +294,12 @@ class EntryProcessor():
                 'Invalid data! "name" not specified.')
 
     def parse_channel(self):
-        if self.json.get('channel_uid').startswith('0x'):
-            self.new_source['channel']['uid'] = self.json.get('channel_uid')
-        else:
+        try:
+            if self.json.get('channel_uid').startswith('0x'):
+                self.new_source['channel']['uid'] = self.json.get('channel_uid')
+        except Exception as e:
             raise InventoryValidationError(
-                'Invalid data! uid of channel not defined')
+                f'Invalid data! uid of channel not defined: {e}')
 
     def parse_channel_url(self):
         if self.json.get('channel_url'):
