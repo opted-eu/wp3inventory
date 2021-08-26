@@ -20,9 +20,10 @@
     <fieldset id="section-general">
         <h3 class="mb-4">General Information</h3>
         <div class="mb-5 form-group">
+            <input type="text" name="uid" id="uid-hidden" readonly value='_:newsource'>
             <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed?</label>
             <select name="channel" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
-                        <option value="" selected>Select Channel...</option>
+                        <option value="">Select Channel...</option>
                     </select>
             <div id="channel-select-feedback"></div>
             <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
@@ -403,8 +404,8 @@
             <label for="geographic-scope-multiple" class="form-label fw-bold fs-5">What is the multinational scope?</label>
             <small id="geographic-scope-multiple-helptext"></small>
             <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
-            <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly hidden>
-            <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly hidden>
+            <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly>
+            <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly>
             <div id="geographic-scope-multiple-feedback"></div>
         </div>
 
@@ -577,12 +578,14 @@
         document.querySelector(selector).append(optOther);
     };
 
-    function addFieldOptions(fieldOptions, key, selector, addother, othernames=false) {
+    function addFieldOptions(fieldOptions, key, selector, addother, othernames=false, datavalue=true) {
         var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
             let opt = document.createElement('option')
             opt.setAttribute('value', item.uid)
-            opt.setAttribute('data-value', item.unique_name)
+            if (datavalue == true) {
+                opt.setAttribute('data-value', item.unique_name)
+            }
             opt.setAttribute('data-index', i)
             let item_label = item.name
             if (othernames) {
@@ -798,39 +801,255 @@
                 });
             }
         } )
-    }
+    };
+
+    if (document.querySelector('input[name="geographic_scope"]')) {
+        document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
+            elem.addEventListener("input", function(event) {
+            var item = event.target.value;
+            if (item == 'multinational') {
+                document.getElementById('group-geographic-scope-multiple').hidden = false;
+                document.getElementById('group-geographic-scope-single').hidden = true;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                document.getElementById('geographic-scope-multiple').required = true;
+                if (document.getElementById('geographic-scope-multiple-tomselected')) {
+                    document.getElementById('geographic-scope-multiple-tomselected').required = true;
+                }
+                document.getElementById('geographic-scope-single').required = false;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                }
+                document.getElementById('geographic-scope-subunit').required = false;
+                if (document.getElementById('geographic-scope-subunit-tomselected')) {
+                    document.getElementById('geographic-scope-subunit-tomselected').required = false;
+                }
+                // geographicScopeSingle.clear();
+                // geographicScopeSubunit.clear();
+            }
+            else if (item == 'national') {
+                document.getElementById('group-geographic-scope-multiple').hidden = true;
+                document.getElementById('group-geographic-scope-single').hidden = false;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                document.getElementById('geographic-scope-multiple').required = false;
+                if (document.getElementById('geographic-scope-multiple-tomselected')) {
+                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                }
+                document.getElementById('geographic-scope-single').required = true;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                    document.getElementById('geographic-scope-single-ts-label').innerText = "What is the national scope?"
+                }
+
+                document.getElementById('geographic-scope-subunit').required = false;
+                if (document.getElementById('geographic-scope-subunit-tomselected')) {
+                    document.getElementById('geographic-scope-subunit-tomselected').required = false;
+                    // geographicScopeMultiple.clear();
+                    // geographicScopeSubunit.clear();
+                }
+            }
+            else if (item == 'subnational') {
+                document.getElementById('group-geographic-scope-multiple').hidden = true;
+                document.getElementById('group-geographic-scope-single').hidden = false;
+                document.getElementById('group-geographic-scope-subunit').hidden = false;
+
+                document.getElementById('geographic-scope-multiple').required = false;
+                if (document.getElementById('geographic-scope-multiple-tomselected')) {
+                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                }
+                document.getElementById('geographic-scope-single').required = true;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                    document.getElementById('geographic-scope-single-ts-label').innerText = "To which national context does the subnational unit belong?"
+                }
+
+                document.getElementById('geographic-scope-subunit').required = true;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                }
+
+                // geographicScopeMultiple.clear();
+            }
+            else {
+                document.getElementById('group-geographic-scope-multiple').hidden = true;
+                document.getElementById('group-geographic-scope-single').hidden = true;
+                document.getElementById('group-geographic-scope-subunit').hidden = true;
+
+                // geographicScopeSingle.clear();
+                // geographicScopeMultiple.clear();
+                // geographicScopeSubunit.clear();
+            }
+            });
+        });
+    };
 
 
     // populate form on page load
-    /*
-    function populateForm(f, jsonData) {
-        for (var element of f.elements) {
-            if (element.name in jsonData) {
-                console.log(jsonData[element.name])
-                if (Array.isArray(jsonData[element.name]))
-                    {
-                        console.log("array:", element)
-                        element.value = jsonData[element.name].join()
-                    }
-
-                element.value = jsonData[element.name];
+    function populateForm(jsonData) {
+        document.getElementById("uid-hidden").value = jsonData["uid"]
+        document.getElementById("channel-select").value = jsonData["channel"].unique_name
+        document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
+        document.getElementById("name").value = jsonData["name"]
+        if ("other_names" in jsonData) {
+            document.getElementById("other-names").value = jsonData["other_names"].join(","); 
+        };
+        if ("founded" in jsonData) {
+            document.getElementById("source-founded").value = jsonData["founded"].split("-")[0]
+        };
+        if ("payment_model" in jsonData) {
+            document.querySelector(`input[name=payment_model][value='${jsonData["payment_model"]}']`).checked = true
+        };
+        if ("contains_ads" in jsonData) {
+            document.querySelector(`input[name=contains_ads][value='${jsonData["contains_ads"]}']`).checked = true
+        };
+        if ("publishes_org" in jsonData) {
+            jsonData["publishes_org"].forEach(function(item) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.uid)
+                opt.innerText = item.name
+                opt.selected = true
+                document.getElementById("publishes_org").append(opt);
+                if ("ownership_kind" in item) {
+                    document.querySelector(`input[name=ownership_kind][value='${item["ownership_kind"]}']`).checked = true
+                }
+            })
+        };
+        if ("publishes_person" in jsonData) {
+            jsonData["publishes_person"].forEach(function(item) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.uid)
+                opt.innerText = item.name
+                opt.selected = true
+                document.getElementById("publishes_person").append(opt);
+                if ("ownership_kind" in item) {
+                    document.querySelector(`input[name=ownership_kind][value='${item["ownership_kind"]}']`).checked = true
+                }
+            })
+        };
+        if ("publication_kind" in jsonData) {
+            jsonData["publication_kind"].forEach(function(item) {
+                item = item.toLowerCase()
+                if (document.querySelector(`#publication-kind option[value='${item}']`)) {
+                    document.querySelector(`#publication-kind option[value='${item}']`).selected = true
+                }
+                else {
+                    let opt = document.createElement('option')
+                    opt.setAttribute('value', item)
+                    opt.innerText = item
+                    opt.selected = true
+                    document.getElementById("publication-kind").append(opt);
+                }
+            })
+        };
+        if ("special_interest" in jsonData) {
+            if (jsonData["special_interest"]) {
+                document.getElementById("special_interest2").checked = true
             }
-        }
-    };
-    */
-    function populateForm(f, jsonData) {
-        for (var element in jsonData) {
-            if (element.name in jsonData) {
-                console.log(jsonData[element.name])
-                if (Array.isArray(jsonData[element.name]))
-                    {
-                        console.log("array:", element)
-                        element.value = jsonData[element.name].join()
+        };
+        if ("topical_focus" in jsonData) {
+            jsonData["topical_focus"].forEach(function(item) {
+                item = item.toLowerCase()
+                if (document.querySelector(`#topical-focus option[value='${item}']`)) {
+                    document.querySelector(`#topical-focus option[value='${item}']`).selected = true
+                }
+                else {
+                    let opt = document.createElement('option')
+                    opt.setAttribute('value', item)
+                    opt.innerText = item
+                    opt.selected = true
+                    document.getElementById("topical-focus").append(opt);
+                }
+            })
+        };
+        if ("publication_cycle" in jsonData) {
+            document.getElementById("publication-cycle").value = jsonData["publication_cycle"]
+            if ("publication_cycle_weekday" in jsonData) {
+                if (jsonData["publication_cycle"] == "weekly") {
+                    document.getElementById('publication-cycle').dispatchEvent(new Event("change"))
+                    document.querySelector(`input[name=publication_cycle_weekday][value="${jsonData['publication_cycle_weekday'][0]}"]`).checked = true
+                }
+                else if (jsonData["publication_cycle"] == "multiple times per week") {
+                    document.getElementById('publication-cycle').dispatchEvent(new Event("change"))
+                    for (item of jsonData["publication_cycle_weekday"]) {
+                        document.getElementById(`publication-cycle-weekday-${item}`).checked = true
                     }
-
-                element.value = jsonData[element.name];
+                }
             }
-        }
+        };
+        if ("geographic_scope" in jsonData) {
+            document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).checked = true
+            document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).dispatchEvent(new Event("input"))
+            if ("geographic_scope_countries" in jsonData) {
+                if (jsonData["geographic_scope"] == "multinational") {
+                    for (country of jsonData["geographic_scope_countries"]) {
+                        if (document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`)) {
+                            document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`).selected = true
+                            document.getElementById("geographic-scope-countries-hidden").value += country["uid"] + ","
+                            }
+                        }
+                    if ("geographic_scope_subunit" in jsonData) {
+                        for (subunit of jsonData["geographic_scope_subunit"]) {
+                            if (document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`)) {
+                                document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`).selected = true
+                                document.getElementById("geographic-scope-subunits-hidden").value += country["uid"] + ","
+                                }
+                        }
+                    }
+                }
+                else if (jsonData["geographic_scope"] == "national") {
+                    let country = jsonData["geographic_scope_countries"][0]
+                    if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
+                        document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                    }
+                    
+                }
+                else if (jsonData["geographic_scope"] == "subnational") {
+                    if ("geographic_scope_subunit" in jsonData) {
+                        for (subunit of jsonData["geographic_scope_subunit"]) {
+                            if (document.querySelector(`#geographic-scope-subunit option[value='${subunit.uid}']`)) {
+                                document.querySelector(`#geographic-scope-subunit option[value='${subunit.uid}']`).selected = true
+                            }
+                        }
+                        let country = jsonData["geographic_scope_countries"][0]
+                        if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
+                            document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                    }
+                    }
+                }
+            }
+        };
+        if ("languages" in jsonData) {
+            for (lang of jsonData["languages"]) {
+                document.querySelector(`#languages option[value=${lang}]`).selected = true
+            }
+
+        };
+        if ("channel_epaper" in jsonData) {
+            document.getElementById("channel-epaper").value = jsonData["channel_epaper"]
+        };
+        if ("archives" in jsonData) {
+            for (archive of jsonData["archives"]) {
+                document.querySelector(`#archive-sources-included option[value='${archive.uid}']`).selected = true
+            }
+        };
+        if ("datasets" in jsonData) {
+            for (dataset of jsonData["datasets"]) {
+                document.querySelector(`#dataset-sources-included option[value='${dataset.uid}']`).selected = true
+            }
+        };
+        if ("entry_notes" in jsonData) {
+            document.getElementById("entry-notes").value = jsonData["entry_notes"]
+        };
+        if ("related" in jsonData) {
+            jsonData["related"].forEach(function(item) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.uid)
+                opt.innerText = item.name + ' (' + item.channel.name + ')'
+                opt.selected = true
+                document.getElementById("related-sources").append(opt);
+            })
+        };
     };
 
     // Progress Bar
@@ -863,11 +1082,11 @@
 
             addFieldOptionsData(data, 'channel', '#channel-select');
             addLanguages(data, 'language', '#languages', false);
-            addFieldOptions(data, 'country', '#geographic-scope-single', false);
-            addFieldOptions(data, 'subunit', '#geographic-scope-subunit', false, true);            
+            addFieldOptions(data, 'country', '#geographic-scope-single', false, false, false);
+            addFieldOptions(data, 'subunit', '#geographic-scope-subunit', false, true, false);            
             
-            addFieldOptions(data, 'archive', '#archive-sources-included', false);
-            addFieldOptions(data, 'dataset', '#dataset-sources-included', false);
+            addFieldOptions(data, 'archive', '#archive-sources-included', false, false, false);
+            addFieldOptions(data, 'dataset', '#dataset-sources-included', false, false, false);
             
             // Add field options for Country & Subunit Selection (Multiple Choice)
             var countries = data.country;
@@ -935,8 +1154,7 @@
             var embeddedJSON = document.getElementById('draft')
             if (embeddedJSON) {
                 embeddedJSON = JSON.parse(embeddedJSON.innerHTML)
-                let form = document.getElementById(formId)
-                populateForm(form, embeddedJSON)
+                populateForm(embeddedJSON)
             }
 
 
@@ -946,12 +1164,13 @@
             document.getElementById('channel-select').addEventListener('change', (element) => {
                 channelVisibility(data, channelVisibilityFields, element);
             })
-
-            // Populate form with locally stored data
-            // populateForm(persistentForm, formIdentifier);
-            // document.getElementById('channel-select').dispatchEvent(new Event('change'))
-
-            
+            // trigger field events from draft
+            if (embeddedJSON) {
+                document.getElementById('channel-select').dispatchEvent(new Event('change'))
+                if (document.getElementById("special_interest2").checked) {
+                    document.getElementById("special_interest2").dispatchEvent(new Event("change"))
+                    }
+            }
 
             // add Tom Select for dynamically loaded data
             var TomSelectCountriesConfig = {
@@ -1033,82 +1252,274 @@
             const archiveSelect = new TomSelect('#archive-sources-included', TomSelectDatasetConfig)
             const datasetSelect = new TomSelect('#dataset-sources-included', TomSelectDatasetConfig)
 
+            // autocomplete organisation
+
+            var TomSelectOrganisationConfig = {
+                plugins: ['remove_button'],
+                create: function(input,callback){
+                        var returnData = {
+                            value:input,
+                            uid:input,
+                            unique_name:input,
+                            text:input,
+                            name:input,
+                            country: [
+                                {name: 'NEW!'}
+                            ]
+                        };
+                        callback(returnData);
+                    },
+                valueField: 'uid',
+                labelField: 'name',
+                searchField: 'name',
+                delimiter: ',',
+                selectOnTab: true,
+                // createFilter: function(input) { return input.length >= 3 },
+                load: function(query, callback) {
+                    if ( query.length < 3 ) return callback();
+                    var url = '{{ url_for("add.orglookup") }}?person=false&q=' + encodeURIComponent(query);
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        callback(json.data);
+                    }).catch(() => {callback();});
+                },
+                render: {
+                    option: function(data, escape) {
+                        var country_label = ' '
+                        if ('country' in data) {
+                            country_label = ' (' + escape(data.country[0].name) + ') '
+                        };
+                        return '<div>' +
+                                '<span class="title">' + escape(data.name) + '</span>' +
+                                '<small class="text-muted mx-1">' + country_label + '</small>' +
+                            '</div>';
+                    },
+                    item: function(data, escape) {
+                        var country_label = ' '
+                        if ('country' in data) {
+                            country_label = ' (' + escape(data.country[0].name) + ') '
+                        };
+                        return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
+                    }
+                },
+                onItemAdd:function(){ // clear input after item was selected
+                    this.setTextboxValue();
+                    this.refreshOptions();
+                }
+            };
+            new TomSelect('#publishes_org', TomSelectOrganisationConfig);
+
+            var TomSelectPersonConfig = {
+                plugins: ['remove_button'],
+                create: function(input,callback){
+                        var returnData = {
+                            value:input,
+                            uid:input,
+                            unique_name:input,
+                            text:input,
+                            name:input,
+                            country: [
+                                {name: 'NEW!'}
+                            ]
+                        };
+                        callback(returnData);
+                    },
+                valueField: 'uid',
+                labelField: 'name',
+                searchField: 'name',
+                delimiter: ',',
+                selectOnTab: true,
+                // createFilter: function(input) { return input.length >= 3 },
+                load: function(query, callback) {
+                    if ( query.length < 3 ) return callback();
+                    var url = '{{ url_for("add.orglookup") }}?person=true&q=' + encodeURIComponent(query);
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        callback(json.data);
+                    }).catch(() => {callback();});
+                },
+                render: {
+                    option: function(data, escape) {
+                        var country_label = ' '
+                        if ('country' in data) {
+                            country_label = ' (' + escape(data.country[0].name) + ') '
+                        };
+                        return '<div>' +
+                                '<span class="title">' + escape(data.name) + '</span>' +
+                                '<small class="text-muted mx-1">' + country_label + '</small>' +
+                            '</div>';
+                    },
+                    item: function(data, escape) {
+                        var country_label = ' '
+                        if ('country' in data) {
+                            country_label = ' (' + escape(data.country[0].name) + ') '
+                        };
+                        return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
+                    }
+                },
+                onItemAdd:function(){ // clear input after item was selected
+                    this.setTextboxValue();
+                    this.refreshOptions();
+                }
+            };
+            new TomSelect('#publishes_person', TomSelectPersonConfig);
+
+
+
+            var TomSelectOtherNamesConfig = {
+                plugins: ['remove_button'],
+                selectOnTab: true,
+                create: true,
+                render: {
+                    no_results:function(data,escape){
+                        return '<div></div>';
+                }
+                }
+            };
+
+            new TomSelect('#other-names', TomSelectOtherNamesConfig);
+
+
+            var TomSelectPublicationKindConfig = {
+                plugins: ['remove_button'],
+                create: true,
+                selectOnTab: true,
+                onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                    this.input.classList.remove('is-invalid');
+                    this.input.removeAttribute("aria-invalid");
+                },
+                onChange: function(){ // invoke validation on change
+                    setFieldValidity(this.input);
+            }
+            };
+            new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
+
+            var TomSelectTopicalFocusConfig = TomSelectPublicationKindConfig;
+
+            new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
+
+            // autocomplete related sources
+
+            function createNewSourceField(container, sourceName) {
+                var row = document.createElement('div')
+                row.classList.add('row', 'mb-3')
+                row.id = 'container-' + sourceName
+                var label = document.createElement('label')
+                label.classList.add('col-sm-2', 'col-form-label')
+                label.setAttribute('for', 'newsource_' + sourceName)
+                label.innerText = sourceName;
+                row.append(label)
+                var col = document.createElement('div');
+                col.classList.add('col-sm-10');
+                var select = document.createElement('select')
+                select.classList.add('form-select')
+                select.setAttribute('name', 'newsource_' + sourceName)
+                
+                // copy options from the first page
+                select.innerHTML = document.getElementById('channel-select').innerHTML
+                for (option of select) {
+                    if ( option.getAttribute('data-value') == 'new') {
+                        option.remove()
+                    }
+                    // this is a lazy way of getting two bits of data into one field
+                    // we have to split this later at the comma to get the unique_name and uid
+                    option.value = option.value + ',' + option.getAttribute('data-value')
+                }
+
+                // append elements
+                col.append(select);
+                row.append(col)
+
+                // append to container
+                document.getElementById(container).append(row) 
+
+            }
+
+            var TomSelectRelatedSourcesConfig = {
+                plugins: ['remove_button'],
+                create: function(input,callback){
+                        var returnData = {
+                            value:input,
+                            uid:input,
+                            text:input,
+                            name:input,
+                            geographic_scope_countries: [
+                                {name: 'NEW!'}
+                            ],
+                            channel: 
+                                {name: ''}
+                        };
+                        callback(returnData);
+                    },
+                valueField: 'uid',
+                labelField: 'name',
+                searchField: 'name',
+                delimiter: ',',
+                selectOnTab: true,
+                onItemAdd: function(input) { 
+                    // clear input after item was selected
+                    this.setTextboxValue();
+                    this.refreshOptions();
+                    if (!input.startsWith('0x')) {
+                        createNewSourceField('group-newrelated-container', input)
+                    }
+                },
+                onItemRemove: function(values) {
+                    if (!values.startsWith('0x')) {
+                        let el = document.getElementById('container-' + values)
+                        el.remove()
+                    }
+                },
+                load: function(query, callback) {
+                    if ( query.length < 3 ) return callback();
+                    var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        callback(json.data);
+                    }).catch(() => {callback();});
+                },
+                render: {
+                    option: function(data, escape) {
+                        var channel_label = ' '
+                        if (data.channel) {
+                            if (data.channel.name) {
+                            channel_label = ' (' + escape(data.channel.name) + ') '
+                            }
+                        };
+                        var country_label = ' '
+                        if ("geographic_scope_countries" in data) {
+                            country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                        }
+                        return '<div>' +
+                                '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                                country_label +
+                            '</div>';
+                    },
+                    item: function(data, escape) {
+                        var channel_label = ' '
+                        if (data.channel) {
+                            if (data.channel.name) {
+                                var channel_label = ' (' + escape(data.channel.name) + ') '
+                            }
+                        };
+                        var country_label = ' '
+                        if ("geographic_scope_countries" in data) {
+                            country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                        }
+                        return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
+                    }
+                }
+            };
+            new TomSelect('#related-sources', TomSelectRelatedSourcesConfig);
+
             // Hide loading spinner and show form
             document.getElementById('loading-form').hidden = true
             document.getElementById('loading-spinner').hidden = true
             document.getElementById('loading-status').hidden = true
             document.getElementById('new-source').hidden = false
-
-            if (document.querySelector('input[name="geographic_scope"]')) {
-                document.querySelectorAll('input[name="geographic_scope"]').forEach((elem) => {
-                    elem.addEventListener("change", function(event) {
-                    var item = event.target.value;
-                    if (item == 'multinational') {
-                        document.getElementById('group-geographic-scope-multiple').hidden = false;
-                        document.getElementById('group-geographic-scope-single').hidden = true;
-                        document.getElementById('group-geographic-scope-subunit').hidden = true;
-
-                        document.getElementById('geographic-scope-multiple').required = true;
-                        document.getElementById('geographic-scope-multiple-tomselected').required = true;
-
-                        document.getElementById('geographic-scope-single').required = false;
-                        document.getElementById('geographic-scope-single-tomselected').required = false;
-
-                        document.getElementById('geographic-scope-subunit').required = false;
-                        document.getElementById('geographic-scope-subunit-tomselected').required = false;
-
-                        geographicScopeSingle.clear();
-                        geographicScopeSubunit.clear();
-
-                    }
-                    else if (item == 'national') {
-                        document.getElementById('group-geographic-scope-multiple').hidden = true;
-                        document.getElementById('group-geographic-scope-single').hidden = false;
-                        document.getElementById('group-geographic-scope-subunit').hidden = true;
-
-                        document.getElementById('geographic-scope-multiple').required = false;
-                        document.getElementById('geographic-scope-multiple-tomselected').required = false;
-
-                        document.getElementById('geographic-scope-single').required = true;
-                        document.getElementById('geographic-scope-single-tomselected').required = true;
-                        document.getElementById('geographic-scope-single-ts-label').innerText = "What is the national scope?"
-
-                        document.getElementById('geographic-scope-subunit').required = false;
-                        document.getElementById('geographic-scope-subunit-tomselected').required = false;
-
-                        geographicScopeMultiple.clear();
-                        geographicScopeSubunit.clear();
-                    }
-                    else if (item == 'subnational') {
-                        document.getElementById('group-geographic-scope-multiple').hidden = true;
-                        document.getElementById('group-geographic-scope-single').hidden = false;
-                        document.getElementById('group-geographic-scope-subunit').hidden = false;
-
-                        document.getElementById('geographic-scope-multiple').required = false;
-                        document.getElementById('geographic-scope-multiple-tomselected').required = false;
-
-                        document.getElementById('geographic-scope-single').required = true;
-                        document.getElementById('geographic-scope-single-tomselected').required = true;
-                        document.getElementById('geographic-scope-single-ts-label').innerText = "To which national context does the subnational unit belong?"
-
-                        document.getElementById('geographic-scope-subunit').required = true;
-                        document.getElementById('geographic-scope-subunit-tomselected').required = true;
-
-                        geographicScopeMultiple.clear();
-                    }
-                    else {
-                        document.getElementById('group-geographic-scope-multiple').hidden = true;
-                        document.getElementById('group-geographic-scope-single').hidden = true;
-                        document.getElementById('group-geographic-scope-subunit').hidden = true;
-
-                        geographicScopeSingle.clear();
-                        geographicScopeMultiple.clear();
-                        geographicScopeSubunit.clear();
-                    }
-                    });
-                });
-            };
-
 
             }).catch(function(err) {
                 // Run this when promise was rejected via reject()
@@ -1119,20 +1530,6 @@
                 document.getElementById('loading-status').innerText = "Sorry, something went wrong..."
                 document.getElementById('loading-status-message').innerText = "Please try to reload this page. If the issue persists, please contact the admins."
             })       
-
-
-        // persistence: save changes in form
-
-        // document.getElementById(formId).addEventListener('change', function() {
-        //     var obj = serializeForm(this);
-        //     localStorage.setItem(formIdentifier, JSON.stringify(obj))
-        // });
-
-        // persistence: clear local storage on "reset"
-        // document.getElementById('reset-form').addEventListener('click', function() {
-        //     localStorage.removeItem(formIdentifier);
-        //     location.reload()
-        // })
 
         // form progression in multiple steps
         var current = 0;
@@ -1185,7 +1582,7 @@
         });
         setProgressBar(current, steps);
 
-    });
+    }); 
 
     // validation & submission
 
@@ -1380,251 +1777,7 @@
 
     };
 
-    // autocomplete organisation
-
-    var TomSelectOrganisationConfig = {
-        plugins: ['remove_button'],
-        create: function(input,callback){
-                var returnData = {
-                    value:input,
-                    uid:input,
-                    unique_name:input,
-                    text:input,
-                    name:input,
-                    country: [
-                        {name: 'NEW!'}
-                    ]
-                };
-                callback(returnData);
-            },
-        valueField: 'uid',
-        labelField: 'name',
-        searchField: 'name',
-        delimiter: ',',
-        selectOnTab: true,
-        // createFilter: function(input) { return input.length >= 3 },
-        load: function(query, callback) {
-            if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("add.orglookup") }}?person=false&q=' + encodeURIComponent(query);
-            fetch(url)
-            .then(response => response.json())
-            .then(json => {
-                callback(json.data);
-            }).catch(() => {callback();});
-        },
-        render: {
-            option: function(data, escape) {
-                var country_label = ' '
-                if ('country' in data) {
-                    country_label = ' (' + escape(data.country[0].name) + ') '
-                };
-                return '<div>' +
-                        '<span class="title">' + escape(data.name) + '</span>' +
-                        '<small class="text-muted mx-1">' + country_label + '</small>' +
-                    '</div>';
-            },
-            item: function(data, escape) {
-                var country_label = ' '
-                if ('country' in data) {
-                    country_label = ' (' + escape(data.country[0].name) + ') '
-                };
-                return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
-            }
-	    },
-        onItemAdd:function(){ // clear input after item was selected
-            this.setTextboxValue();
-            this.refreshOptions();
-        }
-    };
-    new TomSelect('#publishes_org', TomSelectOrganisationConfig);
-
-    var TomSelectPersonConfig = {
-        plugins: ['remove_button'],
-        create: function(input,callback){
-                var returnData = {
-                    value:input,
-                    uid:input,
-                    unique_name:input,
-                    text:input,
-                    name:input,
-                    country: [
-                        {name: 'NEW!'}
-                    ]
-                };
-                callback(returnData);
-            },
-        valueField: 'uid',
-        labelField: 'name',
-        searchField: 'name',
-        delimiter: ',',
-        selectOnTab: true,
-        // createFilter: function(input) { return input.length >= 3 },
-        load: function(query, callback) {
-            if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("add.orglookup") }}?person=true&q=' + encodeURIComponent(query);
-            fetch(url)
-            .then(response => response.json())
-            .then(json => {
-                callback(json.data);
-            }).catch(() => {callback();});
-        },
-        render: {
-            option: function(data, escape) {
-                if ('country' in data) {
-                    country_label = ' (' + escape(data.country[0].name) + ') '
-                };
-                return '<div>' +
-                        '<span class="title">' + escape(data.name) + '</span>' +
-                        '<small class="text-muted mx-1">' + country_label + '</small>' +
-                    '</div>';
-            },
-            item: function(data, escape) {
-                return '<div>' + escape(data.name) + ' <small class="mx-1">' + country_label + '</small></div>';
-            }
-	    },
-        onItemAdd:function(){ // clear input after item was selected
-            this.setTextboxValue();
-            this.refreshOptions();
-        }
-    };
-    new TomSelect('#publishes_person', TomSelectPersonConfig);
-
-
-
-    var TomSelectOtherNamesConfig = {
-        plugins: ['remove_button'],
-        selectOnTab: true,
-        create: true,
-        render: {
-            no_results:function(data,escape){
-			    return '<div></div>';
-		}
-        }
-    };
-
-    new TomSelect('#other-names', TomSelectOtherNamesConfig);
-
-
-    var TomSelectPublicationKindConfig = {
-        plugins: ['remove_button'],
-        create: true,
-        selectOnTab: true,
-        onInitialize: function() { // hacky way of forcing the field to be not-validated on load
-            this.input.classList.remove('is-invalid');
-            this.input.removeAttribute("aria-invalid");
-        },
-        onChange: function(){ // invoke validation on change
-            setFieldValidity(this.input);
-	}
-    };
-    new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
-
-    var TomSelectTopicalFocusConfig = TomSelectPublicationKindConfig;
-
-    new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
-
-    // autocomplete related sources
-
-    function createNewSourceField(container, sourceName) {
-        var row = document.createElement('div')
-        row.classList.add('row', 'mb-3')
-        row.id = 'container-' + sourceName
-        var label = document.createElement('label')
-        label.classList.add('col-sm-2', 'col-form-label')
-        label.setAttribute('for', 'newsource_' + sourceName)
-        label.innerText = sourceName;
-        row.append(label)
-        var col = document.createElement('div');
-        col.classList.add('col-sm-10');
-        var select = document.createElement('select')
-        select.classList.add('form-select')
-        select.setAttribute('name', 'newsource_' + sourceName)
-        
-        // copy options from the first page
-        select.innerHTML = document.getElementById('channel-select').innerHTML
-        for (option of select) {
-            if ( option.getAttribute('data-value') == 'new') {
-                option.remove()
-            }
-            // this is a lazy way of getting two bits of data into one field
-            // we have to split this later at the comma to get the unique_name and uid
-            option.value = option.value + ',' + option.getAttribute('data-value')
-        }
-
-        // append elements
-        col.append(select);
-        row.append(col)
-
-        // append to container
-        document.getElementById(container).append(row) 
-
-     }
-
-    var TomSelectRelatedSourcesConfig = {
-        plugins: ['remove_button'],
-        create: function(input,callback){
-                var returnData = {
-                    value:input,
-                    uid:input,
-                    text:input,
-                    name:input,
-                    geographic_scope_countries: [
-                        {name: 'NEW!'}
-                    ],
-                    channel: 
-                        {name: ''}
-                };
-                callback(returnData);
-            },
-        valueField: 'uid',
-        labelField: 'name',
-        searchField: 'name',
-        delimiter: ',',
-        selectOnTab: true,
-        onItemAdd: function(input) { 
-            // clear input after item was selected
-            this.setTextboxValue();
-            this.refreshOptions();
-            if (!input.startsWith('0x')) {
-                createNewSourceField('group-newrelated-container', input)
-            }
-        },
-        onItemRemove: function(values) {
-            if (!values.startsWith('0x')) {
-                let el = document.getElementById('container-' + values)
-                el.remove()
-            }
-        },
-        load: function(query, callback) {
-            if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
-            fetch(url)
-            .then(response => response.json())
-            .then(json => {
-                callback(json.data);
-            }).catch(() => {callback();});
-        },
-        render: {
-            option: function(data, escape) {
-                var channel_label = ' (' + escape(data.channel.name) + ') '
-                if (data.channel.name == '') {
-                    channel_label = ' '
-                };
-                return '<div>' +
-                        '<span class="title">' + escape(data.name) + channel_label + '</span>' +
-                        '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>' +
-                    '</div>';
-            },
-            item: function(data, escape) {
-                var channel_label = ' (' + escape(data.channel.name) + ') '
-                if (data.channel.name == '') {
-                    channel_label = ' '
-                };
-                return '<div>' + escape(data.name) + channel_label + ' <small class="mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small></div>';
-            }
-	    }
-    };
-    new TomSelect('#related-sources', TomSelectRelatedSourcesConfig);
+    
 
     // summary at the end
 

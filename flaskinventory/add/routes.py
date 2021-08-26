@@ -51,8 +51,8 @@ def new_entry():
 def new_source():
     draft = None
     if request.args.get('draft'):
-        query_string = f"""{{ q(func: uid({request.args.get('draft')})) {{
-                                expand(_all_) {{ uid unique_name name
+        query_string = f"""{{ q(func: uid({request.args.get('draft')})) {{ uid
+                                expand(_all_) {{ uid unique_name name dgraph.type channel {{ name }}
                                             }}
                                 publishes_org: ~publishes @filter(eq(is_person, false)) {{
                                     uid unique_name name ownership_kind country {{ name }} }}
