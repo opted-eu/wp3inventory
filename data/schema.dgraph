@@ -217,7 +217,7 @@ channel_epaper: string .
 transcript_kind: string .
 payment_model: string .
 contains_ads: string .
-publication_kind: string .
+publication_kind: [string] .
 special_interest: bool .
 topical_focus: [string] .
 publication_cycle: string .
