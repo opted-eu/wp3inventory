@@ -7,6 +7,7 @@ from flaskinventory import dgraph
 from flaskinventory.add.forms import NewEntry
 from flaskinventory.add.utils import database_check_table
 from flaskinventory.add.process import EntryProcessor
+from flaskinventory.add.sanitize import SourceSanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
 
 import traceback
@@ -88,20 +89,59 @@ async def fieldoptions():
     return jsonify(data)
 
 
+# @add.route('/new/submit', methods=['POST'])
+# def submit():
+#     try:
+#         processor = EntryProcessor(
+#             request.json, current_user, request.remote_addr)
+#         current_app.logger.debug(f'Mutation Object: {processor.mutation}')
+#     except Exception as e:
+#         error = {'error': f'{e}'}
+#         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+#         current_app.logger.error(tb_str)
+#         return jsonify(error)
+
+#     try:
+#         result = dgraph.mutation(processor.mutation)
+#     except Exception as e:
+#         error = {'error': f'{e}'}
+#         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+#         current_app.logger.error(tb_str)
+#         return jsonify(error)
+
+#     if result:
+#         result = dict(result.uids)
+#         result['redirect'] = url_for(
+#             'view.view_source', uid=result['newsource'])
+#         return jsonify(result)
+#     else:
+#         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
+
+
 @add.route('/new/submit', methods=['POST'])
 def submit():
     try:
-        processor = EntryProcessor(
+        sanitizer = SourceSanitizer(
             request.json, current_user, request.remote_addr)
-        current_app.logger.debug(f'Mutation Object: {processor.mutation}')
+        current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+        current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
     except Exception as e:
         error = {'error': f'{e}'}
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
         current_app.logger.error(tb_str)
         return jsonify(error)
 
+    if sanitizer.is_upsert:
+        try:
+            result = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+        except Exception as e:
+            error = {'error': f'{e}'}
+            tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+            current_app.logger.error(tb_str)
+            return jsonify(error)
+
     try:
-        result = dgraph.mutation(processor.mutation)
+        result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
     except Exception as e:
         error = {'error': f'{e}'}
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
@@ -115,6 +155,7 @@ def submit():
         return jsonify(result)
     else:
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
+
 
 
 @add.route('/new/echo', methods=['POST'])
