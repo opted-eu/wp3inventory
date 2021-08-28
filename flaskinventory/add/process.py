@@ -34,7 +34,7 @@ class EntryProcessor():
         self.json = json
         self.user = user
         self.user_ip = ip
-        self.new_source = {'uid': '_:newsource',
+        self.new_source = {'uid': self.json.get('uid', '_:newsource'),
                            'dgraph.type': 'Source',
                            'channel': dict(),
                            'other_names': [],
