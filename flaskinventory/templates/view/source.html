@@ -70,7 +70,7 @@
             <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
             {% if entry.publication_kind %}
             <dt class="col-sm-3">Publication Kind</dt>
-            <dd class="col-sm-9"><span class="">{{ entry.publication_kind }}</span></dd>{% endif %}
+            <dd class="col-sm-9"><span class="">{{ ", ".join(entry.publication_kind) }}</span></dd>{% endif %}
             <dt class="col-sm-3">Special Interest Publication</dt>
             <dd class="col-sm-9">{{ entry.special_interest }}</dd>
             {% if entry.topical_focus %}
@@ -149,7 +149,7 @@
                 {% endfor %}
             </dd>
             {% if entry.geographic_scope_subunit %}
-            <dd class="col-sm-3">Subunit</dd>
+            <dt class="col-sm-3">Subunit</dt>
             <dd class="col-sm-9">
                 {% for subunit in entry.geographic_scope_subunit %}
                 <span class="">{{ subunit.name }}</span>
