@@ -9,6 +9,7 @@ from flaskinventory.add.utils import database_check_table
 from flaskinventory.add.process import EntryProcessor
 from flaskinventory.add.sanitize import SourceSanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
+from flaskinventory.users.constants import USER_ROLES
 
 import traceback
 
@@ -49,10 +50,11 @@ def new_entry():
 
 @add.route("/add/source")
 @login_required
-def new_source():
-    draft = None
-    if request.args.get('draft'):
-        query_string = f"""{{ q(func: uid({request.args.get('draft')})) {{ uid
+def new_source(draft=None):
+    if draft is None:
+        draft = request.args.get('draft')
+    if draft:
+        query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ uid
                                 expand(_all_) {{ uid unique_name name dgraph.type channel {{ name }}
                                             }}
                                 publishes_org: ~publishes @filter(eq(is_person, false)) {{
@@ -65,9 +67,19 @@ def new_source():
                                     uid unique_name name }} 
                                 }} }}"""
         draft = dgraph.query(query_string)
-    if draft:
-        print(draft)
-        draft = json.dumps(draft['q'][0], default=str)
+        if len(draft['q']) > 0:
+            draft = draft['q'][0]
+            entry_added = draft.pop('entry_added')
+            draft = json.dumps(draft, default=str)
+            # check permissions
+            if current_user.uid != entry_added['uid']:
+                if current_user.user_role >= USER_ROLES.Reviewer:
+                    flash("You are editing another user's draft", category='info')
+                else:
+                    draft = None
+                    flash('You can only edit your own drafts!', category='warning')
+        else:
+            draft = None
     return render_template("add/newsource.html", draft=draft)
 
 
@@ -75,10 +87,12 @@ def new_source():
 def confirmation():
     return render_template("not_implemented.html")
 
-
 @add.route("/add/draft/<string:entity>/<string:uid>")
 def from_draft(entity, uid):
-    return jsonify({"entity": entity, "uid": uid})
+    if entity == 'Source':
+        return new_source(draft=uid)
+    else:
+        return render_template("not_implemented.html")
 
 # API Endpoints
 
@@ -87,35 +101,6 @@ def from_draft(entity, uid):
 async def fieldoptions():
     data = await generate_fieldoptions()
     return jsonify(data)
-
-
-# @add.route('/new/submit', methods=['POST'])
-# def submit():
-#     try:
-#         processor = EntryProcessor(
-#             request.json, current_user, request.remote_addr)
-#         current_app.logger.debug(f'Mutation Object: {processor.mutation}')
-#     except Exception as e:
-#         error = {'error': f'{e}'}
-#         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-#         current_app.logger.error(tb_str)
-#         return jsonify(error)
-
-#     try:
-#         result = dgraph.mutation(processor.mutation)
-#     except Exception as e:
-#         error = {'error': f'{e}'}
-#         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-#         current_app.logger.error(tb_str)
-#         return jsonify(error)
-
-#     if result:
-#         result = dict(result.uids)
-#         result['redirect'] = url_for(
-#             'view.view_source', uid=result['newsource'])
-#         return jsonify(result)
-#     else:
-#         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
 
 @add.route('/new/submit', methods=['POST'])
@@ -149,10 +134,15 @@ def submit():
         return jsonify(error)
 
     if result:
-        result = dict(result.uids)
-        result['redirect'] = url_for(
-            'view.view_source', uid=result['newsource'])
-        return jsonify(result)
+        if sanitizer.is_upsert:
+            uid = str(sanitizer.uid)
+        else:
+            newuids = dict(result.uids)
+            uid = newuids['newsource']
+        response = {'redirect': url_for(
+            'view.view_source', uid=uid)}
+
+        return jsonify(response)
     else:
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
