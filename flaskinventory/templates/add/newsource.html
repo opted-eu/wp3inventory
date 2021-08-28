@@ -2,6 +2,7 @@
 <div class="row align-items-center justify-content-center" id="loading-form">
     <div class="card text-center w-25" id="loading-card">
         <div class="card-top">
+            <i class="fa fa-check text-success fs-1 my-5" id='submit-success-icon' hidden> </i>
             <div class="spinner-border text-primary my-5" role="status" id="loading-spinner">
                 <span class="visually-hidden">Loading...</span>
             </div>
@@ -9,7 +10,11 @@
         <div class="card-body">
             <h5 class="card-title" id="loading-status">Loading...</h5>
             <p class="card-text" id="loading-status-message">We are getting the form ready</p>
-            <a href="#" class="btn btn-light" id="btn-fail-goback" hidden>Go back and edit</a>
+            <div class="btn-group" role="group" aria-label="loading controls"></div>
+                <a href="#" class="btn btn-light" id="btn-fail-goback" hidden>Go back and edit</a>
+                <a href="#" class="btn btn-outline-info" id="btn-viewentry" hidden>View new entry</a>
+                <a href="{{ url_for('add.from_draft') }}" class="btn btn-success" id="btn-add-another" data-bs-toggle="tooltip" data-bs-placement="bottom" title="If you added related sources, we will take you there." hidden>Add another</a>
+            </div>
         </div>
     </div>
 </div>
@@ -1633,10 +1638,13 @@
                 else {
                     document.getElementById('loading-spinner').classList.add('text-success')
                     document.getElementById('loading-spinner').classList.remove('text-primary')
+                    document.getElementById('loading-spinner').hidden = true
+                    document.getElementById('submit-success-icon').hidden = false
                     document.getElementById('loading-status').innerText = "Success!"
                     document.getElementById('loading-status-message').innerText = "Everything looks good"
-                    successRedirect(data.redirect)
-
+                    document.getElementById('btn-viewentry').hidden = false
+                    document.getElementById('btn-viewentry').setAttribute('href', data.redirect)
+                    document.getElementById('btn-add-another').hidden = false
                 }
 
                 

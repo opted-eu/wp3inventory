@@ -191,7 +191,7 @@ unique_name: string @index(hash, trigram) @upsert .
 name: string @index(term, trigram) . 
 entry_added: uid @reverse .
 entry_edit_history: [uid] @reverse .
-entry_review_status: string .
+entry_review_status: string @index(hash).
 entry_notes: string .
 other_names: [string] @index(term, trigram) .
 wikidataID: int .

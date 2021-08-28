@@ -87,12 +87,28 @@ def new_source(draft=None):
 def confirmation():
     return render_template("not_implemented.html")
 
+@login_required
 @add.route("/add/draft/<string:entity>/<string:uid>")
-def from_draft(entity, uid):
-    if entity == 'Source':
-        return new_source(draft=uid)
+@add.route("/add/draft/")
+def from_draft(entity=None, uid=None):
+    if entity and uid:
+        if entity == 'Source':
+            return new_source(draft=uid)
+        else:
+            return render_template("not_implemented.html")
+    
+    query_string = f"""{{ q(func: uid({current_user.uid})) {{
+                user_displayname
+                uid
+                drafts: ~entry_added @filter(type(Source) and eq(entry_review_status, "draft")) 
+                @facets(orderdesc: timestamp) (first: 1) {{ uid }}
+            }} }}"""
+        
+    result = dgraph.query(query_string)
+    if result['q'][0].get('drafts'):
+        return new_source(draft=result['q'][0]['drafts'][0]['uid'])
     else:
-        return render_template("not_implemented.html")
+        return redirect(url_for('users.my_entries'))
 
 # API Endpoints
 
