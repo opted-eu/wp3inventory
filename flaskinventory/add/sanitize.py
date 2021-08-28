@@ -752,7 +752,7 @@ class SourceSanitizer:
                     pers['uid'] = UID(item)
                 else:
                     pers = self.add_entry_meta(pers)
-                    pers['name'] = item,
+                    pers['name'] = item
                     pers['dgraph.type'] = "Organization"
                     unique_name = slugify(item, separator="_")
                     if dgraph.get_uid('unique_name', unique_name):
