@@ -216,7 +216,7 @@ def my_entries():
         return render_template('users/entries.html', 
                                 title='My Entries', 
                                 show_sidebar=True, 
-                                drafts=sources[0]['drafts'],
-                                pending=sources[0]['pending'],
-                                accepted=sources[0]['accepted'])
+                                drafts=sources[0].get('drafts'),
+                                pending=sources[0].get('pending'),
+                                accepted=sources[0].get('accepted'))
     
