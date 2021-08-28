@@ -197,13 +197,13 @@ class DGraph(object):
         else:
             return False
 
-    def upsert(self, query, nquad):
+    def upsert(self, query, set_nquads=None, del_nquads=None, cond=None):
         self.logger.debug("Performing upsert:")
         self.logger.debug(f'Query: {query}')
-        self.logger.debug(f'nquad: {nquad}')
+        self.logger.debug(f'nquad: {set_nquads}')
 
         txn = self.connection.txn()
-        mutation = txn.create_mutation(set_nquads=nquad)
+        mutation = txn.create_mutation(set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
         request = txn.create_request(query=query, mutations=[
                                      mutation], commit_now=True)
 
@@ -216,8 +216,10 @@ class DGraph(object):
             txn.discard()
 
         if response:
-            return True
+            self.logger.debug(f'Response: {response}')
+            return response
         else:
+            self.logger.debug(f'No Response')
             return False
 
     def delete(self, mutation):

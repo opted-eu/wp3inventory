@@ -55,7 +55,7 @@ def sanitize_edit_org(data):
         if item.strip() == "": continue
         query = f'{{ v as var(func: eq(unique_name, "{item.strip()}")) }}'
         nquads = f'<{data.get("uid")}> <owns> uid(v) .'
-        res = dgraph.upsert(query, nquads)
+        res = dgraph.upsert(query, set_nquads=nquads)
         if res == False:
             raise Exception('Could not run mutation')
 
