@@ -17,7 +17,7 @@ class SourceSanitizer:
     """ Class for validating data and generating mutation object
         takes dict (from json) as input and validates all entries accordingly
         also keeps track of user & ip address.
-        Relevant return attribute are query (string), set_nquads (string), del_nquads (string)
+        Relevant return attribute are upsert_query (string), set_nquads (string), delete_nquads (string)
     """
 
     payment_model = ['free', 'soft paywall', 'subscription', 'none']
@@ -42,14 +42,14 @@ class SourceSanitizer:
         self.json = json
         self.user = user
         self.user_ip = ip
-        uid = self.json.get('uid', '_:newsource')
-        if uid.startswith('0x'):
-            uid = UID(uid)
+        self.uid = self.json.get('uid', '_:newsource')
+        if self.uid.startswith('0x'):
+            self.uid = UID(self.uid)
             self.is_upsert = True
             self.upsert_query = ''
         else:
-            uid = NewID(uid)
-        self.newsource = {'uid': uid,
+            self.uid = NewID(self.uid)
+        self.newsource = {'uid': self.uid,
                           'dgraph.type': "Source",
                           'geographic_scope_countries': [],
                           'other_names': []}
@@ -75,12 +75,11 @@ class SourceSanitizer:
             self.process_facebook()
         else:
             raise NotImplementedError('Cannot process submitted news source.')
-        
+
         if self.is_upsert:
             self.delete_nquads = self.make_delete_nquads()
-        
-        self.set_nquads = self.make_set_nquads()
 
+        self.set_nquads = self.make_set_nquads()
 
     @staticmethod
     def enquote(string):
@@ -97,6 +96,15 @@ class SourceSanitizer:
         del_obj.append({
             'uid': self.newsource['uid'],
             'geographic_scope_countries': '*'})
+
+        # delete publication_kind, languages
+        del_obj.append({
+            'uid': self.newsource['uid'],
+            'publication_kind': '*'})
+        
+        del_obj.append({
+            'uid': self.newsource['uid'],
+            'languages': '*'})
 
         # delete all "Organization" <publishes> "Upserted Source"
         orgs = Variable('orgs', 'uid')
@@ -151,8 +159,6 @@ class SourceSanitizer:
         for related in self.related:
             nquads += dict_to_nquad(related)
         return " \n ".join(nquads)
-
-        
 
     def add_entry_meta(self, entry, entry_status="pending"):
         facets = {'timestamp': datetime.datetime.now(
@@ -616,8 +622,8 @@ class SourceSanitizer:
             languages = self.json.get('languages')
             if type(languages) == str:
                 languages = self.json.get('languages').split(',')
-            self.newsource['languages'] = [item.lower() for item in self.json.get(
-                'languages') if item.lower() in icu_codes.keys()]
+            self.newsource['languages'] = [
+                item.lower() for item in languages if item.lower() in icu_codes.keys()]
 
     def parse_audience_size(self):
         if self.json.get('audience_size_subscribers'):
@@ -845,10 +851,22 @@ class SourceSanitizer:
             geo_data = Geolocation('Point', [
                 float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
-            other_names = list(
-                {query, geo_result['namedetails']['name'], geo_result['namedetails']['name:en']})
+            name = None
+            other_names = [query]
+            if geo_result['namedetails'].get('name'):
+                other_names.append(geo_result['namedetails'].get('name'))
+                name = geo_result['namedetails'].get('name')
 
-            new_subunit = {'name': geo_result['namedetails']['name:en'],
+            if geo_result['namedetails'].get('name:en'):
+                other_names.append(geo_result['namedetails'].get('name:en'))
+                name = geo_result['namedetails'].get('name:en')
+
+            other_names = list(set(other_names))
+
+            if not name:
+                name = query
+
+            new_subunit = {'name': name,
                            'country': UID(country_uid),
                            'other_names': other_names,
                            'location_point': geo_data,
