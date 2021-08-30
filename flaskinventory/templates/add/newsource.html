@@ -33,11 +33,6 @@
             <div id="channel-select-feedback"></div>
             <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
         </div>
-        <div id="group-channel-new" class="mb-5" hidden>
-            <label for="channel-new" class="form-label fw-bold fs-5">Please specify the channel that is not listed above:</label>
-            <input type="text" name="channel_new" class="form-control form-control-lg" id="channel-new" aria-describedby="channel-new-feedback">
-            <div id="channel-new-feedback"></div>
-        </div>
         <div class="mb-5">
             <div id="group-name" class="form-group mb-4">
                 <label for="name" class="form-label fw-bold fs-5">What is the name of the print news source?</label>
@@ -565,7 +560,7 @@
         return 0;
     }
 
-    function addFieldOptionsData(fieldOptions, key, selector) {
+    function addFieldOptionsData(fieldOptions, key, selector, addother=false) {
         var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
         opts.forEach(function(item, i) {
             let opt = document.createElement('option')
@@ -575,12 +570,14 @@
             opt.innerText = item.name
             document.querySelector(selector).append(opt);
         });
-        let optOther = document.createElement('option')
-        optOther.setAttribute('value', 'other')
-        optOther.setAttribute('data-value', 'new')
-        optOther.setAttribute('data-index', '99')
-        optOther.innerText = 'Other'
-        document.querySelector(selector).append(optOther);
+        if (addother) {
+            let optOther = document.createElement('option')
+            optOther.setAttribute('value', 'other')
+            optOther.setAttribute('data-value', 'new')
+            optOther.setAttribute('data-index', '99')
+            optOther.innerText = 'Other'
+            document.querySelector(selector).append(optOther);
+        }
     };
 
     function addFieldOptions(fieldOptions, key, selector, addother, othernames=false, datavalue=true) {
@@ -620,6 +617,10 @@
         });
     }
 
+    // misc: optional tag for label
+
+    const optionalTag = '<span class="text-muted mx-3">(optional)</span>'
+
 
 
     function getFieldOptions(targetUrl) {
@@ -641,7 +642,6 @@
             return;
         }
         allNames.forEach((elem) => elem.hidden = true);
-        document.getElementById('group-channel-new').hidden = true;
         document.getElementById('group-name').hidden = false;
 
         if (index != 99) {
@@ -666,7 +666,6 @@
             elem.removeAttribute('required')
         })
 
-        document.querySelector("#channel-new").removeAttribute("required");
         document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
             elem.removeAttribute('required') 
         });
@@ -676,22 +675,11 @@
         });
         document.querySelector("#group-archive-sources-included").hidden = true
 
-        if (value == 'other') {
-            document.querySelector("#group-channel-new").hidden = false;
-            document.querySelector("#channel-new").required = true;
-            document.querySelector("#group-source-founded").hidden = false;
-
-            document.querySelector("#group-payment-model").hidden = false;
-            document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
-                elem.setAttribute('required', true);
-                elem.parentElement.hidden = false
-            })
-            document.querySelector("#group-archive-sources-included").hidden = false
-
-        } else if (value == 'print') {
+        if (value == 'print') {
             document.querySelector("#group-epaper").hidden = false;
             document.querySelector("#group-audience-size").hidden = false;
             document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector('#group-source-founded label').innerHTML = `What year was the print news source founded? ${optionalTag}`
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 if (elem.value == 'soft paywall') {
@@ -711,6 +699,8 @@
                 elem.setAttribute('required', true);
             });
             document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector('#group-source-founded label').innerHTML = `What year was the radio/TV show or podcast founded? ${optionalTag}`
+
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
@@ -725,6 +715,7 @@
             elem.setAttribute('required', true) 
             });
             document.querySelector("#group-source-founded").hidden = false;
+            document.querySelector('#group-source-founded label').innerHTML = `What year was the website founded? ${optionalTag}`
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
