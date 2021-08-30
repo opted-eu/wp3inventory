@@ -64,8 +64,9 @@ class DGraph(object):
     # Helper function for parsing dgraph's iso strings
     @staticmethod
     def parse_datetime(s):
-        if len(s) <= 4:
-            return s
+        if type(s) == str:
+            if len(s) <= 4:
+                return s
         try:
             return isoparse(s)
         except:
