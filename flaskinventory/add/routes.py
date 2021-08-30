@@ -182,10 +182,14 @@ def echo_json():
 def orglookup():
     query = request.args.get('q')
     person = request.args.get('person')
+    if person:
+        person_filter =  f'AND eq(is_person, {person})'
+    else:
+        person_filter = ''
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
     query_string = f'''{{
-            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Organization") AND eq(is_person, {person}))
-            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Organization") AND eq(is_person, {person}))
+            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Organization") {person_filter})
+            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Organization") {person_filter})
   
 	        data(func: uid(field1, field2)) {{
                 uid
