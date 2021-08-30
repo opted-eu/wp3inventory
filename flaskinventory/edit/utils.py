@@ -21,7 +21,10 @@ def sanitize_edit_org(data):
         organization['wikidataID'] = int(data.get('wikidataID').lower().replace('q', ''))
     except:
         pass
-    organization['other_names'] = [item.strip() for item in data['other_names'].split(',')]
+    try:
+        organization['other_names'] = [item.strip() for item in data['other_names'].split(',')]
+    except:
+        pass
     try:
         address_geo = geocode(data.get('address_string'))
         organization["address_geo"] = {'type': 'Point', 'coordinates': [

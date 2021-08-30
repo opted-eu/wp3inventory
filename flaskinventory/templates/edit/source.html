@@ -1,0 +1,28 @@
+{% extends "layout.html" %} {% block content %}
+
+
+<div class="content-section pt-4">
+<div class="row justify-content-center">
+<div class="col-6">
+    {% from "edit/_formhelpers.html" import render_field %}
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group mb-3">
+            <legend class="border-bottom mb-4">Edit Source</legend>
+            {% for field in fields.keys() %}
+                {{ render_field(form.get_field(field)) }}        
+            {% endfor %}
+
+            
+
+            
+
+        </fieldset>
+        <div class="form-group mb-3">
+            {{ form.submit(class="btn btn-outline-info my-4") }}
+        </div>
+    </form>
+</div>
+</div>
+</div>
+{% endblock content %} {% block sidebar %} {% endblock sidebar %}

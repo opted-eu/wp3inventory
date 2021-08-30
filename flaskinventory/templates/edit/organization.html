@@ -216,19 +216,6 @@
                     {{ form.owns_unique_name(class="form-control form-control-lg") }} 
                 {% endif %} 
             </div>
-            <div class="mb-3">
-                {{ form.entry_added.label() }}
-                {% if form.entry_added.errors %} 
-                    {{ form.entry_added(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.entry_added.errors %}
-                        <span>{{ error }}</span> 
-                        {% endfor %}
-                    </div>
-                {% else %} 
-                    {{ form.entry_added(class="form-control form-control-lg") }} 
-                {% endif %} 
-            </div>
 
             
 
