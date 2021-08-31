@@ -173,6 +173,13 @@ publishes = TomSelectMutlitpleField('Publishes', choices=[])
 
 owns = TomSelectMutlitpleField('Owns', choices=[])
 
+# Dataset Fields
+
+access = SelectField('Access to data', choices=[('restricted', 'Restricted'), ('free', 'Free')])
+url = StringField('Link to Dataset')
+sources_included = TomSelectMutlitpleField('Sources included in Dataset', choices=[])
+fulltext = BooleanField('Dataset contains fulltext')
+
 editfields_base = {
     "uid": uid,
     "entry_review_status": entry_review_status,
@@ -240,6 +247,27 @@ edittranscriptfields = {**editsourcefields,
                         "transcript_kind": transcript_kind,
                         "founded": founded}
 
+# Subunits
+
+editsubunitfields = {**editfields_base,
+                        "country": country}
+
+# dataset
+
+editdatasetfields = {**editfields_base,
+                        "description": description,
+                        "access": access,
+                        "fulltext": fulltext,
+                        "url": url,
+                        "sources_included": sources_included}
+                        
+# archive
+
+editarchivefields = {**editfields_base,
+                        "description": description,
+                        "access": access,
+                        "url": url,
+                        "sources_included": sources_included}
 
 class DynamicForm(FlaskForm):
     submit = SubmitField('Commit Changes')
@@ -263,6 +291,12 @@ def make_form(entity, audience_size=1):
         fields = editwebsitefields
     elif entity == 'transcript':
         fields = edittranscriptfields
+    elif entity == 'subunit':
+        fields = editsubunitfields
+    elif entity == 'dataset':
+        fields = editdatasetfields
+    elif entity == 'archive':
+        fields = editarchivefields
     else:
         raise TypeError
     

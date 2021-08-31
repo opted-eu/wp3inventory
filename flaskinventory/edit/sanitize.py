@@ -51,7 +51,6 @@ class Sanitizer:
                 if callable(m):
                     m()
 
-    
     def parse_unique_name(self):
         check = dgraph.get_uid('unique_name', self.data.get('unique_name'))
         if check:
@@ -61,7 +60,8 @@ class Sanitizer:
 
     def parse_entry_review_status(self):
         if self.data.get('entry_review_status'):
-            self.edit['entry_review_status'] = self.data.get('entry_review_status')
+            self.edit['entry_review_status'] = self.data.get(
+                'entry_review_status')
 
     def parse_name(self):
         self.edit['name'] = self.data.get('name')
@@ -76,7 +76,7 @@ class Sanitizer:
                 other_names = other_names.split(',')
 
             self.edit['other_names'] += [item.strip()
-                                            for item in other_names if item.strip() != '']
+                                         for item in other_names if item.strip() != '']
 
     def parse_entry_notes(self):
         if self.data.get('entry_notes'):
@@ -168,12 +168,12 @@ class EditOrgSanitizer(Sanitizer):
         self.is_upsert = True
 
         self.edit = {"uid": UID(data.get('uid')),
-                        "is_person": data.get('is_person')}
+                     "is_person": data.get('is_person')}
         self.edit = self._add_entry_meta(self.edit)
         self.data = data
 
         self.overwrite = {self.edit['uid']: [
-            'other_names', 'owns', 'publishes']}
+            'other_names', 'owns', 'publishes', 'country']}
 
         self._parse()
 
@@ -246,6 +246,7 @@ class EditOrgSanitizer(Sanitizer):
                 if item.startswith('0x'):
                     self.edit['publishes'].append(UID(item))
 
+
 class EditSourceSanitizer(Sanitizer):
 
     def __init__(self, data, user, ip):
@@ -257,20 +258,19 @@ class EditSourceSanitizer(Sanitizer):
         self.data = data
 
         self.overwrite = {self.edit['uid']: [
-            'other_names', 'related', 'geographic_scope_countries', 
-            'geographic_scope_subunit', 'languages', 'publication_kind', 
+            'other_names', 'related', 'geographic_scope_countries',
+            'geographic_scope_subunit', 'languages', 'publication_kind',
             'topical_focus']}
 
         self._parse()
 
         self.delete_nquads = self._make_delete_nquads()
         nquads = dict_to_nquad(self.edit)
-        if len(self.newsubunits) >0:
+        if len(self.newsubunits) > 0:
             for subunit in self.newsubunits:
                 nquads += dict_to_nquad(subunit)
 
         self.set_nquads = " \n ".join(nquads)
-
 
     def _add_entry_meta(self, entry, newentry=False):
         if not newentry:
@@ -311,8 +311,6 @@ class EditSourceSanitizer(Sanitizer):
         nquads = [" \n ".join(dict_to_nquad(obj)) for obj in del_obj]
         return " \n ".join(nquads)
 
-    
-
     def parse_related(self):
         if self.data.get('related'):
             src_list = self.data.get('related')
@@ -327,22 +325,21 @@ class EditSourceSanitizer(Sanitizer):
                 if item.startswith('0x'):
                     self.edit['related'].append(UID(item))
 
-
     def parse_contains_ads(self):
         if self.data.get('contains_ads'):
             self.edit['contains_ads'] = self.data.get('contains_ads')
-    
+
     def parse_publication_kind(self):
         if self.data.get('publication_kind'):
             if not self.edit.get('publication_kind'):
-                    self.edit['publication_kind'] = []
+                self.edit['publication_kind'] = []
 
             publication_kind = self.data.get('publication_kind')
             if type(publication_kind) == str:
                 publication_kind = publication_kind.split(',')
 
             self.edit['publication_kind'] += [item.strip()
-                                            for item in publication_kind if item.strip() != '']
+                                              for item in publication_kind if item.strip() != '']
 
     def parse_special_interest(self):
         if self.data.get('special_interest'):
@@ -351,14 +348,14 @@ class EditSourceSanitizer(Sanitizer):
     def parse_topical_focus(self):
         if self.data.get('topical_focus'):
             if not self.edit.get('topical_focus'):
-                    self.edit['topical_focus'] = []
+                self.edit['topical_focus'] = []
 
             topical_focus = self.data.get('topical_focus')
             if type(topical_focus) == str:
                 topical_focus = topical_focus.split(',')
 
             self.edit['topical_focus'] += [item.strip()
-                                            for item in topical_focus if item.strip() != '']
+                                           for item in topical_focus if item.strip() != '']
 
     def parse_publication_cycle(self):
         if self.data.get('publication_cycle'):
@@ -367,14 +364,16 @@ class EditSourceSanitizer(Sanitizer):
     def parse_publication_cycle_weekday(self):
         if self.data.get('publication_cycle_weekday'):
             if not self.edit.get('publication_cycle_weekday'):
-                    self.edit['publication_cycle_weekday'] = []
+                self.edit['publication_cycle_weekday'] = []
 
-            publication_cycle_weekday = self.data.get('publication_cycle_weekday')
+            publication_cycle_weekday = self.data.get(
+                'publication_cycle_weekday')
             if type(publication_cycle_weekday) == str:
-                publication_cycle_weekday = publication_cycle_weekday.split(',')
+                publication_cycle_weekday = publication_cycle_weekday.split(
+                    ',')
 
             self.edit['publication_cycle_weekday'] += [int(item.strip())
-                                            for item in publication_cycle_weekday if item.strip() != '']
+                                                       for item in publication_cycle_weekday if item.strip() != '']
 
     def parse_geographic_scope(self):
         if self.data.get('geographic_scope'):
@@ -412,23 +411,23 @@ class EditSourceSanitizer(Sanitizer):
                     if geo_query:
                         self.edit['geographic_scope_subunit'].append(
                             geo_query['uid'])
-    
+
     def parse_languages(self):
         if self.data.get('languages'):
             if not self.edit.get('languages'):
-                    self.edit['languages'] = []
+                self.edit['languages'] = []
 
             languages = self.data.get('languages')
             if type(languages) == str:
                 languages = languages.split(',')
 
             self.edit['languages'] += [item.strip()
-                                            for item in languages if item.strip() != '']
+                                       for item in languages if item.strip() != '']
 
     def parse_channel_epaper(self):
         if self.data.get('channel_epaper'):
             self.edit['channel_epaper'] = self.data.get('channel_epaper')
-    
+
     def parse_payment_model(self):
         if self.data.get('payment_model'):
             self.edit['payment_model'] = self.data.get('payment_model')
@@ -440,7 +439,131 @@ class EditSourceSanitizer(Sanitizer):
     def parse_channel_comments(self):
         if self.data.get('channel_comments'):
             self.edit['channel_comments'] = self.data.get('channel_comments')
-    
+
     def parse_transcript_kind(self):
         if self.data.get('transcript_kind'):
             self.edit['transcript_kind'] = self.data.get('transcript_kind')
+
+
+class EditSubunitSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(user, ip)
+        self.is_upsert = True
+
+        self.edit = {"uid": UID(data.get('uid'))}
+        self.edit = self._add_entry_meta(self.edit)
+        self.data = data
+
+        self.overwrite = {self.edit['uid']: [
+            'other_names', 'country']}
+
+        self._parse()
+
+        nquads = dict_to_nquad(self.edit)
+
+        self.set_nquads = " \n ".join(nquads)
+
+        self.delete_nquads = self._make_delete_nquads()
+
+    def _add_entry_meta(self, entry, newentry=False):
+        if not newentry:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc).isoformat(),
+                'ip': self.user_ip}
+            entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
+        else:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc).isoformat(),
+                'ip': self.user_ip}
+            entry['entry_added'] = UID(self.user.uid, facets=facets)
+            entry['entry_review_status'] = 'accepted'
+
+        return entry
+
+    def parse_ownership_kind(self):
+        self.edit['ownership_kind'] = self.data.get('ownership_kind')
+
+    def parse_country(self):
+        self.edit['country'] = UID(self.data.get('country'))
+
+
+
+class EditArchiveSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(user, ip)
+        self.is_upsert = True
+
+        self.edit = {"uid": UID(data.get('uid'))}
+        self.edit = self._add_entry_meta(self.edit)
+        self.data = data
+
+        self.overwrite = {self.edit['uid']: [
+            'other_names']}
+
+        self._parse()
+
+        nquads = dict_to_nquad(self.edit)
+
+        self.set_nquads = " \n ".join(nquads)
+
+        self.delete_nquads = self._make_delete_nquads()
+
+    def _add_entry_meta(self, entry, newentry=False):
+        if not newentry:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc).isoformat(),
+                'ip': self.user_ip}
+            entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
+        else:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc).isoformat(),
+                'ip': self.user_ip}
+            entry['entry_added'] = UID(self.user.uid, facets=facets)
+            entry['entry_review_status'] = 'accepted'
+
+        return entry
+
+    def parse_access(self):
+        if self.data.get('access'):
+            self.edit['access'] = self.data.get('access')
+
+    def parse_description(self):
+        if self.data.get('description'):
+            self.edit['description'] = self.data.get('description')
+    
+    def parse_url(self):
+        if self.data.get('url'):
+            self.edit['url'] = self.data.get('url')
+
+    def parse_sources_included(self):
+        if self.data.get('sources_included'):
+            src_list = self.data.get('sources_included')
+            if type(src_list) == str:
+                src_list = src_list.split(',')
+
+            self.edit['sources_included'] = []
+
+            for item in src_list:
+                if item == str(self.edit['uid']):
+                    continue
+                if item.startswith('0x'):
+                    self.edit['sources_included'].append(UID(item))
+
+
+class EditDatasetSanitizer(EditArchiveSanitizer):
+
+    def parse_sources_included(self):
+        if self.data.get('sources_included'):
+            src_list = self.data.get('sources_included')
+            if type(src_list) == str:
+                src_list = src_list.split(',')
+
+            self.edit['sources_included'] = []
+
+            for item in src_list:
+                if item == str(self.edit['uid']):
+                    continue
+                if item.startswith('0x'):
+                    self.edit['sources_included'].append(UID(item))

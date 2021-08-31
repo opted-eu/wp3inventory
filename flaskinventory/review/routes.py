@@ -53,7 +53,7 @@ def entry(uid=None):
         reject_button = RejectButton()
         reject_button.uid.data = uid
 
-        check = check_entry(uid)
+        check = check_entry(uid=uid)
 
         if not check:
             return abort(404)

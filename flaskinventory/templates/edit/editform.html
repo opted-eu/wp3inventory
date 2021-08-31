@@ -138,7 +138,14 @@ var TomSelectOrganisationConfig = {
 
 {% endif %}
 
+{% if 'related' in fields or 'sources_included' in fields %}
+
 {% if 'related' in fields %}
+var relatedSelector = '#related'
+{% elif 'sources_included' in fields %}
+var relatedSelector = '#sources_included'
+{% endif %}
+
 
 var TomSelectRelatedSourcesConfig = {
     plugins: ['remove_button'],
@@ -193,7 +200,7 @@ var TomSelectRelatedSourcesConfig = {
         }
     }
 };
-new TomSelect('#related', TomSelectRelatedSourcesConfig);
+new TomSelect(relatedSelector, TomSelectRelatedSourcesConfig);
 
 {% endif %}
 

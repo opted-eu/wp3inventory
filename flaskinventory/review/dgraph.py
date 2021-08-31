@@ -31,9 +31,14 @@ def get_overview(dgraphtype, country=None):
     data = data['q']
     return data
 
-def check_entry(uid):
+def check_entry(uid=None, unique_name=None):
 
-    query = f'''{{ q(func: uid({uid})) {{ dgraph.type entry_review_status }} }}'''
+    if uid:
+        query = f'''{{ q(func: uid({uid}))'''
+    elif unique_name:
+        query = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
+
+    query += "{ unique_name dgraph.type entry_review_status entry_added { uid } } }"
     data = dgraph.query(query)
 
     if len(data['q']) == 0:
