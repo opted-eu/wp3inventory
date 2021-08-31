@@ -4,7 +4,7 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, Markup)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.review.forms import AcceptButton, RejectButton, ReviewFilter
+from flaskinventory.review.forms import ReviewActions, ReviewFilter
 from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, check_entry
 from flaskinventory.view.dgraph import get_archive, get_dgraphtype, get_organization, get_source
 from flaskinventory.view.utils import make_mini_table
@@ -48,10 +48,8 @@ def overview():
 def entry(uid=None):
     if uid:
 
-        accept_button = AcceptButton()
-        accept_button.uid.data = uid
-        reject_button = RejectButton()
-        reject_button.uid.data = uid
+        review_actions = ReviewActions()
+        review_actions.uid.data = uid
 
         check = check_entry(uid=uid)
 
@@ -90,25 +88,39 @@ def entry(uid=None):
                                entry=result,
                                show_sidebar=True,
                                related=related,
-                               accept_button=accept_button,
-                               reject_button=reject_button)
+                               review_actions=review_actions)
 
     return abort(404)
 
 
-@review.route('/review/accept', methods=['POST'])
+@review.route('/review/submit', methods=['POST'])
 @login_required
 @requires_access_level(USER_ROLES.Reviewer)
-def accept():
+def submit():
     print(request.form)
     uid = request.form.get('uid')
     if uid:
-        try:
-            accept_entry(uid)
-            flash('Entry has been accepted!', category='success')
-            return redirect(url_for('view.view_uid') + f'?uid={uid}')
-        except Exception as e:
-            return e
+        if request.form.get('accept'):
+            try:
+                accept_entry(uid)
+                flash('Entry has been accepted!', category='success')
+                return redirect(url_for('review.overview'))
+            except Exception as e:
+                return e
+        elif request.form.get('reject'):
+            try:
+                reject_entry(uid)
+                flash('Entry has been rejected!', category='info')
+                return redirect(url_for('review.overview'))
+            except Exception as e:
+                return e
+        elif request.form.get('edit'):
+            try:
+                return redirect(url_for('edit.edit_uid', uid=uid))
+            except Exception as e:
+                return e
+        else:
+            return abort(404)
     else:
         return abort(404)
 

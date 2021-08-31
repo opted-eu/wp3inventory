@@ -19,14 +19,10 @@ class ReviewFilter(FlaskForm):
     submit = SubmitField('Filter')
 
 
-class AcceptButton(FlaskForm):
+class ReviewActions(FlaskForm):
 
     uid = HiddenField(label='UID', validators=[DataRequired()])
     accept = SubmitField('Accept')
-
-
-
-class RejectButton(FlaskForm):
-
-    uid = HiddenField(label='UID', validators=[DataRequired()])
     reject = SubmitField('Reject')
+    edit = SubmitField('Edit')
+

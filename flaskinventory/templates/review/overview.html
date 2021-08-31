@@ -53,7 +53,7 @@
         </th>
         <td>{{ entry.entry_added.get("entry_added|timestamp") }}</td>
         <td>{{ entry.entry_added.get("user_displayname") }}</td>
-        <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div></td>
+        <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('review.entry', uid=entry.get('uid'))}}">Review</a></div></td>
     </tr>
     {% endfor %}
     {% endif %}
