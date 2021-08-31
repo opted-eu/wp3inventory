@@ -77,7 +77,7 @@
                     <li><a href="{{ url_for('users.my_entries') }}" class="dropdown-item" tabindex="-1">
                         <i class="fas fa-tasks me-2 fa-fw"></i>My Entries
                     </a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-glasses me-2 fa-fw"></i>Review Entries</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('review.overview') }}"><i class="fas fa-glasses me-2 fa-fw"></i>Review Entries</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('users.invite') }}"><i class="fas fa-envelope-open-text me-2 fa-fw"></i>Invite New User</a></li>
                     {% endif %}
 

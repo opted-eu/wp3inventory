@@ -2,7 +2,7 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.view.dgraph import get_archive, get_channel, get_country, get_organization, get_paper, get_source, list_by_type
+from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
 
@@ -62,6 +62,14 @@ def search():
     result['status'] = True
     return jsonify(result)
 
+@view.route("/view")
+def view_uid():
+    if request.args.get('uid'):
+        dgraphtype = get_dgraphtype(request.args.get('uid'))
+        if dgraphtype:
+            return redirect(url_for('view.view_' + dgraphtype.lower(), uid=request.args.get('uid')))
+    else: return abort(404)
+
 
 @view.route("/view/source/uid/<string:uid>")
 @view.route("/view/source/<string:unique_name>")
@@ -96,8 +104,9 @@ def view_source(unique_name=None, uid=None):
 
 
 @view.route("/view/archive/<string:unique_name>")
-def view_archive(unique_name):
-    unique_item = get_archive(unique_name=unique_name)
+@view.route("/view/archive/uid/<string:uid>")
+def view_archive(unique_name=None, uid=None):
+    unique_item = get_archive(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Archive" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
@@ -111,7 +120,24 @@ def view_archive(unique_name):
     else:
         return abort(404)
 
+@view.route("/view/dataset/uid/<string:uid>")
+@view.route("/view/dataset/<string:unique_name>")
+def view_dataset(unique_name=None, uid=None):
+    unique_item = get_archive(unique_name=unique_name, uid=uid)
+    if unique_item:
+        if "Dataset" not in unique_item.get('dgraph.type'):
+            entry_type = unique_item.get('dgraph.type')[0]
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
 
+        return render_template('view/archive.html',
+                               title=unique_item.get('name'),
+                               entry=unique_item)
+    else:
+        return abort(404)
+
+@view.route("/view/organization/<string:unique_name>")
 @view.route("/view/organisation/<string:unique_name>")
 def view_organization(unique_name):
     unique_item = get_organization(unique_name=unique_name)
@@ -140,6 +166,23 @@ def view_country(unique_name):
             return abort(403)
 
         return render_template('view/country.html',
+                               title=unique_item.get('name'),
+                               entry=unique_item)
+    else:
+        return abort(404)
+
+@view.route("/view/subunit/<string:unique_name>")
+@view.route("/view/subunit/uid/<string:uid>")
+def view_subunit(unique_name=None, uid=None):
+    unique_item = get_subunit(unique_name=unique_name, uid=uid)
+    if unique_item:
+        if "Subunit" not in unique_item.get('dgraph.type'):
+            entry_type = unique_item.get('dgraph.type')[0]
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
+
+        return render_template('view/subunit.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:

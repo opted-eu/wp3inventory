@@ -18,3 +18,4 @@ globe
 search
 question-circle
 tasks
+city

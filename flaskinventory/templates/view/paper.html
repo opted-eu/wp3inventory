@@ -1,54 +1,7 @@
 {% extends "layout.html" %} {% block content %}
 <article>
-    <div class="col d-flex align-items-start mb-4">
-        <div class="icon-square me-3">
-            <h2><i class="fas fa-graduation-cap" alt="Paper"></i></h2>
-        </div>
-        <div>
-            <h3>{{ entry.title }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h3>
-            <h6>{% if entry.authors is string %}{{ entry.authors }}{%else%}{{ ", ".join(entry.authors )}}{%endif%}</h6>
-        </div>
-    </div>
 
-    <div class="border rounded p-3">
-        <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>About</h5></dt>
-            <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
-            {% if entry.published_date %}
-            <dt class="col-sm-3">Published</dt>
-            <dd class="col-sm-9">{{ entry.published_date.strftime('%Y') }}
-            </dd>
-            {% endif %} {% if entry.description %}
-            <dt class="col-sm-3">Abstract</dt>
-            <dd class="col-sm-9">{{ entry.description }}
-            </dd>{% endif %} {% if entry.paper_kind %}
-            <dt class="col-sm-3">Kind</dt>
-            <dd class="col-sm-9">{{ entry.paper_kind }}</dd>{% endif %} {% if entry.journal %}
-            <dt class="col-sm-3">Journal</dt>
-            <dd class="col-sm-9">{{ entry.journal }}</dd>{% endif %} {% if entry.url %}
-            <dt class="col-sm-3">Link</dt>
-            <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank"><i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open</a></dd>{% endif %} {% if entry.doi %}
-            <dt class="col-sm-3">DOI</dt>
-            <dd class="col-sm-9">{{ entry.doi }}</dd>{%endif%} {% if entry.arxiv %}
-            <dt class="col-sm-3">arXiv</dt>
-            <dd class="col-sm-9">{{ entry.arxiv }}</dd>{%endif%} {% if entry.isbn %}
-            <dt class="col-sm-3">ISBN</dt>
-            <dd class="col-sm-9">{{ entry.isbn }}</dd>{%endif%}
-        </dl>
-    </div>
-
-    <div class="border rounded p-3">
-        <dl class="row">
-            <dt class="col-sm-3 mb-4"><h5>Sources included</h5></dt>
-            <dd class="col-sm-9 mb-4"><small class="text-muted">Shows which sources where studied in this publication.</small></dd>
-            <dt class="col-sm-3"></dt>
-            <dd class="col-sm-9">{% for source in entry.sources_included %}
-                <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{source.name}} ({{source.channel.name}})</a> <span class="text-muted mx-3">{% if source.get('sources_included|from') %} from: {{ source.get('sources_included|from') }}</span>{%endif%}
-                    {% if source.get('sources_included|to') %}
-                    <span class="text-muted mx-3">to: {{ source.get('sources_included|to') }}</span> {%endif%}{% endfor %}
-            </dd>
-        </dl>
-    </div>
+{% include "view/elements/detail_paper.html" %}
 
 </article>
 {% endblock content %}

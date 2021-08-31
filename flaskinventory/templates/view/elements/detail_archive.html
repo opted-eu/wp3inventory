@@ -1,0 +1,41 @@
+<div class="col d-flex align-items-start mb-4">
+    <div class="icon-square me-3">
+        <h2><i class="fas fa-database" alt="Archive"></i></h2>
+    </div>
+    <div>
+        <h2>{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>
+    </div>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
+        <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
+        {% if entry.other_names %}
+        <dt class="col-sm-3">Also known as</dt>
+        <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}
+        </dd>{% endif %} {% if entry.wikidataID %}
+        <dt class="col-sm-3">Wikidata</dt>
+        <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
+        </dd>{% endif %} {% if entry.description %}
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">{{ entry.description }}
+        </dd>{% endif %} {% if entry.access %}
+        <dt class="col-sm-3">Access</dt>
+        <dd class="col-sm-9">{{ entry.access }}
+        </dd>{% endif %} {% if entry.url %}
+        <dt class="col-sm-3">Link</dt>
+        <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank"><i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open</a>{% else %}<span class="text-danger">Missing!</span>
+        </dd>{% endif %}
+    </dl>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Sources included</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Shows how many of the sources listed in this inventory are available in the archive.</small></dd>
+        <dt class="col-sm-3">Total</dt>
+        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
+        </dd>
+    </dl>
+</div>

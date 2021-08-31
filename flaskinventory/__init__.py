@@ -38,12 +38,14 @@ def create_app(config_class=Config, config_json=None):
     from flaskinventory.view.routes import view
     from flaskinventory.add.routes import add
     from flaskinventory.edit.routes import edit
+    from flaskinventory.review.routes import review
     from flaskinventory.main.routes import main
     from flaskinventory.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(view)
     app.register_blueprint(add)
     app.register_blueprint(edit)
+    app.register_blueprint(review)
     app.register_blueprint(main)
     app.register_blueprint(errors)
 

@@ -1,8 +1,7 @@
-from datetime import datetime
 from flask import (current_app, Blueprint, render_template, url_for,
-                   flash, redirect, request, abort, jsonify)
+                   flash, redirect, request, abort)
 from flask_login import current_user, login_required
-from flaskinventory.edit.forms import make_form, editorganizationfields
+from flaskinventory.edit.forms import make_form
 from flaskinventory.edit.sanitize import EditOrgSanitizer, EditSourceSanitizer
 
 from flaskinventory import dgraph
@@ -10,6 +9,21 @@ from flaskinventory import dgraph
 import traceback
 
 edit = Blueprint('edit', __name__)
+
+@edit.route('/edit/uid/<string:uid>')
+@login_required
+def edit_uid(uid):
+    query_string = f'''{{ q(func: uid({uid})) {{
+		uid unique_name entry_review_status dgraph.type }} }}'''
+
+    result = dgraph.query(query_string)
+
+    if len(result['q']) == 0:
+        return abort(404)
+
+    if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization']:
+        return redirect(url_for('edit.' + result['q'][0]['dgraph.type'][0].lower(), unique_name=result['q'][0]['unique_name']) )
+
 
 
 @edit.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
@@ -69,13 +83,18 @@ def organization(unique_name):
     else:
         return abort(404)
 
-
-@edit.route('/edit/source/<string:uid>', methods=['GET', 'POST'])
+@edit.route('/edit/source/<string:unique_name>', methods=['GET', 'POST'])
+@edit.route('/edit/source/uid/<string:uid>', methods=['GET', 'POST'])
 @login_required
-def source(uid):
-    query_string = f'''{{ q(func: uid({uid})) {{
+def source(unique_name=None, uid=None):
+    if unique_name:
+        query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
                             uid expand(_all_) {{ name unique_name uid }}
                             }} }}'''
+    elif uid:
+        query_string = f'''{{ q(func: uid({uid})) {{
+                                uid expand(_all_) {{ name unique_name uid }}
+                                }} }}'''
 
     result = dgraph.query(query_string)
     if len(result['q']) == 0:
@@ -129,6 +148,8 @@ def source(uid):
         elif type(value) is list:
             if type(value[0]) is str:
                 value = ",".join(value)
+            elif type(value[0]) is int:
+                value = [str(val) for val in value]
             else:
                 choices = [(subval['uid'], subval['unique_name']) for subval in value]
                 value = [subval['uid'] for subval in value]

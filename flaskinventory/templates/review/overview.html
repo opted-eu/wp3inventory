@@ -1,0 +1,65 @@
+{% extends "layout.html" %} {% block content %}
+<div class="border rounded p-3">
+<h3 class="mb-4">Entries for Review</h3>
+
+<form method="POST" action="">
+  {{ form.hidden_tag() }}
+  <div class="row mb-4 align-items-end">
+      <div class="col-4">
+          {{ form.entity.label(class="form-label") }}
+          <div class="invalid-feedback">
+              Please select one type.
+          </div>
+          {{ form.entity(class="form-select") }}
+      </div>
+      <div class="col-4">
+          {{ form.country.label(class="form-label") }}
+          <div class="invalid-feedback">
+              Please select one type.
+          </div>
+          {{ form.country(class="form-select") }}
+      </div>
+    <div class="col-4">
+      {{ form.submit(class="btn btn-primary me-4") }}
+      </div>
+  </div>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Unique Name</th>
+      <th scope="col">Type</th>
+      <th scope="col">uid</th>
+      <th scope="col">Country</th>
+      <th scope="col">Added</th>
+      <th scope="col">User</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+    {% if entries %}
+    {% for entry in entries %}
+    <tr>
+        <td>{{ entry.name }}</td>
+        <td>{{ entry.unique_name }}</td>
+        <td>{{ entry.get("dgraph.type")[0] }}</td>
+        <td>{{ entry.uid }}</th>
+        <td>{% for country in entry.get('country') %}
+            {{ country.get("name") }} 
+            {% endfor %}
+        </th>
+        <td>{{ entry.entry_added.get("entry_added|timestamp") }}</td>
+        <td>{{ entry.entry_added.get("user_displayname") }}</td>
+        <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div></td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+  
+
+</div>
+    {% endblock content %} {% block sidebar %} {% include "users/profile_sidebar.html" %} {% endblock sidebar %}

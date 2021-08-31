@@ -1,0 +1,59 @@
+{% extends "layout.html" %} {% block content %}
+<article>
+
+    <div class="row justify-content-end">
+        <div class='col-6'>
+        <h1>Review Mode</h1>
+    </div>
+        <div class="col-2">
+            <form method="POST" action="{{ url_for('review.reject') }}">
+                {{ reject_button.hidden_tag() }}
+                {{ reject_button.reject(class="btn btn-danger me-4") }}
+            </form>
+        </div>
+        <div class="col-2">
+            <a href="{{ url_for('edit.edit_uid', uid=entry.uid)}}" class="btn btn-warning">Edit</a>
+        </div>
+
+        <div class="col-2">
+
+            <form method="POST" action="{{ url_for('review.accept') }}">
+                {{ accept_button.hidden_tag() }}
+                {{ accept_button.accept(class="btn btn-success me-4") }}
+            </form>
+        </div>
+
+
+</div>
+
+{% if dgraphtype == 'Source' %}
+    {% include "view/elements/detail_source.html" %}
+{% endif %}
+
+{% if dgraphtype == 'Organization' %}
+    {% include "view/elements/detail_organization.html" %}
+{% endif %}
+
+{% if dgraphtype == 'Archive' %}
+    {% include "view/elements/detail_archive.html" %}
+{% endif %}
+
+{% if dgraphtype == 'Dataset' %}
+    {% include "view/elements/detail_archive.html" %}
+{% endif %}
+
+{% if dgraphtype == 'Subunit' %}
+    {% include "view/elements/detail_subunit.html" %}
+{% endif %}
+
+{% if dgraphtype == 'ResarchPaper' %}
+    {% include "view/elements/detail_paper.html" %}
+{% endif %}
+
+
+</article>
+{% endblock content %}
+
+{% block sidebar %} 
+    {% include "view/source_sidebar.html" %} 
+{% endblock sidebar %}

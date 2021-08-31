@@ -1,0 +1,81 @@
+<div class="col d-flex align-items-start mb-4">
+    <div class="icon-square me-3">
+        <h2><i class="fas fa-building" alt="Organisation"></i></h2>
+    </div>
+    <div>
+        <h2>{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>
+    </div>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
+        <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
+        {% if entry.other_names %}
+        <dt class="col-sm-3">Also known as</dt>
+        <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}
+        </dd>{% endif %} {% if entry.wikidataID %}
+        <dt class="col-sm-3">Wikidata</dt>
+        <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a></p>
+        </dd>{% endif %} {% if entry.founded %}
+        <dt class="col-sm-3">Founded</dt>
+        <dd class="col-sm-9">{{ entry.founded.strftime('%Y') }}
+        </dd>{% endif %}
+        <dt class="col-sm-3">Country</dt>
+        <dd class="col-sm-9">{% for country in entry.country %}
+            <a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}
+        </dd>{% if entry.address_string %}
+        <dt class="col-sm-3">Primary Address</dt>
+        <dd class="col-sm-9"><a href="https://www.openstreetmap.org/search?query={{ entry.address_string }}" target="_blank">{{ entry.address_string }}</a>
+        </dd>{% endif %}
+    </dl>
+</div>
+
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Publishes</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.publishes %} {% for source in entry.publishes %}
+            <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{ source.name }} ({{ source.channel.name }})</a></p>
+            {% endfor %} {% else %}
+            <p class="card-text text-muted">None</p>
+            {% endif %}
+        </dd>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Owns</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.owns %} {% for org in entry.owns %}
+            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            {% endfor %} {% else %}
+            <p class="card-text text-muted">None</p>
+            {% endif %}
+        </dd>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Owned by</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.owned_by %} {% for org in entry.owned_by %}
+            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            {% endfor %} {% else %}
+            <p class="card-text text-muted">None</p>
+            {% endif %}
+        </dd>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Economic</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.ownership_kind %}
+            <dt class="col-sm-3">Type of Organization</dt>
+            <dd class="col-sm-9">{{ entry.ownership_kind }}
+            </dd>{% endif %}{% if entry.employees %}
+            <p class="card-text">Employees: {{ entry.employees }}</p>{% endif %}
+        </dd>
+</div>

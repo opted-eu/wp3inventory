@@ -12,6 +12,7 @@ class SimpleQuery(FlaskForm):
                              ('Source', 'Journalistic Source'),
                              ('Organization', 'Media Organization'),
                              ('Archive', 'Data Archive'),
+                             ('Dataset', 'Dataset'),
                              ('ResearchPaper', 'Research Paper')],
                             validators=[DataRequired()])
     

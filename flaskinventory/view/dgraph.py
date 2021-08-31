@@ -8,6 +8,15 @@ import json
     Inventory Detail View Functions
 """
 
+def get_dgraphtype(uid):
+    query_string = f'''{{ q(func: uid({uid})) {{  dgraph.type  }} }}'''
+
+    data = dgraph.query(query_string)
+    if len(data['q']) == 0:
+        return False
+
+    return data['q'][0]['dgraph.type'][0]
+
 
 def get_source(unique_name=None, uid=None):
     if unique_name:
@@ -136,7 +145,7 @@ def get_country(unique_name=None, uid=None):
         return None
 
     query_fields = '''{ uid dgraph.type expand(_all_) 
-                        num_sources: count(~country @filter(type("Source")))  
+                        num_sources: count(~geographic_scope_countries @filter(type("Source")))  
                         num_orgs: count(~country @filter(type("Organization"))) } }'''
 
     query = query_func + query_fields
@@ -147,6 +156,29 @@ def get_country(unique_name=None, uid=None):
         return False
 
     data = data['country'][0]
+    return data
+
+
+def get_subunit(unique_name=None, uid=None):
+    if unique_name:
+        query_func = f'{{ subunit(func: eq(unique_name, "{unique_name}"))'
+    elif uid:
+        query_func = f'{{ subunit(func: uid({uid}))'
+    else:
+        return None
+
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name }
+                        num_sources: count(~geographic_scope_subunit @filter(type("Source")))  
+                        } }'''
+
+    query = query_func + query_fields
+
+    data = dgraph.query(query)
+
+    if len(data['subunit']) == 0:
+        return False
+
+    data = data['subunit'][0]
     return data
 
 
@@ -211,7 +243,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
                                 publishes: count(publishes)
                                 owns: count(owns)
                                 '''
-        if typename == 'Archive':
+        if typename in ['Archive', 'Dataset']:
             query_fields = ''' uid: uid unique_name: unique_name name: name access: access
                                 sources_included: count(sources_included)
                                 '''
@@ -219,6 +251,10 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
             normalize = False
             query_fields = ''' uid title authors published_date journal
                                 sources_included: count(sources_included)
+                                '''
+        if typename == 'Subunit':
+            normalize = False
+            query_fields = ''' uid name unique_name 
                                 '''
 
     query_relation = ''
