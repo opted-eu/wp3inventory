@@ -33,16 +33,16 @@ WP3 Inventory
 
 ### Data entry views
 - [x] new source
-- [ ] New / Pending entries: only visible for reviewers and user who added entry
-  - [ ] should also not appear in other queries
+- [x] New / Pending entries: only visible for reviewers and user who added entry
+  - [x] should also not appear in other queries
 - [ ] new organization
 - [ ] new paper
 - [ ] new archive
 
 ### Data edit views
 
-- [ ] review screen
-- [ ] edit entry
+- [x] review screen
+- [x] edit entry
 
 ### Data Queries
 
