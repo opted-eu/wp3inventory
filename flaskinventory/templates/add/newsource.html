@@ -1,5 +1,5 @@
 {% extends "layout.html" %} {% block content %}
-<h2><span id='heading-type'>New Journalistic Source</span><span id='heading-name'></span></h2>
+<h2 class="display-4"><span id='heading-type'>New Journalistic Source</span><span id='heading-name'></span></h2>
 <div class="row align-items-center justify-content-center" id="loading-form">
     <div class="card text-center w-25" id="loading-card">
         <div class="card-top">
@@ -129,6 +129,123 @@
         <input type="button" class="btn btn-primary next" value="Next Step">
     </fieldset>
 
+    <!-- SECTION JOURNALISTIC ROUTINE -->
+
+    <fieldset id="section-routines" hidden>
+        <h3 class="mb-4">Information about Journalistic Routines</h3>
+
+        <div id="group-publication-kind" class="mb-5 form-group">
+            <label for="publication-kind" class="form-label fw-bold fs-5">What label or labels describe the source?</label>
+            <p><small id="publication-kind-helptext">To identify this information please refer to the learning module.</small></p>
+            <select name="publication_kind" class="form-select form-select-lg" id="publication-kind" aria-describedby="publication-kind-feedback" placeholder="Select multiple or add new..." required multiple>
+                        <option value="newspaper">Newspaper</option>
+                        <option value="news agency">News Agency</option>
+                        <option value="magazine">Magazine</option>
+                        <option value="tv show">TV Show</option>
+                        <option value="radio show">Radio Show</option>
+                        <option value="podcast">Podcast</option>
+                        <option value="news blog">News Blog</option>
+                        <option value="alternative media">Alternative Media</option>
+                        <option value="none">Don't know</option>
+                    </select>
+            <div id="publication-kind-feedback"></div>
+
+        </div>
+
+
+
+        <div id="group-special-interest" class="mb-5 form-group fs-5">
+            <p class="form-label fw-bold fs-5">Does the news source have one main topical focus?</p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no" aria-describedby="special-interest-feedback" checked>
+                <label class="form-check-label" for="special_interest1">
+                                No, it is a general interest news source (i.e., general news) 
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback">
+                <label class="form-check-label" for="special_interest2">
+                            Yes, is a special interest news source (i.e., clear focus on one topic) 
+                        </label>
+            </div>
+            <div id="special-interest-feedback"></div>
+        </div>
+
+        <div id="group-topical-focus" class="mb-5 form-group" hidden>
+            <label for="topical-focus" class="form-label fw-bold fs-5">What is the main topical focus of the news source?</label>
+            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
+                        <option value="" selected>Choose...</option>
+                        <option value="politics">Politics</option>
+                        <option value="society">Society & Panorama</option>
+                        <option value="economy">Economy, Finance & Stocks</option>
+                        <option value="religion">Religion</option>
+                        <option value="science">Science & Technology</option>
+                        <option value="media">Media</option>
+                        <option value="environment">Environment</option>
+                        <option value="education">Education</option>
+                        <option value="none">Don't know</option>
+                    </select>
+            <div id="topical-focus-feedback"></div>
+            <small id="topical-focus-helptext"></small>
+        </div>
+
+        <div id="group-publication-cycle" class="mb-3 form-group">
+            <label for="publication-cycle" class="form-label fw-bold fs-5">What is the publication cycle of the source?</label>
+            <select name="publication_cycle" class="form-select form-select-lg" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
+                        <option value="" selected>Choose...</option>
+                        <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
+                        <option value="daily">Daily (7 times a week)</option>
+                        <option value="multiple times per week">Multiple times per week</option>
+                        <option value="weekly">Once a week</option>
+                        <option value="twice a month">Twice a month</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="none">Don't know</option>
+                    </select>
+            <div id="publication-cycle-feedback"></div>
+            <small id="publication-cycle-helptext"></small>
+        </div>
+
+        <div id="group-publication-cycle-weekday" class="mb-5 fs-5" hidden>
+                <p class="form-label fs-6 fw-bold">Please indicate the specific day(s)</p>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
+                <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
+            </div>
+            <div id="publication-cycle-weekday-feedback"></div>
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
 
     <!-- SECTION: ECONOMIC VARIABLES -->
     <fieldset id="section-economic" hidden>
@@ -241,123 +358,6 @@
                             </label>
                 <div id="ownership-kind-feedback"></div>
             </div>
-        </div>
-
-        <input type="button" class="btn btn-primary prev" value="Previous Step">
-        <input type="button" class="btn btn-primary next" value="Next Step">
-    </fieldset>
-
-    <!-- SECTION JOURNALISTIC ROUTINE -->
-
-    <fieldset id="section-routines" hidden>
-        <h3 class="mb-4">Information about Journalistic Routines</h3>
-
-        <div id="group-publication-kind" class="mb-5 form-group">
-            <label for="publication-kind" class="form-label fw-bold fs-5">What label or labels describe the source?</label>
-            <p><small id="publication-kind-helptext">To identify this information please refer to the learning module.</small></p>
-            <select name="publication_kind" class="form-select form-select-lg" id="publication-kind" aria-describedby="publication-kind-feedback" placeholder="Select multiple or add new..." required multiple>
-                        <option value="newspaper">Newspaper</option>
-                        <option value="news agency">News Agency</option>
-                        <option value="magazine">Magazine</option>
-                        <option value="tv show">TV Show</option>
-                        <option value="radio show">Radio Show</option>
-                        <option value="podcast">Podcast</option>
-                        <option value="news blog">News Blog</option>
-                        <option value="alternative media">Alternative Media</option>
-                        <option value="none">Don't know</option>
-                    </select>
-            <div id="publication-kind-feedback"></div>
-
-        </div>
-
-
-
-        <div id="group-special-interest" class="mb-5 form-group fs-5">
-            <p class="form-label fw-bold fs-5">Does the news source have one main topical focus?</p>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no" aria-describedby="special-interest-feedback" checked>
-                <label class="form-check-label" for="special_interest1">
-                                No, it is a general interest news source (i.e., general news) 
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback">
-                <label class="form-check-label" for="special_interest2">
-                            Yes, is a special interest news source (i.e., clear focus on one topic) 
-                        </label>
-            </div>
-            <div id="special-interest-feedback"></div>
-        </div>
-
-        <div id="group-topical-focus" class="mb-5 form-group" hidden>
-            <label for="topical-focus" class="form-label fw-bold fs-5">What is the main topical focus of the news source?</label>
-            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
-                        <option value="" selected>Choose...</option>
-                        <option value="politics">Politics</option>
-                        <option value="society">Society & Panorama</option>
-                        <option value="economy">Economy, Finance & Stocks</option>
-                        <option value="religion">Religion</option>
-                        <option value="science">Science & Technology</option>
-                        <option value="media">Media</option>
-                        <option value="environment">Environment</option>
-                        <option value="education">Education</option>
-                        <option value="none">Don't know</option>
-                    </select>
-            <div id="topical-focus-feedback"></div>
-            <small id="topical-focus-helptext"></small>
-        </div>
-
-        <div id="group-publication-cycle" class="mb-3 form-group">
-            <label for="publication-cycle" class="form-label fw-bold fs-5">What is the publication cycle of the source?</label>
-            <select name="publication_cycle" class="form-select form-select-lg" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
-                        <option value="" selected>Choose...</option>
-                        <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
-                        <option value="daily">Daily (7 times a week)</option>
-                        <option value="multiple times per week">Multiple times per week</option>
-                        <option value="weekly">Once a week</option>
-                        <option value="twice a month">Twice a month</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="none">Don't know</option>
-                    </select>
-            <div id="publication-cycle-feedback"></div>
-            <small id="publication-cycle-helptext"></small>
-        </div>
-
-        <div id="group-publication-cycle-weekday" class="mb-5 fs-5" hidden>
-                <p class="form-label fs-6 fw-bold">Please indicate the specific day(s)</p>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
-                <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
-            </div>
-            <div id="publication-cycle-weekday-feedback"></div>
         </div>
 
         <input type="button" class="btn btn-primary prev" value="Previous Step">
