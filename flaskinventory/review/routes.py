@@ -62,6 +62,7 @@ def entry(uid=None):
 
         dgraphtype = check.get('dgraph.type')[0]
 
+        related = None
         if dgraphtype == 'Source':
             result = get_source(uid=uid)
             if result.get('audience_size'):
