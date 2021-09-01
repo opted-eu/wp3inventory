@@ -250,17 +250,19 @@ def query():
         if request.args.get('country') == 'all':
             relation_filt = None
         else:
-            if request.args.get('entity') == 'source':
+            if request.args.get('entity') == 'Source':
                 relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
             else:
-                relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
+                relation_filt = {'country': {'uid': request.args.get('country')}}
         data = list_by_type(
             request.args['entity'], relation_filt=relation_filt, filt={'eq': {'entry_review_status': 'accepted'}})
 
+        cols = []
         if data:
-            table = make_results_table(data)
-        else:
-            table = 'No results'
+            for item in data:
+                cols += item.keys()
+      
+        cols = list(set(cols))
 
         # CACHE THIS
         countries = dgraph.query(
@@ -272,7 +274,7 @@ def query():
         c_choices.insert(0, ('all', 'All'))
         form = SimpleQuery()
         form.country.choices = c_choices
-        return render_template('query_result.html', title='Query Result', table=table, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
+        return render_template('query_result.html', title='Query Result', result=data, cols=cols, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
     return redirect(url_for('main.home'))
 
 

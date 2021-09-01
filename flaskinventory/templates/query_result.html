@@ -4,7 +4,84 @@
 
 <p class="text-muted">You searched for {{ request.args.entity }} in {{ request.args.country }}</p>
 
-{{ table }} {% endblock content %}
+{% if result %}
+
+<table class="table">
+    <thead>
+      <tr>
+        {% if 'name' in cols %}
+            <th scope="col">Name</th>
+        {% endif %}
+        {% if 'title' in cols %}
+            <th scope="col">Title</th>
+        {% endif %}
+        {% if 'authors' in cols %}
+        <th scope="col">Authors</th>
+        {% endif %}
+        {% if 'channel' in cols %}
+            <th scope="col">Channel</th>
+        {% endif %}
+        {% if 'founded' in cols %}
+            <th scope="col">Founded</th>
+        {% endif %}
+        {% if 'country' in cols %}
+            <th scope="col">Country</th>
+        {% endif %}
+        {% if 'geographic_scope_countries' in cols %}
+            <th scope="col">Country</th>
+        {% endif %}
+        {% if 'access' in cols %}
+            <th scope="col">Access</th>
+        {% endif %}
+        {% if 'sources_included' in cols %}
+            <th scope="col">Sources Included</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+    
+      {% for entry in result %}
+      <tr>
+        {% if 'name' in cols %}
+        <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }}</a></td>
+        {% endif %}
+        {% if 'title' in cols %}
+        <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.title }}</a></td>
+        {% endif %}
+        {% if 'authors' in cols %}
+        <td>{{ entry.authors }}</a></td>
+        {% endif %}
+        {% if 'channel' in cols %}
+            <td>{{ entry.channel.get('name')}}</td>
+        {% endif %}
+        {% if 'founded' in cols %}
+            <td>{% if entry.get('founded') %} {{ entry.founded.strftime('%Y')}} {% endif %}</td>
+        {% endif %}
+        {% if 'country' in cols %}
+        <td>{% if entry.get('country') %} {{ entry.country[0].get('country') }}{% endif %}</td>
+        {% endif %}
+        {% if 'geographic_scope_countries' in cols %}
+        <td>{% if entry.get('geographic_scope_countries') %}{{ entry.geographic_scope_countries[0].get('country') }}{% endif %}</td>
+        {% endif %}
+        {% if 'access' in cols %}
+            <td>{{ entry.get('access')}}</td>
+        {% endif %}
+        {% if 'sources_included' in cols %}
+            <td>{{ entry.get('sources_included')}}</td>
+        {% endif %}
+
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+
+{% else %}
+
+<p>No result!</p>
+
+{% endif %}
+
+{% endblock content %}
 
 {% block sidebar %}
 

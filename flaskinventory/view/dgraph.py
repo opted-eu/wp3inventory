@@ -235,16 +235,16 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
     else:
         normalize = True
         if typename == 'Source':
-            query_fields = ''' uid: uid unique_name: unique_name name: name founded: founded
-                                channel { channel: name }
+            query_fields = ''' uid unique_name name founded
+                                channel { name }
                                 '''
         if typename == 'Organization':
-            query_fields = ''' uid: uid unique_name: unique_name name: name founded: founded
+            query_fields = ''' uid unique_name name founded
                                 publishes: count(publishes)
                                 owns: count(owns)
                                 '''
         if typename in ['Archive', 'Dataset']:
-            query_fields = ''' uid: uid unique_name: unique_name name: name access: access
+            query_fields = ''' uid unique_name name access
                                 sources_included: count(sources_included)
                                 '''
         if typename == 'ResearchPaper':
@@ -254,27 +254,26 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
                                 '''
         if typename == 'Subunit':
             normalize = False
-            query_fields = ''' uid name unique_name 
-                                '''
+            query_fields = ''' uid name unique_name '''
 
     query_relation = ''
     if relation_filt:
-        query_head += ' @cascade '
-        if 'country' in relation_filt.keys() and fields is None:
-            query_fields += ''' country { country: name } '''
-
+        query_head += ' @cascade('
+    
         for key, val in relation_filt.items():
+            query_head += key
             query_relation += f'{key} {dgraph.build_filt_string(val)}'
             if fields == None:
                 query_relation += f'{{ {key}: '
             else:
                 query_relation += ' { '
             query_relation += ''' name }'''
+        query_head += ')'
     else:
-        query_fields += ''' country { country: name } '''
+        query_fields += ''' country { country: name } geographic_scope_countries { country: name } '''
 
     if normalize:
-        query_head += '@normalize'
+        query_head += ''
 
     query_string = query_head + \
         ' { ' + query_fields + ' ' + query_relation + ' } }'
