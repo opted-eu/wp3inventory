@@ -833,6 +833,22 @@ class SourceSanitizer:
                         rel_source['unique_name'] = secrets.token_urlsafe(8)
                         rel_source['dgraph.type'] = 'Source'
                         rel_source['channel'] = UID(channel_uid)
+                        if self.newsource.get('publication_kind'):
+                            rel_source['publication_kind'] = self.newsource.get('publication_kind')
+                        if self.newsource.get('special_interest'):
+                            rel_source['special_interest'] = self.newsource.get('special_interest')
+                        if self.newsource.get('topical_focus'):
+                            rel_source['topical_focus'] = self.newsource.get('topical_focus')
+                        if self.newsource.get('special_interest'):
+                            rel_source['special_interest'] = self.newsource.get('special_interest')
+                        if self.newsource.get('geographic_scope'):
+                            rel_source['geographic_scope'] = self.newsource.get('geographic_scope')
+                        if self.newsource.get('geographic_scope_countries'):
+                            rel_source['geographic_scope_countries'] = self.newsource.get('geographic_scope_countries')
+                        if self.newsource.get('geographic_scope_subunit'):
+                            rel_source['geographic_scope_subunit'] = self.newsource.get('geographic_scope_subunit')
+                        if self.newsource.get('languages'):
+                            rel_source['languages'] = self.newsource.get('languages')
                         self.newsource['related'].append(
                             NewID(f'_:{slugify(item, separator="_")}_{channel_name}'))
                     else:
