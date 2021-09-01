@@ -5,3 +5,9 @@
 <p class="text-muted">You searched for {{ request.args.entity }} in {{ request.args.country }}</p>
 
 {{ table }} {% endblock content %}
+
+{% block sidebar %}
+
+{% include "sidebar_query.html" %}
+
+{% endblock sidebar %}

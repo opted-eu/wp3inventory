@@ -38,29 +38,50 @@ def quicksearch():
 
 @view.route('/search')
 def search():
-    query = request.args.get('query')
-    # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_string = f'''
-            query search($name: string)
-            {{
-            field1 as var(func: anyofterms(name, $name))
-            field2 as var(func: anyofterms(other_names, $name))
-            field3 as var(func: anyofterms(title, $name))
-            
-            data(func: uid(field1, field2, field3)) 
-                @normalize @filter(eq(entry_review_status, "accepted")) {{
-                    uid 
-                    unique_name: unique_name 
-                    name: name 
-                    type: dgraph.type 
-                    title: title
-                    channel {{ channel: name }}
+    if request.args.get('query'):
+        query = request.args.get('query')
+        # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
+        query_string = f'''
+                query search($name: string)
+                {{
+                field1 as var(func: anyofterms(name, $name))
+                field2 as var(func: anyofterms(other_names, $name))
+                field3 as var(func: anyofterms(title, $name))
+                
+                data(func: uid(field1, field2, field3)) 
+                    @normalize @filter(eq(entry_review_status, "accepted")) {{
+                        uid 
+                        unique_name: unique_name 
+                        name: name 
+                        type: dgraph.type 
+                        title: title
+                        channel {{ channel: name }}
+                        country {{ country: name }}
+                      	geographic_scope_countries {{ country: name }}
+                    }}
                 }}
-            }}
-    '''
-    result = dgraph.query(query_string, variables={'$name': query})
-    result['status'] = True
-    return jsonify(result)
+        '''
+        result = dgraph.query(query_string, variables={'$name': query})
+
+        if len(result['data']) > 0:
+            result = result['data']
+        else:
+            result = None
+
+        # CACHE THIS
+        countries = dgraph.query(
+            '''{ q(func: type("Country")) { name uid } }''')
+
+        c_choices = [(country.get('uid'), country.get('name'))
+                        for country in countries['q']]
+        c_choices = sorted(c_choices, key=lambda x: x[1])
+        c_choices.insert(0, ('all', 'All'))
+        form = SimpleQuery()
+        form.country.choices = c_choices
+        return render_template('search_result.html', title='Query Result', result=result, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
+    else:
+        flash("Please enter a search query in the top search bar", "info")
+        return redirect(url_for('main.home'))
 
 @view.route("/view")
 def view_uid():
