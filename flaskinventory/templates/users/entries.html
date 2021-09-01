@@ -34,10 +34,10 @@
     {% for entry in drafts %}
     <tr>
         <td>{{ entry.name }}</td>
-        <td>{{ entry.unique_name }}</td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
         <td>{{ entry.get("dgraph.type")[0] }}</td>
         <td>{{ entry.uid }}</th>
-        <td>{{ entry.get("draft|timestamp") }}</td>
+        <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
         <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div></td>
     </tr>
     {% endfor %}
@@ -64,10 +64,10 @@
     {% for entry in pending %}
     <tr>
         <td>{{ entry.name }}</td>
-        <td>{{ entry.unique_name }}</td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
         <td>{{ entry.get("dgraph.type")[0] }}</td>
         <td>{{ entry.uid }}</th>
-        <td>{{ entry.get("pending|timestamp") }}</td>
+        <td>{% if entry.get("pending|timestamp") %}{{ entry.get("pending|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
         <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div></td>
     </tr>
     {% endfor %}
@@ -93,10 +93,11 @@
         {% for entry in accepted %}
         <tr>
             <td>{{ entry.name }}</td>
-            <td>{{ entry.unique_name }}</td>
+            <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
             <td>{{ entry.get("dgraph.type")[0] }}</td>
             <td>{{ entry.uid }}</th>
-            <td>{{ entry.get("accepted|timestamp") }}</td>
+            <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+
         </tr>
         {% endfor %}
         {% endif %}

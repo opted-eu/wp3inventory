@@ -44,14 +44,14 @@
     {% for entry in entries %}
     <tr>
         <td>{{ entry.name }}</td>
-        <td>{{ entry.unique_name }}</td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
         <td>{{ entry.get("dgraph.type")[0] }}</td>
         <td>{{ entry.uid }}</th>
         <td>{% for country in entry.get('country') %}
             {{ country.get("name") }} 
             {% endfor %}
         </th>
-        <td>{{ entry.entry_added.get("entry_added|timestamp") }}</td>
+        <td>{% if entry.entry_added.get("entry_added|timestamp") %}{{ entry.entry_added.get("entry_added|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
         <td>{{ entry.entry_added.get("user_displayname") }}</td>
         <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('review.entry', uid=entry.get('uid'))}}">Review</a></div></td>
     </tr>
