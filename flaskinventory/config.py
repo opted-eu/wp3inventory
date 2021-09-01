@@ -13,7 +13,7 @@ class Config:
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER', None)
     MAIL_PASSWORD = os.environ.get('EMAIL_PW', None)
-    APP_VERSION = "0.2"
+    APP_VERSION = "0.3"
     TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', None)
     TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', None)
     TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN', None)
