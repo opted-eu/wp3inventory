@@ -1,4 +1,5 @@
 {% extends "layout.html" %} {% block content %}
+<h2><span id='heading-type'>New Journalistic Source</span><span id='heading-name'></span></h2>
 <div class="row align-items-center justify-content-center" id="loading-form">
     <div class="card text-center w-25" id="loading-card">
         <div class="card-top">
@@ -888,7 +889,7 @@
         document.getElementById("uid-hidden").value = jsonData["uid"]
         document.getElementById("channel-select").value = jsonData["channel"].unique_name
         document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
-        document.getElementById("name").value = jsonData["name"]
+        document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
         if ("other_names" in jsonData) {
             document.getElementById("other-names").value = jsonData["other_names"].join(","); 
         };
@@ -1146,7 +1147,7 @@
             // get url parameter to pre-fill fields
             var currentUrl = new URL(window.location.href);
             var entry_name = currentUrl.searchParams.get("entry_name");
-            document.getElementById('name').value = entry_name
+            document.getElementById('heading-name').innerText = ': ' + entry_name
 
             // Populate form with draft data from embedded json
             var embeddedJSON = document.getElementById('draft')
