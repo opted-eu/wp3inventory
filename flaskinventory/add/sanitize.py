@@ -419,10 +419,16 @@ class SourceSanitizer:
     def resolve_website(self):
         if self.json.get('name'):
 
-            urls, names = parse_meta(self.json.get('name'))
+            try:
+                urls, names = parse_meta(self.json.get('name'))
+            except:
+                raise InventoryValidationError(
+                    f"Could not resolve website! URL provided does not exist: {self.json.get('name')}")
+
             if urls == False:
                 raise InventoryValidationError(
                     f"Could not resolve website! URL provided does not exist: {self.json.get('name')}")
+                
 
             self.newsource['name'] = self.json.get('name').replace(
                 'http://', '').replace('https://', '').lower()
