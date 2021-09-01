@@ -160,8 +160,10 @@ def view_dataset(unique_name=None, uid=None):
 
 @view.route("/view/organization/<string:unique_name>")
 @view.route("/view/organisation/<string:unique_name>")
-def view_organization(unique_name):
-    unique_item = get_organization(unique_name=unique_name)
+@view.route("/view/organization/uid/<string:uid>")
+@view.route("/view/organisation/uid/<string:uid>")
+def view_organization(unique_name=None, uid=None):
+    unique_item = get_organization(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Organization" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]

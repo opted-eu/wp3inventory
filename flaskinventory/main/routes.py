@@ -16,7 +16,25 @@ def home():
     c_choices.insert(0, ('all', 'All'))
     form = SimpleQuery()
     form.country.choices = c_choices
-    return render_template('home.html', form=form)
+
+    query_string = f'''{{
+                        data(func: has(dgraph.type), orderdesc: creation_date, first: 5) 
+                            @normalize @filter(eq(entry_review_status, "accepted") AND has(creation_date)) {{
+                                uid
+                                unique_name: unique_name 
+                                name: name 
+                                type: dgraph.type 
+                                title: title
+                                creation_date: creation_date
+                                channel {{ channel: name }}
+                                country {{ country: name }}
+                                geographic_scope_countries {{ country: name }}
+                            }}
+                        }}'''
+    
+    result = dgraph.query(query_string)
+
+    return render_template('home.html', form=form, recent=result['data'], show_sidebar=True)
 
 
 @main.route('/about')
