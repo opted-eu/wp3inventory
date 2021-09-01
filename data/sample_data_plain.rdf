@@ -174,7 +174,7 @@ _:derstandardtwitter <related> _:derstandardfacebook .
 _:derstandardfacebook <related> _:derstandardprint .
 _:derstandardfacebook <related> _:derstandardinstagram .
 _:derstandardfacebook <related> _:derstandardtwitter .
-_:derstandardfacebook <related> _:derstandardfacebook .
+_:derstandardfacebook <related> _:derstandardat .
 
 _:mbhderstandard <dgraph.type> "Organization" .
 _:mbhderstandard <unique_name> "derstandard_mbh" .
