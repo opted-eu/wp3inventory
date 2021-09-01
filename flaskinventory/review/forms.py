@@ -9,6 +9,7 @@ class ReviewFilter(FlaskForm):
                          choices=[
                              ('Source', 'Journalistic Source'),
                              ('Organization', 'Media Organization'),
+                             ('Subunit', 'Subunit'),
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
                              ('ResearchPaper', 'Research Paper')], validators=[DataRequired()]

@@ -6,7 +6,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.review.forms import ReviewActions, ReviewFilter
 from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, check_entry
-from flaskinventory.view.dgraph import get_archive, get_dgraphtype, get_organization, get_source
+from flaskinventory.view.dgraph import get_archive, get_dgraphtype, get_organization, get_source, get_subunit
 from flaskinventory.view.utils import make_mini_table
 
 from flaskinventory.users.constants import USER_ROLES
@@ -79,6 +79,8 @@ def entry(uid=None):
             result = get_archive(uid=uid)
         elif dgraphtype == 'Dataset':
             result = get_archive(uid=uid)
+        elif dgraphtype == 'Subunit':
+            result = get_subunit(uid=uid)
         else:
             flash(f"Entry is not reviewable! Entry status: {check.get('entry_review_status')}", category='warning')
             return redirect(url_for('review.overview'))

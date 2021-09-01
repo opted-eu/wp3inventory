@@ -22,8 +22,10 @@ def edit_uid(uid):
     if len(result['q']) == 0:
         return abort(404)
 
-    if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization']:
+    if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization', 'Subunit', 'Archive', 'Dataset']:
         return redirect(url_for('edit.' + result['q'][0]['dgraph.type'][0].lower(), unique_name=result['q'][0]['unique_name']) )
+    else:
+        return abort(404)
 
 
 
@@ -87,6 +89,8 @@ def organization(unique_name=None, uid=None):
             if type(value) is list:
                 if type(value[0]) is str:
                     value = ",".join(value)
+                elif key == 'country':
+                    value = value[0].get('uid')
                 elif key != 'country':
                     choices = [(subval['uid'], subval['name']) for subval in value]
                     value = [subval['uid'] for subval in value]
@@ -250,6 +254,8 @@ def subunit(unique_name=None, uid=None):
             if type(value) is list:
                 if type(value[0]) is str:
                     value = ",".join(value)
+                elif key == 'country':
+                    value = value[0].get('uid')
                 elif key != 'country':
                     choices = [(subval['uid'], subval['name']) for subval in value]
                     value = [subval['uid'] for subval in value]
@@ -318,6 +324,8 @@ def dataset(unique_name=None, uid=None):
             if type(value) is list:
                 if type(value[0]) is str:
                     value = ",".join(value)
+                elif key == 'country':
+                    value = value[0].get('uid')
                 elif key != 'country':
                     choices = [(subval['uid'], subval['name']) for subval in value]
                     value = [subval['uid'] for subval in value]
@@ -389,6 +397,8 @@ def archive(unique_name=None, uid=None):
             if type(value) is list:
                 if type(value[0]) is str:
                     value = ",".join(value)
+                elif key == 'country':
+                    value = value[0].get('uid')
                 elif key != 'country':
                     choices = [(subval['uid'], subval['name']) for subval in value]
                     value = [subval['uid'] for subval in value]

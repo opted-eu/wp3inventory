@@ -45,7 +45,8 @@
 
 </article>
 {% endblock content %}
-
+{% if dgraphtype == 'Source' %}
 {% block sidebar %} 
     {% include "view/source_sidebar.html" %} 
 {% endblock sidebar %}
+{% endif %}
