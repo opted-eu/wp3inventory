@@ -162,10 +162,12 @@ class SourceSanitizer:
 
     def add_entry_meta(self, entry, entry_status="pending"):
         facets = {'timestamp': datetime.datetime.now(
-            datetime.timezone.utc).isoformat(),
+            datetime.timezone.utc),
             'ip': self.user_ip}
         entry['entry_added'] = UID(self.user.uid, facets=facets)
         entry['entry_review_status'] = entry_status
+        entry['creation_date'] = datetime.datetime.now(
+            datetime.timezone.utc)
 
         return entry
 
@@ -638,7 +640,7 @@ class SourceSanitizer:
             if self.json.get('audience_size_year'):
                 audience_size_year = int(self.json.get('audience_size_year'))
             else:
-                audience_size_year = datetime.date.today().isoformat()
+                audience_size_year = datetime.date.today()
 
             self.newsource['audience_size'] = Scalar(
                 audience_size_year, facets=facets)
@@ -647,7 +649,7 @@ class SourceSanitizer:
         daily_visitors = siterankdata(self.newsource['name'])
 
         if daily_visitors:
-            self.newsource['audience_size'] = Scalar(datetime.date.today().isoformat(), facets={
+            self.newsource['audience_size'] = Scalar(datetime.date.today(), facets={
                 'daily_visitors': daily_visitors,
                 'datafrom': f"https://siterankdata.com/{self.newsource['name'].replace('www.', '')}"})
 

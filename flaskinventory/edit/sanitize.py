@@ -89,7 +89,7 @@ class Sanitizer:
 
     def parse_founded(self):
         if self.data.get('founded'):
-            self.edit['founded'] = self.data.get('founded').isoformat()
+            self.edit['founded'] = self.data.get('founded')
 
     def _resolve_geographic_name(self, query):
         geo_result = geocode(query)
@@ -186,15 +186,17 @@ class EditOrgSanitizer(Sanitizer):
     def _add_entry_meta(self, entry, newentry=False):
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
         else:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
             entry['entry_review_status'] = 'accepted'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
 
         return entry
 
@@ -275,15 +277,17 @@ class EditSourceSanitizer(Sanitizer):
     def _add_entry_meta(self, entry, newentry=False):
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
         else:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
             entry['entry_review_status'] = 'accepted'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
 
         return entry
 
@@ -469,15 +473,17 @@ class EditSubunitSanitizer(Sanitizer):
     def _add_entry_meta(self, entry, newentry=False):
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
         else:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
             entry['entry_review_status'] = 'accepted'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
 
         return entry
 
@@ -513,15 +519,17 @@ class EditArchiveSanitizer(Sanitizer):
     def _add_entry_meta(self, entry, newentry=False):
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
         else:
             facets = {'timestamp': datetime.datetime.now(
-                datetime.timezone.utc).isoformat(),
+                datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
             entry['entry_review_status'] = 'accepted'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
 
         return entry
 

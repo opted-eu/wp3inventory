@@ -152,7 +152,12 @@ def make_nquad(s, p, o) -> str:
     if hasattr(o, 'facets'):
         facets = []
         for key, val in o.facets.items():
-            facets.append(f'{key}={_enquote(val)}')
+            if type(val) in [datetime.date, datetime.datetime]:
+                facets.append(f'{key}={val.isoformat()}')
+            elif type(val) in [int, float]:
+                facets.append(f'{key}={val}')
+            else:
+                facets.append(f'{key}={_enquote(val)}')
         nquad_string += f' ({", ".join(facets)})'
 
     nquad_string += ' .'
