@@ -9,7 +9,7 @@ from flaskinventory import dgraph
 class SimpleQuery(FlaskForm):
     entity = SelectField('Entity Type',
                          choices=[
-                             ('Source', 'Journalistic Source'),
+                             ('Source', 'News Source'),
                              ('Organization', 'Media Organization'),
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),

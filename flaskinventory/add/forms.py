@@ -11,7 +11,7 @@ class NewEntry(FlaskForm):
     
     entity = SelectField('Entity Type',
                          choices=[
-                             ('Source', 'Journalistic Source'),
+                             ('Source', 'News Source'),
                             #  ('Organization', 'Media Organization'),
                             #  ('Archive', 'Data Archive'),
                             #  ('ResearchPaper', 'Research Paper')

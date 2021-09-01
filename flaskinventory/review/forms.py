@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 class ReviewFilter(FlaskForm):
     entity = SelectField('Filter by Entity Type',
                          choices=[
-                             ('Source', 'Journalistic Source'),
+                             ('Source', 'News Source'),
                              ('Organization', 'Media Organization'),
                              ('Subunit', 'Subunit'),
                              ('Archive', 'Data Archive'),

@@ -2,7 +2,7 @@
 
 <main>
     <h1>Welcome to the OPTED inventory for media</h1>
-    <p class="fs-5 col-md-8">Quickly and easily query our database of journalistic sources and organisations. Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
+    <p class="fs-5 col-md-8">Quickly and easily query our database of news sources and organisations. Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
         already exists!</p>
     <div class="mb-5">
         <form method="GET" action="{{ url_for('view.query') }}">
@@ -39,8 +39,8 @@
             <h2>Contribute</h2>
             <p>You want to help us and add entries to the database? You can contribute through various means:</p>
             <ul class="icon-list">
-                <li>Add media organisations and journalistic sources to our inventory.</li>
-                <li>Make <strong>your</strong> research paper more visible by adding it to the inventory and linking it to journalistic sources.</li>
+                <li>Add media organisations and news sources to our inventory.</li>
+                <li>Make <strong>your</strong> research paper more visible by adding it to the inventory and linking it to news sources.</li>
                 <li>You know a data base or corpus that contains full-text data? Share it with the community by adding it here!</li>
             </ul>
             <a href="{{ url_for('add.new_entry') }}" class="btn btn-primary px-4">Add entry</a>
