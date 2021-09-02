@@ -52,7 +52,8 @@ def accept_entry(uid):
     dgraph.update_entry(accepted, uid=uid)
 
 def reject_entry(uid):
-    del_nquads = f'''<{uid}> <dgraph.type> * .'''
+    del_nquads = f'''<{uid}> <dgraph.type> * .
+                        <{uid}> <unique_name> * .'''
     query = None
     dgraph.upsert(query, del_nquads=del_nquads)
 
