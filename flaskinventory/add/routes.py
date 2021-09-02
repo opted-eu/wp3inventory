@@ -22,26 +22,24 @@ def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
         query_string = f'''{{
-                field1 as var(func: match(name, "{form.name.data}", 8)) @filter(type("{form.entity.data}"))
-                field2 as var(func: match(other_names, "{form.name.data}", 8)) @filter(type("{form.entity.data}"))
+                field1 as var(func: regexp(name, /{form.name.data}/i)) @filter(type("{form.entity.data}"))
+                field2 as var(func: anyofterms(name, "{form.name.data}")) @filter(type("{form.entity.data}"))
+                field3 as var(func: anyofterms(other_names, "{form.name.data}")) @filter(type("{form.entity.data}"))
     
-                data(func: uid(field1, field2)) @normalize {{
+                data(func: uid(field1, field2, field3)) {{
                     uid
-                    unique_name: unique_name
-                    name: name
-                    other_names: other_names
-                    channel {{ channel: name }}
-                    geographic_scope_countries {{ country: name }}
+                    unique_name
+                    name
+                    other_names
+                    channel {{ name }}
+                    geographic_scope_countries {{ name }}
+                    entry_review_status
                     }}
                 }}
         '''
         result = dgraph.query(query_string)
         if len(result['data']) > 0:
-            for item in result['data']:
-                if item.get('other_names'):
-                    item['other_names'] = ", ".join(item['other_names'])
-            table = database_check_table(result['data'])
-            return render_template('add/database_check.html', query=form.name.data, table=table)
+            return render_template('add/database_check.html', query=form.name.data, result=result['data'])
             # return redirect(url_for('add.database_check', result=result['data']))
         else:
             return redirect(url_for('add.new_source', entry_name=form.name.data))
