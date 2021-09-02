@@ -45,9 +45,9 @@
                 <i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a>
                 </dd>
         {% endif %}
-        {% if entry.verified_account %}
+        {% if 'verified_account' in entry.keys() %}
         <dt class="col-sm-3">Verified Account</dt>
-        <dd class="col-sm-9">{{ entry.verified_account }}</dd>
+        <dd class="col-sm-9">{% if entry.verified_account %}Yes{% else %}No{% endif %}</dd>
         {% endif %}
         {% if entry.wikidataID %}
         <dt class="col-sm-3">Wikidata</dt>
@@ -67,9 +67,12 @@
         <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
         {% if entry.publication_kind %}
         <dt class="col-sm-3">Publication Kind</dt>
-        <dd class="col-sm-9"><span class="">{{ ", ".join(entry.publication_kind) }}</span></dd>{% endif %}
+        <dd class="col-sm-9"><span class="">{{ ", ".join(entry.publication_kind) }}</span></dd>
+        {% endif %}
+        {% if 'special_interest' in entry.keys() %}
         <dt class="col-sm-3">Special Interest Publication</dt>
-        <dd class="col-sm-9">{{ entry.special_interest }}</dd>
+        <dd class="col-sm-9">{% if entry.special_interest %}Yes{% else %}No{% endif %}</dd>
+        {% endif %}
         {% if entry.topical_focus %}
         <dt class="col-sm-3">Topical Focus</dt>
         <dd class="col-sm-9">{{ ", ".join(entry.topical_focus) }}</dd>{% endif %} {% if entry.publication_cycle %}
