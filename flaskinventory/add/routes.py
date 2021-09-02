@@ -224,4 +224,3 @@ def sourcelookup():
     result = dgraph.query(query_string)
     result['status'] = True
     return jsonify(result)
-

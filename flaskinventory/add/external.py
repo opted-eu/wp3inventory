@@ -1,4 +1,5 @@
 from flask import current_app
+from pydgraph.proto.api_pb2 import Payload
 import requests
 from requests.models import PreparedRequest
 import requests.exceptions
@@ -11,6 +12,9 @@ import json
 import instaloader
 import tweepy
 from dateutil.parser import isoparse
+from flaskinventory import dgraph
+from flaskinventory.flaskdgraph.dgraph_types import UID, Geolocation
+
 
 
 def geocode(address):
@@ -29,6 +33,16 @@ def geocode(address):
     else:
         return r.json()[0]
 
+def reverse_geocode(lat, lon):
+    api = "https://nominatim.openstreetmap.org/reverse"
+    payload = {'lat': lat, 'lon': lon, 'format': 'json'} 
+    r = requests.get(api, params=payload)
+    if r.status_code != 200:
+        return False
+    elif 'display_name' not in r.json().keys():
+        return False
+    else:
+        return r.json()
 
 # Sitemaps & RSS/XML/Atom Feeds
 
@@ -299,3 +313,74 @@ def facebook(username):
         return profile
     else:
         return None
+
+def get_wikidata(query):
+
+    api = 'https://www.wikidata.org/w/api.php'
+
+    params = {'action': 'wbsearchentities', 'search': query, 'format': 'json', 'language': 'en'}
+
+    result = {}
+
+    try:
+        r = requests.get(api, params=params)
+        get_id = r.json()
+        wikidataid = get_id['search'][0]['id']
+        result['wikidataID'] = wikidataid
+    except:
+        return False
+
+    try:
+        params = {'action': 'wbgetentities', 'languages': 'en', 'ids': wikidataid, 'format': 'json'}
+        r = requests.get(api, params=params)
+        wikidata = r.json()
+    except:
+        return result
+
+    result['other_names'] = []
+    try:
+        aliases = wikidata['entities'][wikidataid]['aliases']['en']
+        for alias in aliases:
+            result['other_names'].append(alias['value'])
+    except:
+        pass
+
+    # P17: country, P571: inception, P1128: employees, P159: headquarters
+    
+    try:
+        inception = wikidata['entities'][wikidataid]['claims']['P571'][0]['mainsnak']['datavalue']['value']['time'].replace('+', '')
+        result['founded'] = isoparse(inception)
+    except:
+        pass
+
+    try:
+        country = wikidata['entities'][wikidataid]['claims']['P17'][0]['mainsnak']['datavalue']['value']['id'].replace('Q', '')
+        query_string = f'''{{q(func: eq(wikidataID, {country})) {{ name uid }} }}'''
+        country_uid = dgraph.query(query_string)
+
+        country_uid = country_uid['q'][0]['uid']
+        result['country'] = UID(country_uid)
+    except Exception as e:
+        pass
+
+    try:
+        result['employees'] = wikidata['entities'][wikidataid]['claims']['P1128'][0]['mainsnak']['datavalue']['value']['amount'].replace('+','')
+    except:
+        pass
+
+    try:
+        headquarters = wikidata['entities'][wikidataid]['claims']['P159'][0]['mainsnak']['datavalue']['value']['id']
+        params = {'action': 'wbgetentities', 'languages': 'en', 'ids': headquarters, 'format': 'json', 'props': 'labels'}
+        r = requests.get(api, params=params)
+        wikidata = r.json()
+        address = wikidata['entities'][headquarters]['labels']['en']['value']
+        geo_result = geocode(address)
+        address_geo = Geolocation('Point', [
+                float(geo_result.get('lon')), float(geo_result.get('lat'))])
+        
+        result['address'] = address
+        result['address_geo'] = address_geo
+    except:
+        pass
+
+    return result

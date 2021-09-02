@@ -101,6 +101,8 @@ class Geolocation:
 
     def __init__(self, geotype, coordinates):
         self.geotype = geotype
+        for coord in coordinates:
+            round(coord, 12)
         self.coordinates = coordinates
         self.geojson = {'type': geotype, 'coordinates': coordinates}
 

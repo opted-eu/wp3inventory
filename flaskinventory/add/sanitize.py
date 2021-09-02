@@ -3,8 +3,8 @@ from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
 from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
-                                         parse_meta, siterankdata, find_sitemaps, find_feeds,
-                                         build_url, twitter, facebook)
+                                         parse_meta, reverse_geocode, siterankdata, find_sitemaps, find_feeds,
+                                         build_url, twitter, facebook, get_wikidata)
 from flaskinventory import dgraph
 from flask import current_app
 from slugify import slugify
@@ -734,6 +734,12 @@ class SourceSanitizer:
                     org['uid'] = NewID(item)
                     org['name'] = item
                     org['dgraph.type'] = 'Organization'
+
+                    try:
+                        self.resolve_org(org)
+                    except Exception as e:
+                        current_app.logger.warning(e)
+
                     unique_name = slugify(item, separator="_")
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
@@ -1012,6 +1018,36 @@ class SourceSanitizer:
         else:
             raise InventoryValidationError(
                 'Invalid data! "name" not specified.')
+
+    def resolve_org(self, org):
+
+        geo_result = geocode(org['name'])
+        if geo_result:
+            try:
+                org['address_geo'] = Geolocation('Point', [
+                    float(geo_result.get('lon')), float(geo_result.get('lat'))])
+            except:
+                pass
+            try:
+                address_lookup = reverse_geocode(geo_result.get('lat'), geo_result.get('lon'))
+                org['address_string'] = address_lookup['display_name']
+            except:
+                pass
+
+        wikidata = get_wikidata(org['name'])
+
+        if wikidata:
+            for key, val in wikidata.items():
+                if key not in org.keys():
+                    org[key] = val
+        
+        return org
+
+
+
+
+
+
 
     def fetch_facebook(self):
         if self.json.get('name'):

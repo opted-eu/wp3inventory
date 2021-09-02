@@ -210,7 +210,7 @@ entry_edit_history: [uid] @reverse .
 entry_review_status: string @index(hash).
 entry_notes: string .
 other_names: [string] @index(term, trigram) .
-wikidataID: int .
+wikidataID: int @index(int) .
 founded: dateTime @index(year) .
 country: [uid] @reverse .
 country_code: string @index(exact).
