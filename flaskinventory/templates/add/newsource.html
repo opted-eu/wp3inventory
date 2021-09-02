@@ -875,6 +875,20 @@
                 document.getElementById('group-geographic-scope-single').hidden = true;
                 document.getElementById('group-geographic-scope-subunit').hidden = true;
 
+                document.getElementById('geographic-scope-multiple').required = false;
+                if (document.getElementById('geographic-scope-multiple-tomselected')) {
+                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                }
+                document.getElementById('geographic-scope-single').required = false;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                }
+
+                document.getElementById('geographic-scope-subunit').required = false;
+                if (document.getElementById('geographic-scope-single-tomselected')) {
+                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                }
+
                 // geographicScopeSingle.clear();
                 // geographicScopeMultiple.clear();
                 // geographicScopeSubunit.clear();
