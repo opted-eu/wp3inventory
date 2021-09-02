@@ -22,7 +22,7 @@ def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
         query_string = f'''{{
-                field1 as var(func: regexp(name, /{form.name.data}/i)) @filter(type("{form.entity.data}"))
+                field1 as var(func: regexp(name, /{form.name.data.ljust(3)}/i)) @filter(type("{form.entity.data}"))
                 field2 as var(func: anyofterms(name, "{form.name.data}")) @filter(type("{form.entity.data}"))
                 field3 as var(func: anyofterms(other_names, "{form.name.data}")) @filter(type("{form.entity.data}"))
     
