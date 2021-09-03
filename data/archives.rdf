@@ -8,6 +8,46 @@
         _:lexisnexis <description> "LexisNexis University ermöglicht die Suche nach nationalen und internationalen Wirtschafts-, Presse- und Firmeninformationen. Unter den Pressequellen sind folgende wichtige enthalten: Volltexte von mehr als 1.000 Zeitungen weltweit in englischer, deutscher, französischer, holländischer, spanischer, italienischer und russischer Sprache; Archiv von Publikationen, wie The New York Times (ab 1980), Financial Times (ab 1982), Le Monde (ab 1990) oder taz (ab 1995); Magazine, Journals und Newsletter, inklusive Manager Magazin, Der Spiegel oder Newsweek; Agenturmeldungen mit mehrmals täglichen Updates, inklusive angesehener Namen wie Agence France Presse, Associated Press, Business Wire, dpa-AFX oder PR Newswire; schwer zu findende Transkripte von Rundfunk- und Fernsehsendungen der großen englischsprachigen TV- und Radiosender, inklusive ABC, CBS, CNN, FOX, NBC oder NPR sowie Protokolle von US Congressional Committee Hearings und Presidential News Conference; Web Blogs in englischer Sprache. Ebenfalls enthalten sind Wirtschafts- und Finanznachrichten, internationale Geschäftsberichte sowie Personeninformationen, Länderinformationen und Branchenreports. Ein Branchenverzeichnis verzeichnet Berichte z.B. aus Business Monitor International (BMI) bzw. aus Fachzeitschriften für verschiedene Branchen. Eine Suche nach Länderreports von BBC Monitoring, gtai, IMOE oder Global Insight oder die Suche nach Primär- und Sekundärquellen zu internationalem Recht, komplementieren das Angebot." . 
         _:lexisnexis <access> "restricted" .
         _:lexisnexis <url> "https://advance.lexis.com/" .
+        _:lexisnexis <entry_review_status> "accepted" .
 
+        _:factiva <dgraph.type> "Archive" .
+        _:factiva <unique_name> "factiva" .
+        _:factiva <name> "Factiva" .
+        _:factiva <access> "restricted" .
+        _:factiva <url> "https://professional.dowjones.com/factiva/" . 
+        _:factiva <entry_review_status> "accepted" .
+
+        _:autnes2013 <dgraph.type> "Dataset" .
+        _:autnes2013 <unique_name> "autnes_2013" .
+        _:autnes2013 <name> "AUTNES Manual Content Analysis of the Media Coverage 2013" .
+        _:autnes2013 <doi> "10.4232/1.12565" .
+        _:autnes2013 <access> "free" .
+        _:autnes2013 <url> "https://search.gesis.org/research_data/ZA5864" . 
+        _:autnes2013 <published_date> "2016" .
+        _:autnes2013 <authors> "[Eberl, Jakob-Moritz; Vonbun, Ramona; Haselmayer, Martin; Jacobi, Carina; Kleinen-von Königslöw, Katharina; Schönbach, Klaus; Boomgaarden, Hajo G.]" .
+        _:autnes2013 <entry_review_status> "accepted" .
+
+        _:ees2009 <dgraph.type> "Dataset" .
+        _:ees2009 <unique_name> "ees_2009" .
+        _:ees2009 <name> "European Parliament Election Study 2009, Media Study" .
+        _:ees2009 <other_names> "EES 2009" .
+        _:ees2009 <doi> "10.4232/1.10203" .
+        _:ees2009 <access> "free" .
+        _:ees2009 <url> "https://search.gesis.org/research_data/ZA5056" . 
+        _:ees2009 <published_date> "2010" .
+        _:ees2009 <authors> "[Schuck, Andreas; Xezonakis, Georgios; Banducci, Susan; de Vreese, Claes H.]" .
+        _:ees2009 <entry_review_status> "accepted" .
+
+        _:reminder <dgraph.type> "Dataset" .
+        _:reminder <unique_name> "reminder_2017" .
+        _:reminder <name> "REMINDER: Short Term Media Analysis on Migration 2017-2018 (OA edition)" .
+        _:reminder <doi> "doi:10.11587/T86DVG" .
+        _:reminder <access> "free" .
+        _:reminder <url> "https://data.aussda.at/dataset.xhtml?persistentId=doi:10.11587/T86DVG" . 
+        _:reminder <published_date> "2020-08-21" .
+        _:reminder <authors> "[Heidenreich, Tobias; Lind, Fabienne; Eberl, Jakob-Moritz; Galyga, Sebastian; Edie, Rachel; Herrero-Jiménez, Beatriz; Gómez Montero, Eva Luisa; Berganza, Rosa; Boomgaarden, Hajo G.]" .
+        _:reminder <description> "Full edition for public use. The principle of free movement allows citizens of the European Union (EU) to cross EU borders to live, work, or travel in other EU member states. It is one of the “four freedoms”, and a fundamental principle of the EU. However, since the so-called “refugee movements” in 2015, free movement within Europe and migration into the EU are fiercely debated topics, particularly in the media. This dataset allows users to compare the salience and sentiment of coverage pertaining to the two different concepts of migration (i.e. general migration vs. intra-European mobility), as well as to investigate the salience and corresponding sentiment of specific, migration-related media frames. The dataset was collected within the Horizon 2020 Project REMINDER using automated content analysis and consists of annotations of migration-related news articles published between 01.12.2017 and 06.11.2018 in Spain, UK, Germany, Sweden, Poland, Hungary, and Romania and includes media coverage from 81 media outlets. The data can be linked to the \"REMINDER: Online-Panel Study on Migration and Mobility Attitudes 2017-2018\" (doi: 10.11587/LBSMPQ)." .
+        _:reminder <entry_review_status> "accepted" .
     }
 }
+

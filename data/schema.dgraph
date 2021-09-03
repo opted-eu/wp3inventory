@@ -156,6 +156,11 @@ type Dataset {
     url
     annotations
     fulltext
+    doi
+    arxiv
+    isbn
+    authors
+    published_date
 }
 
 
