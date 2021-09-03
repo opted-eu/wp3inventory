@@ -644,7 +644,7 @@ class SourceSanitizer:
 
     def parse_audience_size(self):
         if self.json.get('audience_size_subscribers'):
-            facets = {'subscribers': int(
+            facets = {'copies_sold': int(
                 self.json.get('audience_size_subscribers'))}
             if self.json.get('audience_size_datafrom'):
                 facets['datafrom'] = self.json.get(
