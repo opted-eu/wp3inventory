@@ -133,13 +133,6 @@
                 ">Sun</li>
               </ul>
         </dd>{% endif %}
-    </dl>
-</div>
-
-<div class="border rounded p-3">
-    <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
         <dt class="col-sm-3">Geographic Scope</dt>
         <dd class="col-sm-9">{{ entry.geographic_scope }}
         <dt class="col-sm-3">Countries</dt>
@@ -161,7 +154,15 @@
         
         {% if entry.languages %}
         <dt class="col-sm-3">Languages</dt>
-        <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %} {% if entry.audience_size %}
+        <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %}
+    </dl>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+         {% if entry.audience_size %}
         <dt class="col-sm-3">Audience Size</dt>
         <dd class="col-sm-9"> {{ entry.audience_size_table }}</dd> {% endif %} {% if entry.audience_residency %}
         <dt class="col-sm-3">Audience Residency</dt>
