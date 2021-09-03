@@ -29,10 +29,10 @@ def make_mini_table(table_data):
     TableCls.classes = ['table']
     if 'date' in table_data[0].keys():
         TableCls.add_column('date', DateCol('Date'))
-    if 'datafrom' in table_data[0].keys():
-        TableCls.add_column('datafrom', ExternalURLCol('Datafrom', url_attr='datafrom', attr='datafrom'))
+    if 'data_from' in table_data[0].keys():
+        TableCls.add_column('data_from', ExternalURLCol('Data from', url_attr='data_from', attr='data_from'))
     for item in table_data[0].keys():
-        if item == 'date' or item == 'datafrom': continue
+        if item == 'date' or item == 'data_from': continue
         TableCls.add_column(item, Col(item.replace("_", " ").title()))
     return TableCls(table_data)
 

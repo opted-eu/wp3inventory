@@ -647,10 +647,10 @@ class SourceSanitizer:
             facets = {'copies_sold': int(
                 self.json.get('audience_size_subscribers'))}
             if self.json.get('audience_size_datafrom'):
-                facets['datafrom'] = self.json.get(
+                facets['data_from'] = self.json.get(
                     'audience_size_datafrom')
             else:
-                facets['datafrom'] = "unknown"
+                facets['data_from'] = "unknown"
 
             if self.json.get('audience_size_year'):
                 audience_size_year = int(self.json.get('audience_size_year'))
@@ -666,7 +666,7 @@ class SourceSanitizer:
         if daily_visitors:
             self.newsource['audience_size'] = Scalar(datetime.date.today(), facets={
                 'daily_visitors': daily_visitors,
-                'datafrom': f"https://siterankdata.com/{self.newsource['name'].replace('www.', '')}"})
+                'data_from': f"https://siterankdata.com/{self.newsource['name'].replace('www.', '')}"})
 
     @staticmethod
     def source_unique_name(name, channel=None, channel_uid=None, country=None, country_uid=None):
