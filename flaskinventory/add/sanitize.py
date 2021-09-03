@@ -578,23 +578,32 @@ class SourceSanitizer:
 
                 elif self.newsource['geographic_scope'] == 'national':
                     if self.json.get('geographic_scope_single'):
-                        if self.json.get('geographic_scope_single').startswith('0x'):
-                            self.newsource['geographic_scope_countries'] = [
-                                UID(self.json.get('geographic_scope_single'))]
-                        else:
-                            raise InventoryValidationError(
-                                f'Invalid Data! "geographic_scope_single" not uid: {self.json.get("geographic_scope_single")}')
+                        countries = []
+                        if type(self.json.get('geographic_scope_single')) == str:
+                            country = self.json.get('geographic_scope_single').split(',')
+                        for item in country:
+                            try:
+                                if item.startswith('0x'):
+                                    countries.append(UID(item))
+                            except:
+                                continue
+                        self.newsource['geographic_scope_countries'] = countries
+
                 elif self.newsource['geographic_scope'] == 'subnational':
                     if self.json.get('geographic_scope_single'):
-                        if self.json.get('geographic_scope_single').startswith('0x'):
-                            self.newsource['geographic_scope_countries'] = [
-                                UID(self.json.get('geographic_scope_single'))]
-                        else:
-                            raise InventoryValidationError(
-                                f'Invalid Data! "geographic_scope_single" not uid: {self.json.get("geographic_scope_single")}')
+                        countries = []
+                        if type(self.json.get('geographic_scope_single')) == str:
+                            country = self.json.get('geographic_scope_single').split(',')
+                        for item in country:
+                            try:
+                                if item.startswith('0x'):
+                                    countries.append(UID(item))
+                            except:
+                                continue
+                        self.newsource['geographic_scope_countries'] = countries
                     else:
                         raise InventoryValidationError(
-                            'Invalid Data! need to specify at least one country!')
+                            'Invalid Data! Please specify at least one country!')
                     self.parse_subunit()
             else:
                 raise InventoryValidationError(
