@@ -19,3 +19,5 @@ search
 question-circle
 tasks
 city
+info-circle
+book

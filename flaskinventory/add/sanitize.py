@@ -753,13 +753,7 @@ class SourceSanitizer:
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     org['unique_name'] = unique_name
-                    if self.json.get('ownership_kind'):
-                        if self.json.get('ownership_kind').lower() in self.ownership_kind:
-                            org['ownership_kind'] = self.json.get(
-                                'ownership_kind').lower()
-                        else:
-                            raise InventoryValidationError(
-                                f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
+                    
                 self.orgs.append(org)
 
     def parse_person(self):
@@ -781,13 +775,7 @@ class SourceSanitizer:
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     pers['unique_name'] = unique_name
-                # if self.json.get('ownership_kind'):
-                #     if self.json.get('ownership_kind').lower() in self.ownership_kind:
-                #         pers["ownership_kind"] = self.json.get(
-                #             'ownership_kind').lower()
-                #     else:
-                #         raise InventoryValidationError(
-                #             f'Invalid data! Unknown value in "ownership_kind": {self.json.get("ownership_kind")}')
+               
                 self.orgs.append(pers)
 
     def parse_archives(self):

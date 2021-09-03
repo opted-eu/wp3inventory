@@ -1,0 +1,11 @@
+{% macro make_tooltip(text, position='right', id=None) %}
+
+<i class="fas mx-1 fa-info-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="{{ position }}" title="{{ text }}" {% if id %}id="{{id}}"{% endif %}></i>
+
+{% endmacro %}
+
+{% macro make_researchtip(text, position='right', id=None) %}
+
+<i class="fas mx-1 fa-book text-primary" data-bs-toggle="tooltip" data-bs-placement="{{ position }}" title="Research hint: {{ text }}" {% if id %}id="{{id}}"{% endif %}></i>
+
+{% endmacro %}

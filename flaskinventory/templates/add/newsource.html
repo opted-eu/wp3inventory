@@ -20,6 +20,8 @@
     </div>
 </div>
 <form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden>
+    {% from "helpers/_tooltip.html" import make_tooltip %}
+    {% from "helpers/_tooltip.html" import make_researchtip %}
     <div class="progress my-4">
         <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
@@ -27,7 +29,7 @@
         <h3 class="mb-4">General Information</h3>
         <div class="mb-5 form-group">
             <input type="text" name="uid" id="uid-hidden" value='_:newsource' readonly hidden>
-            <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed?</label>
+            <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed? {{ make_tooltip('If the channel you have in mind is not included as an option you may write to wp3@opted.eu and we discuss your suggestion.') }}</label>
             <select name="channel" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
                         <option value="">Select Channel...</option>
                     </select>
@@ -36,8 +38,14 @@
         </div>
         <div class="mb-5">
             <div id="group-name" class="form-group mb-4">
-                <label for="name" class="form-label fw-bold fs-5">What is the name of the print news source?</label>
-                <small id="name-helptext"></small>
+                <label for="name" class="form-label fw-bold fs-5"><span id="name-question">What is the name of the print news source?</span>
+                    {{ make_tooltip('Please write the title as it appears on the printed copy. Pay attention to capitalization and word separation. Logos and other formatting do not need to be respected. Stick to the original language of the source and do not translate the name into English.', id='name-print-tooltip')}}
+                    {{ make_tooltip('Please specify the URL. For example https://www.theguardian.com', id='name-website-tooltip')}}
+                    {{ make_tooltip('Please specify the Facebook URL. For example for https://www.facebook.com/theguardian you just type ‘theguardian’.', id='name-facebook-tooltip') }}
+                    {{ make_tooltip('Please specify the name of the Instagram account. For example for https://www.instagram.com/guardian you just type “guardian”. The @ is added automatically.', id='name-instagram-tooltip') }}
+                    {{ make_tooltip('Please specify the handle of the Twitter account. For example for https://twitter.com/guardian you just type “guardian”. The @ is added automatically.', id='name-twitter-tooltip') }}
+                </label>
+                <p class="my-0"><small id="name-helptext"></small></p>
                 <div class="input-group input-group-lg">
                     <span class="input-group-text" id="name-addon">https://www.facebook.com/</span>
                     <input name="name" type="text" class="form-control" id="name" placeholder="e.g. 'The Royal Gazette'" aria-describedby="name-feedback" autocomplete="off" required>
@@ -46,9 +54,9 @@
         </div>
             <div id="group-transcript-kind" class="form-group">
                 <div class="form-group mb-4">
-                    <label for="channel_url" class="form-label fw-bold fs-5">What is the name of the website that provides tv, radio, or podcast scripts?</label>
-                    <p><small id="channel_url-helptext">Please specify the archive name or the direct URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)</small></p>
-                    <input name="channel_url" type="text" class="form-control form-control-lg" id="channel_url" placeholder="e.g. 'The Royal Gazette'" aria-describedby="channel_url-feedback" autocomplete="off">
+                    <label for="channel_url" class="form-label fw-bold fs-5">What is the url of the website that provides tv, radio, or podcast scripts?</label>
+                    <p class="my-0"><small id="channel_url-helptext">Please specify the archive name or the direct URL (e.g., https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html; https://www.ndr.de/nachrichten/info/index.html)</small></p>
+                    <input name="channel_url" type="text" class="form-control form-control-lg" id="channel_url" placeholder="e.g., 'https://www.deutschlandfunk.de/die-nachrichten-nachlesen.1794.de.html'" aria-describedby="channel_url-feedback" autocomplete="off">
                 </div>
                 <div id="channel_url-feedback"></div>
 
@@ -85,30 +93,37 @@
 
         <!-- Optional Field -->
         <div id="group-other-names" class="mb-5 form-group">
-            <label for="other-names" class="form-label fw-bold fs-5">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:<span class="text-muted mx-3">(optional)</span></label>
+            <label for="other-names" class="form-label fw-bold fs-5">Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)? Please type them here:
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_tooltip('For example the “Mitteldeutsche Zeitung” is also called “MZ”. This question is not channel specific. Add the English translation of the names if frequently used. Do not enter names of sources that were the forerunner of the source that you enter.') }}
+                {{ make_researchtip('Wikipedia often mentions alternative names') }}
+            </label>
             <input type="text" name="other_names" class="form-control form-control-lg" id="other-names" placeholder="Separate by comma" multiple>
             <div id="other-names-feedback"></div>
         </div>
 
         <div id="group-channel-comments" class="mb-5 form-group fs-5" hidden>
-            <p class="form-label fw-bold fs-5">Does the online news source have user comments below individual news articles?</p>
+            <p class="form-label fw-bold fs-5">Does the online news source have user comments below individual news articles? 
+                {{make_researchtip('Please visit the website, click on a few individual articles, check whether there are comments and whether it is possible to add a comment as non-registered user. Hints like “You must be logged in to post a comment.” point you to selecting the second option. ')}}
+
+            </p>
 
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments1" value="no comments" aria-describedby="channel-comments-feedback">
                 <label class="form-check-label" for="channel_comments1">
-                        No comments
+                    No user comments
                     </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments2" value="user comments with registration" aria-describedby="channel-comments-feedback">
                 <label class="form-check-label" for="channel_comments2">
-                        Registration required
+                    Yes, but only  with registration
                     </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments3" value="user comments without registration" aria-describedby="channel-comments-feedback">
                 <label class="form-check-label" for="channel_comments3">
-                        Anyone
+                    Yes, and anyone can comment
                     </label>
             </div>
             <div class="form-check">
@@ -121,7 +136,11 @@
         </div>
 
         <div id="group-source-founded" class="mb-5 form-group">
-            <label for="source-founded" class="form-label fw-bold fs-5">What year was the news source founded?<span class="text-muted mx-3">(optional)</span></label>
+            <label for="source-founded" class="form-label fw-bold fs-5"><span id="source-founded-question">What year was the news source founded?</span>
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_tooltip('If you can not find the ‘founding’ year, you may also put the year of the first edition (for print), the first post (social media) or the website launch (for websites). Use the founding year of the current brand not the founding year of its forerunners. Information about associated forerunners (related brands) can be added as comments (the last question).') }}
+                {{ make_researchtip('Please double check the information that you find on Wikipedia. For example, by checking the ‘about me’/ ‘corporate history’ pages of the news source.') }}
+            </label>
             <input name="founded" type="number" step="1" min="1700" max="2100" class="form-control form-control-lg" id="source-founded" placeholder="Format: YYYY" aria-describedby="founded-feedback">
             <div id="founded-feedback"></div>
         </div>
@@ -135,8 +154,12 @@
         <h3 class="mb-4">Information about Journalistic Routines</h3>
 
         <div id="group-publication-kind" class="mb-5 form-group">
-            <label for="publication-kind" class="form-label fw-bold fs-5">What label or labels describe the source?</label>
-            <p><small id="publication-kind-helptext">To identify this information please refer to the learning module.</small></p>
+            <label for="publication-kind" class="form-label fw-bold fs-5">What label or labels describe the main source?
+                {{ make_tooltip('This variable points to the main product. For example, if you enter a website for an online newspaper, select newspaper. For example, if you enter a social media account that is related to a TV show, select TV show.') }}
+                {{ make_researchtip('Check the ‘about me/imprint’ pages.
+                The membership of a news source in larger well-established organisations (like: www.ivw.eu) may include hints on appropriate labels.') }}
+            </label>
+            <p class="my-0"><small id="publication-kind-helptext">To identify this information please refer to the learning module.</small></p>
             <select name="publication_kind" class="form-select form-select-lg" id="publication-kind" aria-describedby="publication-kind-feedback" placeholder="Select multiple or add new..." required multiple>
                         <option value="newspaper">Newspaper</option>
                         <option value="news agency">News Agency</option>
@@ -146,7 +169,6 @@
                         <option value="podcast">Podcast</option>
                         <option value="news blog">News Blog</option>
                         <option value="alternative media">Alternative Media</option>
-                        <option value="none">Don't know</option>
                     </select>
             <div id="publication-kind-feedback"></div>
 
@@ -155,17 +177,19 @@
 
 
         <div id="group-special-interest" class="mb-5 form-group fs-5">
-            <p class="form-label fw-bold fs-5">Does the news source have one main topical focus?</p>
+            <p class="form-label fw-bold fs-5">Does the news source have one main topical focus?
+                {{ make_tooltip('A general news source is understood as one that covers topics like politics, economics, culture, sports, etc. not necessarily with equal attention but reports about all of them regularly. A specialized news source has a clear main focus e.g. ‘Ziarul Financiar’, a Romanian newspaper has a clear focus on finance related topics.')}}
+            </p>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="special_interest" id="special_interest1" value="no" aria-describedby="special-interest-feedback" checked>
                 <label class="form-check-label" for="special_interest1">
-                                No, it is a general interest news source (i.e., general news) 
+                    No, is a general news source (i.e., general news) 
                             </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="special_interest" id="special_interest2" value="yes" aria-describedby="special-interest-feedback">
                 <label class="form-check-label" for="special_interest2">
-                            Yes, is a special interest news source (i.e., clear focus on one topic) 
+                        Yes, is a specialized news source (i.e., clear focus on one topic) 
                         </label>
             </div>
             <div id="special-interest-feedback"></div>
@@ -173,8 +197,9 @@
 
         <div id="group-topical-focus" class="mb-5 form-group" hidden>
             <label for="topical-focus" class="form-label fw-bold fs-5">What is the main topical focus of the news source?</label>
-            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
-                        <option value="" selected>Choose...</option>
+            <p class="my-0"><small id="topical-focus-helptext"></small></p>
+            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback">
+                        <option value="" selected>Choose or add other</option>
                         <option value="politics">Politics</option>
                         <option value="society">Society & Panorama</option>
                         <option value="economy">Economy, Finance & Stocks</option>
@@ -183,14 +208,16 @@
                         <option value="media">Media</option>
                         <option value="environment">Environment</option>
                         <option value="education">Education</option>
-                        <option value="none">Don't know</option>
                     </select>
             <div id="topical-focus-feedback"></div>
-            <small id="topical-focus-helptext"></small>
         </div>
 
         <div id="group-publication-cycle" class="mb-3 form-group">
-            <label for="publication-cycle" class="form-label fw-bold fs-5">What is the publication cycle of the source?</label>
+            <label for="publication-cycle" class="form-label fw-bold fs-5">What is the publication cycle of the source?
+                {{ make_tooltip('What is the publication cycle as of today? For print newspapers that publish from Mon-Sat select “multiple times per week” and select the respective days.') }}
+                {{ make_researchtip('Check the ‘subscription’ page of the source.') }}
+            </label>
+            <p class="my-0"><small id="publication-cycle-helptext"></small></p>
             <select name="publication_cycle" class="form-select form-select-lg" id="publication-cycle" aria-describedby="publication-cycle-feedback" required>
                         <option value="" selected>Choose...</option>
                         <option value="continuous">Continuous (mainly applicable for online news / social media / messenger)</option>
@@ -202,7 +229,6 @@
                         <option value="none">Don't know</option>
                     </select>
             <div id="publication-cycle-feedback"></div>
-            <small id="publication-cycle-helptext"></small>
         </div>
 
         <div id="group-publication-cycle-weekday" class="mb-5 fs-5" hidden>
@@ -242,154 +268,30 @@
             <div id="publication-cycle-weekday-feedback"></div>
         </div>
 
-        <input type="button" class="btn btn-primary prev" value="Previous Step">
-        <input type="button" class="btn btn-primary next" value="Next Step">
-    </fieldset>
-
-
-    <!-- SECTION: ECONOMIC VARIABLES -->
-    <fieldset id="section-economic" hidden>
-        <h3 class="mb-4">Economic Information</h3>
-        <div id="group-payment-model" class="mb-5 form-group fs-5">
-            <p class="form-label fw-bold fs-5">Is the content produced by the news source accessible free of charge?</p>
-
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free" aria-describedby="payment-model-feedback" required>
-                <label class="form-check-label" for="payment_model1">
-                               Free
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="soft paywall" aria-describedby="payment-model-feedback" required>
-                <label class="form-check-label" for="payment_model2">
-                                Soft paywall
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="subscription" aria-describedby="payment-model-feedback" required>
-                <label class="form-check-label" for="payment_model3">
-                                Subscription
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model4" value="none" aria-describedby="payment-model-feedback" required>
-                <label class="form-check-label" for="payment_model4">
-                                Don't know
-                            </label>
-            </div>
-            <div id="payment-model-feedback"></div>
-        </div>
-
-
-
-
-        <div id="group-contains-ads" class="mb-5 form-group fs-5">
-
-            <p for="contains_ads" class="form-label fw-bold fs-5">Does the news source contain advertisements?</p>
-
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes" aria-describedby="contains-ads-feedback" required>
-                <label class="form-check-label" for="contains_ads1">
-                               Yes
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads2" value="no" aria-describedby="contains-ads-feedback" required>
-                <label class="form-check-label" for="contains_ads2">
-                                No
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads3" value="non subscribers" aria-describedby="contains-ads-feedback" required>
-                <label class="form-check-label" for="contains_ads3">
-                                Only for non-paying users
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads4" value="none" aria-describedby="contains-ads-feedback" required>
-                <label class="form-check-label" for="contains_ads4">
-                                Don't know
-                            </label>
-                <div id="contains-ads-feedback"></div>
-            </div>
-        </div>
-
-        <!-- Optional Field -->
-        <div id="group-publishes" class="mb-5 form-group">
-            <p class="form-label fw-bold fs-5">Which organisation or person owns the news source?<span class="text-muted mx-3">(optional)</span></p>
-            <p><small id="publishes_org-helptext" class="mb-3">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small></p>
-            <div class="input-group my-3">
-                <span class="input-group-text">Organisation</span>
-                <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
-            </div>
-            <div class="input-group">
-                <span class="input-group-text">Person</span>
-                <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
-            </div>
-        </div>
-
-        <div id="group-ownership-kind" class="mb-5 form-group fs-5">
-            <p class="form-label fw-bold fs-5">Is the news source funded mainly public or mainly private?</p>
-            <p><small id="ownership-kind-helptext">To identify this information please check the imprint (or imprint alike information)</small></p>
-
-
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind1" value="public ownership" aria-describedby="ownership-kind-feedback" required>
-                <label class="form-check-label" for="ownership_kind1">
-                               Mainly public
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind2" value="private ownership" aria-describedby="ownership-kind-feedback" required>
-                <label class="form-check-label" for="ownership_kind2">
-                                Mainly private
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind3" value="unknown" aria-describedby="ownership-kind-feedback" required>
-                <label class="form-check-label" for="ownership_kind3">
-                                News source does not mention the type of funding
-                            </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="ownership_kind" id="ownership_kind4" value="none" aria-describedby="ownership-kind-feedback" required>
-                <label class="form-check-label" for="ownership_kind4">
-                                Don't know
-                            </label>
-                <div id="ownership-kind-feedback"></div>
-            </div>
-        </div>
-
-        <input type="button" class="btn btn-primary prev" value="Previous Step">
-        <input type="button" class="btn btn-primary next" value="Next Step">
-    </fieldset>
-
-    <!-- SECTION AUDIENCE RELATED -->
-
-    <fieldset id="section-audience" hidden>
-        <h3 class="mb-4">Information about the Audience</h3>
-
-        <div id="group-geographic-scope" class="mb-5 form-group fs-5">
+        <div id="group-geographic-scope" class="my-5 form-group fs-5">
             <div>
-                <p class="form-label fw-bold fs-5">What is the geographic scope of the news source? Who is the audience that the source is primarily addressing? </p>
-                <p><small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small></p>
+                <p class="form-label fw-bold fs-5">What is the geographic scope of the news source?
+                    {{ make_tooltip('The geographic scope is related to the content of the news source. At which geographical location do most of the reported news stories happen? From what geographical perspective is the news looked at? The geographic scope of the source is often but does not have to be in line with the residency of the main audience of a source. The geographic scope can but does not have to be in line with the related media company’s headquarter location. Examples for multinational news sources are EuroNews or Reuters. Select ‘national’ for news sources that have a large international news section and also international audience, but the majority of the news is still related to one country (e.g. Jerusalem Post).') }}
+                    {{ make_researchtip('Browse through the articles/posts/sections of the news source.') }}
+                </p>
+                <p class="my-0"><small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small></p>
             </div>
             <div class="form-check">
                 <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope1" value="multinational">
                 <label class="form-check-label" for="geographic_scope1">
-                            Multinational (e.g., EU in general, German-speaking countries)
+                        Multinational (e.g., EU in general, dedicated cross-national news sources)
                         </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope2" value="national">
                 <label class="form-check-label" for="geographic_scope2">
-                            National (consumed mainly in one country) 
+                    National (covers news that relate mainly to one country) 
                         </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope3" value="subnational">
                 <label class="form-check-label" for="geographic_scope3">
-                            Subnational (consumed in a city/county/province/department)
+                    Subnational (covers news that relate mainly to one city/county/province/department)
                         </label>
             </div>
             <div class="form-check">
@@ -402,7 +304,9 @@
         </div>
 
         <div id="group-geographic-scope-multiple" class="mb-5 form-group">
-            <label for="geographic-scope-multiple" class="form-label fw-bold fs-5">What is the multinational scope?</label>
+            <label for="geographic-scope-multiple" class="form-label fw-bold fs-5">What is the multinational scope?
+                {{ make_tooltip('Groupings such as “German speaking countries” have to be entered manually. In this case: Austria, Germany, Switzerland.') }}
+            </label>
             <small id="geographic-scope-multiple-helptext"></small>
             <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
             <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly hidden>
@@ -411,7 +315,9 @@
         </div>
 
         <div id="group-geographic-scope-subunit" class="mb-5 form-group" hidden>
-            <label for="geographic-scope-subunit" class="form-label fw-bold fs-5">What is the subnational scope?</label>
+            <label for="geographic-scope-subunit" class="form-label fw-bold fs-5">What is the subnational scope?
+                {{ make_tooltip('Here, terms that are as all-encompassing as possible are required. For example, enter “Vienna” and not each individual district of the city.') }}
+            </label>
             <select type="text" name="geographic_scope_subunit" class="form-control form-control-lg" id="geographic-scope-subunit" aria-describedby="geographic-scope-subunit-feedback" placeholder="Enter name(s) and separate by comma..." multiple></select>
             <div id="geographic-scope-subunit-feedback"></div>
         </div>
@@ -426,26 +332,138 @@
         </div>
 
         <div id="group-languages" class="mb-5 form-group">
-            <label for="languages" class="form-label fw-bold fs-5">In which language(s) does the news source publish its news texts?</label>
+            <label for="languages" class="form-label fw-bold fs-5">In which language(s) does the news source publish its news texts?
+                {{ make_tooltip('Enter all languages that are an integral part of the source and if articles are regularly published in the different languages.') }}
+            </label>
             <select name="languages" id="languages" class="form-select form-select-lg" placeholder="Select multiple..." aria-describedby="languages-feedback" multiple required></select>
             <small id="languages-helptext"></small>
             <div id="languages-feedback"></div>
         </div>
 
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
+
+    <!-- SECTION: ECONOMIC VARIABLES -->
+    <fieldset id="section-economic" hidden>
+        <h3 class="mb-4">Economic Information</h3>
+        <div id="group-payment-model" class="mb-5 form-group fs-5">
+            <p class="form-label fw-bold fs-5">Is the content produced by the news source accessible free of charge?
+                {{ make_tooltip('Select ‘free’ only if all content is free of charge. Select ‘free’ also if the source asks for donations on a voluntary basis. Select “subscription’ for sources with freemium models, metered paywalls, and hard paywall.') }}
+                {{ make_researchtip('Visit the website of the medium and search for (potential) subscription prices for the digital and non-digital content.')}}
+            </p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model1">
+                               Free
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="subscription" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model2">
+                                Subscription
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="none" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model3">
+                                Don't know
+                            </label>
+            </div>
+            <div id="payment-model-feedback"></div>
+        </div>
+
+
+
+
+        <div id="group-contains-ads" class="mb-5 form-group fs-5">
+
+            <p for="contains_ads" class="form-label fw-bold fs-5">Does the news source contain advertisements?
+                {{ make_tooltip('Select Don’t know if the full content can not be accessed.') }}
+                {{ make_researchtip('Deactivate your ad blocker if applicable.') }}
+            </p>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads1" value="yes" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads1">
+                               Yes, for all audiences
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads3" value="non subscribers" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads3">
+                                Yes, but not for paying users
+
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads2" value="no" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads2">
+                                No, not at all
+                            </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="contains_ads" id="contains_ads4" value="none" aria-describedby="contains-ads-feedback" required>
+                <label class="form-check-label" for="contains_ads4">
+                                Don't know
+                            </label>
+                <div id="contains-ads-feedback"></div>
+            </div>
+        </div>
+
+        <!-- Optional Field -->
+        <div id="group-publishes" class="mb-5 form-group">
+            <p class="form-label fw-bold fs-5">Which organisation or person owns the news source?
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_researchtip('To identify this information please check the imprint (or imprint alike information). You can also check Wikipedia to cross-check.') }}
+            </p>
+            <p><small id="publishes_org-helptext" class="mb-3">e.g. The print newspaper The Guardian is owned by Guardian Media Group. To identify this information please check the imprint (or imprint alike information)</small></p>
+            <div class="input-group my-3">
+                <span class="input-group-text">Organisation {{ make_tooltip('Add the name(s) of organisations/companies that hold shares of a news source. Please name the next larger unit. ') }}</span>
+                <select name="publishes_org" id="publishes_org" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">Person {{ make_tooltip('If applicable, add names of people who hold shares in a news source. This field specified individual persons who own the news source or parts of it. It is not there to include chairmen or chairwomen of a company, also not to mention the publisher’s/editor’s names.') }}</span>
+                <select name="publishes_person" id="publishes_person" class="form-select form-select-lg" placeholder="Select multiple or add new..." multiple></select>
+            </div>
+        </div>
+
+        <input type="button" class="btn btn-primary prev" value="Previous Step">
+        <input type="button" class="btn btn-primary next" value="Next Step">
+    </fieldset>
+
+    <!-- SECTION AUDIENCE RELATED -->
+
+    <fieldset id="section-audience" hidden>
+        <h3 class="mb-4">Information about the Audience</h3>
+
         <div id="group-audience-size" class="mb-5">
             <div id="group-audience-size-subscribers" class="mb-5">
-                <label for="audience-size-subscribers" class="form-label fw-bold fs-5">How many people subscribe to this newspaper? <span class="text-muted">Please specify an absolute number (no percentage)</span></label>
-                <input name="audience_size_subscribers" type="number" step="1" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
-                <p><small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small></p>
+                <label for="audience-size-subscribers" class="form-label fw-bold fs-5">How many copies of this newspaper are sold per issue?
+                    <span class="text-muted mx-1">(optional)</span>
+                    {{ make_tooltip('If the newspaper has regional editions try to find the total number of sold copies for all of them combined. The newspaper will have varying sales figures for different days in the week, try to find an average number of copies sold per issue per day. Important: Please check carefully whether the source allows the public use and free distribution of the number.') }}
+                    {{ make_researchtip('Use established and recognized sources to retrieve this information. Visit https://www.ifabc.org/members/full-member-list-alphabetically to find an appropriate source for many European countries. 
+                    E.g.: 
+                    Austria: https://www.oeak.at/auflagedetails/
+                    Germany: https://www.ivw.eu/print/print') }}
+                </label>
+                <p class="my-0"><small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small></p>
+                <input name="audience_size_subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">
-                <label for="audience-size-year" class="form-label fw-bold fs-5">For which year is this information?<span class="text-muted mx-1">(i.e., number of subscribers)</span></label>
+                <label for="audience-size-year" class="form-label fw-bold fs-5">For which year is this number?
+                    <span class="text-muted mx-1">(optional)</span>
+                    {{ make_tooltip('Use the latest information that is available') }}
+                </label>
+                <p class="my-0"><small id="audience-size-helptext">(i.e., number of sold copies per issue)</small></p>
                 <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
                 <div id="audience-size-year-feedback"></div>
             </div>
             <div id="group-audience-size-datafrom" class="mb-5">
-                <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted mx-3">(optional)</span></label>
+                <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted mx-1">(optional)</span></label>
                 <input name="audience_size_datafrom" type="text" class="form-control" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
                 <div id="audience-size-datafrom-feedback"></div>
             </div>
@@ -460,16 +478,37 @@
 
     <fieldset id="section-annotations" hidden>
         <h3 class="mb-4">Access to Raw Text and Annotations</h3>
-        <div id="group-epaper" class="mb-5 form-group" hidden>
-            <label for="channel-epaper" class="form-label fw-bold fs-5">Does the print news source have an e-paper version? Please insert the url here:<span class="text-muted mx-3">(optional)</span></label>
-            <input name="channel_epaper" type="text" class="form-control" id="channel-epaper" placeholder="Please specify (e.g., https://swmh-epaper.s4p-iapps.com/)" aria-describedby="channel-epaper-feedback">
-            <div id="channel-epaper-feedback"></div>
 
+        <div id="group-epaper" class="mb-5 form-group fs-5" hidden>
+            <p class="form-label fw-bold fs-5">Does the print news source have an e-paper version?<span class="text-muted mx-1">(optional)</span></p>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_epaper" id="channel_epaper1" value="yes" aria-describedby="channel-epaper-feedback">
+                <label class="form-check-label" for="channel_epaper1">
+                               Yes
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_epaper" id="channel_epaper2" value="no" aria-describedby="channel-epaper-feedback">
+                <label class="form-check-label" for="channel_epaper2">
+                                No
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="channel_epaper" id="channel_epaper4" value="none" aria-describedby="channel-epaper-feedback">
+                <label class="form-check-label" for="channel_epaper4">
+                                Don't know
+                            </label>
+            </div>
+            <div id="channel-epaper-feedback"></div>
         </div>
 
         <!-- Optional Field -->
         <div id="group-archive-sources-included" class="mb-5 form-group" hidden>
-            <label for="archive-sources-included" class="form-label fw-bold fs-5">Are texts from the news source available for download in one or several of the following data archives?<span class="text-muted mx-3">(optional)</span></label>
+            <label for="archive-sources-included" class="form-label fw-bold fs-5">Are texts from the news source available for download in one or several of the following data archives?
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_tooltip('For news sources that run their own archives, please add the name via the option “Other please specify” e.g. The Guardian Open Platform”.') }}
+            </label>
             <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
             <small id="archive-sources-included-helptext"></small>
             <div id="archive-sources-included-feedback"></div>
@@ -477,7 +516,7 @@
 
         <!-- Optional Field -->
         <div id="group-dataset-sources-included" class="mb-5 form-group">
-            <label for="dataset-sources-included" class="form-label fw-bold fs-5">Is the news source included in one or several of the following annotated media text data sets?<span class="text-muted mx-3">(optional)</span></label>
+            <label for="dataset-sources-included" class="form-label fw-bold fs-5">Is the news source included in one or several of the following annotated media text data sets?<span class="text-muted mx-1">(optional)</span></label>
             <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
             <small id="dataset-sources-included-helptext"></small>
             <div id="dataset-sources-included-feedback"></div>
@@ -494,7 +533,10 @@
 
         <!-- Optional Field -->
         <div id="group-entry-notes" class="mb-5 form-group">
-            <label for="entry-notes" class="form-label fw-bold fs-5">Do you have any other notes on the source that you just coded?<span class="text-muted mx-3">(optional)</span></label>
+            <label for="entry-notes" class="form-label fw-bold fs-5">Do you have any other notes on the source that you just coded?
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_tooltip('This is a good place to add Information about associated forerunners (related brands). There are cases where one news brand emerged out of another.')}}
+            </label>
             <input type="text" name="entry_notes" id="entry-notes" class="form-control form-control-lg" aria-describedby="entry-notes-feedback" placeholder="">
             <small id="entry-notes-helptext"></small>
             <div id="entry-notes-feedback"></div>
@@ -502,7 +544,7 @@
 
         <!-- Optional Field -->
         <div id="group-related-sources" class="mb-5 form-group">
-            <label for="related-sources" class="form-label fw-bold fs-5">For the source that you just coded, does it have other closely related sources? Please type their names below and start a new entry<span class="text-muted mx-3">(optional)</span></label>
+            <label for="related-sources" class="form-label fw-bold fs-5">For the source that you just coded, does it have other closely related sources? Please type their names below and start a new entry<span class="text-muted mx-1">(optional)</span></label>
             <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
             <small id="related-sources-helptext"></small>
             <div id="related-sources-feedback"></div>
@@ -622,7 +664,7 @@
 
     // misc: optional tag for label
 
-    const optionalTag = '<span class="text-muted mx-3">(optional)</span>'
+    const optionalTag = '<span class="text-muted mx-1">(optional)</span>'
 
 
 
@@ -647,8 +689,14 @@
         allNames.forEach((elem) => elem.hidden = true);
         document.getElementById('group-name').hidden = false;
 
+        document.getElementById('name-print-tooltip').hidden = true;
+        document.getElementById('name-facebook-tooltip').hidden = true;
+        document.getElementById('name-website-tooltip').hidden = true;
+        document.getElementById('name-instagram-tooltip').hidden = true;
+        document.getElementById('name-twitter-tooltip').hidden = true;
+
         if (index != 99) {
-            document.querySelector("#group-name label").innerText = fieldOptions.channel[index]['form_name_question'];
+            document.querySelector("#name-question").innerText = fieldOptions.channel[index]['form_name_question'];
             document.querySelector("#name").setAttribute("placeholder", fieldOptions.channel[index]['form_name_placeholder'])
             if ('form_name_helptext' in fieldOptions.channel[index]) {
                 document.querySelector('#name-helptext').innerText = fieldOptions.channel[index]['form_name_helptext'];
@@ -679,10 +727,11 @@
         document.querySelector("#group-archive-sources-included").hidden = true
 
         if (value == 'print') {
+            document.getElementById('name-print-tooltip').hidden = false;
             document.querySelector("#group-epaper").hidden = false;
             document.querySelector("#group-audience-size").hidden = false;
             document.querySelector("#group-source-founded").hidden = false;
-            document.querySelector('#group-source-founded label').innerHTML = `What year was the print news source founded? ${optionalTag}`
+            document.querySelector('#source-founded-question').innerHTML = `What year was the print news source founded?`
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 if (elem.value == 'soft paywall') {
@@ -702,7 +751,7 @@
                 elem.setAttribute('required', true);
             });
             document.querySelector("#group-source-founded").hidden = false;
-            document.querySelector('#group-source-founded label').innerHTML = `What year was the radio/TV show or podcast founded? ${optionalTag}`
+            document.querySelector('#source-founded-question').innerHTML = `What year was the radio/TV show or podcast founded?`
 
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
@@ -713,20 +762,29 @@
 
 
         } else if (value == 'website') {
+            document.getElementById('name-website-tooltip').hidden = false;
             document.querySelector("#group-channel-comments").hidden = false;
             document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
             elem.setAttribute('required', true) 
             });
             document.querySelector("#group-source-founded").hidden = false;
-            document.querySelector('#group-source-founded label').innerHTML = `What year was the website founded? ${optionalTag}`
+            document.querySelector('#source-founded-question').innerHTML = `What year was the website founded?`
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
                 elem.setAttribute('required', true);
                 elem.parentElement.hidden = false
             })
             document.querySelector("#group-archive-sources-included").hidden = false
-
-
+        } else if (value == 'facebook') {
+            document.getElementById('name-facebook-tooltip').hidden = false;
+            
+            document.querySelector('#group-source-founded').hidden = false
+            document.querySelector('#source-founded-question').innerHTML = `What year was the facebook page created?`
+        } else if (value == 'instagram') {
+            document.getElementById('name-instagram-tooltip').hidden = false;
+        }
+        else if (value == 'twitter') {
+            document.getElementById('name-twitter-tooltip').hidden = false;
         }
     };
 
@@ -923,9 +981,6 @@
                 opt.innerText = item.name
                 opt.selected = true
                 document.getElementById("publishes_org").append(opt);
-                if ("ownership_kind" in item) {
-                    document.querySelector(`input[name=ownership_kind][value='${item["ownership_kind"]}']`).checked = true
-                }
             })
         };
         if ("publishes_person" in jsonData) {
@@ -935,9 +990,6 @@
                 opt.innerText = item.name
                 opt.selected = true
                 document.getElementById("publishes_person").append(opt);
-                if ("ownership_kind" in item) {
-                    document.querySelector(`input[name=ownership_kind][value='${item["ownership_kind"]}']`).checked = true
-                }
             })
         };
         if ("publication_kind" in jsonData) {
@@ -1409,7 +1461,17 @@
             };
             new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
 
-            var TomSelectTopicalFocusConfig = TomSelectPublicationKindConfig;
+            var TomSelectTopicalFocusConfig = {
+                create: true,
+                selectOnTab: true,
+                onInitialize: function() { // hacky way of forcing the field to be not-validated on load
+                    this.input.classList.remove('is-invalid');
+                    this.input.removeAttribute("aria-invalid");
+                },
+                onChange: function(){ // invoke validation on change
+                    setFieldValidity(this.input);
+            }
+            };
 
             new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
 
@@ -1569,10 +1631,16 @@
                 for (field of currentStep.elements) {
                     if (!field.validity.valid) {
                         // field.reportValidity();
+                        console.log('invalid field:', field)
                         return;
                     };
                 };
                 nextStep = nextbutton.parentElement.nextElementSibling;
+                if (nextStep.id == 'section-audience') {
+                    if (document.getElementById('channel-select').value != 'print') {
+                        nextStep = nextStep.nextElementSibling;
+                    }
+                }
                 currentStep.hidden = true;
                 nextStep.hidden = false
                 document.body.scrollTop = 0; // For Safari
@@ -1588,6 +1656,11 @@
             prevbutton.addEventListener('click', function() {
                 currentStep = prevbutton.parentElement;
                 prevStep = prevbutton.parentElement.previousElementSibling;
+                if (prevStep.id == 'section-audience') {
+                    if (document.getElementById('channel-select').value != 'print') {
+                        prevStep = prevStep.previousElementSibling;
+                    }
+                }
                 currentStep.hidden = true;
                 prevStep.hidden = false;
                 setProgressBar(--current, steps);

@@ -53,3 +53,7 @@ def privacy():
 @main.route('/notimplemented')
 def under_development():
     return render_template('not_implemented.html')
+
+@main.route('/guides/newssource')
+def guides_newssource():
+    return render_template('guides/newsource.html')
