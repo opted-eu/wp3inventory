@@ -728,7 +728,7 @@
         document.querySelector("#group-archive-sources-included").hidden = true
 
         document.querySelectorAll('input[name="channel_epaper"').forEach((elem) => {
-                    elem.setAttribute('required', false);
+                    elem.removeAttribute('required');
             })
 
         if (value == 'print') {
@@ -742,13 +742,7 @@
             document.querySelector('#source-founded-question').innerHTML = `What year was the print news source founded?`
             document.querySelector("#group-payment-model").hidden = false;
             document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
-                if (elem.value == 'soft paywall') {
-                    elem.setAttribute('required', false);
-                    elem.parentElement.hidden = true
-                }
-                else {
                     elem.setAttribute('required', true);
-                }
             })
             document.querySelector("#group-archive-sources-included").hidden = false
 
