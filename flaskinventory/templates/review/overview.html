@@ -44,7 +44,7 @@
     {% for entry in entries %}
     <tr>
         <td>{{ entry.name }}</td>
-        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 100px;">{{ entry.unique_name }}</span></td>
         <td>{{ entry.get("dgraph.type")[0] }}</td>
         <td>{{ entry.uid }}</th>
         <td>{% if entry.get('country') %} {% for country in entry.get('country') %}
