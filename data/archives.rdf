@@ -1,0 +1,13 @@
+{
+    set {
+        _:lexisnexis <dgraph.type> "Archive" .
+        _:lexisnexis <unique_name> "lexisnexis" .
+        _:lexisnexis <name> "LexisNexis" .
+        _:lexisnexis <other_names> "LexisNexis University" .
+        _:lexisnexis <other_names> "Lexis Nexis" .
+        _:lexisnexis <description> "LexisNexis University ermöglicht die Suche nach nationalen und internationalen Wirtschafts-, Presse- und Firmeninformationen. Unter den Pressequellen sind folgende wichtige enthalten: Volltexte von mehr als 1.000 Zeitungen weltweit in englischer, deutscher, französischer, holländischer, spanischer, italienischer und russischer Sprache; Archiv von Publikationen, wie The New York Times (ab 1980), Financial Times (ab 1982), Le Monde (ab 1990) oder taz (ab 1995); Magazine, Journals und Newsletter, inklusive Manager Magazin, Der Spiegel oder Newsweek; Agenturmeldungen mit mehrmals täglichen Updates, inklusive angesehener Namen wie Agence France Presse, Associated Press, Business Wire, dpa-AFX oder PR Newswire; schwer zu findende Transkripte von Rundfunk- und Fernsehsendungen der großen englischsprachigen TV- und Radiosender, inklusive ABC, CBS, CNN, FOX, NBC oder NPR sowie Protokolle von US Congressional Committee Hearings und Presidential News Conference; Web Blogs in englischer Sprache. Ebenfalls enthalten sind Wirtschafts- und Finanznachrichten, internationale Geschäftsberichte sowie Personeninformationen, Länderinformationen und Branchenreports. Ein Branchenverzeichnis verzeichnet Berichte z.B. aus Business Monitor International (BMI) bzw. aus Fachzeitschriften für verschiedene Branchen. Eine Suche nach Länderreports von BBC Monitoring, gtai, IMOE oder Global Insight oder die Suche nach Primär- und Sekundärquellen zu internationalem Recht, komplementieren das Angebot." . 
+        _:lexisnexis <access> "restricted" .
+        _:lexisnexis <url> "https://advance.lexis.com/" .
+
+    }
+}

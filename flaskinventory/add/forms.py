@@ -6,7 +6,7 @@ from flaskinventory import dgraph
 
 
 class NewEntry(FlaskForm):
-    name = StringField('Name',
+    name = StringField('Name of New Entity',
                            validators=[DataRequired()])
     
     entity = SelectField('Entity Type',

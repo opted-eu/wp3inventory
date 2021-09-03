@@ -19,7 +19,7 @@
         </div>
     </div>
 </div>
-<form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden>
+<form id="new-source" autocomplete="off" autocorrect="off" spellcheck="false" hidden novalidate="true">
     {% from "helpers/_tooltip.html" import make_tooltip %}
     {% from "helpers/_tooltip.html" import make_researchtip %}
     <div class="progress my-4">
@@ -98,7 +98,7 @@
                 {{ make_tooltip('For example the “Mitteldeutsche Zeitung” is also called “MZ”. This question is not channel specific. Add the English translation of the names if frequently used. Do not enter names of sources that were the forerunner of the source that you enter.') }}
                 {{ make_researchtip('Wikipedia often mentions alternative names') }}
             </label>
-            <input type="text" name="other_names" class="form-control form-control-lg" id="other-names" placeholder="Separate by comma" multiple>
+            <input type="text" name="other_names" class="form-control form-control-lg" id="other-names" placeholder="Separate by comma" aria-describedby="other-names-feedback" multiple>
             <div id="other-names-feedback"></div>
         </div>
 
@@ -277,25 +277,25 @@
                 <p class="my-0"><small id="geographic-scope-helptext">This information can be inferred from the content (e.g., actors, topics, events).</small></p>
             </div>
             <div class="form-check">
-                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope1" value="multinational">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" required name="geographic_scope" id="geographic_scope1" value="multinational">
                 <label class="form-check-label" for="geographic_scope1">
                         Multinational (e.g., EU in general, dedicated cross-national news sources)
                         </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope2" value="national">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" required name="geographic_scope" id="geographic_scope2" value="national">
                 <label class="form-check-label" for="geographic_scope2">
                     National (covers news that relate mainly to one country) 
                         </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope3" value="subnational">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" required name="geographic_scope" id="geographic_scope3" value="subnational">
                 <label class="form-check-label" for="geographic_scope3">
                     Subnational (covers news that relate mainly to one city/county/province/department)
                         </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" name="geographic_scope" id="geographic_scope4" value="none">
+                <input class="form-check-input" aria-describedby="geographic-scope-feedback" type="radio" required name="geographic_scope" id="geographic_scope4" value="none">
                 <label class="form-check-label" for="geographic_scope4">
                             Don't know
                         </label>
@@ -449,8 +449,8 @@
                     Austria: https://www.oeak.at/auflagedetails/
                     Germany: https://www.ivw.eu/print/print') }}
                 </label>
-                <p class="my-0"><small id="audience-size-helptext">If you’re not sure about this, just skip the question.</small></p>
-                <input name="audience_size_subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                <p class="my-0"><small id="audience-size-helptext"></small></p>
+                <input name="audience_size_subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">
@@ -459,12 +459,12 @@
                     {{ make_tooltip('Use the latest information that is available') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext">(i.e., number of sold copies per issue)</small></p>
-                <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
+                <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control form-control-lg" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
                 <div id="audience-size-year-feedback"></div>
             </div>
             <div id="group-audience-size-datafrom" class="mb-5">
-                <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get the subscriber information from? Please type the name of the data source or paste a link.<span class="text-muted mx-1">(optional)</span></label>
-                <input name="audience_size_datafrom" type="text" class="form-control" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
+                <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get this number (i.e., number of sold copies per issue) from? Please type the name of the data source or paste a link.<span class="text-muted mx-1">(optional)</span></label>
+                <input name="audience_size_datafrom" type="text" class="form-control form-control-lg" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
                 <div id="audience-size-datafrom-feedback"></div>
             </div>
             
@@ -480,7 +480,7 @@
         <h3 class="mb-4">Access to Raw Text and Annotations</h3>
 
         <div id="group-epaper" class="mb-5 form-group fs-5" hidden>
-            <p class="form-label fw-bold fs-5">Does the print news source have an e-paper version?<span class="text-muted mx-1">(optional)</span></p>
+            <p class="form-label fw-bold fs-5">Does the print news source have an e-paper version?</p>
 
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="channel_epaper" id="channel_epaper1" value="yes" aria-describedby="channel-epaper-feedback">
@@ -726,9 +726,16 @@
         });
         document.querySelector("#group-archive-sources-included").hidden = true
 
+        document.querySelectorAll('input[name="channel_epaper"').forEach((elem) => {
+                    elem.setAttribute('required', false);
+            })
+
         if (value == 'print') {
             document.getElementById('name-print-tooltip').hidden = false;
             document.querySelector("#group-epaper").hidden = false;
+            document.querySelectorAll('input[name="channel_epaper"').forEach((elem) => {
+                    elem.setAttribute('required', true);
+            })
             document.querySelector("#group-audience-size").hidden = false;
             document.querySelector("#group-source-founded").hidden = false;
             document.querySelector('#source-founded-question').innerHTML = `What year was the print news source founded?`
@@ -1248,6 +1255,12 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
                 },
                 onItemAdd:function(){ // clear input after item was selected
                     this.setTextboxValue();
@@ -1262,6 +1275,12 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
                 }
             };
 
@@ -1274,6 +1293,12 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
                 },
                 onItemAdd:function(){ // clear input after item was selected
                     this.setTextboxValue();
@@ -1295,6 +1320,12 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
                 },
                 onItemAdd:function(){ // clear input after item was selected
                     this.setTextboxValue();
@@ -1457,6 +1488,13 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
+                    
             }
             };
             new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
@@ -1470,6 +1508,12 @@
                 },
                 onChange: function(){ // invoke validation on change
                     setFieldValidity(this.input);
+                    if (!this.isValid) {
+                        this.wrapper.classList.remove('is-invalid')
+                    }
+                    else {
+                        this.wrapper.classList.add('is-invalid')
+                    }
             }
             };
 
@@ -1620,8 +1664,9 @@
                     if (!visited.includes(field)) {
                         visited.push(field);
                         // hacky solution to prevent validation loop
-                        if (field.id == "languages-tomselected") {
+                        if (field.id.includes("tomselected")) {
                             field.checkValidity();
+                            setFieldValidity(field)
                         }
                         else {
                         field.reportValidity();
@@ -1630,8 +1675,6 @@
                 };
                 for (field of currentStep.elements) {
                     if (!field.validity.valid) {
-                        // field.reportValidity();
-                        console.log('invalid field:', field)
                         return;
                     };
                 };
@@ -1762,7 +1805,7 @@
         event.preventDefault();
         });
 
-    const visited = [];
+        const visited = [];
     for (const field of form.elements) {
         field.addEventListener("invalid", function handleInvalidField(event) {
             setFieldValidity(field);
@@ -1791,6 +1834,9 @@
         }
 
     function errorContainer(field) {
+        if (field.id.includes("tomselected")) {
+            field = document.getElementById(field.id.replace("-tomselected", ""))
+        }
         const errorContainerId = field
             .getAttribute("aria-describedby")
             .split(" ")
@@ -1804,11 +1850,17 @@
             errorContainer(field).classList.add('invalid-feedback');
             field.setAttribute("aria-invalid", "true");
             field.classList.add('is-invalid');
+            if (field.id.includes('tomselected')) {
+                field.parentElement.parentElement.classList.add('is-invalid');
+            }
         } else {
             errorContainer(field).textContent = "";
             errorContainer(field).classList.remove('invalid-feedback');
             field.removeAttribute("aria-invalid");
             field.classList.remove('is-invalid');
+            if (field.id.includes('tomselected')) {
+                field.parentElement.parentElement.classList.remove('is-invalid');
+            }
             if (field.type == 'radio') {
                 document.querySelectorAll(`input[name=${field.name}]`).forEach(function (el) {
                     errorContainer(el).classList.remove('invalid-feedback');

@@ -101,3 +101,9 @@ dt {
     /* description lists need more spacing between rows */
     margin-bottom: 0.5em;
 }
+
+
+.tooltip-inner {
+    max-width: 350px!important;
+    text-align: left!important;
+}
