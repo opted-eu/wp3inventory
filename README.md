@@ -1,70 +1,46 @@
-# wp3inventory
-WP3 Inventory
+# Introduction
 
-## In Development
+This is the code repository for the WP3 Inventory, which will contain an interlinked knowledge graph of news sources, media organizations, and data archives in Europe (for details see the [OPTED main page](https://opted.eu/)). Currently, this is a prototype / work in progress.
 
-# Todos
+The WP3 Inventory is a web based application that allows users to
 
-## Before Public Repository
+- browse & query the WP3 database
+- Add new entries to the database
+- edit and update existing entries
 
-- [x] User Registration
-- [ ] Improve server side email settings (send pw reset mails)
-- [x] Implement Twitter API
-- [x] ~~Implement Pseudo FB API~~ *Too unreliable*
-- [x] Cosmetic improvements
-  - [x] Viewing sources: subunits need parsing
-- [ ] Tidy up source code
-  - [x] standardize dgraph query method and usage in other functions
-  - [x] remove unnecessary methods
-  - [x] move non-generic dgraph methods outside of class, move into respective modules
-  - [x] Turn dgraph into flask extension
-  - [x] rename modules ('records' -> 'add', 'inventory' -> 'view')
-  - [x] dateparsing for dgraph objects
-  - [ ] divorce HTML from JS ('newsource.html')
-  - [ ] ~~Remove external JS dependencies and collect via yarn instead~~
-  - [x] repository contains JS/CSS dependencies
-  - [ ] get rid of JQuery
-- [x] Implement Account Delete feature
-- [x] Subset Fontawesome, do not load via CDN (because this sets a cookie)
-- [ ] Form field options generator functions all in one file, then use caching module
+## Technical Details
 
-## New Features
+- developed in the Python framework [Flask](https://flask.palletsprojects.com/en/2.0.x/) (most recent version)
+- uses [DGraph](https://dgraph.io/) as backend / data storage
 
+# Getting started
 
-### Data entry views
-- [x] new source
-- [x] New / Pending entries: only visible for reviewers and user who added entry
-  - [x] should also not appear in other queries
-- [ ] new organization
-- [ ] new paper
-- [ ] new archive
+1. Clone the repository
+2. Install the requirements via pip (`python3 -m pip install -r requirements.txt`)
+3. Install DGraph on your local machine (see [official documentation](https://dgraph.io/downloads/))
+4. Launch your local DGraph instances (alpha and zero)
+5. Launch the inventory via `python3 run.py` 
+      - alternatively you can specify a configuration via `python3 run.py --config config.json`
+6. Set the data schema to your DGraph instance via `python3 tools/setschema.py`
+7. Add sample data to your DGraph instance using `python3 tools/sample_data.py`
+8. Open your browser at your localhost with port 5000 (http://127.0.0.1:5000)
 
-### Data edit views
+# Quick Codebase Walkthrough
 
-- [x] review screen
-- [x] edit entry
+```
+├── data                  # contains sample data in various formats and the dgraph schem
+├── flaskinventory        # root folder for flask
+├── README.md             # this file
+├── requirements.txt      # python requirements
+├── run.py                # Flask launcher
+└── tools                 # collection of helper scripts and files for server deployment
+```
 
-### Data Queries
+## Contributing & Bug Fixes
 
-- [ ] add advanced query complex filters based on variables
-- [x] add enter button for full text search
-  - add route for full text search results
-- [ ] add "report" button to detail view, add form for reporting need to edit item
+Please contact Paul Balluff for contribution. If you found a problem, just raise an issue here in this repository.
 
-
-### Automated Data Retrieval
-- [ ] Get telegram data??
-- [x] Detect RSS/XML Feeds & Sitemaps
-- [ ] Get Wikidata ID: get year founded (if possible), headquarter location
-- [x] Geocode Strings (e.g. Addresses) automatically via `geocode.osm('Address')`
-
-
-### Performance
-
-- [ ] investigate caching for form input fields
-- [ ] caching for external assets (fontawesome, js libs)
-- [ ] investigate async data processing
-
+# Other Notes
 
 
 ## User Permissions
