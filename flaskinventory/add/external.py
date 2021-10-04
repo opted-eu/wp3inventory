@@ -10,7 +10,8 @@ import re
 import json
 import instaloader
 import tweepy
-from telethon.sync import TelegramClient
+from telethon import TelegramClient
+import asyncio
 from dateutil.parser import isoparse
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.dgraph_types import UID, Geolocation
@@ -423,16 +424,21 @@ def vkontakte(screen_name):
 
 
 def telegram(username):
-    bot = TelegramClient('bot', current_app.config['TELEGRAM_APP_ID'], current_app.config['TELEGRAM_APP_HASH']).start(
-        bot_token=current_app.config['TELEGRAM_BOT_TOKEN'])
-    try:
-        profile = bot.get_entity(username)
-    except ValueError as e:
-        return False
 
+    async def get_profile(username):
+        bot = await TelegramClient('bot', current_app.config['TELEGRAM_APP_ID'], current_app.config['TELEGRAM_APP_HASH']).start(
+            bot_token=current_app.config['TELEGRAM_BOT_TOKEN'])
+        try:
+            return await bot.get_entity(username)
+        except ValueError as e:
+            return False
+        finally:
+            bot.disconnect()
+
+    profile = asyncio.new_event_loop().run_until_complete(get_profile(username))
     profile = profile.to_dict()
     telegram_id = profile.get('id')
-    fullname = profile.get('title')
+    fullname = profile.get('first_name')
     joined = profile.get('date')
     verified = profile.get('verified')
     followers = None
@@ -446,5 +452,6 @@ def telegram(username):
             followers = r.json().get('result')
         except:
             followers = None
+        fullname = profile.get('title')
 
     return {'followers': followers, 'fullname': fullname, 'joined': joined, 'verified': verified, 'telegram_id': telegram_id}
