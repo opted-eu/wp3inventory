@@ -107,3 +107,7 @@ dt {
     max-width: 350px!important;
     text-align: left!important;
 }
+
+.ts-no-arrow {
+    background-image: none!important;
+}
