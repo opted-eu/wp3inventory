@@ -58,6 +58,13 @@ _:vkontakte <form_name_question> "What is the name of the VK community?" .
 _:vkontakte <form_name_placeholder> "pagehandle" .
 _:vkontakte <form_name_addon> "https://www.vk.com/" .
 
+_:telegram <dgraph.type> "Channel" .
+_:telegram <unique_name> "telegram" .
+_:telegram <name> "Telegram" .
+_:telegram <form_name_question> "What is the name of the Telegram username or channel?" .
+_:telegram <form_name_placeholder> "pagehandle" .
+_:telegram <form_name_addon> "https://www.t.me/" .
+
 _:derstandardat <dgraph.type> "Source" .
 _:derstandardat <unique_name> "www.derstandard.at" .
 _:derstandardat <name> "www.derstandard.at" .

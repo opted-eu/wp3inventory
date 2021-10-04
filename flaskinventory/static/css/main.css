@@ -50,6 +50,14 @@
     font-style: normal;
 }
 
+.icon-vkontakte::before {
+    content: "\f2c6";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+
 
 /* social colors */
 
@@ -75,6 +83,10 @@
 
 .color-vkontakte {
     color: #2787f5;
+}
+
+.color-telegram {
+    color: #0088cc;
 }
 
 

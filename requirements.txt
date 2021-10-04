@@ -33,3 +33,4 @@ instaloader
 bs4
 tweepy
 lxml
+telethon

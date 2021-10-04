@@ -18,8 +18,11 @@ class Config:
     TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', None)
     TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN', None)
     TWITTER_ACCESS_SECRET = os.environ.get('TWITTER_ACCESS_SECRET', None)
-    VK_TOKEN = os.environ.get('VK_TOKEN')
-    
+    VK_TOKEN = os.environ.get('VK_TOKEN', None)
+    TELEGRAM_APP_ID = os.environ.get('TELEGRAM_APP_ID', None)
+    TELEGRAM_APP_HASH = os.environ.get('TELEGRAM_APP_HASH', None)
+    TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', None)
+
 """ Configure Logging """
 
 

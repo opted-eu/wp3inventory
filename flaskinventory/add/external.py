@@ -10,10 +10,10 @@ import re
 import json
 import instaloader
 import tweepy
+from telethon.sync import TelegramClient
 from dateutil.parser import isoparse
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.dgraph_types import UID, Geolocation
-
 
 
 def geocode(address):
@@ -32,9 +32,10 @@ def geocode(address):
     else:
         return r.json()[0]
 
+
 def reverse_geocode(lat, lon):
     api = "https://nominatim.openstreetmap.org/reverse"
-    payload = {'lat': lat, 'lon': lon, 'format': 'json'} 
+    payload = {'lat': lat, 'lon': lon, 'format': 'json'}
     r = requests.get(api, params=payload)
     if r.status_code != 200:
         return False
@@ -58,6 +59,7 @@ def build_url(site):
     except Exception as e:
         return False
 
+
 def test_url(site):
     site = build_url(site)
     if not site:
@@ -66,10 +68,10 @@ def test_url(site):
         r = requests.head(site, timeout=5)
     except Exception as e:
         return False
-    
+
     if r.ok:
         return True
-    
+
     return False
 
 
@@ -99,7 +101,7 @@ def find_feeds(site):
     site = build_url(site)
     if not site:
         return []
-    
+
     if site.endswith('/'):
         site = site[:-1]
 
@@ -313,11 +315,13 @@ def facebook(username):
     else:
         return None
 
+
 def get_wikidata(query):
 
     api = 'https://www.wikidata.org/w/api.php'
 
-    params = {'action': 'wbsearchentities', 'search': query, 'format': 'json', 'language': 'en'}
+    params = {'action': 'wbsearchentities',
+              'search': query, 'format': 'json', 'language': 'en'}
 
     result = {}
 
@@ -330,7 +334,8 @@ def get_wikidata(query):
         return False
 
     try:
-        params = {'action': 'wbgetentities', 'languages': 'en', 'ids': wikidataid, 'format': 'json'}
+        params = {'action': 'wbgetentities', 'languages': 'en',
+                  'ids': wikidataid, 'format': 'json'}
         r = requests.get(api, params=params)
         wikidata = r.json()
     except:
@@ -345,15 +350,17 @@ def get_wikidata(query):
         pass
 
     # P17: country, P571: inception, P1128: employees, P159: headquarters
-    
+
     try:
-        inception = wikidata['entities'][wikidataid]['claims']['P571'][0]['mainsnak']['datavalue']['value']['time'].replace('+', '')
+        inception = wikidata['entities'][wikidataid]['claims']['P571'][0]['mainsnak']['datavalue']['value']['time'].replace(
+            '+', '')
         result['founded'] = isoparse(inception)
     except:
         pass
 
     try:
-        country = wikidata['entities'][wikidataid]['claims']['P17'][0]['mainsnak']['datavalue']['value']['id'].replace('Q', '')
+        country = wikidata['entities'][wikidataid]['claims']['P17'][0]['mainsnak']['datavalue']['value']['id'].replace(
+            'Q', '')
         query_string = f'''{{q(func: eq(wikidataID, {country})) {{ name uid }} }}'''
         country_uid = dgraph.query(query_string)
 
@@ -363,20 +370,22 @@ def get_wikidata(query):
         pass
 
     try:
-        result['employees'] = wikidata['entities'][wikidataid]['claims']['P1128'][0]['mainsnak']['datavalue']['value']['amount'].replace('+','')
+        result['employees'] = wikidata['entities'][wikidataid]['claims']['P1128'][
+            0]['mainsnak']['datavalue']['value']['amount'].replace('+', '')
     except:
         pass
 
     try:
         headquarters = wikidata['entities'][wikidataid]['claims']['P159'][0]['mainsnak']['datavalue']['value']['id']
-        params = {'action': 'wbgetentities', 'languages': 'en', 'ids': headquarters, 'format': 'json', 'props': 'labels'}
+        params = {'action': 'wbgetentities', 'languages': 'en',
+                  'ids': headquarters, 'format': 'json', 'props': 'labels'}
         r = requests.get(api, params=params)
         wikidata = r.json()
         address = wikidata['entities'][headquarters]['labels']['en']['value']
         geo_result = geocode(address)
         address_geo = Geolocation('Point', [
-                float(geo_result.get('lon')), float(geo_result.get('lat'))])
-        
+            float(geo_result.get('lon')), float(geo_result.get('lat'))])
+
         result['address'] = address
         result['address_geo'] = address_geo
     except:
@@ -391,7 +400,7 @@ def vkontakte(screen_name):
         "access_token": current_app.config["VK_TOKEN"],
         "v": "5.131",
         "fields": "id,name,screen_name,is_closed,type,description,site,verified,members_count"
-        }
+    }
     api = "https://api.vk.com/method/"
     r = requests.get(api + "groups.getById", params=params)
     if r.status_code != 200:
@@ -404,7 +413,7 @@ def vkontakte(screen_name):
     res = res.get('response')
     if len(res) == 0 or type(res) is not list:
         return False
-    
+
     res = res[0]
 
     if 'id' not in res.keys():
@@ -413,5 +422,29 @@ def vkontakte(screen_name):
     return {'followers': res.get('members_count'), 'fullname': res.get('name'), 'verified': res.get('verified'), 'description': res.get('description')}
 
 
-    
+def telegram(username):
+    bot = TelegramClient('bot', current_app.config['TELEGRAM_APP_ID'], current_app.config['TELEGRAM_APP_HASH']).start(
+        bot_token=current_app.config['TELEGRAM_BOT_TOKEN'])
+    try:
+        profile = bot.get_entity(username)
+    except ValueError as e:
+        return False
 
+    profile = profile.to_dict()
+    telegram_id = profile.get('id')
+    fullname = profile.get('title')
+    joined = profile.get('date')
+    verified = profile.get('verified')
+    followers = None
+
+    if profile['_'] == 'Channel':
+        api = "https://api.telegram.org/bot"
+        params = {'chat_id': '@' + username}
+        r = requests.get(
+            api + current_app.config['TELEGRAM_BOT_TOKEN'] + '/getChatMemberCount', params=params)
+        try:
+            followers = r.json().get('result')
+        except:
+            followers = None
+
+    return {'followers': followers, 'fullname': fullname, 'joined': joined, 'verified': verified, 'telegram_id': telegram_id}
