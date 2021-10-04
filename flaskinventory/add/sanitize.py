@@ -4,7 +4,7 @@ from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
                                          parse_meta, reverse_geocode, siterankdata, find_sitemaps, find_feeds,
-                                         build_url, twitter, facebook, get_wikidata)
+                                         build_url, twitter, facebook, get_wikidata, vkontakte)
 from flaskinventory import dgraph
 from flask import current_app
 from slugify import slugify
@@ -73,6 +73,8 @@ class SourceSanitizer:
             self.process_twitter()
         elif self.json.get('channel') == 'facebook':
             self.process_facebook()
+        elif self.json.get('channel') == 'vkontakte':
+            self.process_vk()
         else:
             raise NotImplementedError('Cannot process submitted news source.')
 
@@ -356,6 +358,37 @@ class SourceSanitizer:
 
         self.parse_other_names()
         self.parse_founded()
+
+        # economic
+        self.parse_contains_ads()
+        self.parse_org()
+        self.parse_person()
+
+        # journalistic routines
+        self.parse_publication_kind()
+        self.parse_special_interest()
+        self.parse_publication_cycle()
+
+        # audience related
+        self.parse_geographic_scope()
+        self.parse_languages()
+
+        # data access
+        self.parse_archives()
+        self.parse_datasets()
+
+        # other
+        self.parse_entry_notes()
+        self.parse_related()
+
+        self.generate_unique_name()
+        self.newsource = self.add_entry_meta(self.newsource)
+
+    def process_vk(self):
+        self.parse_channel()
+        self.fetch_vk()
+
+        self.parse_other_names()
 
         # economic
         self.parse_contains_ads()
@@ -1015,6 +1048,36 @@ class SourceSanitizer:
         else:
             raise InventoryValidationError(
                 'Invalid data! "name" not specified.')
+    
+    def fetch_vk(self):
+        if self.json.get('name'):
+            self.newsource['channel_url'] = self.json.get(
+                'name').replace('@', '')
+            try:
+                profile = vkontakte(self.json.get('name').replace('@', ''))
+            except Exception as e:
+                raise InventoryValidationError(
+                    f"VKontakte profile not found: {self.json.get('name')}. {e}")
+
+            self.newsource['name'] = self.json.get(
+                'name').lower().replace('@', '')
+
+            if profile.get('fullname'):
+                self.newsource['other_names'].append(profile['fullname'])
+            if profile.get('followers'):
+                facets = {'followers': int(
+                    profile['followers'])}
+                self.newsource['audience_size'] = Scalar(
+                    str(datetime.date.today()), facets=facets)
+            if profile.get('verified'):
+                self.newsource['verified_account'] = profile.get('verified')
+            if profile.get('description'):
+                self.newsource['description'] = profile.get('description')
+
+        else:
+            raise InventoryValidationError(
+                'Invalid data! "name" not specified.')
+                
 
     def resolve_org(self, org):
 

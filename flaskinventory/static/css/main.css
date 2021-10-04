@@ -43,6 +43,13 @@
     font-style: normal;
 }
 
+.icon-vkontakte::before {
+    content: "\f189";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
 
 /* social colors */
 
@@ -65,6 +72,11 @@
 .color-github {
     color: black;
 }
+
+.color-vkontakte {
+    color: #2787f5;
+}
+
 
 
 /* Animations / Transitions */

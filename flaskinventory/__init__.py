@@ -1,4 +1,5 @@
 import logging
+import json
 
 from flask import Flask
 from .config import create_filehandler
@@ -29,7 +30,7 @@ def create_app(config_class=Config, config_json=None):
 
 
     if config_json:
-        app.config.from_json(config_json)
+        app.config.from_file(config_json, json.load)
     else:
         app.config.from_object(config_class)
 

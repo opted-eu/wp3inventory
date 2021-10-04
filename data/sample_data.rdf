@@ -17,47 +17,48 @@
         _:website <dgraph.type> "Channel" .
         _:website <unique_name> "website" .
         _:website <name> "Self-Hosted Website" .
+        _:website <form_name_question> "What is the address of the self-hosted news website?" .
+        _:website <form_name_placeholder> "e.g. 'http://www.thedailynews.com'" .
 
         _:print <dgraph.type> "Channel" .
         _:print <unique_name> "print" .
         _:print <name> "Print" .
+        _:print <form_name_question> "What is the name of the print news source?" .
+        _:print <form_name_placeholder> "e.g. 'The Royal Gazette" .
 
         _:twitter <dgraph.type> "Channel" .
         _:twitter <unique_name> "twitter" .
         _:twitter <name> "Twitter" .
+        _:twitter <form_name_question> "What is the name of Twitter account?" .
+        _:twitter <form_name_placeholder> "account" .
+        _:twitter <form_name_addon> "@" .
 
         _:instagram <dgraph.type> "Channel" .
         _:instagram <unique_name> "instagram" .
         _:instagram <name> "Instagram" .
+        _:instagram <form_name_question> "What is the name of Instagram account?" .
+        _:instagram <form_name_placeholder> "account" .
+        _:instagram <form_name_addon> "@" .
 
         _:facebook <dgraph.type> "Channel" .
         _:facebook <unique_name> "facebook" .
         _:facebook <name> "Facebook" .
+        _:facebook <form_name_question> "What is the name of the Facebook page?" .
+        _:facebook <form_name_placeholder> "pagehandle" .
+        _:facebook <form_name_addon> "https://www.facebook.com/" .
 
         _:transcript <dgraph.type> "Channel" .
         _:transcript <unique_name> "transcript" .
         _:transcript <name> "Transcript (TV/Radio/Podcast)" .
-
-        _:facebook <form_name_question> "What is the name of the Facebook page?" .
-        _:facebook <form_name_placeholder> "pagehandle" .
-        _:facebook <form_name_addon> "https://www.facebook.com/" .
-        
-        _:print <form_name_question> "What is the name of the print news source?" .
-        _:print <form_name_placeholder> "e.g. 'The Royal Gazette" .
-        
-        _:instagram <form_name_question> "What is the name of Instagram account?" .
-        _:instagram <form_name_placeholder> "account" .
-        _:instagram <form_name_addon> "@" .
-        
-        _:twitter <form_name_question> "What is the name of Twitter account?" .
-        _:twitter <form_name_placeholder> "account" .
-        _:twitter <form_name_addon> "@" .
-        
-        _:website <form_name_question> "What is the address of the self-hosted news website?" .
-        _:website <form_name_placeholder> "e.g. 'http://www.thedailynews.com'" .
-        
         _:transcript <form_name_question> "What is the name of the show that is being transcribed?" .
         _:transcript <form_name_placeholder> "e.g. 'CNN News'" .
+
+        _:vkontakte <dgraph.type> "Channel" .
+        _:vkontakte <unique_name> "vkontakte" .
+        _:vkontakte <name> "VK (VKontakte)" .
+        _:vkontakte <form_name_question> "What is the name of the VK community?" .
+        _:vkontakte <form_name_placeholder> "pagehandle" .
+        _:vkontakte <form_name_addon> "https://www.vk.com/" .
 
         _:derstandardat <dgraph.type> "Source" .
         _:derstandardat <unique_name> "www.derstandard.at" .

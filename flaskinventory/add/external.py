@@ -1,5 +1,4 @@
 from flask import current_app
-from pydgraph.proto.api_pb2 import Payload
 import requests
 from requests.models import PreparedRequest
 import requests.exceptions
@@ -326,7 +325,7 @@ def get_wikidata(query):
         r = requests.get(api, params=params)
         get_id = r.json()
         wikidataid = get_id['search'][0]['id']
-        result['wikidataID'] = wikidataid
+        result['wikidataID'] = wikidataid.replace('Q', '')
     except:
         return False
 
@@ -384,3 +383,35 @@ def get_wikidata(query):
         pass
 
     return result
+
+
+def vkontakte(screen_name):
+    params = {
+        "group_id": screen_name,
+        "access_token": current_app.config["VK_TOKEN"],
+        "v": "5.131",
+        "fields": "id,name,screen_name,is_closed,type,description,site,verified,members_count"
+        }
+    api = "https://api.vk.com/method/"
+    r = requests.get(api + "groups.getById", params=params)
+    if r.status_code != 200:
+        return False
+    res = r.json()
+
+    if "response" not in res.keys():
+        return False
+
+    res = res.get('response')
+    if len(res) == 0 or type(res) is not list:
+        return False
+    
+    res = res[0]
+
+    if 'id' not in res.keys():
+        return False
+
+    return {'followers': res.get('members_count'), 'fullname': res.get('name'), 'verified': res.get('verified'), 'description': res.get('description')}
+
+
+    
+

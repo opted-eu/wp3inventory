@@ -18,7 +18,8 @@ class Config:
     TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', None)
     TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN', None)
     TWITTER_ACCESS_SECRET = os.environ.get('TWITTER_ACCESS_SECRET', None)
-
+    VK_TOKEN = os.environ.get('VK_TOKEN')
+    
 """ Configure Logging """
 
 
