@@ -6,13 +6,15 @@
         <p>Please go through the list below and make sure your suggestion is not in the inventory yet</p>
     </div>
     <div class="mb-5">
-            
+
         
 <table class="table">
     <thead>
       <tr>
             <th scope="col">Name</th>
+            {% if entity == 'Source' %}
             <th scope="col">Channel</th>
+            {% endif %}
             <th scope="col">Country</th>
             <th scope="col">Other Names</th>
             <th scope="col">Status</th>
@@ -20,20 +22,23 @@
 
         </tr>
     </thead>
-    <tbody>
-    
+    <tbody> 
       {% for entry in result %}
       <tr>
         <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }}</a></td>
+        {% if entity == 'Source' %}
         <td>{{ entry.channel.get('name')}}</td>
         <td>{% if entry.get('geographic_scope_countries') %}{{ entry.geographic_scope_countries[0].get('name') }}{% endif %}</td>
+        {% else %}
+        <td>{% if entry.get('country') %}{{ entry.country[0].get('name') }}{% endif %}</td>
+        {% endif %}
         <td>{% if entry.get('other_names') %}{{ ", ".join(entry.other_names) }}{% endif %}</td>
         <td>{{ entry.get('entry_review_status')}}</td>
         <td>{% if entry.get('entry_review_status') == 'draft' %}<a class="btn btn-sm btn-primary" href="{{ url_for('add.new_source', draft=entry.get('uid')) }}">Continue editing</a>{% endif %}</td>
       </tr>
       {% endfor %}
-      </tbody>
-  </table>
+    </tbody>
+</table>
 
             
     </div>
@@ -43,7 +48,11 @@
         <h4>Is your suggestion listed above or new?</h4>
         <div class="my-4 d-grid gap-2 d-md-flex">
         <a class="btn btn-outline-secondary" href="{{ url_for('add.new_entry') }}" role="button">Already listed</a>
+        {% if entity == 'Source' %}
         <a class="btn btn-outline-primary" href="{{ url_for('add.new_source') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+        {% elif entity == 'Organization' %}
+        <a class="btn btn-outline-primary" href="{{ url_for('add.new_organization') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+        {% endif %}
 </div>
 
 {% endblock content %}

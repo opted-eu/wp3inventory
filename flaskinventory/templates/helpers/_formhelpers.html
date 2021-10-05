@@ -1,0 +1,30 @@
+{% macro render_field(field) %}
+
+<div class="mb-3">
+    <label for="{{ field.id}}" class="form-label fw-bold fs-5">{{ field.label.text }}</label>
+    {% if field.errors %} 
+        {{ field(class="form-control form-control-lg is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in field.errors %}
+            <span>{{ error }}</span> 
+            {% endfor %}
+        </div>
+    {% else %} 
+        {% if field.type == 'BooleanField' %}
+            {{ field(class="form-check") }} 
+        {% elif field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+            {{ field(class="form-select form-select-lg") }} 
+        {% elif field.type == 'RadioField' %}
+            {% for subfield in field %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+            {% endfor %} 
+        {% else %}
+            {{ field(class="form-control form-control-lg") }} 
+        {% endif %}
+    {% endif %} 
+</div>
+
+{% endmacro %}

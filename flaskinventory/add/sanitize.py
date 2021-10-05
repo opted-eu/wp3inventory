@@ -1199,3 +1199,268 @@ class SourceSanitizer:
                 'Invalid data! "name" not specified.')
 
     # unique names of related & new sources are generated later (after reviewed)
+
+
+
+
+class Sanitizer:
+    """ Base Class for validating data and generating mutation object
+        also keeps track of user & ip address.
+        Relevant return attribute are upsert_query (string), set_nquads (string), delete_nquads (string)
+    """
+
+    is_upsert = False
+    upsert_query = None
+    set_nquads = None
+    delete_nquads = None
+    new = {}
+    newsubunits = []
+
+    def __init__(self, data, user, ip):
+        self.user = user
+        self.user_ip = ip
+        self.data = data
+
+
+    def _parse(self):
+        for item in dir(self):
+            if item.startswith('parse_'):
+                m = getattr(self, item)
+                if callable(m):
+                    m()
+
+    def _add_entry_meta(self, entry, newentry=False):
+        if not newentry:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc),
+                'ip': self.user_ip}
+            entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
+        else:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc),
+                'ip': self.user_ip}
+            entry['entry_added'] = UID(self.user.uid, facets=facets)
+            entry['entry_review_status'] = 'pending'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
+
+        return entry
+
+    def parse_name(self):
+        self.new['name'] = self.data.get('name')
+
+    def parse_other_names(self):
+        if self.data.get('other_names'):
+            if not self.new.get('other_names'):
+                self.new['other_names'] = []
+
+            other_names = self.data.get('other_names')
+            if type(other_names) == str:
+                other_names = other_names.split(',')
+
+            self.new['other_names'] += [item.strip()
+                                         for item in other_names if item.strip() != '']
+
+    def parse_entry_notes(self):
+        if self.data.get('entry_notes'):
+            self.new['entry_notes'] = self.data.get(
+                'entry_notes').strip()
+
+    def _resolve_geographic_name(self, query):
+        geo_result = geocode(query)
+        if geo_result:
+            dql_string = f'''{{ q(func: eq(country_code, "{geo_result['address']['country_code']}")) @filter(type("Country")) {{ uid }} }}'''
+            dql_result = dgraph.query(dql_string)
+            try:
+                country_uid = dql_result['q'][0]['uid']
+            except Exception:
+                raise InventoryValidationError(
+                    f"Country not found in inventory: {geo_result['address']['country_code']}")
+            geo_data = Geolocation('Point', [
+                float(geo_result.get('lon')), float(geo_result.get('lat'))])
+
+            name = None
+            other_names = [query]
+            if geo_result['namedetails'].get('name'):
+                other_names.append(geo_result['namedetails'].get('name'))
+                name = geo_result['namedetails'].get('name')
+
+            if geo_result['namedetails'].get('name:en'):
+                other_names.append(geo_result['namedetails'].get('name:en'))
+                name = geo_result['namedetails'].get('name:en')
+
+            other_names = list(set(other_names))
+
+            if not name:
+                name = query
+
+            new_subunit = {'name': name,
+                           'country': UID(country_uid),
+                           'other_names': other_names,
+                           'location_point': geo_data,
+                           'country_code': geo_result['address']['country_code']}
+            if geo_result.get('extratags'):
+                if geo_result.get('extratags').get('wikidata'):
+                    if geo_result.get('extratags').get('wikidata').lower().startswith('q'):
+                        try:
+                            new_subunit['wikidataID'] = int(geo_result.get(
+                                'extratags').get('wikidata').lower().replace('q', ''))
+                        except Exception as e:
+                            current_app.logger.debug(
+                                f'Could not parse wikidata ID in subunit: {e}')
+                            pass
+
+            return new_subunit
+        else:
+            return False
+
+    def _resolve_subunit(self, subunit):
+        geo_query = self._resolve_geographic_name(subunit)
+        if geo_query:
+            geo_query = self._add_entry_meta(geo_query, newentry=True)
+            geo_query['dgraph.type'] = 'Subunit'
+            geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
+            # prevent duplicates
+            duplicate_check = dgraph.get_uid(
+                'unique_name', geo_query['unique_name'])
+            if duplicate_check:
+                geo_query = UID(duplicate_check)
+            else:
+                geo_query['uid'] = NewID(
+                    f"_:{slugify(secrets.token_urlsafe(8))}")
+            self.newsubunits.append(geo_query)
+
+            return geo_query
+        else:
+            raise InventoryValidationError(
+                f'Invalid Data! Could not resolve geographic subunit {subunit}')
+
+
+class NewOrgSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(data, user, ip)
+
+        self.new = {"uid": UID(data.get('uid')),
+                    "dgraph.type": 'Organization'}
+        self.new = self._add_entry_meta(self.new, newentry=True)
+
+        self._generate_unique_name()
+        self._parse()
+        self._resolve_wikidata()
+
+        nquads = dict_to_nquad(self.new)
+
+        self.set_nquads = " \n ".join(nquads)
+
+    @staticmethod
+    def _org_unique_name(name, country=None, country_uid=None):
+        name = slugify(name, separator="_")
+        if country_uid:
+            country = dgraph.query(
+                f'''{{ q(func: uid({country_uid})) {{ unique_name }} }}''')
+            country = country['q'][0]['unique_name']
+
+        country = slugify(country, separator="_")
+        query_string = f'''{{
+                            field1 as var(func: eq(unique_name, "{name}"))
+                            field2 as var(func: eq(unique_name, "{name}_{country}"))
+                        
+                            data1(func: uid(field1)) {{
+                                    unique_name
+                                    uid
+                            }}
+                        
+                            data2(func: uid(field2)) {{
+                                unique_name
+                                uid
+                            }}
+                            
+                        }}'''
+
+        result = dgraph.query(query_string)
+
+        if len(result['data1']) == 0:
+            return f'{name}'
+        elif len(result['data2']) == 0:
+            return f'{name}_{country}'
+        else:
+            return f'{name}_{country}_{secrets.token_urlsafe(4)}'
+
+    def _generate_unique_name(self):
+        
+        if self.data.get('country'):
+            self.new["unique_name"] = self._org_unique_name(
+                self.data['name'], country_uid=self.data['country'])
+        else:
+            self.new["unique_name"] = self._org_unique_name(
+                self.json['name'], country="unknown")
+
+    def _resolve_wikidata(self):
+
+        geo_result = geocode(self.new['name'])
+        if geo_result:
+            try:
+                self.new['address_geo'] = Geolocation('Point', [
+                    float(geo_result.get('lon')), float(geo_result.get('lat'))])
+            except:
+                pass
+            try:
+                address_lookup = reverse_geocode(geo_result.get('lat'), geo_result.get('lon'))
+                self.new['address_string'] = address_lookup['display_name']
+            except:
+                pass
+
+        wikidata = get_wikidata(self.new['name'])
+
+        if wikidata:
+            for key, val in wikidata.items():
+                if key not in self.new.keys():
+                    self.new[key] = val
+        
+    def parse_is_person(self):
+        if self.data.get('is_person'):
+            if self.data.get('is_person') == 'y':
+                self.new['is_person'] = True
+        else:
+            self.new['is_person'] = False
+
+    def parse_ownership_kind(self):
+        if self.data.get('ownership_kind'):
+            self.new['ownership_kind'] = self.data.get('ownership_kind')
+        else:
+            self.new['ownership_kind'] = 'none'
+    
+    def parse_country(self):
+        self.new['country'] = UID(self.data.get('country'))
+
+    def parse_employees(self):
+        if self.data.get('employees'):
+            self.new['employees'] = self.data.get('employees')
+
+    def parse_owns(self):
+        if self.data.get('owns'):
+            org_list = self.data.get('owns')
+            if type(org_list) == str:
+                org_list = org_list.split(',')
+
+            self.new['owns'] = []
+
+            for item in org_list:
+                if item == str(self.new['uid']):
+                    continue
+                if item.startswith('0x'):
+                    self.new['owns'].append(UID(item))
+
+    def parse_publishes(self):
+        if self.data.get('publishes'):
+            org_list = self.data.get('publishes')
+            if type(org_list) == str:
+                org_list = org_list.split(',')
+
+            self.new['publishes'] = []
+
+            for item in org_list:
+                if item.startswith('0x'):
+                    self.new['publishes'].append(UID(item))
+            

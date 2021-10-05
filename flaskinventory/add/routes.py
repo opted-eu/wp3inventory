@@ -4,13 +4,14 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.add.forms import NewEntry
+from flaskinventory.add.forms import NewEntry, NewOrganization
 from flaskinventory.add.utils import database_check_table
 from flaskinventory.add.process import EntryProcessor
-from flaskinventory.add.sanitize import SourceSanitizer
+from flaskinventory.add.sanitize import SourceSanitizer, NewOrgSanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
+from flaskinventory.edit.sanitize import EditOrgSanitizer
 from flaskinventory.users.constants import USER_ROLES
-
+from flaskinventory.misc.forms import get_country_choices
 import traceback
 
 add = Blueprint('add', __name__)
@@ -28,21 +29,22 @@ def new_entry():
     
                 data(func: uid(field1, field2, field3)) {{
                     uid
-                    unique_name
-                    name
-                    other_names
-                    channel {{ name }}
-                    geographic_scope_countries {{ name }}
-                    entry_review_status
+                    expand(_all_) {{ name }}
                     }}
                 }}
         '''
         result = dgraph.query(query_string)
         if len(result['data']) > 0:
-            return render_template('add/database_check.html', query=form.name.data, result=result['data'])
+            return render_template('add/database_check.html', query=form.name.data, result=result['data'], entity=form.entity.data)
             # return redirect(url_for('add.database_check', result=result['data']))
         else:
-            return redirect(url_for('add.new_source', entry_name=form.name.data))
+            if form.entity.data == 'Source':
+                return redirect(url_for('add.new_source', entry_name=form.name.data))
+            elif form.entity.data == 'Organization':
+                return redirect(url_for('add.new_organization'))
+            else:
+                return redirect(url_for('main.under_development'))
+
     return render_template('add/newentry.html', form=form)
 
 
@@ -79,6 +81,96 @@ def new_source(draft=None):
         else:
             draft = None
     return render_template("add/newsource.html", draft=draft)
+
+@add.route("/add/organisation", methods=['GET', 'POST'])
+@add.route("/add/organization", methods=['GET', 'POST'])
+@login_required
+def new_organization(draft=None):
+    form = NewOrganization(uid="_:neworganization", is_person='n')
+    form.country.choices = get_country_choices()
+
+    if draft is None:
+        draft = request.args.get('draft')
+    if draft:
+        query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ 
+                                uid expand(_all_) {{ name unique_name uid }}
+                                }} }}"""
+        draft = dgraph.query(query_string)
+        if len(draft['q']) > 0:
+            draft = draft['q'][0]
+            entry_added = draft.pop('entry_added')
+            for key, value in draft['q'][0].items():
+                if not hasattr(form, key):
+                    continue
+                if type(value) is list:
+                    if type(value[0]) is str:
+                        value = ",".join(value)
+                    elif key == 'country':
+                        value = value[0].get('uid')
+                    elif key != 'country':
+                        choices = [(subval['uid'], subval['name']) for subval in value]
+                        value = [subval['uid'] for subval in value]
+                        setattr(getattr(form, key),
+                                    'choices', choices)
+                        
+                setattr(getattr(form, key), 'data', value)
+            # check permissions
+            if current_user.uid != entry_added['uid']:
+                if current_user.user_role >= USER_ROLES.Reviewer:
+                    flash("You are editing another user's draft", category='info')
+                else:
+                    draft = None
+                    flash('You can only edit your own drafts!', category='warning')
+        else:
+            draft = None
+
+    if form.validate_on_submit():
+        if draft:
+            try:
+                sanitizer = EditOrgSanitizer(
+                    form.data, current_user, request.remote_addr)
+                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+                current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'Organization could not be updated: {e}', 'danger')
+                return redirect(url_for('add.new_organization', draft=form.data))
+        else:
+            try:
+                sanitizer = NewOrgSanitizer(
+                    form.data, current_user, request.remote_addr)
+                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'Organization could not be added: {e}', 'danger')
+                return redirect(url_for('add.new_organization'))
+        
+
+        try:
+            if hasattr(sanitizer, 'delete_nquads'):
+                delete = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+                current_app.logger.debug(delete)
+            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            current_app.logger.debug(result)
+            flash(f'Organization has been added!', 'success')
+            return redirect(url_for('view.view_organization', unique_name=sanitizer.new['unique_name']))
+        except Exception as e:
+            if current_app.debug:
+                    e_trace = traceback.format_exception(None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+            flash(f'Organization could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_organization'))
+     
+
+    fields = list(form.data.keys())
+    fields.remove('submit')
+    fields.remove('csrf_token')
+    #return render_template("add/organization.html", form=form, title="Add Media Organisation", draft=draft)
+    return render_template('add/organization.html', title='Add Media Organization', form=form, fields=fields)
 
 
 @add.route("/add/confirmation")
