@@ -12,6 +12,8 @@
     {% else %} 
         {% if field.type == 'BooleanField' %}
             {{ field(class="form-check") }} 
+        {% elif field.type == 'SelectField' %}
+            {{ field(class="form-select form-select-lg") }} 
         {% else %}
             {{ field(class="form-control form-control-lg") }} 
         {% endif %}

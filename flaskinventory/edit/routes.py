@@ -130,8 +130,13 @@ def source(unique_name=None, uid=None):
     result = dgraph.query(query_string)
     if len(result['q']) == 0:
         return abort(404)
+    
+    if result['q'][0].get('audience_size'):
+        audience_size_entries = len(result['q'][0]['audience_size'])
+    else:
+        audience_size_entries = 0
 
-    form, fields = make_form(result['q'][0]['channel']['unique_name'], audience_size=len(result['q'][0]['audience_size']))
+    form, fields = make_form(result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
     countries = dgraph.query('''{ countries(func: type("Country")) { name uid } subunits(func: type("Subunit")) { name uid }}''')
     c_choices = [(country.get('uid'), country.get('name'))
                  for country in countries['countries']]
