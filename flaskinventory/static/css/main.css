@@ -50,13 +50,12 @@
     font-style: normal;
 }
 
-.icon-vkontakte::before {
+.icon-telegram::before {
     content: "\f2c6";
     font-weight: 400;
     font-family: "Font Awesome 5 Brands";
     font-style: normal;
 }
-
 
 
 /* social colors */
@@ -90,7 +89,6 @@
 }
 
 
-
 /* Animations / Transitions */
 
 @keyframes fadein {
@@ -119,13 +117,13 @@ fieldset {
     animation: fadein 200ms;
 }
 
+
 /* Layout tweaks */
 
 dt {
     /* description lists need more spacing between rows */
     margin-bottom: 0.5em;
 }
-
 
 .tooltip-inner {
     max-width: 350px!important;
