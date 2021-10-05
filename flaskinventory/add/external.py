@@ -429,11 +429,12 @@ def telegram(username):
         bot = await TelegramClient('bot', current_app.config['TELEGRAM_APP_ID'], current_app.config['TELEGRAM_APP_HASH']).start(
             bot_token=current_app.config['TELEGRAM_BOT_TOKEN'])
         try:
-            return await bot.get_entity(username)
+            profile = await bot.get_entity(username)
         except ValueError as e:
-            return False
-        finally:
-            bot.disconnect()
+            profile = False
+        
+        await bot.disconnect()
+        return profile
 
     profile = asyncio.new_event_loop().run_until_complete(get_profile(username))
     profile = profile.to_dict()
