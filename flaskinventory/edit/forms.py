@@ -304,6 +304,10 @@ def make_form(entity, audience_size=1):
         fields = edittwitterfields
     elif entity == 'facebook':
         fields = editfacebookfields
+    elif entity == 'vkontakte':
+        fields = editinstagramfields
+    elif entity == 'telegram':
+        fields = editinstagramfields
     elif entity == 'website':
         fields = editwebsitefields
     elif entity == 'transcript':
