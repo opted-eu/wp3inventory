@@ -9,6 +9,7 @@ import secrets
 class User(UserMixin):
     
     id = None
+    user_role = 0
 
     def __init__(self, **kwargs):
         if 'uid' or 'email' in kwargs.keys():

@@ -4,7 +4,7 @@ import json
 from flask import Flask
 from .config import create_filehandler
 
-from flask_login import LoginManager
+from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
 from flaskinventory.config import Config
 from flask_wtf.csrf import CSRFProtect
@@ -15,9 +15,14 @@ from flaskinventory.flaskdgraph import DGraph
 
 dgraph = DGraph()
 
+class AnonymousUser(AnonymousUserMixin):
+    user_role = 0
+
 login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
+login_manager.anonymous_user = AnonymousUser
+
 
 mail = Mail()
 
