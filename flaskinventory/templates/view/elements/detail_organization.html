@@ -2,8 +2,13 @@
     <div class="icon-square me-3">
         <h2><i class="fas fa-building" alt="Organisation"></i></h2>
     </div>
-    <div>
+    <div class="w-100">
         <h2>{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>
+    </div>
+    <div>
+        {% if current_user.user_role > 1 %}
+            <a class="btn btn-primary" href="{{ url_for('edit.organization', uid=entry.uid) }}">Edit</a>
+        {% endif %}
     </div>
 </div>
 

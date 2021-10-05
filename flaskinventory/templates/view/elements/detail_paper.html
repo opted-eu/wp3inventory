@@ -2,7 +2,7 @@
     <div class="icon-square me-3">
         <h2><i class="fas fa-graduation-cap" alt="Paper"></i></h2>
     </div>
-    <div>
+    <div class="w-100">
         <h3>{{ entry.title }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h3>
         <h6>{% if entry.authors is string %}{{ entry.authors }}{%else%}{{ ", ".join(entry.authors )}}{%endif%}</h6>
     </div>
