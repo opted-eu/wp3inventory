@@ -1394,7 +1394,7 @@ class NewOrgSanitizer(Sanitizer):
                 self.data['name'], country_uid=self.data['country'])
         else:
             self.new["unique_name"] = self._org_unique_name(
-                self.json['name'], country="unknown")
+                self.data['name'], country="unknown")
 
     def _resolve_wikidata(self):
 
@@ -1464,3 +1464,167 @@ class NewOrgSanitizer(Sanitizer):
                 if item.startswith('0x'):
                     self.new['publishes'].append(UID(item))
             
+
+
+
+
+class NewArchiveSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(data, user, ip)
+
+        self.new = {"uid": UID(data.get('uid')),
+                    "dgraph.type": 'Archive'}
+        self.new = self._add_entry_meta(self.new, newentry=True)
+
+        self._generate_unique_name()
+        self._parse()
+        self._resolve_wikidata()
+
+        nquads = dict_to_nquad(self.new)
+
+        self.set_nquads = " \n ".join(nquads)
+
+    @staticmethod
+    def _archive_unique_name(name):
+        name = slugify(name, separator="_")
+
+        query_string = f'''{{
+                            field1 as var(func: eq(unique_name, "{name}"))
+                            field2 as var(func: eq(unique_name, "{name}_archive"))
+                        
+                            data1(func: uid(field1)) {{
+                                    unique_name
+                                    uid
+                            }}
+                        
+                            data2(func: uid(field2)) {{
+                                unique_name
+                                uid
+                            }}
+                            
+                        }}'''
+
+        result = dgraph.query(query_string)
+
+        if len(result['data1']) == 0:
+            return f'{name}'
+        elif len(result['data2']) == 0:
+            return f'{name}_archive'
+        else:
+            return f'{name}_archive_{secrets.token_urlsafe(4)}'
+
+    def _generate_unique_name(self):
+        self.new["unique_name"] = self._archive_unique_name(
+            self.data['name'])
+
+    def _resolve_wikidata(self):
+
+        wikidata = get_wikidata(self.new['name'])
+
+        if wikidata:
+            for key, val in wikidata.items():
+                if key not in self.new.keys():
+                    self.new[key] = val
+        
+    def parse_access(self):
+        if self.data.get('access'):
+            if self.data.get('access') == 'free':
+                self.new['access'] = 'free'
+            else:
+                self.new['access'] = 'restricted'
+        else:
+            self.new['access'] = 'restricted'
+
+    def parse_url(self):
+        if self.data.get('url'):
+            self.new['url'] = self.data.get('url')
+        else:
+            raise InventoryValidationError('URL is required!')
+
+    def parse_sources_included(self):
+        if self.data.get('sources_included'):
+            src_list = self.data.get('sources_included')
+            if type(src_list) == str:
+                src_list = src_list.split(',')
+
+            self.new['sources_included'] = []
+
+            for item in src_list:
+                if item.startswith('0x'):
+                    self.new['sources_included'].append(UID(item))
+
+    def parse_description(self):
+        if self.data.get('description'):
+            self.new['description'] = self.data.get('description')
+    
+
+
+class NewCountrySanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(data, user, ip)
+
+        self.new = {"uid": UID(data.get('uid')),
+                    "dgraph.type": 'Country',
+                    "opted_scope": False}
+
+        self.new = self._add_entry_meta(self.new, newentry=True)
+
+        self._generate_unique_name()
+        self._parse()
+        self._resolve_wikidata()
+
+        nquads = dict_to_nquad(self.new)
+
+        self.set_nquads = " \n ".join(nquads)
+
+    @staticmethod
+    def _country_unique_name(name):
+        name = slugify(name, separator="_")
+
+        query_string = f'''{{
+                            field1 as var(func: eq(unique_name, "{name}"))
+                            field2 as var(func: eq(unique_name, "{name}_country"))
+                        
+                            data1(func: uid(field1)) {{
+                                    unique_name
+                                    uid
+                            }}
+                        
+                            data2(func: uid(field2)) {{
+                                unique_name
+                                uid
+                            }}
+                            
+                        }}'''
+
+        result = dgraph.query(query_string)
+
+        if len(result['data1']) == 0:
+            return f'{name}'
+        elif len(result['data2']) == 0:
+            return f'{name}_archive'
+        else:
+            return f'{name}_archive_{secrets.token_urlsafe(4)}'
+
+    def _generate_unique_name(self):
+        self.new["unique_name"] = self._archive_unique_name(
+            self.data['name'])
+
+    def _resolve_wikidata(self):
+
+        wikidata = get_wikidata(self.new['name'])
+
+        if wikidata:
+            for key, val in wikidata.items():
+                if key not in self.new.keys():
+                    self.new[key] = val
+
+    def parse_country_code(self):
+        if self.data.get('country_code'):
+            self.new['country_code'] = self.data.get('country_code')
+        else:
+            raise InventoryValidationError('Country Code is required!')
+
+    

@@ -4,13 +4,14 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.add.forms import NewEntry, NewOrganization
-from flaskinventory.add.utils import database_check_table
+from flaskinventory.add.forms import NewCountry, NewEntry, NewOrganization, NewArchive
+from flaskinventory.add.utils import check_draft
 from flaskinventory.add.process import EntryProcessor
-from flaskinventory.add.sanitize import SourceSanitizer, NewOrgSanitizer
+from flaskinventory.add.sanitize import NewCountrySanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
-from flaskinventory.edit.sanitize import EditOrgSanitizer
+from flaskinventory.edit.sanitize import EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.users.constants import USER_ROLES
+from flaskinventory.users.utils import requires_access_level
 from flaskinventory.misc.forms import get_country_choices
 import traceback
 
@@ -42,6 +43,8 @@ def new_entry():
                 return redirect(url_for('add.new_source', entry_name=form.name.data))
             elif form.entity.data == 'Organization':
                 return redirect(url_for('add.new_organization'))
+            elif form.entity.data == 'Archive':
+                return redirect(url_for('add.new_archive'))
             else:
                 return redirect(url_for('main.under_development'))
 
@@ -77,10 +80,12 @@ def new_source(draft=None):
                     flash("You are editing another user's draft", category='info')
                 else:
                     draft = None
-                    flash('You can only edit your own drafts!', category='warning')
+                    flash('You can only edit your own drafts!',
+                          category='warning')
         else:
             draft = None
     return render_template("add/newsource.html", draft=draft)
+
 
 @add.route("/add/organisation", methods=['GET', 'POST'])
 @add.route("/add/organization", methods=['GET', 'POST'])
@@ -92,37 +97,7 @@ def new_organization(draft=None):
     if draft is None:
         draft = request.args.get('draft')
     if draft:
-        query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ 
-                                uid expand(_all_) {{ name unique_name uid }}
-                                }} }}"""
-        draft = dgraph.query(query_string)
-        if len(draft['q']) > 0:
-            draft = draft['q'][0]
-            entry_added = draft.pop('entry_added')
-            for key, value in draft['q'][0].items():
-                if not hasattr(form, key):
-                    continue
-                if type(value) is list:
-                    if type(value[0]) is str:
-                        value = ",".join(value)
-                    elif key == 'country':
-                        value = value[0].get('uid')
-                    elif key != 'country':
-                        choices = [(subval['uid'], subval['name']) for subval in value]
-                        value = [subval['uid'] for subval in value]
-                        setattr(getattr(form, key),
-                                    'choices', choices)
-                        
-                setattr(getattr(form, key), 'data', value)
-            # check permissions
-            if current_user.uid != entry_added['uid']:
-                if current_user.user_role >= USER_ROLES.Reviewer:
-                    flash("You are editing another user's draft", category='info')
-                else:
-                    draft = None
-                    flash('You can only edit your own drafts!', category='warning')
-        else:
-            draft = None
+        draft = check_draft(draft, form)
 
     if form.validate_on_submit():
         if draft:
@@ -130,10 +105,12 @@ def new_organization(draft=None):
                 sanitizer = EditOrgSanitizer(
                     form.data, current_user, request.remote_addr)
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-                current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
+                current_app.logger.debug(
+                    f'Set Nquads: {sanitizer.delete_nquads}')
             except Exception as e:
                 if current_app.debug:
-                    e_trace = traceback.format_exception(None, e, e.__traceback__)
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
                     current_app.logger.debug(e_trace)
                 flash(f'Organization could not be updated: {e}', 'danger')
                 return redirect(url_for('add.new_organization', draft=form.data))
@@ -144,15 +121,16 @@ def new_organization(draft=None):
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             except Exception as e:
                 if current_app.debug:
-                    e_trace = traceback.format_exception(None, e, e.__traceback__)
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
                     current_app.logger.debug(e_trace)
                 flash(f'Organization could not be added: {e}', 'danger')
                 return redirect(url_for('add.new_organization'))
-        
 
         try:
             if hasattr(sanitizer, 'delete_nquads'):
-                delete = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+                delete = dgraph.upsert(
+                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
                 current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
@@ -160,22 +138,121 @@ def new_organization(draft=None):
             return redirect(url_for('view.view_organization', unique_name=sanitizer.new['unique_name']))
         except Exception as e:
             if current_app.debug:
-                    e_trace = traceback.format_exception(None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
+                e_trace = traceback.format_exception(None, e, e.__traceback__)
+                current_app.logger.debug(e_trace)
             flash(f'Organization could not be added: {e}', 'danger')
             return redirect(url_for('add.new_organization'))
-     
 
     fields = list(form.data.keys())
     fields.remove('submit')
     fields.remove('csrf_token')
-    #return render_template("add/organization.html", form=form, title="Add Media Organisation", draft=draft)
-    return render_template('add/organization.html', title='Add Media Organization', form=form, fields=fields)
+    return render_template('add/generic.html', title='Add Media Organization', form=form, fields=fields)
+
+
+@add.route("/add/archive", methods=['GET', 'POST'])
+@login_required
+def new_archive(draft=None):
+    form = NewArchive(uid="_:newarchive")
+
+    if draft is None:
+        draft = request.args.get('draft')
+    if draft:
+        draft = check_draft(draft, form)
+
+    if form.validate_on_submit():
+        if draft:
+            try:
+                sanitizer = EditArchiveSanitizer(
+                    form.data, current_user, request.remote_addr)
+                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+                current_app.logger.debug(
+                    f'Set Nquads: {sanitizer.delete_nquads}')
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'Archive could not be updated: {e}', 'danger')
+                return redirect(url_for('add.new_archive', draft=form.data))
+        else:
+            try:
+                sanitizer = NewArchiveSanitizer(
+                    form.data, current_user, request.remote_addr)
+                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'Archive could not be added: {e}', 'danger')
+                return redirect(url_for('add.new_archive'))
+
+        try:
+            if sanitizer.delete_nquads is not None:
+                delete = dgraph.upsert(
+                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+                current_app.logger.debug(delete)
+            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            current_app.logger.debug(result)
+            flash(f'Archive has been added!', 'success')
+            return redirect(url_for('view.view_archive', unique_name=sanitizer.new['unique_name']))
+        except Exception as e:
+            if current_app.debug:
+                e_trace = traceback.format_exception(None, e, e.__traceback__)
+                current_app.logger.debug(e_trace)
+            flash(f'Archive could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_archive'))
+
+    fields = list(form.data.keys())
+    fields.remove('submit')
+    fields.remove('csrf_token')
+    return render_template('add/generic.html', title='Add Full Text Archive', form=form, fields=fields)
+
+@add.route("/add/country", methods=['GET', 'POST'])
+@login_required
+@requires_access_level(USER_ROLES.Admin)
+def new_country():
+    form = NewCountry(uid="_:newcountry")
+
+    if form.validate_on_submit():
+        try:
+            sanitizer = NewCountrySanitizer(
+                form.data, current_user, request.remote_addr)
+            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+        except Exception as e:
+            if current_app.debug:
+                e_trace = traceback.format_exception(
+                    None, e, e.__traceback__)
+                current_app.logger.debug(e_trace)
+            flash(f'Archive could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_archive'))
+
+        try:
+            if sanitizer.delete_nquads is not None:
+                delete = dgraph.upsert(
+                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+                current_app.logger.debug(delete)
+            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            current_app.logger.debug(result)
+            flash(f'Archive has been added!', 'success')
+            return redirect(url_for('view.view_archive', unique_name=sanitizer.new['unique_name']))
+        except Exception as e:
+            if current_app.debug:
+                e_trace = traceback.format_exception(None, e, e.__traceback__)
+                current_app.logger.debug(e_trace)
+            flash(f'Archive could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_archive'))
+
+    fields = list(form.data.keys())
+    fields.remove('submit')
+    fields.remove('csrf_token')
+    return render_template('add/generic.html', title='Add Country', form=form, fields=fields)
 
 
 @add.route("/add/confirmation")
 def confirmation():
     return render_template("not_implemented.html")
+
 
 @login_required
 @add.route("/add/draft/<string:entity>/<string:uid>")
@@ -186,14 +263,14 @@ def from_draft(entity=None, uid=None):
             return new_source(draft=uid)
         else:
             return render_template("not_implemented.html")
-    
+
     query_string = f"""{{ q(func: uid({current_user.uid})) {{
                 user_displayname
                 uid
                 drafts: ~entry_added @filter(type(Source) and eq(entry_review_status, "draft")) 
                 @facets(orderdesc: timestamp) (first: 1) {{ uid }}
             }} }}"""
-        
+
     result = dgraph.query(query_string)
     if result['q'][0].get('drafts'):
         return new_source(draft=result['q'][0]['drafts'][0]['uid'])
@@ -224,10 +301,12 @@ def submit():
 
     if sanitizer.is_upsert:
         try:
-            result = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+            result = dgraph.upsert(
+                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
         except Exception as e:
             error = {'error': f'{e}'}
-            tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+            tb_str = ''.join(traceback.format_exception(
+                None, e, e.__traceback__))
             current_app.logger.error(tb_str)
             return jsonify(error)
 
@@ -258,7 +337,7 @@ def orglookup():
     query = request.args.get('q')
     person = request.args.get('person')
     if person:
-        person_filter =  f'AND eq(is_person, {person})'
+        person_filter = f'AND eq(is_person, {person})'
     else:
         person_filter = ''
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'

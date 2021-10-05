@@ -1,7 +1,12 @@
 {% macro render_field(field) %}
+{% if field.name == 'uid' %}
+{{ field(class="form-control form-control-lg", hidden="true") }} 
+{% else %}
 
-<div class="mb-3">
-    <label for="{{ field.id}}" class="form-label fw-bold fs-5">{{ field.label.text }}</label>
+<div class="mb-5">
+    <label for="{{ field.id}}" class="form-label fw-bold fs-5">{{ field.label.text }}
+    {% if field.flags.required %}<span class="text-danger">*</span>{% else %}<span class="text-muted">(optional)</span>{% endif %}
+    </label>
     {% if field.errors %} 
         {{ field(class="form-control form-control-lg is-invalid") }}
         <div class="invalid-feedback">
@@ -26,5 +31,6 @@
         {% endif %}
     {% endif %} 
 </div>
+{% endif %}
 
 {% endmacro %}
