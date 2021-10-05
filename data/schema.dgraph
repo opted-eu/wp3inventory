@@ -107,6 +107,7 @@ type Country {
     other_names
     wikidataID
     country_code
+    opted_scope
 }
 
 type Subunit {
@@ -260,6 +261,9 @@ address_geo: geo @index(geo) .
 employees: string .
 owns: [uid] @reverse .
 publishes: [uid] @reverse .
+
+# Country Predicates
+opted_scope: bool .
 
 # Archive and ResearchPaper Predicates
 sources_included: [uid] @reverse .
