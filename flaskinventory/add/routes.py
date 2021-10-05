@@ -253,21 +253,6 @@ def submit():
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
 
-
-@add.route('/new/echo', methods=['POST'])
-def echo_json():
-    try:
-        processor = EntryProcessor(
-            request.json, current_user, request.remote_addr)
-        current_app.logger.debug(f'Mutation Object: {processor.mutation}')
-        return jsonify(processor.mutation)
-    except Exception as e:
-        error = {'error': f'{e}'}
-        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-        current_app.logger.error(tb_str)
-        return jsonify(error)
-
-
 @add.route('/_orglookup')
 def orglookup():
     query = request.args.get('q')
