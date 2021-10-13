@@ -119,7 +119,7 @@ def find_feeds(site):
     possible_feeds = []
     html = bs4(r.content, 'lxml')
     feed_urls = html.find_all("link", rel="alternate")
-    if len(feed_urls) > 1:
+    if len(feed_urls) > 0:
         for f in feed_urls:
             t = f.get("type")
             if t:
