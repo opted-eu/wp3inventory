@@ -1370,3 +1370,65 @@ function generateSummary() {
 
 
 }
+
+function prettySummary() {
+
+    // iterate by type
+    // text, select, radio, checkbox, tomselect
+
+    document.querySelectorAll('#summary-container [id^="summary-"]').forEach((el) => el.hidden = true)
+    Array.from(form.elements).forEach(function(e) {
+        if (e.type == 'text' || e.type == 'number') { 
+                if (e.value) {
+                let summary_element = document.querySelector('#summary-' + e.name)
+                if (summary_element) {
+                    summary_element.children[1].innerHTML = e.value  
+                    summary_element.hidden = false
+                    }
+                }
+        }
+        else if (e.tagName.toLowerCase() == 'select') {
+            console.log(e.name)
+            if (e.multiple && e.selectedOptions) {
+                let summary_element = document.querySelector('#summary-' + e.name)
+                if (summary_element) {
+                    let selected = []
+                    for (opt of e.selectedOptions) { selected.push(opt.innerHTML) }
+                    if (selected.length > 0) {
+                        summary_element.children[1].innerHTML = selected.join(', ')   
+                        summary_element.hidden = false
+                        }
+                    }
+                }
+            else {
+                let summary_element = document.querySelector('#summary-' + e.name)
+                if (summary_element) {
+                    if (e.value) {
+                        console.log(e.value)
+                        summary_element.children[1].innerHTML = e.selectedOptions[0].innerHTML   
+                        summary_element.hidden = false
+                        }
+                    }
+                }
+            }
+        else if (e.type == 'radio' && e.checked) {
+            let summary_element = document.querySelector('#summary-' + e.name)
+                if (summary_element) {
+                    summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
+                    summary_element.hidden = false
+                }
+
+        }
+        else if (e.type == 'checkbox' && e.checked) {
+            let summary_element = document.querySelector('#summary-' + e.name)
+                if (summary_element) {
+                    summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
+                    summary_element.hidden = false
+                }
+
+        }
+        
+
+        }
+    )
+}
