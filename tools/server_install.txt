@@ -3,6 +3,7 @@
 apt update
 apt upgrade
 apt install curl git ufw nano htop python3-venv python3-pip libxml2-dev libxslt-dev python-dev -y
+python3 -m pip install wheel waitress requests
 
 # change ssh port
 nano /etc/ssh/sshd_config
@@ -35,7 +36,10 @@ useradd --system -d /var/lib/dgraph -s /bin/false -g dgraph dgraph
 mkdir -p /var/lib/dgraph/{p,w,zw}
 mkdir -p /var/log/dgraph
 
+mkdir /mnt/public/backup
+
 chown -R dgraph:dgraph /var/{lib,log}/dgraph
+chown -R dgraph:dgraph /mnt/public/backup
 
 ## Create systemd service files
 nano /etc/systemd/system/dgraph-zero.service
