@@ -21,7 +21,6 @@ if __name__ == '__main__':
     file_handler = TimedRotatingFileHandler(
         log_file, when="midnight", interval=1, backupCount=7)
 
-    # file_handler = logging.FileHandler(LOGGING_PATH)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
