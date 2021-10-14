@@ -10,7 +10,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 if __name__ == '__main__':
 
-    this_file = Path.resolve(__file__)
+    this_file = Path(__file__).resolve()
     log_file = this_file.parent / 'backup.log'
     config_file = this_file.parent / 'backup.json'
 
@@ -27,14 +27,18 @@ if __name__ == '__main__':
 
     logger.info('Starting backup...')
 
-    with open(config_file, 'rb') as f:
-        config = json.load(f)
+    try:
+        with open(config_file, 'rb') as f:
+            config = json.load(f)
+    except FileNotFoundError as e:
+        logger.error('Could not open config file', e)
+
 
     dgraph = "http://localhost:8080/admin"
     backup_timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
     backupfolder = Path(config['backup_path']) / backup_timestamp
 
-    query = 'mutation { export(input: {destination: "' + backupfolder + '"}) { response { message code } } }'
+    query = 'mutation { export(input: {destination: "' + str(backupfolder) + '"}) { response { message code } } }'
 
     payload = {"query": query}
 
