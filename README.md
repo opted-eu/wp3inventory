@@ -59,3 +59,35 @@ Level | Name | Permissions
 - Font Awesome
 - Tom-Select
 - jquery typeahead
+
+## Backups
+
+Currently backups are uploaded to ucloud (for data safety and convenience). If the amount of database dumps gets too large, a different solution would be preferred.
+
+Backups are run by a user with root privileges, because database dumps are created by the `dgraph` user and thus, cannot be manipulated directly by other users. Of course it would be possible to run some `chown` magic though.
+
+Make sure that the `requests` module is installed for the root user.
+
+### Create Backup Settings
+
+create a settings file (`backup.json`) inside the tools folder:
+
+```json
+{
+    "ucloud_url": "https://ucloud.univie.ac.at/public.php/webdav/",
+    "ucloud_token": "secret",
+    "backup_path": "/mnt/public/backup/"
+}
+```
+
+Make sure the directory `backup_path` exists and that the `dgraph` user has rights to write to it.
+
+### Run backup
+
+Simply execute the script `tools/backup.py`.
+
+Add it as cronjob with `crontab -e`
+
+```
+0 1 * * * /usr/bin/python3 /home/user/wp3inventory/tools/backup.py
+```
