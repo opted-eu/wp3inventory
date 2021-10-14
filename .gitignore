@@ -134,6 +134,7 @@ flaskinventory/static/labels
 flaskinventory/static/profile_pics
 
 tools/secrets.md
+tools/backup.json
 logs/
 
 .vscode/
