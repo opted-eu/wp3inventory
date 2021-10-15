@@ -374,6 +374,7 @@ class SourceSanitizer:
         # audience related
         self.parse_geographic_scope()
         self.parse_languages()
+        self.parse_followers()
 
         # data access
         self.parse_archives()
@@ -722,6 +723,16 @@ class SourceSanitizer:
                 audience_size_year = int(self.json.get('audience_size_year'))
             else:
                 audience_size_year = datetime.date.today()
+
+            self.newsource['audience_size'] = Scalar(
+                audience_size_year, facets=facets)
+    
+    def parse_followers(self):
+        if self.json.get('audience_size_followers'):
+            facets = {'likes': int(
+                self.json.get('audience_size_followers'))}
+
+            audience_size_year = datetime.date.today()
 
             self.newsource['audience_size'] = Scalar(
                 audience_size_year, facets=facets)

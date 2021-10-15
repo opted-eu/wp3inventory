@@ -113,6 +113,7 @@ function channelVisibility(fieldOptions, allNames, el) {
     document.getElementById('name-website-tooltip').hidden = true;
     document.getElementById('name-instagram-tooltip').hidden = true;
     document.getElementById('name-twitter-tooltip').hidden = true;
+    document.querySelector('#group-audience-size-followers').hidden = true
 
     if (index != 99) {
         document.querySelector("#name-question").innerText = fieldOptions.channel[index]['form_name_question'];
@@ -197,9 +198,9 @@ function channelVisibility(fieldOptions, allNames, el) {
         document.querySelector("#group-archive-sources-included").hidden = false
     } else if (value == 'facebook') {
         document.getElementById('name-facebook-tooltip').hidden = false;
-
         document.querySelector('#group-source-founded').hidden = false
         document.querySelector('#source-founded-question').innerHTML = `What year was the facebook page created?`
+        document.querySelector('#group-audience-size-followers').hidden = false
     } else if (value == 'instagram') {
         document.getElementById('name-instagram-tooltip').hidden = false;
     } else if (value == 'twitter') {
@@ -1071,7 +1072,8 @@ ready(() => {
             };
             nextStep = nextbutton.parentElement.nextElementSibling;
             if (nextStep.id == 'section-audience') {
-                if (document.getElementById('channel-select').value != 'print') {
+                let audience_size_channels = ['print', 'facebook']
+                if (!audience_size_channels.includes(document.getElementById('channel-select').value)) {
                     nextStep = nextStep.nextElementSibling;
                 }
             }

@@ -439,6 +439,16 @@
 
     <fieldset id="section-audience" hidden>
         <h3 class="mb-4">Information about the Audience</h3>
+        <div id="group-audience-size-followers" class="mb-5">
+            <label for="audience-size-followers" class="form-label fw-bold fs-5">How many likes does the Facebook page currently have?
+                <span class="text-muted mx-1">(optional)</span>
+                {{ make_tooltip('Usually, we retrieve this information automatically. However, Facebook does not allow us to do this.') }}
+                {{ make_researchtip('Just open the Facebook page and check the current count of "likes"') }}
+            </label>
+            <p class="my-0"><small id="audience-size-followers-helptext"></small></p>
+            <input name="audience_size_followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
+            <div id="audience-size-followers-feedback"></div>
+        </div>
 
         <div id="group-audience-size" class="mb-5">
             <div id="group-audience-size-subscribers" class="mb-5">
