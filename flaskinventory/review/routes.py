@@ -32,7 +32,7 @@ def overview():
     if form.validate_on_submit():
         overview = get_overview(form.entity.data, country=form.country.data)
     else:
-        overview = get_overview("Source")
+        overview = get_overview("all")
 
     print(overview)
 

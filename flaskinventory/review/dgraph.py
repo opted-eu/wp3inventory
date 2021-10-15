@@ -4,8 +4,10 @@ from flaskinventory import dgraph
 
 
 def get_overview(dgraphtype, country=None):
-    
-    query_head = f'''{{ q(func: type({dgraphtype})) @filter(eq(entry_review_status, "pending")) '''
+    if dgraphtype == 'all':
+        query_head = f'''{{ q(func: has(dgraph.type)) @filter(eq(entry_review_status, "pending")) '''
+    else:
+        query_head = f'''{{ q(func: type({dgraphtype})) @filter(eq(entry_review_status, "pending")) '''
     
     query_fields = f''' uid name unique_name dgraph.type entry_added @facets(timestamp) {{ uid user_displayname }}'''
 
