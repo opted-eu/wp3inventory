@@ -141,7 +141,7 @@ def source(unique_name=None, uid=None):
     c_choices = [(country.get('uid'), country.get('name'))
                  for country in countries['countries']]
     c_choices = sorted(c_choices, key=lambda x: x[1])
-    form.geographic_scope_countries.choices = c_choices
+    form.country.choices = c_choices
 
     su_choices = [(subunit.get('uid'), subunit.get('name'))
                  for subunit in countries['subunits']]
@@ -189,7 +189,7 @@ def source(unique_name=None, uid=None):
             else:
                 choices = [(subval['uid'], subval['unique_name']) for subval in value]
                 value = [subval['uid'] for subval in value]
-                if key not in ['geographic_scope_countries', 'geographic_scope_subunit']:
+                if key not in ['country', 'geographic_scope_subunit']:
                     setattr(getattr(form, key),
                             'choices', choices)
                

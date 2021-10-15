@@ -42,8 +42,8 @@
                         }
                     };
                     var country_label = ' '
-                    if ("geographic_scope_countries" in data) {
-                        country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                    if ("country" in data) {
+                        country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
                     return '<div>' +
                             '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
@@ -58,8 +58,8 @@
                         }
                     };
                     var country_label = ' '
-                    if ("geographic_scope_countries" in data) {
-                        country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                    if ("country" in data) {
+                        country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
                     return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
                 }
@@ -154,8 +154,8 @@
                     }
                 };
                 var country_label = ' '
-                if ("geographic_scope_countries" in data) {
-                    country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                if ("country" in data) {
+                    country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                 }
                 return '<div>' +
                         '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
@@ -170,8 +170,8 @@
                     }
                 };
                 var country_label = ' '
-                if ("geographic_scope_countries" in data) {
-                    country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                if ("country" in data) {
+                    country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                 }
                 return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
             }
@@ -181,7 +181,7 @@
     
     {% endif %}
     
-    {% if 'geographic_scope_countries' in fields %}
+    {% if 'country' in fields %}
     
     var TomSelectCountriesConfig = {
         plugins: ['remove_button'],
@@ -192,7 +192,7 @@
         }
     };
     
-    new TomSelect('#geographic_scope_countries', TomSelectCountriesConfig);
+    new TomSelect('#country', TomSelectCountriesConfig);
     
     {% endif %}
     

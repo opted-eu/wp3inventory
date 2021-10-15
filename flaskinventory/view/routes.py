@@ -57,7 +57,6 @@ def search():
                         title: title
                         channel {{ channel: name }}
                         country {{ country: name }}
-                      	geographic_scope_countries {{ country: name }}
                     }}
                 }}
         '''
@@ -250,10 +249,7 @@ def query():
         if request.args.get('country') == 'all':
             relation_filt = None
         else:
-            if request.args.get('entity') == 'Source':
-                relation_filt = {'geographic_scope_countries': {'uid': request.args.get('country')}}
-            else:
-                relation_filt = {'country': {'uid': request.args.get('country')}}
+            relation_filt = {'country': {'uid': request.args.get('country')}}
         data = list_by_type(
             request.args['entity'], relation_filt=relation_filt, filt={'eq': {'entry_review_status': 'accepted'}})
 

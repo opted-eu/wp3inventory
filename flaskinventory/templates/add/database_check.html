@@ -28,8 +28,6 @@
         <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }}</a></td>
         {% if entity == 'Source' %}
         <td>{{ entry.channel.get('name')}}</td>
-        <td>{% if entry.get('geographic_scope_countries') %}{{ entry.geographic_scope_countries[0].get('name') }}{% endif %}</td>
-        {% else %}
         <td>{% if entry.get('country') %}{{ entry.country[0].get('name') }}{% endif %}</td>
         {% endif %}
         <td>{% if entry.get('other_names') %}{{ ", ".join(entry.other_names) }}{% endif %}</td>

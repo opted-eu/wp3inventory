@@ -16,10 +16,8 @@ def get_overview(dgraphtype, country=None):
             filt_string = f''' @filter(uid({country})) '''
             query_head += '@cascade'
 
-    if dgraphtype == 'Source':
-        query_fields += f''' channel {{ uid unique_name name }} country: geographic_scope_countries {filt_string}  {{ uid unique_name name }}  '''
-    else:
-        query_fields += f''' country {filt_string}  {{ uid unique_name name }}  '''
+   
+    query_fields += f''' country {filt_string}  {{ uid unique_name name }} channel {{ uid unique_name name }} '''
 
     query = f'{query_head} {{ {query_fields} }} }}'
 

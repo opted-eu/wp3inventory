@@ -201,6 +201,9 @@ class DGraph(object):
             return False
 
     def upsert(self, query, set_nquads=None, del_nquads=None, cond=None):
+        if query:
+            if not query.startswith('{'):
+                query = '{' + query + '}'
         self.logger.debug("Performing upsert:")
         self.logger.debug(f'Query: {query}')
         self.logger.debug(f'nquad: {set_nquads}')

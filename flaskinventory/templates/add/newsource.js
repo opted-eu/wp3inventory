@@ -455,9 +455,9 @@ function populateForm(jsonData) {
     if ("geographic_scope" in jsonData) {
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).checked = true
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).dispatchEvent(new Event("input"))
-        if ("geographic_scope_countries" in jsonData) {
+        if ("country" in jsonData) {
             if (jsonData["geographic_scope"] == "multinational") {
-                for (country of jsonData["geographic_scope_countries"]) {
+                for (country of jsonData["country"]) {
                     if (document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`)) {
                         document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`).selected = true
                         document.getElementById("geographic-scope-countries-hidden").value += country["uid"] + ","
@@ -472,7 +472,7 @@ function populateForm(jsonData) {
                     }
                 }
             } else if (jsonData["geographic_scope"] == "national") {
-                let country = jsonData["geographic_scope_countries"][0]
+                let country = jsonData["country"][0]
                 if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                     document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
                 }
@@ -484,7 +484,7 @@ function populateForm(jsonData) {
                             document.querySelector(`#geographic-scope-subunit option[value='${subunit.uid}']`).selected = true
                         }
                     }
-                    let country = jsonData["geographic_scope_countries"][0]
+                    let country = jsonData["country"][0]
                     if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                         document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
                     }
@@ -958,7 +958,7 @@ ready(() => {
                         uid: input,
                         text: input,
                         name: input,
-                        geographic_scope_countries: [
+                        country: [
                             { name: 'NEW!' }
                         ],
                         channel: { name: '' }
@@ -1002,8 +1002,8 @@ ready(() => {
                             }
                         };
                         var country_label = ' '
-                        if ("geographic_scope_countries" in data) {
-                            country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                        if ("country" in data) {
+                            country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
                         return '<div>' +
                             '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
@@ -1018,8 +1018,8 @@ ready(() => {
                             }
                         };
                         var country_label = ' '
-                        if ("geographic_scope_countries" in data) {
-                            country_label = '<small class="text-muted mx-1"> (' + escape(data.geographic_scope_countries[0].name) + ')</small>'
+                        if ("country" in data) {
+                            country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
                         return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
                     }

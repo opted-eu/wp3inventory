@@ -28,7 +28,6 @@ def home():
                                 creation_date: creation_date
                                 channel {{ channel: name }}
                                 country {{ country: name }}
-                                geographic_scope_countries {{ country: name }}
                             }}
                         }}'''
     

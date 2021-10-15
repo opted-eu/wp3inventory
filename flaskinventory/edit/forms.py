@@ -129,7 +129,7 @@ publication_cycle_weekday_choices = [(1, 'Monday'),
                                      (7, 'Sunday'),
                                      ('none', "Don't know / NA")]
 
-publication_cycle_weekday = SelectMultipleField(
+publication_cycle_weekday = TomSelectMutlitpleField(
     'Publication weekdays', choices=publication_cycle_weekday_choices)
 
 geographic_scope_choices = [('multinational', 'Multinational'),
@@ -139,8 +139,8 @@ geographic_scope_choices = [('multinational', 'Multinational'),
 geographic_scope = SelectField('Geographic Scope', validators=[
                                DataRequired()], choices=geographic_scope_choices)
 
+countries = TomSelectMutlitpleField('Countries', choices=[])
 
-geographic_scope_countries = TomSelectMutlitpleField('Country')
 geographic_scope_subunit = TomSelectMutlitpleField('Subunit', choices=[])
 
 languages = SelectMultipleField('Languages', choices=icu_codes_list_tuples)
@@ -231,7 +231,7 @@ editsourcefields = {
     "publication_cycle": publication_cycle,
     "publication_cycle_weekday": publication_cycle_weekday,
     "geographic_scope": geographic_scope,
-    "geographic_scope_countries": geographic_scope_countries,
+    "country": countries,
     "geographic_scope_subunit": geographic_scope_subunit,
     "languages": languages}
 

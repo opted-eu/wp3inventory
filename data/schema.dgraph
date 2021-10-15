@@ -51,7 +51,7 @@ type Source {
     publication_cycle
     publication_cycle_weekday
     geographic_scope
-    geographic_scope_countries
+    country
     geographic_scope_subunit
     geographic_scope_subunit_geo
     audience_size
@@ -245,7 +245,6 @@ topical_focus: [string] .
 publication_cycle: string .
 publication_cycle_weekday: [int] .
 geographic_scope: string .
-geographic_scope_countries: [uid] @reverse .
 geographic_scope_subunit: [uid] @reverse .
 geographic_scope_subunit_geo: geo @index(geo) .
 languages: [string] @index(hash) .

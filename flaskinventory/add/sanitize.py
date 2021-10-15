@@ -51,7 +51,7 @@ class SourceSanitizer:
             self.uid = NewID(self.uid)
         self.newsource = {'uid': self.uid,
                           'dgraph.type': "Source",
-                          'geographic_scope_countries': [],
+                          'country': [],
                           'other_names': []}
 
         self.newsubunits = []
@@ -99,7 +99,7 @@ class SourceSanitizer:
 
         del_obj.append({
             'uid': self.newsource['uid'],
-            'geographic_scope_countries': '*'})
+            'country': '*'})
 
         # delete publication_kind, languages
         del_obj.append({
@@ -636,7 +636,7 @@ class SourceSanitizer:
                                 countries = countries.split(',')
                             for country in countries:
                                 if country.startswith('0x'):
-                                    self.newsource['geographic_scope_countries'].append(
+                                    self.newsource['country'].append(
                                         UID(country))
                                 else:
                                     # discard other data
@@ -654,7 +654,7 @@ class SourceSanitizer:
                                     countries.append(UID(item))
                             except:
                                 continue
-                        self.newsource['geographic_scope_countries'] = countries
+                        self.newsource['country'] = countries
 
                 elif self.newsource['geographic_scope'] == 'subnational':
                     if self.json.get('geographic_scope_single'):
@@ -667,7 +667,7 @@ class SourceSanitizer:
                                     countries.append(UID(item))
                             except:
                                 continue
-                        self.newsource['geographic_scope_countries'] = countries
+                        self.newsource['country'] = countries
                     else:
                         raise InventoryValidationError(
                             'Invalid Data! Please specify at least one country!')
@@ -796,9 +796,9 @@ class SourceSanitizer:
                 self.newsource["unique_name"] = self.source_unique_name(
                     self.json['name'], channel=self.json['channel'], country=self.newsubunits[0]['name'])
 
-        elif len(self.newsource['geographic_scope_countries']) > 0:
+        elif len(self.newsource['country']) > 0:
             self.newsource["unique_name"] = self.source_unique_name(
-                self.json['name'], self.json['channel'], country_uid=self.newsource['geographic_scope_countries'][0])
+                self.json['name'], self.json['channel'], country_uid=self.newsource['country'][0])
         else:
             self.newsource["unique_name"] = self.source_unique_name(
                 self.json['name'], self.json['channel'], country="unknown")
@@ -929,8 +929,8 @@ class SourceSanitizer:
                             rel_source['special_interest'] = self.newsource.get('special_interest')
                         if self.newsource.get('geographic_scope'):
                             rel_source['geographic_scope'] = self.newsource.get('geographic_scope')
-                        if self.newsource.get('geographic_scope_countries'):
-                            rel_source['geographic_scope_countries'] = self.newsource.get('geographic_scope_countries')
+                        if self.newsource.get('country'):
+                            rel_source['country'] = self.newsource.get('country')
                         if self.newsource.get('geographic_scope_subunit'):
                             rel_source['geographic_scope_subunit'] = self.newsource.get('geographic_scope_subunit')
                         if self.newsource.get('languages'):

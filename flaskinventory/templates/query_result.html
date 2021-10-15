@@ -27,9 +27,6 @@
         {% if 'country' in cols %}
             <th scope="col">Country</th>
         {% endif %}
-        {% if 'geographic_scope_countries' in cols %}
-            <th scope="col">Country</th>
-        {% endif %}
         {% if 'access' in cols %}
             <th scope="col">Access</th>
         {% endif %}
@@ -59,9 +56,6 @@
         {% endif %}
         {% if 'country' in cols %}
         <td>{% if entry.get('country') %} {{ entry.country[0].get('country') }}{% endif %}</td>
-        {% endif %}
-        {% if 'geographic_scope_countries' in cols %}
-        <td>{% if entry.get('geographic_scope_countries') %}{{ entry.geographic_scope_countries[0].get('country') }}{% endif %}</td>
         {% endif %}
         {% if 'access' in cols %}
             <td>{{ entry.get('access')}}</td>

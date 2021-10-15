@@ -145,7 +145,7 @@ def get_country(unique_name=None, uid=None):
         return None
 
     query_fields = '''{ uid dgraph.type expand(_all_) 
-                        num_sources: count(~geographic_scope_countries @filter(type("Source")))  
+                        num_sources: count(~country @filter(type("Source")))  
                         num_orgs: count(~country @filter(type("Organization"))) } }'''
 
     query = query_func + query_fields
@@ -270,7 +270,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
             query_relation += ''' name }'''
         query_head += ')'
     else:
-        query_fields += ''' country { country: name } geographic_scope_countries { country: name } '''
+        query_fields += ''' country { country: name } '''
 
     if normalize:
         query_head += ''

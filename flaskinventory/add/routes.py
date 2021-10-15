@@ -372,7 +372,7 @@ def sourcelookup():
                 unique_name
                 name
                 channel {{ name }}
-                geographic_scope_countries {{ name }}
+                country {{ name }}
                 }}
             }}
     '''

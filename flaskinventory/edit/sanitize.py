@@ -260,9 +260,9 @@ class EditSourceSanitizer(Sanitizer):
         self.data = data
 
         self.overwrite = {self.edit['uid']: [
-            'other_names', 'related', 'geographic_scope_countries',
+            'other_names', 'related', 'country',
             'geographic_scope_subunit', 'languages', 'publication_kind',
-            'topical_focus']}
+            'topical_focus', 'publication_cycle_weekday']}
 
         self._parse()
 
@@ -384,18 +384,18 @@ class EditSourceSanitizer(Sanitizer):
             self.edit['geographic_scope'] = self.data.get('geographic_scope')
 
     def parse_geographic_scope_countries(self):
-        if self.data.get('geographic_scope_countries'):
-            src_list = self.data.get('geographic_scope_countries')
+        if self.data.get('country'):
+            src_list = self.data.get('country')
             if type(src_list) == str:
                 src_list = src_list.split(',')
 
-            self.edit['geographic_scope_countries'] = []
+            self.edit['country'] = []
 
             for item in src_list:
                 if item == str(self.edit['uid']):
                     continue
                 if item.startswith('0x'):
-                    self.edit['geographic_scope_countries'].append(UID(item))
+                    self.edit['country'].append(UID(item))
 
     def parse_geographic_scope_subunit(self):
         if self.data.get('geographic_scope_subunit'):

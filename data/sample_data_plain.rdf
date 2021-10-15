@@ -84,10 +84,9 @@ _:derstandardat <publication_kind> "newspaper" .
 _:derstandardat <special_interest> "false" .
 _:derstandardat <publication_cycle> "continuous" .
 _:derstandardat <geographic_scope> "national" .
-_:derstandardat <geographic_scope_countries> _:austria .
+_:derstandardat <country> _:austria .
 _:derstandardat <languages> "de" .
 _:derstandardat <audience_size> "2021-05-06" (daily_visitors=884687, data_from="https://siterankdata.com/derstandard.at") .
-_:derstandardat <audience_residency> "2021-05-06" (austria=68.8, germany=11.9, usa=9.4, data_from="https://www.alexa.com/siteinfo/derstandard.at") .
 
 _:derstandardprint <dgraph.type> "Source" .
 _:derstandardprint <unique_name> "derstandard_print" .
@@ -103,10 +102,9 @@ _:derstandardprint <publication_kind> "newspaper" .
 _:derstandardprint <special_interest> "false" .
 _:derstandardprint <publication_cycle> "daily" .
 _:derstandardprint <geographic_scope> "national" .
-_:derstandardprint <geographic_scope_countries> _:austria .
+_:derstandardprint <country> _:austria .
 _:derstandardprint <languages> "de" .
 _:derstandardprint <audience_size> "2018" (papers_sold=57221, subscribers=52046, data_from="https://www.oeak.at/wp-content/uploads/2019/01/KORR_Auflagenliste_H1_2018.pdf") .
-_:derstandardprint <audience_residency> "2018" (austria=100) .
 
 _:derstandardinstagram <dgraph.type> "Source" .
 _:derstandardinstagram <unique_name> "derstandard_instagram" .
@@ -120,7 +118,7 @@ _:derstandardinstagram <publication_kind> "newspaper" .
 _:derstandardinstagram <special_interest> "false" .
 _:derstandardinstagram <publication_cycle> "continuous" .
 _:derstandardinstagram <geographic_scope> "national" .
-_:derstandardinstagram <geographic_scope_countries> _:austria .
+_:derstandardinstagram <country> _:austria .
 _:derstandardinstagram <languages> "de" .
 _:derstandardinstagram <audience_size> "2021-05-06" (followers=292000) .
 _:derstandardinstagram <verified_account> "true" .
@@ -137,7 +135,7 @@ _:derstandardtwitter <publication_kind> "newspaper" .
 _:derstandardtwitter <special_interest> "false" .
 _:derstandardtwitter <publication_cycle> "continuous" .
 _:derstandardtwitter <geographic_scope> "national" .
-_:derstandardtwitter <geographic_scope_countries> _:austria .
+_:derstandardtwitter <country> _:austria .
 _:derstandardtwitter <languages> "de" .
 _:derstandardtwitter <audience_size> "2021-05-06" (followers=333700) .
 _:derstandardtwitter <verified_account> "true" .
@@ -154,7 +152,7 @@ _:derstandardfacebook <publication_kind> "newspaper" .
 _:derstandardfacebook <special_interest> "false" .
 _:derstandardfacebook <publication_cycle> "continuous" .
 _:derstandardfacebook <geographic_scope> "national" .
-_:derstandardfacebook <geographic_scope_countries> _:austria .
+_:derstandardfacebook <country> _:austria .
 _:derstandardfacebook <languages> "de" .
 _:derstandardfacebook <audience_size> "2021-05-06" (followers=347671) .
 _:derstandardfacebook <verified_account> "true" .
@@ -223,7 +221,7 @@ _:falterprint <special_interest> "false" .
 _:falterprint <publication_cycle> "weekly" .
 _:falterprint <publication_cycle_weekday> "3" .
 _:falterprint <geographic_scope> "national" .
-_:falterprint <geographic_scope_countries> _:austria .
+_:falterprint <country> _:austria .
 _:falterprint <languages> "de" .
 _:falterprint <audience_size> "2020" (papers_sold=51000, data_from="https://www.falter.at/media/b2b/Mediadaten2021_FALTER.pdf") .
 _:falterprint <audience_residency> "2020" (austria=100) .
