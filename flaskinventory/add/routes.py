@@ -6,7 +6,6 @@ from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.add.forms import NewCountry, NewEntry, NewOrganization, NewArchive
 from flaskinventory.add.utils import check_draft
-from flaskinventory.add.process import EntryProcessor
 from flaskinventory.add.sanitize import NewCountrySanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
 from flaskinventory.edit.sanitize import EditOrgSanitizer, EditArchiveSanitizer
