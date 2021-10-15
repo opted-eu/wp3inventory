@@ -1,110 +1,108 @@
 {% extends "layout.html" %} {% block content %}
 <div class="border rounded p-3">
-<h3 class="mb-4">My Entries</h3>
+    <h3 class="mb-4">My Entries</h3>
 
-<ul class="nav nav-tabs" id="entryTab" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="drafts-tab" data-bs-toggle="tab" data-bs-target="#drafts" type="button" role="tab" aria-controls="drafts" aria-selected="true">Drafts</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
-  </li>
-</ul>
-<div class="tab-content" id="entryTabContent">
-  <div class="tab-pane fade show active" id="drafts" role="tabpanel" aria-labelledby="drafts-tab">
-    
-<h4 class="my-4">My Drafts</h4>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Unique Name</th>
-      <th scope="col">Type</th>
-      <th scope="col">uid</th>
-      <th scope="col">Added</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-  
-    {% if drafts %}
-    {% for entry in drafts %}
-    <tr>
-        <td>{{ entry.name }}</td>
-        <td><span class="d-inline-block text-truncate" style="max-width: 100px;">{{ entry.unique_name }}</span></td>
-        <td>{{ entry.get("dgraph.type")[0] }}</td>
-        <td>{{ entry.uid }}</th>
-        <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
-        <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div></td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-    </tbody>
-</table>
-  </div>
-  <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
-    <h4 class="my-4">My Submitted Entries</h4>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Unique Name</th>
-      <th scope="col">Type</th>
-      <th scope="col">uid</th>
-      <th scope="col">Added</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-  
-    {% if pending %}
-    {% for entry in pending %}
-    <tr>
-        <td>{{ entry.name }}</td>
-        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
-        <td>{{ entry.get("dgraph.type")[0] }}</td>
-        <td>{{ entry.uid }}</th>
-        <td>{% if entry.get("pending|timestamp") %}{{ entry.get("pending|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
-        <td><div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div></td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-    </tbody>
-</table>
-  </div>
-  <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab">
-    <h4 class="my-4">My Accepted Entries</h4>
-    <table class="table">
-    <thead>
-        <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Unique Name</th>
-        <th scope="col">Type</th>
-        <th scope="col">uid</th>
-        <th scope="col">Added</th>
-        </tr>
-    </thead>
-    <tbody>
-    
-        {% if accepted %}
-        {% for entry in accepted %}
-        <tr>
-            <td>{{ entry.name }}</td>
-            <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
-            <td>{{ entry.get("dgraph.type")[0] }}</td>
-            <td>{{ entry.uid }}</th>
-            <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+    <ul class="nav nav-tabs" id="entryTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="drafts-tab" data-bs-toggle="tab" data-bs-target="#drafts" type="button" role="tab" aria-controls="drafts" aria-selected="true">Drafts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="entryTabContent">
+        <div class="tab-pane fade show active" id="drafts" role="tabpanel" aria-labelledby="drafts-tab">
 
-        </tr>
-        {% endfor %}
-        {% endif %}
-        </tbody>
-        </table>
+            <h4 class="my-4">My Drafts</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Unique Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">uid</th>
+                        <th scope="col">Added</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% if drafts %} {% for entry in drafts %}
+                    <tr>
+                        <td>{{ entry.name }}</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 100px;">{{ entry.unique_name }}</span></td>
+                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td>{{ entry.uid }}</td>
+                        <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div>
+                        </td>
+                    </tr>
+                    {% endfor %} {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <h4 class="my-4">My Submitted Entries</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Unique Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">uid</th>
+                        <th scope="col">Added</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% if pending %} {% for entry in pending %}
+                    <tr>
+                        <td>{{ entry.name }}</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
+                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td>{{ entry.uid }}</td>
+                        <td>{% if entry.get("pending|timestamp") %}{{ entry.get("pending|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div>
+                        </td>
+                    </tr>
+                    {% endfor %} {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="accepted" role="tabpanel" aria-labelledby="accepted-tab">
+            <h4 class="my-4">My Accepted Entries</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Unique Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">uid</th>
+                        <th scope="col">Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% if accepted %} {% for entry in accepted %}
+                    <tr>
+                        <td>{{ entry.name }}</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
+                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td>{{ entry.uid }}</td>
+                        <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+
+                    </tr>
+                    {% endfor %} {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
 </div>
-    {% endblock content %} {% block sidebar %} {% include "users/profile_sidebar.html" %} {% endblock sidebar %}
+{% endblock content %} {% block sidebar %} {% include "users/profile_sidebar.html" %} {% endblock sidebar %}

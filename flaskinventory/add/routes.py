@@ -11,6 +11,7 @@ from flaskinventory.add.dgraph import generate_fieldoptions
 from flaskinventory.edit.sanitize import EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
+from flaskinventory.users.dgraph import list_entries
 from flaskinventory.misc.forms import get_country_choices
 import traceback
 
@@ -47,7 +48,10 @@ def new_entry():
             else:
                 return redirect(url_for('main.under_development'))
 
-    return render_template('add/newentry.html', form=form)
+    drafts = list_entries(current_user.id, onlydrafts=True)
+    if drafts:
+        drafts = drafts[0]['drafts']
+    return render_template('add/newentry.html', form=form, drafts=drafts)
 
 
 @add.route("/add/source")

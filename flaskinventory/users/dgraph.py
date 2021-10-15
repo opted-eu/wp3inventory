@@ -154,16 +154,22 @@ def list_users():
         return False
     return data['q']
 
-def list_entries(user):
+def list_entries(user, onlydrafts=False):
     query_string = f"""{{ q(func: uid({user})) {{
-    drafts: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "draft"))
-    {{ uid unique_name name dgraph.type entry_review_status }} 
-    pending: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "pending"))
-    {{ uid unique_name name dgraph.type entry_review_status }} 
-    accepted: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "accepted"))
-    {{ uid unique_name name dgraph.type entry_review_status }}
-    }} }}
-    """
+        drafts: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "draft"))
+        {{ uid unique_name name dgraph.type entry_review_status }} 
+        """
+
+    if onlydrafts:
+        query_string += '} }'
+    else:
+        query_string += f"""
+            pending: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "pending"))
+            {{ uid unique_name name dgraph.type entry_review_status }} 
+            accepted: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "accepted"))
+            {{ uid unique_name name dgraph.type entry_review_status }}
+            }} }}
+            """
 
     data = dgraph.query(query_string)
 

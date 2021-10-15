@@ -1,10 +1,8 @@
 {% extends "layout.html" %} {% block content %}
+<h1 class="display-5 mb-4">Add new entry</h1>
 
-<main>
-    <h1 class="display-5 mb-4">Add new entry</h1>
-
-    <div class="row mb-4">    
-        <div class="col-8">
+<div class="row mb-4">
+    <div class="col-6">
         <div class="alert alert-info" role="alert">
             <h4 class="alert-heading">First time doing this?</h4>
             <p>Please quickly read through our <a class="fw-bold" href="{{ url_for('main.guides_newssource') }}" target="_blank">detailed guide for adding entries</a> to the inventory.</p>
@@ -13,38 +11,62 @@
                 <li>The <i class="fas fa-info-circle mx-1"></i> icons next to the questions give you additional information and explanations.</li>
                 <li>The <i class="fas fa-book mx-1"></i> icons give you ideas on how to retrieve some specific information.</li>
             </ul>
+        </div>
     </div>
-</div>
-    
-    <div class="my-4">
-        {% if form %}
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <div class="row mb-4">
-                <div class="col-md-5">
-                    {{ form.name.label(class="form-label") }}
-                    <div class="invalid-feedback">
-                        Enter the name of new the entity
-                    </div>
-                    {{ form.name(class="form-control form-control-lg") }}
-                </div>
-                <div class="col-md-5">
-                    {{ form.entity.label(class="form-label") }}
-                    <div class="invalid-feedback">
-                        Please select one type.
-                    </div>
-                    {{ form.entity(class="form-select form-select-lg") }}
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-md-5 d-flex align-content-end flex-wrap">
-                    <button class="btn btn-primary btn-lg mx-2" type="submit">Add new entry</button>
-                </div>
-            </div>
-        </form>
+    <div class="col-6">
+        {% if drafts %}
+        <h4>Your Drafts</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Added</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in drafts %}
+                <tr>
+                    <td>{{ entry.name }}{% if entry.channel %} ({{ entry.channel.name }}){% endif %}</td>
+                    <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
     </div>
-</main>
+</div>
+<div class="my-4">
+    {% if form %}
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="row mb-4">
+            <div class="col-md-5">
+                {{ form.name.label(class="form-label") }}
+                <div class="invalid-feedback">
+                    Enter the name of new the entity
+                </div>
+                {{ form.name(class="form-control form-control-lg") }}
+            </div>
+            <div class="col-md-5">
+                {{ form.entity.label(class="form-label") }}
+                <div class="invalid-feedback">
+                    Please select one type.
+                </div>
+                {{ form.entity(class="form-select form-select-lg") }}
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-5 d-flex align-content-end flex-wrap">
+                <button class="btn btn-primary btn-lg mx-2" type="submit">Add new entry</button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
 
 {% endblock content %}
