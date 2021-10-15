@@ -1313,24 +1313,27 @@ function submitForm(endpoint, form, callback) {
 function generateSummary() {
 
     data = serializeForm(document.getElementById('new-source'));
+    console.log("Form submission data:", data)
 
-    var descriptionList = document.createElement('dl')
-    descriptionList.classList.add('row')
+    prettySummary()
 
-    for (const [key, value] of Object.entries(data)) {
-        var question = document.createElement('dt');
-        question.classList.add('col-sm-4');
-        question.innerText = key;
-        var answer = document.createElement('dd');
-        answer.classList.add('col-sm-8');
-        answer.innerText = value;
+    // var descriptionList = document.createElement('dl')
+    // descriptionList.classList.add('row')
 
-        descriptionList.append(question)
-        descriptionList.append(answer)
+    // for (const [key, value] of Object.entries(data)) {
+    //     var question = document.createElement('dt');
+    //     question.classList.add('col-sm-4');
+    //     question.innerText = key;
+    //     var answer = document.createElement('dd');
+    //     answer.classList.add('col-sm-8');
+    //     answer.innerText = value;
 
-    }
+    //     descriptionList.append(question)
+    //     descriptionList.append(answer)
 
-    document.getElementById('summary-container').append(descriptionList);
+    // }
+
+    // document.getElementById('summary-container').append(descriptionList);
 
 
     // var formFields = document.querySelectorAll('#new-source input, select');
@@ -1378,16 +1381,15 @@ function prettySummary() {
 
     document.querySelectorAll('#summary-container [id^="summary-"]').forEach((el) => el.hidden = true)
     Array.from(form.elements).forEach(function(e) {
-        if (e.type == 'text' || e.type == 'number') { 
-                if (e.value) {
+        if (e.type == 'text' || e.type == 'number') {
+            if (e.value) {
                 let summary_element = document.querySelector('#summary-' + e.name)
                 if (summary_element) {
-                    summary_element.children[1].innerHTML = e.value  
+                    summary_element.children[1].innerHTML = e.value
                     summary_element.hidden = false
-                    }
                 }
-        }
-        else if (e.tagName.toLowerCase() == 'select') {
+            }
+        } else if (e.tagName.toLowerCase() == 'select') {
             console.log(e.name)
             if (e.multiple && e.selectedOptions) {
                 let summary_element = document.querySelector('#summary-' + e.name)
@@ -1395,40 +1397,35 @@ function prettySummary() {
                     let selected = []
                     for (opt of e.selectedOptions) { selected.push(opt.innerHTML) }
                     if (selected.length > 0) {
-                        summary_element.children[1].innerHTML = selected.join(', ')   
+                        summary_element.children[1].innerHTML = selected.join(', ')
                         summary_element.hidden = false
-                        }
                     }
                 }
-            else {
+            } else {
                 let summary_element = document.querySelector('#summary-' + e.name)
                 if (summary_element) {
                     if (e.value) {
-                        console.log(e.value)
-                        summary_element.children[1].innerHTML = e.selectedOptions[0].innerHTML   
+                        summary_element.children[1].innerHTML = e.selectedOptions[0].innerHTML
                         summary_element.hidden = false
-                        }
                     }
                 }
             }
-        else if (e.type == 'radio' && e.checked) {
+        } else if (e.type == 'radio' && e.checked) {
             let summary_element = document.querySelector('#summary-' + e.name)
-                if (summary_element) {
-                    summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
-                    summary_element.hidden = false
-                }
+            if (summary_element) {
+                summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
+                summary_element.hidden = false
+            }
 
-        }
-        else if (e.type == 'checkbox' && e.checked) {
+        } else if (e.type == 'checkbox' && e.checked) {
             let summary_element = document.querySelector('#summary-' + e.name)
-                if (summary_element) {
-                    summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
-                    summary_element.hidden = false
-                }
+            if (summary_element) {
+                summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
+                summary_element.hidden = false
+            }
 
         }
-        
 
-        }
-    )
+
+    })
 }
