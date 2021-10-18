@@ -903,7 +903,7 @@ class SourceSanitizer:
             if type(related_list) == str:
                 related_list = related_list.split(',')
             for item in related_list:
-                rel_source = {'related': self.newsource['uid']}
+                rel_source = {'related': [self.newsource['uid']]}
                 if item.startswith('0x'):
                     rel_source['uid'] = UID(item)
                     self.newsource['related'].append(UID(item))
@@ -941,6 +941,12 @@ class SourceSanitizer:
                         # just discard data if no channel is defined
                         continue
                 self.related.append(rel_source)
+            related_uids = []
+            for related in self.related:
+                related_uids.append(related.get('uid'))
+            for related in self.related:
+                related['related'] += [item for item in related_uids if item != related['uid']]
+
 
     def resolve_geographic_name(self, query):
         geo_result = geocode(query)
