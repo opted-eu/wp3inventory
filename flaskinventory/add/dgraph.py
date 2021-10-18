@@ -7,7 +7,7 @@ import json
 async def generate_fieldoptions():
 
     query_channel = '''channel(func: type("Channel"), orderasc: name) { uid expand(_all_) }'''
-    query_country = '''country(func: type("Country"), orderasc: name) { uid unique_name name  }'''
+    query_country = '''country(func: type("Country"), orderasc: name) @filter(eq(opted_scope, true)) { uid unique_name name  }'''
     query_dataset = '''dataset(func: type("Dataset"), orderasc: name) { uid unique_name name  }'''
     query_archive = '''archive(func: type("Archive"), orderasc: name) { uid unique_name name  }'''
     query_subunit = '''subunit(func: type("Subunit"), orderasc: name) { uid unique_name name other_names country{ name } }'''

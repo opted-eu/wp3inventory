@@ -69,7 +69,7 @@ def search():
 
         # CACHE THIS
         countries = dgraph.query(
-            '''{ q(func: type("Country")) { name uid } }''')
+            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
 
         c_choices = [(country.get('uid'), country.get('name'))
                         for country in countries['q']]
@@ -262,7 +262,7 @@ def query():
 
         # CACHE THIS
         countries = dgraph.query(
-            '''{ q(func: type("Country")) { name uid } }''')
+            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
 
         c_choices = [(country.get('uid'), country.get('name'))
                      for country in countries['q']]

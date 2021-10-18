@@ -9,7 +9,7 @@ main = Blueprint('main', __name__)
 @main.route('/home')
 def home():
     # needs caching!
-    countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
+    countries = dgraph.query('''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
     c_choices = [(country.get('uid'), country.get('name'))
                  for country in countries['q']]
     c_choices = sorted(c_choices, key=lambda x: x[1])

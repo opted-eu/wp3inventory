@@ -20,7 +20,7 @@ review = Blueprint('review', __name__)
 @requires_access_level(USER_ROLES.Reviewer)
 def overview():
     countries = dgraph.query(
-            '''{ q(func: type("Country")) { name uid } }''')
+            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
 
     c_choices = [(country.get('uid'), country.get('name'))
                     for country in countries['q']]

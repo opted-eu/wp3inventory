@@ -137,7 +137,7 @@ def source(unique_name=None, uid=None):
         audience_size_entries = 0
 
     form, fields = make_form(result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
-    countries = dgraph.query('''{ countries(func: type("Country")) { name uid } subunits(func: type("Subunit")) { name uid }}''')
+    countries = dgraph.query('''{ countries(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } subunits(func: type("Subunit")) { name uid }}''')
     c_choices = [(country.get('uid'), country.get('name'))
                  for country in countries['countries']]
     c_choices = sorted(c_choices, key=lambda x: x[1])
@@ -219,7 +219,7 @@ def subunit(unique_name=None, uid=None):
 
 
     form, fields = make_form('subunit')
-    countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
+    countries = dgraph.query('''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
     c_choices = [(country.get('uid'), country.get('name'))
                  for country in countries['q']]
     c_choices = sorted(c_choices, key=lambda x: x[1])
