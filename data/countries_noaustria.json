@@ -4,6 +4,7 @@
             "uid": "_:belgium",
             "unique_name": "belgium",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Belgium",
             "wikidataID": 31,
             "country_code": "be"
@@ -12,6 +13,7 @@
             "uid": "_:bulgaria",
             "unique_name": "bulgaria",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Bulgaria",
             "wikidataID": 219,
             "country_code": "bg"
@@ -20,6 +22,7 @@
             "uid": "_:cyprus",
             "unique_name": "cyprus",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Cyprus",
             "wikidataID": 229,
             "country_code": "cy"
@@ -28,8 +31,11 @@
             "uid": "_:czechia",
             "unique_name": "czechia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Czech Republic",
-            "other_names": ["Czechia"],
+            "other_names": [
+                "Czechia"
+            ],
             "wikidataID": 221,
             "country_code": "cz"
         },
@@ -37,6 +43,7 @@
             "uid": "_:germany",
             "unique_name": "germany",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Germany",
             "wikidataID": 183,
             "country_code": "de"
@@ -45,6 +52,7 @@
             "uid": "_:denmark",
             "unique_name": "denmark",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Denmark",
             "wikidataID": 35,
             "country_code": "dk"
@@ -53,6 +61,7 @@
             "uid": "_:estonia",
             "unique_name": "estonia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Estonia",
             "wikidataID": 191,
             "country_code": "ee"
@@ -61,6 +70,7 @@
             "uid": "_:spain",
             "unique_name": "spain",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Spain",
             "wikidataID": 29,
             "country_code": "es"
@@ -69,6 +79,7 @@
             "uid": "_:finland",
             "unique_name": "finland",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Finland",
             "wikidataID": 33,
             "country_code": "fi"
@@ -77,6 +88,7 @@
             "uid": "_:france",
             "unique_name": "france",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "France",
             "wikidataID": 142,
             "country_code": "fr"
@@ -85,6 +97,7 @@
             "uid": "_:greece",
             "unique_name": "greece",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Greece",
             "wikidataID": 41,
             "country_code": "gr"
@@ -93,6 +106,7 @@
             "uid": "_:croatia",
             "unique_name": "croatia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Croatia",
             "wikidataID": 224,
             "country_code": "hr"
@@ -101,6 +115,7 @@
             "uid": "_:hungary",
             "unique_name": "hungary",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Hungary",
             "wikidataID": 28,
             "country_code": "hu"
@@ -109,6 +124,7 @@
             "uid": "_:ireland",
             "unique_name": "ireland",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Ireland",
             "wikidataID": 27,
             "country_code": "ie"
@@ -117,6 +133,7 @@
             "uid": "_:italy",
             "unique_name": "italy",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Italy",
             "wikidataID": 38,
             "country_code": "it"
@@ -125,6 +142,7 @@
             "uid": "_:lithuania",
             "unique_name": "lithuania",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Lithuania",
             "wikidataID": 37,
             "country_code": "lt"
@@ -133,6 +151,7 @@
             "uid": "_:luxemburg",
             "unique_name": "luxemburg",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Luxemburg",
             "wikidataID": 32,
             "country_code": "lu"
@@ -141,6 +160,7 @@
             "uid": "_:latvia",
             "unique_name": "latvia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Latvia",
             "wikidataID": 211,
             "country_code": "lv"
@@ -149,6 +169,7 @@
             "uid": "_:malta",
             "unique_name": "malta",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Malta",
             "wikidataID": 233,
             "country_code": "mt"
@@ -157,6 +178,7 @@
             "uid": "_:netherlands",
             "unique_name": "netherlands",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Netherlands",
             "wikidataID": 55,
             "country_code": "nl"
@@ -165,6 +187,7 @@
             "uid": "_:poland",
             "unique_name": "poland",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Poland",
             "wikidataID": 36,
             "country_code": "pl"
@@ -173,6 +196,7 @@
             "uid": "_:portugal",
             "unique_name": "portugal",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Portugal",
             "wikidataID": 45,
             "country_code": "pt"
@@ -181,6 +205,7 @@
             "uid": "_:romania",
             "unique_name": "romania",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Romania",
             "wikidataID": 218,
             "country_code": "ro"
@@ -189,6 +214,7 @@
             "uid": "_:sweden",
             "unique_name": "sweden",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Sweden",
             "wikidataID": 34,
             "country_code": "se"
@@ -197,6 +223,7 @@
             "uid": "_:slovenia",
             "unique_name": "slovenia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Slovenia",
             "wikidataID": 215,
             "country_code": "si"
@@ -205,6 +232,7 @@
             "uid": "_:slovakia",
             "unique_name": "slovakia",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Slovakia",
             "wikidataID": 214,
             "country_code": "sk"
@@ -213,8 +241,12 @@
             "uid": "_:uk",
             "unique_name": "unitedkingdom",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "United Kingdom",
-            "other_names": ["UK", "Great Britain"],
+            "other_names": [
+                "UK",
+                "Great Britain"
+            ],
             "wikidataID": 145,
             "country_code": "gb"
         },
@@ -222,8 +254,11 @@
             "uid": "_:israel",
             "unique_name": "israel",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Israel",
-            "other_names": ["ישראל"],
+            "other_names": [
+                "ישראל"
+            ],
             "wikidataID": 801,
             "country_code": "il"
         },
@@ -231,6 +266,7 @@
             "uid": "_:norway",
             "unique_name": "norway",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Norway",
             "wikidataID": 20,
             "country_code": "no"
@@ -239,6 +275,7 @@
             "uid": "_:switzerland",
             "unique_name": "switzerland",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Switzerland",
             "wikidataID": 39,
             "country_code": "ch"
@@ -247,10 +284,10 @@
             "uid": "_:palestine",
             "unique_name": "palestine",
             "dgraph.type": "Country",
+            "opted_scope": true,
             "name": "Palestinian Territories",
             "wikidataID": 407199,
             "country_code": "ps"
         }
-
     ]
 }

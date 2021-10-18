@@ -1,0 +1,1985 @@
+[
+    {
+        "name": "Brazil",
+        "unique_name": "brazil",
+        "country_code": "br",
+        "wikidataID": 155,
+        "dgraph.type": "Country",
+        "uid": "_:brazil",
+        "opted_scope": false
+    },
+    {
+        "name": "Cote d'Ivoire",
+        "unique_name": "cote_d_ivoire",
+        "country_code": "ci",
+        "wikidataID": 1008,
+        "dgraph.type": "Country",
+        "uid": "_:cote_d_ivoire",
+        "opted_scope": false
+    },
+    {
+        "name": "Chile",
+        "unique_name": "chile",
+        "country_code": "cl",
+        "wikidataID": 298,
+        "dgraph.type": "Country",
+        "uid": "_:chile",
+        "opted_scope": false
+    },
+    {
+        "name": "People's Republic of China",
+        "unique_name": "prc_china",
+        "country_code": "cn",
+        "wikidataID": 148,
+        "dgraph.type": "Country",
+        "uid": "_:people_s_republic_of_china",
+        "opted_scope": false,
+        "other_names": ["PRC", "China"]
+    },
+    {
+        "name": "The Gambia",
+        "unique_name": "the_gambia",
+        "country_code": "gm",
+        "wikidataID": 1005,
+        "dgraph.type": "Country",
+        "uid": "_:the_gambia",
+        "opted_scope": false
+    },
+    {
+        "name": "United Arab Emirates",
+        "unique_name": "united_arab_emirates",
+        "country_code": "ae",
+        "wikidataID": 878,
+        "dgraph.type": "Country",
+        "uid": "_:united_arab_emirates",
+        "opted_scope": false
+    },
+    {
+        "name": "Angola",
+        "unique_name": "angola",
+        "country_code": "ao",
+        "wikidataID": 916,
+        "dgraph.type": "Country",
+        "uid": "_:angola",
+        "opted_scope": false
+    },
+    {
+        "name": "Bosnia and Herzegovina",
+        "unique_name": "bosnia_and_herzegovina",
+        "country_code": "ba",
+        "wikidataID": 225,
+        "dgraph.type": "Country",
+        "uid": "_:bosnia_and_herzegovina",
+        "opted_scope": false
+    },
+    {
+        "name": "Bahrain",
+        "unique_name": "bahrain",
+        "country_code": "bh",
+        "wikidataID": 398,
+        "dgraph.type": "Country",
+        "uid": "_:bahrain",
+        "opted_scope": false
+    },
+    {
+        "name": "Brunei",
+        "unique_name": "brunei",
+        "country_code": "bn",
+        "wikidataID": 921,
+        "dgraph.type": "Country",
+        "uid": "_:brunei",
+        "opted_scope": false
+    },
+    {
+        "name": "Iceland",
+        "unique_name": "iceland",
+        "country_code": "is",
+        "wikidataID": 189,
+        "dgraph.type": "Country",
+        "uid": "_:iceland",
+        "opted_scope": false
+    },
+    {
+        "name": "Laos",
+        "unique_name": "laos",
+        "country_code": "la",
+        "wikidataID": 819,
+        "dgraph.type": "Country",
+        "uid": "_:laos",
+        "opted_scope": false
+    },
+    {
+        "name": "Morocco",
+        "unique_name": "morocco",
+        "country_code": "ma",
+        "wikidataID": 1028,
+        "dgraph.type": "Country",
+        "uid": "_:morocco",
+        "opted_scope": false
+    },
+    {
+        "name": "Mali",
+        "unique_name": "mali",
+        "country_code": "ml",
+        "wikidataID": 912,
+        "dgraph.type": "Country",
+        "uid": "_:mali",
+        "opted_scope": false
+    },
+    {
+        "name": "Puerto Rico",
+        "unique_name": "puerto_rico",
+        "country_code": "pr",
+        "wikidataID": 1183,
+        "dgraph.type": "Country",
+        "uid": "_:puerto_rico",
+        "opted_scope": false
+    },
+    {
+        "name": "R\u00e9union",
+        "unique_name": "reunion",
+        "country_code": "re",
+        "wikidataID": 17070,
+        "dgraph.type": "Country",
+        "uid": "_:reunion",
+        "opted_scope": false
+    },
+    {
+        "name": "Sudan",
+        "unique_name": "sudan",
+        "country_code": "sd",
+        "wikidataID": 1049,
+        "dgraph.type": "Country",
+        "uid": "_:sudan",
+        "opted_scope": false
+    },
+    {
+        "name": "Sierra Leone",
+        "unique_name": "sierra_leone",
+        "country_code": "sl",
+        "wikidataID": 1044,
+        "dgraph.type": "Country",
+        "uid": "_:sierra_leone",
+        "opted_scope": false
+    },
+    {
+        "name": "Turks and Caicos Islands",
+        "unique_name": "turks_and_caicos_islands",
+        "country_code": "tc",
+        "wikidataID": 18221,
+        "dgraph.type": "Country",
+        "uid": "_:turks_and_caicos_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Thailand",
+        "unique_name": "thailand",
+        "country_code": "th",
+        "wikidataID": 869,
+        "dgraph.type": "Country",
+        "uid": "_:thailand",
+        "opted_scope": false
+    },
+    {
+        "name": "Tajikistan",
+        "unique_name": "tajikistan",
+        "country_code": "tj",
+        "wikidataID": 863,
+        "dgraph.type": "Country",
+        "uid": "_:tajikistan",
+        "opted_scope": false
+    },
+    {
+        "name": "Vanuatu",
+        "unique_name": "vanuatu",
+        "country_code": "vu",
+        "wikidataID": 686,
+        "dgraph.type": "Country",
+        "uid": "_:vanuatu",
+        "opted_scope": false
+    },
+    {
+        "name": "Bangladesh",
+        "unique_name": "bangladesh",
+        "country_code": "bd",
+        "wikidataID": 902,
+        "dgraph.type": "Country",
+        "uid": "_:bangladesh",
+        "opted_scope": false
+    },
+    {
+        "name": "Dominica",
+        "unique_name": "dominica",
+        "country_code": "dm",
+        "wikidataID": 784,
+        "dgraph.type": "Country",
+        "uid": "_:dominica",
+        "opted_scope": false
+    },
+    {
+        "name": "Grenada",
+        "unique_name": "grenada",
+        "country_code": "gd",
+        "wikidataID": 769,
+        "dgraph.type": "Country",
+        "uid": "_:grenada",
+        "opted_scope": false
+    },
+    {
+        "name": "French Guiana",
+        "unique_name": "french_guiana",
+        "country_code": "gf",
+        "wikidataID": 3769,
+        "dgraph.type": "Country",
+        "uid": "_:french_guiana",
+        "opted_scope": false
+    },
+    {
+        "name": "Gibraltar",
+        "unique_name": "gibraltar",
+        "country_code": "gi",
+        "wikidataID": 1410,
+        "dgraph.type": "Country",
+        "uid": "_:gibraltar",
+        "opted_scope": false
+    },
+    {
+        "name": "Kiribati",
+        "unique_name": "kiribati",
+        "country_code": "ki",
+        "wikidataID": 710,
+        "dgraph.type": "Country",
+        "uid": "_:kiribati",
+        "opted_scope": false
+    },
+    {
+        "name": "Monaco",
+        "unique_name": "monaco",
+        "country_code": "mc",
+        "wikidataID": 235,
+        "dgraph.type": "Country",
+        "uid": "_:monaco",
+        "opted_scope": false
+    },
+    {
+        "name": "Montenegro",
+        "unique_name": "montenegro",
+        "country_code": "me",
+        "wikidataID": 236,
+        "dgraph.type": "Country",
+        "uid": "_:montenegro",
+        "opted_scope": false
+    },
+    {
+        "name": "Montserrat",
+        "unique_name": "montserrat",
+        "country_code": "ms",
+        "wikidataID": 13353,
+        "dgraph.type": "Country",
+        "uid": "_:montserrat",
+        "opted_scope": false
+    },
+    {
+        "name": "New Zealand",
+        "unique_name": "new_zealand",
+        "country_code": "nz",
+        "wikidataID": 664,
+        "dgraph.type": "Country",
+        "uid": "_:new_zealand",
+        "opted_scope": false
+    },
+    {
+        "name": "Panama",
+        "unique_name": "panama",
+        "country_code": "pa",
+        "wikidataID": 804,
+        "dgraph.type": "Country",
+        "uid": "_:panama",
+        "opted_scope": false
+    },
+    {
+        "name": "Solomon Islands",
+        "unique_name": "solomon_islands",
+        "country_code": "sb",
+        "wikidataID": 685,
+        "dgraph.type": "Country",
+        "uid": "_:solomon_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Tunisia",
+        "unique_name": "tunisia",
+        "country_code": "tn",
+        "wikidataID": 948,
+        "dgraph.type": "Country",
+        "uid": "_:tunisia",
+        "opted_scope": false
+    },
+    {
+        "name": "Benin",
+        "unique_name": "benin",
+        "country_code": "bj",
+        "wikidataID": 962,
+        "dgraph.type": "Country",
+        "uid": "_:benin",
+        "opted_scope": false
+    },
+    {
+        "name": "Bermuda",
+        "unique_name": "bermuda",
+        "country_code": "bm",
+        "wikidataID": 23635,
+        "dgraph.type": "Country",
+        "uid": "_:bermuda",
+        "opted_scope": false
+    },
+    {
+        "name": "Cape Verde",
+        "unique_name": "cape_verde",
+        "country_code": "cv",
+        "wikidataID": 1011,
+        "dgraph.type": "Country",
+        "uid": "_:cape_verde",
+        "opted_scope": false
+    },
+    {
+        "name": "Greenland",
+        "unique_name": "greenland",
+        "country_code": "gl",
+        "wikidataID": 223,
+        "dgraph.type": "Country",
+        "uid": "_:greenland",
+        "opted_scope": false
+    },
+    {
+        "name": "Lebanon",
+        "unique_name": "lebanon",
+        "country_code": "lb",
+        "wikidataID": 822,
+        "dgraph.type": "Country",
+        "uid": "_:lebanon",
+        "opted_scope": false
+    },
+    {
+        "name": "Marshall Islands",
+        "unique_name": "marshall_islands",
+        "country_code": "mh",
+        "wikidataID": 709,
+        "dgraph.type": "Country",
+        "uid": "_:marshall_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "North Macedonia",
+        "unique_name": "north_macedonia",
+        "country_code": "mk",
+        "wikidataID": 221,
+        "dgraph.type": "Country",
+        "uid": "_:north_macedonia",
+        "opted_scope": false
+    },
+    {
+        "name": "Niger",
+        "unique_name": "niger",
+        "country_code": "ne",
+        "wikidataID": 1032,
+        "dgraph.type": "Country",
+        "uid": "_:niger",
+        "opted_scope": false
+    },
+    {
+        "name": "Nauru",
+        "unique_name": "nauru",
+        "country_code": "nr",
+        "wikidataID": 697,
+        "dgraph.type": "Country",
+        "uid": "_:nauru",
+        "opted_scope": false
+    },
+    {
+        "name": "French Polynesia",
+        "unique_name": "french_polynesia",
+        "country_code": "pf",
+        "wikidataID": 30971,
+        "dgraph.type": "Country",
+        "uid": "_:french_polynesia",
+        "opted_scope": false
+    },
+    {
+        "name": "Russia",
+        "unique_name": "russia",
+        "country_code": "ru",
+        "wikidataID": 159,
+        "dgraph.type": "Country",
+        "uid": "_:russia",
+        "opted_scope": false
+    },
+    {
+        "name": "Singapore",
+        "unique_name": "singapore",
+        "country_code": "sg",
+        "wikidataID": 334,
+        "dgraph.type": "Country",
+        "uid": "_:singapore",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Helena, Ascension and Tristan da Cunha",
+        "unique_name": "saint_helena_ascension_and_tristan_da_cunha",
+        "country_code": "sh",
+        "wikidataID": 192184,
+        "dgraph.type": "Country",
+        "uid": "_:saint_helena_ascension_and_tristan_da_cunha",
+        "opted_scope": false
+    },
+    {
+        "name": "Somalia",
+        "unique_name": "somalia",
+        "country_code": "so",
+        "wikidataID": 1045,
+        "dgraph.type": "Country",
+        "uid": "_:somalia",
+        "opted_scope": false
+    },
+    {
+        "name": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+        "unique_name": "sao_tome_and_principe",
+        "country_code": "st",
+        "wikidataID": 1039,
+        "dgraph.type": "Country",
+        "uid": "_:sao_tome_and_principe",
+        "opted_scope": false
+    },
+    {
+        "name": "Tonga",
+        "unique_name": "tonga",
+        "country_code": "to",
+        "wikidataID": 678,
+        "dgraph.type": "Country",
+        "uid": "_:tonga",
+        "opted_scope": false
+    },
+    {
+        "name": "Turkey",
+        "unique_name": "turkey",
+        "country_code": "tr",
+        "wikidataID": 43,
+        "dgraph.type": "Country",
+        "uid": "_:turkey",
+        "opted_scope": false
+    },
+    {
+        "name": "United States Virgin Islands",
+        "unique_name": "united_states_virgin_islands",
+        "country_code": "vi",
+        "wikidataID": 11703,
+        "dgraph.type": "Country",
+        "uid": "_:united_states_virgin_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Albania",
+        "unique_name": "albania",
+        "country_code": "al",
+        "wikidataID": 222,
+        "dgraph.type": "Country",
+        "uid": "_:albania",
+        "opted_scope": false
+    },
+    {
+        "name": "Antarctic Treaty area",
+        "unique_name": "antarctic_treaty_area",
+        "country_code": "aq",
+        "wikidataID": 21590062,
+        "dgraph.type": "Country",
+        "uid": "_:antarctic_treaty_area",
+        "opted_scope": false
+    },
+    {
+        "name": "Burundi",
+        "unique_name": "burundi",
+        "country_code": "bi",
+        "wikidataID": 967,
+        "dgraph.type": "Country",
+        "uid": "_:burundi",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Barth\u00e9lemy",
+        "unique_name": "saint_barthelemy",
+        "country_code": "bl",
+        "wikidataID": 25362,
+        "dgraph.type": "Country",
+        "uid": "_:saint_barthelemy",
+        "opted_scope": false
+    },
+    {
+        "name": "Bhutan",
+        "unique_name": "bhutan",
+        "country_code": "bt",
+        "wikidataID": 917,
+        "dgraph.type": "Country",
+        "uid": "_:bhutan",
+        "opted_scope": false
+    },
+    {
+        "name": "Canada",
+        "unique_name": "canada",
+        "country_code": "ca",
+        "wikidataID": 16,
+        "dgraph.type": "Country",
+        "uid": "_:canada",
+        "opted_scope": false
+    },
+    {
+        "name": "Costa Rica",
+        "unique_name": "costa_rica",
+        "country_code": "cr",
+        "wikidataID": 800,
+        "dgraph.type": "Country",
+        "uid": "_:costa_rica",
+        "opted_scope": false
+    },
+    {
+        "name": "Kenya",
+        "unique_name": "kenya",
+        "country_code": "ke",
+        "wikidataID": 114,
+        "dgraph.type": "Country",
+        "uid": "_:kenya",
+        "opted_scope": false
+    },
+    {
+        "name": "North Korea",
+        "unique_name": "north_korea",
+        "country_code": "kp",
+        "wikidataID": 423,
+        "dgraph.type": "Country",
+        "uid": "_:north_korea",
+        "opted_scope": false
+    },
+    {
+        "name": "South Korea",
+        "unique_name": "south_korea",
+        "country_code": "kr",
+        "wikidataID": 884,
+        "dgraph.type": "Country",
+        "uid": "_:south_korea",
+        "opted_scope": false
+    },
+    {
+        "name": "Mongolia",
+        "unique_name": "mongolia",
+        "country_code": "mn",
+        "wikidataID": 711,
+        "dgraph.type": "Country",
+        "uid": "_:mongolia",
+        "opted_scope": false
+    },
+    {
+        "name": "Norfolk Island",
+        "unique_name": "norfolk_island",
+        "country_code": "nf",
+        "wikidataID": 31057,
+        "dgraph.type": "Country",
+        "uid": "_:norfolk_island",
+        "opted_scope": false
+    },
+    {
+        "name": "Papua New Guinea",
+        "unique_name": "papua_new_guinea",
+        "country_code": "pg",
+        "wikidataID": 691,
+        "dgraph.type": "Country",
+        "uid": "_:papua_new_guinea",
+        "opted_scope": false
+    },
+    {
+        "name": "South Sudan",
+        "unique_name": "south_sudan",
+        "country_code": "ss",
+        "wikidataID": 958,
+        "dgraph.type": "Country",
+        "uid": "_:south_sudan",
+        "opted_scope": false
+    },
+    {
+        "name": "United States Minor Outlying Islands",
+        "unique_name": "united_states_minor_outlying_islands",
+        "country_code": "um",
+        "wikidataID": 16645,
+        "dgraph.type": "Country",
+        "uid": "_:united_states_minor_outlying_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Vatican City",
+        "unique_name": "vatican_city",
+        "country_code": "va",
+        "wikidataID": 237,
+        "dgraph.type": "Country",
+        "uid": "_:vatican_city",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Vincent and the Grenadines",
+        "unique_name": "saint_vincent_and_the_grenadines",
+        "country_code": "vc",
+        "wikidataID": 757,
+        "dgraph.type": "Country",
+        "uid": "_:saint_vincent_and_the_grenadines",
+        "opted_scope": false
+    },
+    {
+        "name": "Venezuela",
+        "unique_name": "venezuela",
+        "country_code": "ve",
+        "wikidataID": 717,
+        "dgraph.type": "Country",
+        "uid": "_:venezuela",
+        "opted_scope": false
+    },
+    {
+        "name": "South Africa",
+        "unique_name": "south_africa",
+        "country_code": "za",
+        "wikidataID": 258,
+        "dgraph.type": "Country",
+        "uid": "_:south_africa",
+        "opted_scope": false
+    },
+    {
+        "name": "Christmas Island",
+        "unique_name": "christmas_island",
+        "country_code": "cx",
+        "wikidataID": 31063,
+        "dgraph.type": "Country",
+        "uid": "_:christmas_island",
+        "opted_scope": false
+    },
+    {
+        "name": "British Indian Ocean Territory",
+        "unique_name": "british_indian_ocean_territory",
+        "country_code": "io",
+        "wikidataID": 43448,
+        "dgraph.type": "Country",
+        "uid": "_:british_indian_ocean_territory",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Lucia",
+        "unique_name": "saint_lucia",
+        "country_code": "lc",
+        "wikidataID": 760,
+        "dgraph.type": "Country",
+        "uid": "_:saint_lucia",
+        "opted_scope": false
+    },
+    {
+        "name": "Syria",
+        "unique_name": "syria",
+        "country_code": "sy",
+        "wikidataID": 858,
+        "dgraph.type": "Country",
+        "uid": "_:syria",
+        "opted_scope": false
+    },
+    {
+        "name": "Tuvalu",
+        "unique_name": "tuvalu",
+        "country_code": "tv",
+        "wikidataID": 672,
+        "dgraph.type": "Country",
+        "uid": "_:tuvalu",
+        "opted_scope": false
+    },
+    {
+        "name": "Argentina",
+        "unique_name": "argentina",
+        "country_code": "ar",
+        "wikidataID": 414,
+        "dgraph.type": "Country",
+        "uid": "_:argentina",
+        "opted_scope": false
+    },
+    {
+        "name": "Cocos (Keeling) Islands",
+        "unique_name": "cocos_keeling_islands",
+        "country_code": "cc",
+        "wikidataID": 36004,
+        "dgraph.type": "Country",
+        "uid": "_:cocos_keeling_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Colombia",
+        "unique_name": "colombia",
+        "country_code": "co",
+        "wikidataID": 739,
+        "dgraph.type": "Country",
+        "uid": "_:colombia",
+        "opted_scope": false
+    },
+    {
+        "name": "Federated States of Micronesia",
+        "unique_name": "federated_states_of_micronesia",
+        "country_code": "fm",
+        "wikidataID": 702,
+        "dgraph.type": "Country",
+        "uid": "_:federated_states_of_micronesia",
+        "opted_scope": false
+    },
+    {
+        "name": "Central African Republic",
+        "unique_name": "central_african_republic",
+        "country_code": "cf",
+        "wikidataID": 929,
+        "dgraph.type": "Country",
+        "uid": "_:central_african_republic",
+        "opted_scope": false
+    },
+    {
+        "name": "Algeria",
+        "unique_name": "algeria",
+        "country_code": "dz",
+        "wikidataID": 262,
+        "dgraph.type": "Country",
+        "uid": "_:algeria",
+        "opted_scope": false
+    },
+    {
+        "name": "Uruguay",
+        "unique_name": "uruguay",
+        "country_code": "uy",
+        "wikidataID": 77,
+        "dgraph.type": "Country",
+        "uid": "_:uruguay",
+        "opted_scope": false
+    },
+    {
+        "name": "Djibouti",
+        "unique_name": "djibouti",
+        "country_code": "dj",
+        "wikidataID": 977,
+        "dgraph.type": "Country",
+        "uid": "_:djibouti",
+        "opted_scope": false
+    },
+    {
+        "name": "Cayman Islands",
+        "unique_name": "cayman_islands",
+        "country_code": "ky",
+        "wikidataID": 5785,
+        "dgraph.type": "Country",
+        "uid": "_:cayman_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Heard Island and McDonald Islands",
+        "unique_name": "heard_island_and_mcdonald_islands",
+        "country_code": "hm",
+        "wikidataID": 131198,
+        "dgraph.type": "Country",
+        "uid": "_:heard_island_and_mcdonald_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Kazakhstan",
+        "unique_name": "kazakhstan",
+        "country_code": "kz",
+        "wikidataID": 232,
+        "dgraph.type": "Country",
+        "uid": "_:kazakhstan",
+        "opted_scope": false
+    },
+    {
+        "name": "Andorra",
+        "unique_name": "andorra",
+        "country_code": "ad",
+        "wikidataID": 228,
+        "dgraph.type": "Country",
+        "uid": "_:andorra",
+        "opted_scope": false
+    },
+    {
+        "name": "Ethiopia",
+        "unique_name": "ethiopia",
+        "country_code": "et",
+        "wikidataID": 115,
+        "dgraph.type": "Country",
+        "uid": "_:ethiopia",
+        "opted_scope": false
+    },
+    {
+        "name": "Republic of the Congo",
+        "unique_name": "republic_of_the_congo",
+        "country_code": "cg",
+        "wikidataID": 971,
+        "dgraph.type": "Country",
+        "uid": "_:republic_of_the_congo",
+        "opted_scope": false
+    },
+    {
+        "name": "Sri Lanka",
+        "unique_name": "sri_lanka",
+        "country_code": "lk",
+        "wikidataID": 854,
+        "dgraph.type": "Country",
+        "uid": "_:sri_lanka",
+        "opted_scope": false
+    },
+    {
+        "name": "Sint Maarten",
+        "unique_name": "sint_maarten",
+        "country_code": "sx",
+        "wikidataID": 26273,
+        "dgraph.type": "Country",
+        "uid": "_:sint_maarten",
+        "opted_scope": false
+    },
+    {
+        "name": "Western Sahara",
+        "unique_name": "western_sahara",
+        "country_code": "eh",
+        "wikidataID": 6250,
+        "dgraph.type": "Country",
+        "uid": "_:western_sahara",
+        "opted_scope": false
+    },
+    {
+        "name": "Maldives",
+        "unique_name": "maldives",
+        "country_code": "mv",
+        "wikidataID": 826,
+        "dgraph.type": "Country",
+        "uid": "_:maldives",
+        "opted_scope": false
+    },
+    {
+        "name": "Kuwait",
+        "unique_name": "kuwait",
+        "country_code": "kw",
+        "wikidataID": 817,
+        "dgraph.type": "Country",
+        "uid": "_:kuwait",
+        "opted_scope": false
+    },
+    {
+        "name": "Diego Garcia",
+        "unique_name": "diego_garcia",
+        "country_code": "dg",
+        "wikidataID": 184851,
+        "dgraph.type": "Country",
+        "uid": "_:diego_garcia",
+        "opted_scope": false
+    },
+    {
+        "name": "Botswana",
+        "unique_name": "botswana",
+        "country_code": "bw",
+        "wikidataID": 963,
+        "dgraph.type": "Country",
+        "uid": "_:botswana",
+        "opted_scope": false
+    },
+    {
+        "name": "Chad",
+        "unique_name": "chad",
+        "country_code": "td",
+        "wikidataID": 657,
+        "dgraph.type": "Country",
+        "uid": "_:chad",
+        "opted_scope": false
+    },
+    {
+        "name": "Ecuador",
+        "unique_name": "ecuador",
+        "country_code": "ec",
+        "wikidataID": 736,
+        "dgraph.type": "Country",
+        "uid": "_:ecuador",
+        "opted_scope": false
+    },
+    {
+        "name": "Haiti",
+        "unique_name": "haiti",
+        "country_code": "ht",
+        "wikidataID": 790,
+        "dgraph.type": "Country",
+        "uid": "_:haiti",
+        "opted_scope": false
+    },
+    {
+        "name": "Turkmenistan",
+        "unique_name": "turkmenistan",
+        "country_code": "tm",
+        "wikidataID": 874,
+        "dgraph.type": "Country",
+        "uid": "_:turkmenistan",
+        "opted_scope": false
+    },
+    {
+        "name": "Northern Mariana Islands",
+        "unique_name": "northern_mariana_islands",
+        "country_code": "mp",
+        "wikidataID": 16644,
+        "dgraph.type": "Country",
+        "uid": "_:northern_mariana_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Nepal",
+        "unique_name": "nepal",
+        "country_code": "np",
+        "wikidataID": 837,
+        "dgraph.type": "Country",
+        "uid": "_:nepal",
+        "opted_scope": false
+    },
+    {
+        "name": "Kosovo",
+        "unique_name": "kosovo",
+        "country_code": "xk",
+        "wikidataID": 1246,
+        "dgraph.type": "Country",
+        "uid": "_:kosovo",
+        "opted_scope": false
+    },
+    {
+        "name": "Australia",
+        "unique_name": "australia",
+        "country_code": "au",
+        "wikidataID": 408,
+        "dgraph.type": "Country",
+        "uid": "_:australia",
+        "opted_scope": false
+    },
+    {
+        "name": "Samoa",
+        "unique_name": "samoa",
+        "country_code": "ws",
+        "wikidataID": 683,
+        "dgraph.type": "Country",
+        "uid": "_:samoa",
+        "opted_scope": false
+    },
+    {
+        "name": "Oman",
+        "unique_name": "oman",
+        "country_code": "om",
+        "wikidataID": 842,
+        "dgraph.type": "Country",
+        "uid": "_:oman",
+        "opted_scope": false
+    },
+    {
+        "name": "Ghana",
+        "unique_name": "ghana",
+        "country_code": "gh",
+        "wikidataID": 117,
+        "dgraph.type": "Country",
+        "uid": "_:ghana",
+        "opted_scope": false
+    },
+    {
+        "name": "Guinea",
+        "unique_name": "guinea",
+        "country_code": "gn",
+        "wikidataID": 1006,
+        "dgraph.type": "Country",
+        "uid": "_:guinea",
+        "opted_scope": false
+    },
+    {
+        "name": "Indonesia",
+        "unique_name": "indonesia",
+        "country_code": "id",
+        "wikidataID": 252,
+        "dgraph.type": "Country",
+        "uid": "_:indonesia",
+        "opted_scope": false
+    },
+    {
+        "name": "Yemen",
+        "unique_name": "yemen",
+        "country_code": "ye",
+        "wikidataID": 805,
+        "dgraph.type": "Country",
+        "uid": "_:yemen",
+        "opted_scope": false
+    },
+    {
+        "name": "Japan",
+        "unique_name": "japan",
+        "country_code": "jp",
+        "wikidataID": 17,
+        "dgraph.type": "Country",
+        "uid": "_:japan",
+        "opted_scope": false
+    },
+    {
+        "name": "Jamaica",
+        "unique_name": "jamaica",
+        "country_code": "jm",
+        "wikidataID": 766,
+        "dgraph.type": "Country",
+        "uid": "_:jamaica",
+        "opted_scope": false
+    },
+    {
+        "name": "Eritrea",
+        "unique_name": "eritrea",
+        "country_code": "er",
+        "wikidataID": 986,
+        "dgraph.type": "Country",
+        "uid": "_:eritrea",
+        "opted_scope": false
+    },
+    {
+        "name": "Taiwan",
+        "unique_name": "taiwan",
+        "country_code": "tw",
+        "wikidataID": 865,
+        "dgraph.type": "Country",
+        "uid": "_:taiwan",
+        "other_names": ["Republic of China"],
+        "opted_scope": false
+    },
+    {
+        "name": "Tanzania",
+        "unique_name": "tanzania",
+        "country_code": "tz",
+        "wikidataID": 924,
+        "dgraph.type": "Country",
+        "uid": "_:tanzania",
+        "opted_scope": false
+    },
+    {
+        "name": "Paraguay",
+        "unique_name": "paraguay",
+        "country_code": "py",
+        "wikidataID": 733,
+        "dgraph.type": "Country",
+        "uid": "_:paraguay",
+        "opted_scope": false
+    },
+    {
+        "name": "Burkina Faso",
+        "unique_name": "burkina_faso",
+        "country_code": "bf",
+        "wikidataID": 965,
+        "dgraph.type": "Country",
+        "uid": "_:burkina_faso",
+        "opted_scope": false
+    },
+    {
+        "name": "Egypt",
+        "unique_name": "egypt",
+        "country_code": "eg",
+        "wikidataID": 79,
+        "dgraph.type": "Country",
+        "uid": "_:egypt",
+        "opted_scope": false
+    },
+    {
+        "name": "Guyana",
+        "unique_name": "guyana",
+        "country_code": "gy",
+        "wikidataID": 734,
+        "dgraph.type": "Country",
+        "uid": "_:guyana",
+        "opted_scope": false
+    },
+    {
+        "name": "New Caledonia",
+        "unique_name": "new_caledonia",
+        "country_code": "nc",
+        "wikidataID": 33788,
+        "dgraph.type": "Country",
+        "uid": "_:new_caledonia",
+        "opted_scope": false
+    },
+    {
+        "name": "Fiji",
+        "unique_name": "fiji",
+        "country_code": "fj",
+        "wikidataID": 712,
+        "dgraph.type": "Country",
+        "uid": "_:fiji",
+        "opted_scope": false
+    },
+    {
+        "name": "Zimbabwe",
+        "unique_name": "zimbabwe",
+        "country_code": "zw",
+        "wikidataID": 954,
+        "dgraph.type": "Country",
+        "uid": "_:zimbabwe",
+        "opted_scope": false
+    },
+    {
+        "name": "Iran",
+        "unique_name": "iran",
+        "country_code": "ir",
+        "wikidataID": 794,
+        "dgraph.type": "Country",
+        "uid": "_:iran",
+        "opted_scope": false
+    },
+    {
+        "name": "Equatorial Guinea",
+        "unique_name": "equatorial_guinea",
+        "country_code": "gq",
+        "wikidataID": 983,
+        "dgraph.type": "Country",
+        "uid": "_:equatorial_guinea",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Martin",
+        "unique_name": "saint_martin",
+        "country_code": "mf",
+        "wikidataID": 126125,
+        "dgraph.type": "Country",
+        "uid": "_:saint_martin",
+        "opted_scope": false
+    },
+    {
+        "name": "Malawi",
+        "unique_name": "malawi",
+        "country_code": "mw",
+        "wikidataID": 1020,
+        "dgraph.type": "Country",
+        "uid": "_:malawi",
+        "opted_scope": false
+    },
+    {
+        "name": "Uzbekistan",
+        "unique_name": "uzbekistan",
+        "country_code": "uz",
+        "wikidataID": 265,
+        "dgraph.type": "Country",
+        "uid": "_:uzbekistan",
+        "opted_scope": false
+    },
+    {
+        "name": "Georgia",
+        "unique_name": "georgia",
+        "country_code": "ge",
+        "wikidataID": 230,
+        "dgraph.type": "Country",
+        "uid": "_:georgia",
+        "opted_scope": false
+    },
+    {
+        "name": "Guernsey",
+        "unique_name": "guernsey",
+        "country_code": "gg",
+        "wikidataID": 25230,
+        "dgraph.type": "Country",
+        "uid": "_:guernsey",
+        "opted_scope": false
+    },
+    {
+        "name": "Peru",
+        "unique_name": "peru",
+        "country_code": "pe",
+        "wikidataID": 419,
+        "dgraph.type": "Country",
+        "uid": "_:peru",
+        "opted_scope": false
+    },
+    {
+        "name": "Pitcairn Islands",
+        "unique_name": "pitcairn_islands",
+        "country_code": "pn",
+        "wikidataID": 35672,
+        "dgraph.type": "Country",
+        "uid": "_:pitcairn_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Saudi Arabia",
+        "unique_name": "saudi_arabia",
+        "country_code": "sa",
+        "wikidataID": 851,
+        "dgraph.type": "Country",
+        "uid": "_:saudi_arabia",
+        "opted_scope": false
+    },
+    {
+        "name": "Antigua and Barbuda",
+        "unique_name": "antigua_and_barbuda",
+        "country_code": "ag",
+        "wikidataID": 781,
+        "dgraph.type": "Country",
+        "uid": "_:antigua_and_barbuda",
+        "opted_scope": false
+    },
+    {
+        "name": "Anguilla",
+        "unique_name": "anguilla",
+        "country_code": "ai",
+        "wikidataID": 25228,
+        "dgraph.type": "Country",
+        "uid": "_:anguilla",
+        "opted_scope": false
+    },
+    {
+        "name": "The Bahamas",
+        "unique_name": "the_bahamas",
+        "country_code": "bs",
+        "wikidataID": 778,
+        "dgraph.type": "Country",
+        "uid": "_:the_bahamas",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Kitts and Nevis",
+        "unique_name": "saint_kitts_and_nevis",
+        "country_code": "kn",
+        "wikidataID": 763,
+        "dgraph.type": "Country",
+        "uid": "_:saint_kitts_and_nevis",
+        "opted_scope": false
+    },
+    {
+        "name": "Namibia",
+        "unique_name": "namibia",
+        "country_code": "na",
+        "wikidataID": 1030,
+        "dgraph.type": "Country",
+        "uid": "_:namibia",
+        "opted_scope": false
+    },
+    {
+        "name": "Eswatini",
+        "unique_name": "eswatini",
+        "country_code": "sz",
+        "wikidataID": 1050,
+        "dgraph.type": "Country",
+        "uid": "_:eswatini",
+        "opted_scope": false
+    },
+    {
+        "name": "Togo",
+        "unique_name": "togo",
+        "country_code": "tg",
+        "wikidataID": 945,
+        "dgraph.type": "Country",
+        "uid": "_:togo",
+        "opted_scope": false
+    },
+    {
+        "name": "Bolivia",
+        "unique_name": "bolivia",
+        "country_code": "bo",
+        "wikidataID": 750,
+        "dgraph.type": "Country",
+        "uid": "_:bolivia",
+        "opted_scope": false
+    },
+    {
+        "name": "Belize",
+        "unique_name": "belize",
+        "country_code": "bz",
+        "wikidataID": 242,
+        "dgraph.type": "Country",
+        "uid": "_:belize",
+        "opted_scope": false
+    },
+    {
+        "name": "Democratic Republic of the Congo",
+        "unique_name": "democratic_republic_of_the_congo",
+        "country_code": "cd",
+        "wikidataID": 974,
+        "dgraph.type": "Country",
+        "uid": "_:democratic_republic_of_the_congo",
+        "opted_scope": false
+    },
+    {
+        "name": "Guadeloupe",
+        "unique_name": "guadeloupe",
+        "country_code": "gp",
+        "wikidataID": 17012,
+        "dgraph.type": "Country",
+        "uid": "_:guadeloupe",
+        "opted_scope": false
+    },
+    {
+        "name": "Qatar",
+        "unique_name": "qatar",
+        "country_code": "qa",
+        "wikidataID": 846,
+        "dgraph.type": "Country",
+        "uid": "_:qatar",
+        "opted_scope": false
+    },
+    {
+        "name": "Rwanda",
+        "unique_name": "rwanda",
+        "country_code": "rw",
+        "wikidataID": 1037,
+        "dgraph.type": "Country",
+        "uid": "_:rwanda",
+        "opted_scope": false
+    },
+    {
+        "name": "Macau",
+        "unique_name": "macau",
+        "country_code": "mo",
+        "wikidataID": 14773,
+        "dgraph.type": "Country",
+        "uid": "_:macau",
+        "opted_scope": false
+    },
+    {
+        "name": "Tokelau",
+        "unique_name": "tokelau",
+        "country_code": "tk",
+        "wikidataID": 36823,
+        "dgraph.type": "Country",
+        "uid": "_:tokelau",
+        "opted_scope": false
+    },
+    {
+        "name": "Afghanistan",
+        "unique_name": "afghanistan",
+        "country_code": "af",
+        "wikidataID": 889,
+        "dgraph.type": "Country",
+        "uid": "_:afghanistan",
+        "opted_scope": false
+    },
+    {
+        "name": "Azerbaijan",
+        "unique_name": "azerbaijan",
+        "country_code": "az",
+        "wikidataID": 227,
+        "dgraph.type": "Country",
+        "uid": "_:azerbaijan",
+        "opted_scope": false
+    },
+    {
+        "name": "Honduras",
+        "unique_name": "honduras",
+        "country_code": "hn",
+        "wikidataID": 783,
+        "dgraph.type": "Country",
+        "uid": "_:honduras",
+        "opted_scope": false
+    },
+    {
+        "name": "Cambodia",
+        "unique_name": "cambodia",
+        "country_code": "kh",
+        "wikidataID": 424,
+        "dgraph.type": "Country",
+        "uid": "_:cambodia",
+        "opted_scope": false
+    },
+    {
+        "name": "Liechtenstein",
+        "unique_name": "liechtenstein",
+        "country_code": "li",
+        "wikidataID": 347,
+        "dgraph.type": "Country",
+        "uid": "_:liechtenstein",
+        "opted_scope": false
+    },
+    {
+        "name": "Nicaragua",
+        "unique_name": "nicaragua",
+        "country_code": "ni",
+        "wikidataID": 811,
+        "dgraph.type": "Country",
+        "uid": "_:nicaragua",
+        "opted_scope": false
+    },
+    {
+        "name": "Senegal",
+        "unique_name": "senegal",
+        "country_code": "sn",
+        "wikidataID": 1041,
+        "dgraph.type": "Country",
+        "uid": "_:senegal",
+        "opted_scope": false
+    },
+    {
+        "name": "Armenia",
+        "unique_name": "armenia",
+        "country_code": "am",
+        "wikidataID": 399,
+        "dgraph.type": "Country",
+        "uid": "_:armenia",
+        "opted_scope": false
+    },
+    {
+        "name": "Barbados",
+        "unique_name": "barbados",
+        "country_code": "bb",
+        "wikidataID": 244,
+        "dgraph.type": "Country",
+        "uid": "_:barbados",
+        "opted_scope": false
+    },
+    {
+        "name": "Hong Kong",
+        "unique_name": "hong_kong",
+        "country_code": "hk",
+        "wikidataID": 8646,
+        "dgraph.type": "Country",
+        "uid": "_:hong_kong",
+        "opted_scope": false
+    },
+    {
+        "name": "Caribbean Netherlands",
+        "unique_name": "caribbean_netherlands",
+        "country_code": "bq",
+        "wikidataID": 27561,
+        "dgraph.type": "Country",
+        "uid": "_:caribbean_netherlands",
+        "opted_scope": false
+    },
+    {
+        "name": "Guam",
+        "unique_name": "guam",
+        "country_code": "gu",
+        "wikidataID": 16635,
+        "dgraph.type": "Country",
+        "uid": "_:guam",
+        "opted_scope": false
+    },
+    {
+        "name": "Iraq",
+        "unique_name": "iraq",
+        "country_code": "iq",
+        "wikidataID": 796,
+        "dgraph.type": "Country",
+        "uid": "_:iraq",
+        "opted_scope": false
+    },
+    {
+        "name": "Jersey",
+        "unique_name": "jersey",
+        "country_code": "je",
+        "wikidataID": 785,
+        "dgraph.type": "Country",
+        "uid": "_:jersey",
+        "opted_scope": false
+    },
+    {
+        "name": "Lesotho",
+        "unique_name": "lesotho",
+        "country_code": "ls",
+        "wikidataID": 1013,
+        "dgraph.type": "Country",
+        "uid": "_:lesotho",
+        "opted_scope": false
+    },
+    {
+        "name": "Mauritius",
+        "unique_name": "mauritius",
+        "country_code": "mu",
+        "wikidataID": 1027,
+        "dgraph.type": "Country",
+        "uid": "_:mauritius",
+        "opted_scope": false
+    },
+    {
+        "name": "El Salvador",
+        "unique_name": "el_salvador",
+        "country_code": "sv",
+        "wikidataID": 792,
+        "dgraph.type": "Country",
+        "uid": "_:el_salvador",
+        "opted_scope": false
+    },
+    {
+        "name": "Cura\u00e7ao",
+        "unique_name": "curacao",
+        "country_code": "cw",
+        "wikidataID": 25279,
+        "dgraph.type": "Country",
+        "uid": "_:curacao",
+        "opted_scope": false
+    },
+    {
+        "name": "Falkland Islands",
+        "unique_name": "falkland_islands",
+        "country_code": "fk",
+        "wikidataID": 9648,
+        "dgraph.type": "Country",
+        "uid": "_:falkland_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "South Georgia and the South Sandwich Islands",
+        "unique_name": "south_georgia_and_the_south_sandwich_islands",
+        "country_code": "gs",
+        "wikidataID": 35086,
+        "dgraph.type": "Country",
+        "uid": "_:south_georgia_and_the_south_sandwich_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Malaysia",
+        "unique_name": "malaysia",
+        "country_code": "my",
+        "wikidataID": 833,
+        "dgraph.type": "Country",
+        "uid": "_:malaysia",
+        "opted_scope": false
+    },
+    {
+        "name": "Svalbard and Jan Mayen",
+        "unique_name": "svalbard_and_jan_mayen",
+        "country_code": "sj",
+        "wikidataID": 842829,
+        "dgraph.type": "Country",
+        "uid": "_:svalbard_and_jan_mayen",
+        "opted_scope": false
+    },
+    {
+        "name": "Ukraine",
+        "unique_name": "ukraine",
+        "country_code": "ua",
+        "wikidataID": 212,
+        "dgraph.type": "Country",
+        "uid": "_:ukraine",
+        "opted_scope": false
+    },
+    {
+        "name": "Vietnam",
+        "unique_name": "vietnam",
+        "country_code": "vn",
+        "wikidataID": 881,
+        "dgraph.type": "Country",
+        "uid": "_:vietnam",
+        "opted_scope": false
+    },
+    {
+        "name": "Aruba",
+        "unique_name": "aruba",
+        "country_code": "aw",
+        "wikidataID": 21203,
+        "dgraph.type": "Country",
+        "uid": "_:aruba",
+        "opted_scope": false
+    },
+    {
+        "name": "Bouvet Island",
+        "unique_name": "bouvet_island",
+        "country_code": "bv",
+        "wikidataID": 23408,
+        "dgraph.type": "Country",
+        "uid": "_:bouvet_island",
+        "opted_scope": false
+    },
+    {
+        "name": "Guinea-Bissau",
+        "unique_name": "guinea_bissau",
+        "country_code": "gw",
+        "wikidataID": 1007,
+        "dgraph.type": "Country",
+        "uid": "_:guinea_bissau",
+        "opted_scope": false
+    },
+    {
+        "name": "Comoros",
+        "unique_name": "comoros",
+        "country_code": "km",
+        "wikidataID": 970,
+        "dgraph.type": "Country",
+        "uid": "_:comoros",
+        "opted_scope": false
+    },
+    {
+        "name": "Mozambique",
+        "unique_name": "mozambique",
+        "country_code": "mz",
+        "wikidataID": 1029,
+        "dgraph.type": "Country",
+        "uid": "_:mozambique",
+        "opted_scope": false
+    },
+    {
+        "name": "Philippines",
+        "unique_name": "philippines",
+        "country_code": "ph",
+        "wikidataID": 928,
+        "dgraph.type": "Country",
+        "uid": "_:philippines",
+        "opted_scope": false
+    },
+    {
+        "name": "Palau",
+        "unique_name": "palau",
+        "country_code": "pw",
+        "wikidataID": 695,
+        "dgraph.type": "Country",
+        "uid": "_:palau",
+        "opted_scope": false
+    },
+    {
+        "name": "British Virgin Islands",
+        "unique_name": "british_virgin_islands",
+        "country_code": "vg",
+        "wikidataID": 25305,
+        "dgraph.type": "Country",
+        "uid": "_:british_virgin_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Mayotte",
+        "unique_name": "mayotte",
+        "country_code": "yt",
+        "wikidataID": 17063,
+        "dgraph.type": "Country",
+        "uid": "_:mayotte",
+        "opted_scope": false
+    },
+    {
+        "name": "Zambia",
+        "unique_name": "zambia",
+        "country_code": "zm",
+        "wikidataID": 953,
+        "dgraph.type": "Country",
+        "uid": "_:zambia",
+        "opted_scope": false
+    },
+    {
+        "name": "Guatemala",
+        "unique_name": "guatemala",
+        "country_code": "gt",
+        "wikidataID": 774,
+        "dgraph.type": "Country",
+        "uid": "_:guatemala",
+        "opted_scope": false
+    },
+    {
+        "name": "Liberia",
+        "unique_name": "liberia",
+        "country_code": "lr",
+        "wikidataID": 1014,
+        "dgraph.type": "Country",
+        "uid": "_:liberia",
+        "opted_scope": false
+    },
+    {
+        "name": "Seychelles",
+        "unique_name": "seychelles",
+        "country_code": "sc",
+        "wikidataID": 1042,
+        "dgraph.type": "Country",
+        "uid": "_:seychelles",
+        "opted_scope": false
+    },
+    {
+        "name": "Ceuta and Melilla",
+        "unique_name": "ceuta_and_melilla",
+        "country_code": "ea",
+        "wikidataID": 28868874,
+        "dgraph.type": "Country",
+        "uid": "_:ceuta_and_melilla",
+        "opted_scope": false
+    },
+    {
+        "name": "Faroe Islands",
+        "unique_name": "faroe_islands",
+        "country_code": "fo",
+        "wikidataID": 4628,
+        "dgraph.type": "Country",
+        "uid": "_:faroe_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "Isle of Man",
+        "unique_name": "isle_of_man",
+        "country_code": "im",
+        "wikidataID": 9676,
+        "dgraph.type": "Country",
+        "uid": "_:isle_of_man",
+        "opted_scope": false
+    },
+    {
+        "name": "Pakistan",
+        "unique_name": "pakistan",
+        "country_code": "pk",
+        "wikidataID": 843,
+        "dgraph.type": "Country",
+        "uid": "_:pakistan",
+        "opted_scope": false
+    },
+    {
+        "name": "San Marino",
+        "unique_name": "san_marino",
+        "country_code": "sm",
+        "wikidataID": 238,
+        "dgraph.type": "Country",
+        "uid": "_:san_marino",
+        "opted_scope": false
+    },
+    {
+        "name": "Suriname",
+        "unique_name": "suriname",
+        "country_code": "sr",
+        "wikidataID": 730,
+        "dgraph.type": "Country",
+        "uid": "_:suriname",
+        "opted_scope": false
+    },
+    {
+        "name": "Trinidad and Tobago",
+        "unique_name": "trinidad_and_tobago",
+        "country_code": "tt",
+        "wikidataID": 754,
+        "dgraph.type": "Country",
+        "uid": "_:trinidad_and_tobago",
+        "opted_scope": false
+    },
+    {
+        "name": "Cuba",
+        "unique_name": "cuba",
+        "country_code": "cu",
+        "wikidataID": 241,
+        "dgraph.type": "Country",
+        "uid": "_:cuba",
+        "opted_scope": false
+    },
+    {
+        "name": "Jordan",
+        "unique_name": "jordan",
+        "country_code": "jo",
+        "wikidataID": 810,
+        "dgraph.type": "Country",
+        "uid": "_:jordan",
+        "opted_scope": false
+    },
+    {
+        "name": "Moldova",
+        "unique_name": "moldova",
+        "country_code": "md",
+        "wikidataID": 217,
+        "dgraph.type": "Country",
+        "uid": "_:moldova",
+        "opted_scope": false
+    },
+    {
+        "name": "Uganda",
+        "unique_name": "uganda",
+        "country_code": "ug",
+        "wikidataID": 1036,
+        "dgraph.type": "Country",
+        "uid": "_:uganda",
+        "opted_scope": false
+    },
+    {
+        "name": "Niue",
+        "unique_name": "niue",
+        "country_code": "nu",
+        "wikidataID": 34020,
+        "dgraph.type": "Country",
+        "uid": "_:niue",
+        "opted_scope": false
+    },
+    {
+        "name": "Kyrgyzstan",
+        "unique_name": "kyrgyzstan",
+        "country_code": "kg",
+        "wikidataID": 813,
+        "dgraph.type": "Country",
+        "uid": "_:kyrgyzstan",
+        "opted_scope": false
+    },
+    {
+        "name": "Myanmar",
+        "unique_name": "myanmar",
+        "country_code": "mm",
+        "wikidataID": 836,
+        "dgraph.type": "Country",
+        "uid": "_:myanmar",
+        "opted_scope": false
+    },
+    {
+        "name": "Serbia",
+        "unique_name": "serbia",
+        "country_code": "rs",
+        "wikidataID": 403,
+        "dgraph.type": "Country",
+        "uid": "_:serbia",
+        "opted_scope": false
+    },
+    {
+        "name": "Gabon",
+        "unique_name": "gabon",
+        "country_code": "ga",
+        "wikidataID": 1000,
+        "dgraph.type": "Country",
+        "uid": "_:gabon",
+        "opted_scope": false
+    },
+    {
+        "name": "Saint Pierre and Miquelon",
+        "unique_name": "saint_pierre_and_miquelon",
+        "country_code": "pm",
+        "wikidataID": 34617,
+        "dgraph.type": "Country",
+        "uid": "_:saint_pierre_and_miquelon",
+        "opted_scope": false
+    },
+    {
+        "name": "French Southern and Antarctic Lands",
+        "unique_name": "french_southern_and_antarctic_lands",
+        "country_code": "tf",
+        "wikidataID": 129003,
+        "dgraph.type": "Country",
+        "uid": "_:french_southern_and_antarctic_lands",
+        "opted_scope": false
+    },
+    {
+        "name": "Timor-Leste",
+        "unique_name": "timor_leste",
+        "country_code": "tl",
+        "wikidataID": 574,
+        "dgraph.type": "Country",
+        "uid": "_:timor_leste",
+        "opted_scope": false
+    },
+    {
+        "name": "Cook Islands",
+        "unique_name": "cook_islands",
+        "country_code": "ck",
+        "wikidataID": 26988,
+        "dgraph.type": "Country",
+        "uid": "_:cook_islands",
+        "opted_scope": false
+    },
+    {
+        "name": "\u00c5land",
+        "unique_name": "aland",
+        "country_code": "ax",
+        "wikidataID": 5689,
+        "dgraph.type": "Country",
+        "uid": "_:aland",
+        "opted_scope": false
+    },
+    {
+        "name": "Mauritania",
+        "unique_name": "mauritania",
+        "country_code": "mr",
+        "wikidataID": 1025,
+        "dgraph.type": "Country",
+        "uid": "_:mauritania",
+        "opted_scope": false
+    },
+    {
+        "name": "American Samoa",
+        "unique_name": "american_samoa",
+        "country_code": "as",
+        "wikidataID": 16641,
+        "dgraph.type": "Country",
+        "uid": "_:american_samoa",
+        "opted_scope": false
+    },
+    {
+        "name": "Belarus",
+        "unique_name": "belarus",
+        "country_code": "by",
+        "wikidataID": 184,
+        "dgraph.type": "Country",
+        "uid": "_:belarus",
+        "opted_scope": false
+    },
+    {
+        "name": "Mexico",
+        "unique_name": "mexico",
+        "country_code": "mx",
+        "wikidataID": 96,
+        "dgraph.type": "Country",
+        "uid": "_:mexico",
+        "opted_scope": false
+    },
+    {
+        "name": "India",
+        "unique_name": "india",
+        "country_code": "in",
+        "wikidataID": 668,
+        "dgraph.type": "Country",
+        "uid": "_:india",
+        "opted_scope": false
+    },
+    {
+        "name": "Libya",
+        "unique_name": "libya",
+        "country_code": "ly",
+        "wikidataID": 1016,
+        "dgraph.type": "Country",
+        "uid": "_:libya",
+        "opted_scope": false
+    },
+    {
+        "name": "Nigeria",
+        "unique_name": "nigeria",
+        "country_code": "ng",
+        "wikidataID": 1033,
+        "dgraph.type": "Country",
+        "uid": "_:nigeria",
+        "opted_scope": false
+    },
+    {
+        "name": "Wallis and Futuna",
+        "unique_name": "wallis_and_futuna",
+        "country_code": "wf",
+        "wikidataID": 35555,
+        "dgraph.type": "Country",
+        "uid": "_:wallis_and_futuna",
+        "opted_scope": false
+    },
+    {
+        "name": "Dominican Republic",
+        "unique_name": "dominican_republic",
+        "country_code": "do",
+        "wikidataID": 786,
+        "dgraph.type": "Country",
+        "uid": "_:dominican_republic",
+        "opted_scope": false
+    },
+    {
+        "name": "Madagascar",
+        "unique_name": "madagascar",
+        "country_code": "mg",
+        "wikidataID": 1019,
+        "dgraph.type": "Country",
+        "uid": "_:madagascar",
+        "opted_scope": false
+    },
+    {
+        "name": "Martinique",
+        "unique_name": "martinique",
+        "country_code": "mq",
+        "wikidataID": 17054,
+        "dgraph.type": "Country",
+        "uid": "_:martinique",
+        "opted_scope": false
+    },
+    {
+        "name": "Cameroon",
+        "unique_name": "cameroon",
+        "country_code": "cm",
+        "wikidataID": 1009,
+        "dgraph.type": "Country",
+        "uid": "_:cameroon",
+        "opted_scope": false
+    },
+    {
+        "name": "United States of America",
+        "unique_name": "united_states_of_america",
+        "other_names": ["USA"],
+        "country_code": "us",
+        "wikidataID": 30,
+        "dgraph.type": "Country",
+        "uid": "_:united_states_of_america",
+        "opted_scope": false
+    }
+]
