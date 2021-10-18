@@ -356,7 +356,8 @@ def get_wikidata(query):
         inception = wikidata['entities'][wikidataid]['claims']['P571'][0]['mainsnak']['datavalue']['value']['time'].replace(
             '+', '')
         result['founded'] = isoparse(inception)
-    except:
+    except Exception as e:
+        current_app.logger.debug(f"Could not get inception date: {e}")
         pass
 
     try:
