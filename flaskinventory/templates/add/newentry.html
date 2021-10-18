@@ -28,7 +28,7 @@
                 {% for entry in drafts %}
                 <tr>
                     <td>{{ entry.name }}{% if entry.channel %} ({{ entry.channel.name }}){% endif %}</td>
-                    <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+                    <td>{% if entry.get("drafts|timestamp") %}{{ entry.get("drafts|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div>
                     </td>
