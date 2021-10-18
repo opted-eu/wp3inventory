@@ -1541,6 +1541,8 @@ class NewArchiveSanitizer(Sanitizer):
 
         if wikidata:
             for key, val in wikidata.items():
+                if key == 'country':
+                    continue
                 if key not in self.new.keys():
                     self.new[key] = val
         
