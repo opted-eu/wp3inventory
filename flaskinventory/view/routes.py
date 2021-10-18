@@ -2,6 +2,7 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
+from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
@@ -68,12 +69,7 @@ def search():
             result = None
 
         # CACHE THIS
-        countries = dgraph.query(
-            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
-
-        c_choices = [(country.get('uid'), country.get('name'))
-                        for country in countries['q']]
-        c_choices = sorted(c_choices, key=lambda x: x[1])
+        c_choices = get_country_choices()
         c_choices.insert(0, ('all', 'All'))
         form = SimpleQuery()
         form.country.choices = c_choices
@@ -261,12 +257,7 @@ def query():
         cols = list(set(cols))
 
         # CACHE THIS
-        countries = dgraph.query(
-            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
-
-        c_choices = [(country.get('uid'), country.get('name'))
-                     for country in countries['q']]
-        c_choices = sorted(c_choices, key=lambda x: x[1])
+        c_choices = get_country_choices()
         c_choices.insert(0, ('all', 'All'))
         form = SimpleQuery()
         form.country.choices = c_choices

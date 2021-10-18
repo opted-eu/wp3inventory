@@ -1,9 +1,8 @@
-from datetime import datetime
-from enum import unique
 from flask import (Blueprint, render_template, url_for,
-                   flash, redirect, request, abort, Markup)
-from flask_login import login_user, current_user, logout_user, login_required
+                   flash, redirect, request, abort)
+from flask_login import login_required
 from flaskinventory import dgraph
+from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.review.forms import ReviewActions, ReviewFilter
 from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, check_entry
 from flaskinventory.view.dgraph import get_archive, get_dgraphtype, get_organization, get_source, get_subunit
@@ -19,12 +18,8 @@ review = Blueprint('review', __name__)
 @login_required
 @requires_access_level(USER_ROLES.Reviewer)
 def overview():
-    countries = dgraph.query(
-            '''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
 
-    c_choices = [(country.get('uid'), country.get('name'))
-                    for country in countries['q']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
+    c_choices = get_country_choices()
     c_choices.insert(0, ('all', 'All'))
     form = ReviewFilter()
     form.country.choices = c_choices

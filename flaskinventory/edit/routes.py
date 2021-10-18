@@ -5,6 +5,8 @@ from flaskinventory.edit.forms import make_form
 from flaskinventory.edit.utils import can_edit
 from flaskinventory.edit.sanitize import EditArchiveSanitizer, EditOrgSanitizer, EditSourceSanitizer, EditSubunitSanitizer, EditDatasetSanitizer
 from flaskinventory.review.dgraph import check_entry
+from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
+
 from flaskinventory import dgraph
 
 import traceback
@@ -49,12 +51,8 @@ def organization(unique_name=None, uid=None):
         unique_name = check.get('unique_name') 
 
     form, fields = make_form('organization')
-    countries = dgraph.query('''{ q(func: type("Country")) { name uid } }''')
-    c_choices = [(country.get('uid'), country.get('name'))
-                 for country in countries['q']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
 
-    form.country.choices = c_choices
+    form.country.choices = get_country_choices(opted=False)
     if form.validate_on_submit():
         try:
             sanitizer = EditOrgSanitizer(
@@ -137,16 +135,9 @@ def source(unique_name=None, uid=None):
         audience_size_entries = 0
 
     form, fields = make_form(result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
-    countries = dgraph.query('''{ countries(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } subunits(func: type("Subunit")) { name uid }}''')
-    c_choices = [(country.get('uid'), country.get('name'))
-                 for country in countries['countries']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
-    form.country.choices = c_choices
-
-    su_choices = [(subunit.get('uid'), subunit.get('name'))
-                 for subunit in countries['subunits']]
-    su_choices = sorted(su_choices, key=lambda x: x[1])
-    form.geographic_scope_subunit.choices = su_choices
+    
+    form.country.choices = get_country_choices()
+    form.geographic_scope_subunit.choices = get_subunit_choices()
 
     if form.validate_on_submit():
         try:
@@ -219,12 +210,8 @@ def subunit(unique_name=None, uid=None):
 
 
     form, fields = make_form('subunit')
-    countries = dgraph.query('''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
-    c_choices = [(country.get('uid'), country.get('name'))
-                 for country in countries['q']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
 
-    form.country.choices = c_choices
+    form.country.choices = get_country_choices(opted=False)
     if form.validate_on_submit():
         try:
             sanitizer = EditSubunitSanitizer(

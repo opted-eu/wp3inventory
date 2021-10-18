@@ -95,7 +95,7 @@ def new_source(draft=None):
 @login_required
 def new_organization(draft=None):
     form = NewOrganization(uid="_:neworganization", is_person='n')
-    form.country.choices = get_country_choices()
+    form.country.choices = get_country_choices(opted=False)
 
     if draft is None:
         draft = request.args.get('draft')

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort, current_app
 from flaskinventory import dgraph
+from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.forms import SimpleQuery
 
 main = Blueprint('main', __name__)
@@ -9,10 +10,7 @@ main = Blueprint('main', __name__)
 @main.route('/home')
 def home():
     # needs caching!
-    countries = dgraph.query('''{ q(func: type("Country")) @filter(eq(opted_scope, true)) { name uid } }''')
-    c_choices = [(country.get('uid'), country.get('name'))
-                 for country in countries['q']]
-    c_choices = sorted(c_choices, key=lambda x: x[1])
+    c_choices = get_country_choices()
     c_choices.insert(0, ('all', 'All'))
     form = SimpleQuery()
     form.country.choices = c_choices
