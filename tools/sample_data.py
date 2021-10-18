@@ -19,6 +19,9 @@ def main():
     with open('./data/countries_noaustria.json', 'r') as f:
         countries = json.load(f)
     
+    with open('./data/countries_nonopted.json', 'r') as f:
+        non_optedcountries = json.load(f)
+    
     client_stub = pydgraph.DgraphClientStub('localhost:9080')
     client = pydgraph.DgraphClient(client_stub)
     
@@ -35,6 +38,14 @@ def main():
 
     try:
         txn.mutate(set_obj=countries)
+        txn.commit()
+    finally:
+        txn.discard()
+
+    txn = client.txn()
+
+    try:
+        txn.mutate(set_obj={'set': non_optedcountries})
         txn.commit()
     finally:
         txn.discard()
