@@ -487,11 +487,52 @@ class EditSubunitSanitizer(Sanitizer):
 
         return entry
 
-    def parse_ownership_kind(self):
-        self.edit['ownership_kind'] = self.data.get('ownership_kind')
-
     def parse_country(self):
         self.edit['country'] = UID(self.data.get('country'))
+
+
+class EditMultinationalSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(user, ip)
+        self.is_upsert = True
+
+        self.edit = {"uid": UID(data.get('uid'))}
+        self.edit = self._add_entry_meta(self.edit)
+        self.data = data
+
+        self.overwrite = {self.edit['uid']: [
+            'other_names']}
+
+        self._parse()
+
+        nquads = dict_to_nquad(self.edit)
+
+        self.set_nquads = " \n ".join(nquads)
+
+        self.delete_nquads = self._make_delete_nquads()
+
+    def _add_entry_meta(self, entry, newentry=False):
+        if not newentry:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc),
+                'ip': self.user_ip}
+            entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
+        else:
+            facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc),
+                'ip': self.user_ip}
+            entry['entry_added'] = UID(self.user.uid, facets=facets)
+            entry['entry_review_status'] = 'accepted'
+            entry['creation_date'] = datetime.datetime.now(
+                datetime.timezone.utc)
+
+        return entry
+    
+    def parse_description(self):
+        if self.data.get('description'):
+            self.edit['description'] = self.data.get('description')
+
 
 
 

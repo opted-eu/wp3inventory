@@ -10,6 +10,7 @@ from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes_list_tuples
 import datetime
 
+
 class TomSelectMutlitpleField(SelectMultipleField):
 
     def pre_validate(self, form):
@@ -22,9 +23,12 @@ class TomSelectField(SelectField):
         pass
 
 # taken from: https://stackoverflow.com/questions/27766417/
+
+
 class NullableDateField(DateField):
     """Native WTForms DateField throws error for empty dates.
     Let's fix this so that we could have DateField nullable."""
+
     def process_formdata(self, valuelist):
         if valuelist:
             date_str = ' '.join(valuelist).strip()
@@ -32,17 +36,21 @@ class NullableDateField(DateField):
                 self.data = None
                 return
             try:
-                self.data = datetime.datetime.strptime(date_str, self.format).date()
+                self.data = datetime.datetime.strptime(
+                    date_str, self.format).date()
             except ValueError:
                 self.data = None
                 raise ValueError(self.gettext('Not a valid date value'))
 
 # generic fields
 
+
 na_option = ('none', "Don't Know / NA")
 
-entry_review_status_choices = [('draft', 'Draft'), ('pending', 'Pending'), ('accepted', 'Accepted')]
-entry_review_status = SelectField('Entry Review Status', choices=entry_review_status_choices)
+entry_review_status_choices = [
+    ('draft', 'Draft'), ('pending', 'Pending'), ('accepted', 'Accepted')]
+entry_review_status = SelectField(
+    'Entry Review Status', choices=entry_review_status_choices)
 
 
 uid = StringField('uid', render_kw={'readonly': True})
@@ -66,20 +74,25 @@ description = TextAreaField('Description')
 
 related = TomSelectMutlitpleField('Related Sources', choices=[])
 
-channel = TomSelectField('Channel', validators=[DataRequired()], render_kw={'readonly': True})
+channel = TomSelectField('Channel', validators=[
+                         DataRequired()], render_kw={'readonly': True})
 
-channel_comments_choices = [('no comments', 'No Comments'), 
-                            ('user comments with registration', 'Registered Users can comment'),
+channel_comments_choices = [('no comments', 'No Comments'),
+                            ('user comments with registration',
+                             'Registered Users can comment'),
                             ('user comments without registration', 'Anyone can comment'), na_option]
-channel_comments = SelectField('Allows user comments', choices=channel_comments_choices)
+channel_comments = SelectField(
+    'Allows user comments', choices=channel_comments_choices)
 
 channel_url = StringField('Channel URL')
 
 channel_epaper = StringField('Link to E-Paper')
 
-transcript_kind_choices = [('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast'), na_option]
+transcript_kind_choices = [
+    ('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast'), na_option]
 
-transcript_kind = SelectField('Transcript Kind', choices=transcript_kind_choices)
+transcript_kind = SelectField(
+    'Transcript Kind', choices=transcript_kind_choices)
 
 payment_model_choices = [('free', 'Free, all content is free of charge'),
                          ('partly free', 'Some content is free of charge'),
@@ -149,7 +162,8 @@ audience_size_value = IntegerField('Audience Size')
 audience_size_unit = StringField(
     'Audience Size Unit', description="e.g. subscribers, followers, papers sold", default='Subscribers')
 
-audience_size = DateField('Audience Size (Date of Measurement)', render_kw={'type': 'date'})
+audience_size = DateField(
+    'Audience Size (Date of Measurement)', render_kw={'type': 'date'})
 
 published_by = SelectMultipleField('Published by')
 
@@ -192,9 +206,11 @@ owns = TomSelectMutlitpleField('Owns', choices=[])
 
 # Dataset Fields
 
-access = SelectField('Access to data', choices=[('restricted', 'Restricted'), ('free', 'Free')])
+access = SelectField('Access to data', choices=[
+                     ('restricted', 'Restricted'), ('free', 'Free')])
 url = StringField('Link to Dataset')
-sources_included = TomSelectMutlitpleField('Sources included in Dataset', choices=[])
+sources_included = TomSelectMutlitpleField(
+    'Sources included in Dataset', choices=[])
 fulltext = BooleanField('Dataset contains fulltext')
 
 editfields_base = {
@@ -236,30 +252,30 @@ editsourcefields = {
     "languages": languages}
 
 
-editprintfields = {**editsourcefields, 
-                    "channel_epaper": channel_epaper,
-                    "payment_model": payment_model,
-                    "founded": founded}
+editprintfields = {**editsourcefields,
+                   "channel_epaper": channel_epaper,
+                   "payment_model": payment_model,
+                   "founded": founded}
 
 edittwitterfields = {**editsourcefields,
-                        "channel_url": channel_url}
+                     "channel_url": channel_url}
 
 editinstagramfields = {**editsourcefields,
-                        "channel_url": channel_url,
-                        "founded": founded}
+                       "channel_url": channel_url,
+                       "founded": founded}
 
 editwebsitefields = {**editsourcefields,
-                        "channel_url": channel_url,
-                        "channel_comments": channel_comments,
-                        "founded": founded,
-                        "payment_model": payment_model}
+                     "channel_url": channel_url,
+                     "channel_comments": channel_comments,
+                     "founded": founded,
+                     "payment_model": payment_model}
 
-editfacebookfields = {**editsourcefields, 
-                        "channel_url": channel_url,
-                        "founded": founded}
+editfacebookfields = {**editsourcefields,
+                      "channel_url": channel_url,
+                      "founded": founded}
 
 
-edittranscriptfields = {**editsourcefields, 
+edittranscriptfields = {**editsourcefields,
                         "channel_url": channel_url,
                         "transcript_kind": transcript_kind,
                         "founded": founded}
@@ -267,24 +283,34 @@ edittranscriptfields = {**editsourcefields,
 # Subunits
 
 editsubunitfields = {**editfields_base,
-                        "country": country}
+                     "country": country}
+
+# Multinational
+editmultinationalfields = {"uid": uid,
+                           "entry_review_status": entry_review_status,
+                           "unique_name": unique_name,
+                           "name": name,
+                           "other_names": other_names,
+                           "entry_notes": entry_notes,
+                           "description": description}
 
 # dataset
 
 editdatasetfields = {**editfields_base,
-                        "description": description,
-                        "access": access,
-                        "fulltext": fulltext,
-                        "url": url,
-                        "sources_included": sources_included}
-                        
+                     "description": description,
+                     "access": access,
+                     "fulltext": fulltext,
+                     "url": url,
+                     "sources_included": sources_included}
+
 # archive
 
 editarchivefields = {**editfields_base,
-                        "description": description,
-                        "access": access,
-                        "url": url,
-                        "sources_included": sources_included}
+                     "description": description,
+                     "access": access,
+                     "url": url,
+                     "sources_included": sources_included}
+
 
 class DynamicForm(FlaskForm):
     submit = SubmitField('Commit Changes')
@@ -292,6 +318,7 @@ class DynamicForm(FlaskForm):
     # helper method for Jinja2
     def get_field(self, field):
         return getattr(self, field)
+
 
 def make_form(entity, audience_size=1):
     if entity == 'organization':
@@ -318,9 +345,11 @@ def make_form(entity, audience_size=1):
         fields = editdatasetfields
     elif entity == 'archive':
         fields = editarchivefields
+    elif entity == 'multinational':
+        fields = editmultinationalfields
     else:
         raise TypeError
-    
+
     class F(DynamicForm):
         pass
 
@@ -337,4 +366,3 @@ def make_form(entity, audience_size=1):
         setattr(F, key, val)
 
     return F(), fields
-

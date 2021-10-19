@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type
+from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type, get_multinational
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
 
@@ -201,6 +201,24 @@ def view_subunit(unique_name=None, uid=None):
             return abort(403)
 
         return render_template('view/subunit.html',
+                               title=unique_item.get('name'),
+                               entry=unique_item)
+    else:
+        return abort(404)
+
+
+@view.route("/view/multinational/<string:unique_name>")
+@view.route("/view/multinational/uid/<string:uid>")
+def view_multinational(unique_name=None, uid=None):
+    unique_item = get_multinational(unique_name=unique_name, uid=uid)
+    if unique_item:
+        if "Multinational" not in unique_item.get('dgraph.type'):
+            entry_type = unique_item.get('dgraph.type')[0]
+            return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
+        if not can_view(unique_item, current_user):
+            return abort(403)
+
+        return render_template('view/multinational.html',
                                title=unique_item.get('name'),
                                entry=unique_item)
     else:

@@ -564,11 +564,24 @@ ready(() => {
             // Add field options for Country & Subunit Selection (Multiple Choice)
             var countries = data.country;
             var subunits = data.subunit;
+            var multinational = data.multinational
             // Sort values alphabetically
             // countries.sort((a,b) => a.name > b.name ? 1 : -1);
             // subunits.sort((a,b) => a.name > b.name ? 1 : -1);
 
             var inputGeographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+
+            var optgroupMultinational = document.createElement('optgroup');
+            optgroupMultinational.setAttribute('label', 'Multinational Constructs');
+            multinational.forEach(function(item, i) {
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.unique_name)
+                opt.setAttribute('data-uid', item.uid)
+                opt.setAttribute('data-type', 'country')
+                opt.innerText = item.name
+                optgroupMultinational.append(opt)
+            });
+
             var optgroupCountries = document.createElement('optgroup');
             optgroupCountries.setAttribute('label', 'Country');
             countries.forEach(function(item, i) {
@@ -595,6 +608,7 @@ ready(() => {
                 optgroupSubunits.append(opt)
             });
 
+            inputGeographicScopeMultiple.append(optgroupMultinational)
             inputGeographicScopeMultiple.append(optgroupCountries)
             inputGeographicScopeMultiple.append(optgroupSubunits)
 

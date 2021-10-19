@@ -182,6 +182,29 @@ def get_subunit(unique_name=None, uid=None):
     return data
 
 
+def get_multinational(unique_name=None, uid=None):
+    if unique_name:
+        query_func = f'{{ multinational(func: eq(unique_name, "{unique_name}"))'
+    elif uid:
+        query_func = f'{{ multinational(func: uid({uid}))'
+    else:
+        return None
+
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name }
+                        num_sources: count(~country)
+                        } }'''
+
+    query = query_func + query_fields
+
+    data = dgraph.query(query)
+
+    if len(data['multinational']) == 0:
+        return False
+
+    data = data['multinational'][0]
+    return data
+
+
 def get_paper(uid):
     query_func = f'{{ paper(func: uid({uid}))'
 

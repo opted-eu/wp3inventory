@@ -11,9 +11,10 @@ async def generate_fieldoptions():
     query_dataset = '''dataset(func: type("Dataset"), orderasc: name) { uid unique_name name  }'''
     query_archive = '''archive(func: type("Archive"), orderasc: name) { uid unique_name name  }'''
     query_subunit = '''subunit(func: type("Subunit"), orderasc: name) { uid unique_name name other_names country{ name } }'''
+    query_multinational = '''multinational(func: type("Multinational"), orderasc: name) { uid unique_name name other_names country{ name } }'''
 
     query_string = '{ ' + query_channel + query_country + \
-        query_dataset + query_archive + query_subunit + ' }'
+        query_dataset + query_archive + query_subunit + query_multinational + ' }'
 
     # Use async query here because a lot of data is retrieved
     query_future = dgraph.connection.txn().async_query(query_string)
