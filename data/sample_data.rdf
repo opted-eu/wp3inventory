@@ -6,6 +6,7 @@
         _:austria <other_names> "Österreich" .
         _:austria <wikidataID> "40" .
         _:austria <country_code> "at" .
+        _:austria <opted_scope> "true" .
 
         _:vienna <dgraph.type> "Subunit" .
         _:vienna <unique_name> "vienna" .
