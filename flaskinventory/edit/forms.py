@@ -81,9 +81,9 @@ transcript_kind_choices = [('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast
 
 transcript_kind = SelectField('Transcript Kind', choices=transcript_kind_choices)
 
-payment_model_choices = [('free', 'Free'),
-                         ('soft paywall', 'Soft Paywall'),
-                         ('subscription', 'Subscription'),
+payment_model_choices = [('free', 'Free, all content is free of charge'),
+                         ('partly free', 'Some content is free of charge'),
+                         ('not free', 'No content is free of charge'),
                          ('none', "Don't know / NA")]
 
 payment_model = SelectField('Payment model', choices=payment_model_choices)

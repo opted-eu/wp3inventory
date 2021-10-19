@@ -350,24 +350,30 @@
         <h3 class="mb-4">Economic Information</h3>
         <div id="group-payment-model" class="mb-5 form-group fs-5">
             <p class="form-label fw-bold fs-5">Is the content produced by the news source accessible free of charge?
-                {{ make_tooltip('Select ‘free’ only if all content is free of charge. Select ‘free’ also if the source asks for donations on a voluntary basis. Select “subscription’ for sources with freemium models, metered paywalls, and hard paywall.') }}
+                {{ make_tooltip('Select ‘free’ only if all content is free of charge. Select ‘free’ also if the source asks for donations on a voluntary basis. Select ‘some content’ for freemium models, soft paywalls, or metered paywalls or similar cases. Select ‘no content is free’ for sources with hard paywalls, subscription models or similar.') }}
                 {{ make_researchtip('Visit the website of the medium and search for (potential) subscription prices for the digital and non-digital content.')}}
             </p>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="payment_model" id="payment_model1" value="free" aria-describedby="payment-model-feedback" required>
                 <label class="form-check-label" for="payment_model1">
-                               Free
-                            </label>
+                    Free, all content is free of charge
+                </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="subscription" aria-describedby="payment-model-feedback" required>
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model2" value="partly free" aria-describedby="payment-model-feedback" required>
                 <label class="form-check-label" for="payment_model2">
-                                Subscription
+                    Some content is free of charge
                             </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="none" aria-describedby="payment-model-feedback" required>
-                <label class="form-check-label" for="payment_model3">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model3" value="not free" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model2">
+                    No content is free of charge
+                            </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_model" id="payment_model4" value="none" aria-describedby="payment-model-feedback" required>
+                <label class="form-check-label" for="payment_model4">
                                 Don't know
                             </label>
             </div>

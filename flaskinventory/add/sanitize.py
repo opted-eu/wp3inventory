@@ -20,7 +20,7 @@ class SourceSanitizer:
         Relevant return attribute are upsert_query (string), set_nquads (string), delete_nquads (string)
     """
 
-    payment_model = ['free', 'soft paywall', 'subscription', 'none']
+    payment_model = ['free', 'partly free', 'not free', 'none']
     contains_ads = ['yes', 'no', 'non subscribers', 'none']
     ownership_kind = ['public ownership',
                       'private ownership', 'unknown', 'none']

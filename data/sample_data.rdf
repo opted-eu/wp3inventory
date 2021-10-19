@@ -81,7 +81,7 @@
         _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml" (kind="sitemap") .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/sitemap.xml" (kind="sitemap") .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/rss" (kind="rss") .
-        _:derstandardat <payment_model> "soft paywall" .
+        _:derstandardat <payment_model> "partly free" .
         _:derstandardat <contains_ads> "non subscribers" .
         _:derstandardat <publication_kind> "newspaper" .
         _:derstandardat <special_interest> "false" .
@@ -99,7 +99,7 @@
         _:derstandardprint <wikidataID> "128660" .
         _:derstandardprint <founded> "1988-10-19" .
         _:derstandardprint <channel> _:print .
-        _:derstandardprint <payment_model> "subscription" .
+        _:derstandardprint <payment_model> "not free" .
         _:derstandardprint <contains_ads> "yes" .
         _:derstandardprint <publication_kind> "newspaper" .
         _:derstandardprint <special_interest> "false" .
@@ -217,7 +217,7 @@
         _:falterprint <wikidataID> "1394979" .
         _:falterprint <founded> "1977-05-25" .
         _:falterprint <channel> _:print .
-        _:falterprint <payment_model> "subscription" .
+        _:falterprint <payment_model> "not free" .
         _:falterprint <contains_ads> "yes" .
         _:falterprint <publication_kind> "newspaper" .
         _:falterprint <special_interest> "false" .
