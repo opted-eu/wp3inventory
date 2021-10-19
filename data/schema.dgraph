@@ -110,6 +110,19 @@ type Country {
     opted_scope
 }
 
+
+type Multinational {
+    unique_name
+    name
+    description
+    entry_added
+    creation_date
+    entry_edit_history
+    entry_review_status
+    entry_notes
+    other_names
+}
+
 type Subunit {
     unique_name
     name
@@ -157,6 +170,49 @@ type Dataset {
     url
     annotations
     fulltext
+    doi
+    arxiv
+    isbn
+    authors
+    published_date
+}
+
+type Corpus {
+    unique_name
+    name
+    description
+    entry_added
+    creation_date
+    entry_edit_history
+    entry_review_status
+    entry_notes
+    other_names
+    access
+    sources_included
+    url
+    annotations
+    doi
+    arxiv
+    isbn
+    authors
+    published_date
+}
+
+
+type Tool {
+    unique_name
+    name
+    description
+    entry_added
+    creation_date
+    entry_edit_history
+    entry_review_status
+    entry_notes
+    other_names
+    access
+    sources_included
+    url
+    annotations
     doi
     arxiv
     isbn
