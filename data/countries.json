@@ -300,6 +300,24 @@
             "name": "Palestinian Territories",
             "wikidataID": 407199,
             "country_code": "ps"
+        },
+        {
+            "uid": "_:global",
+            "unique_name": "global",
+            "dgraph.type": "Multinational",
+            "opted_scope": true,
+            "name": "Global Scope",
+            "description": "For news sources with a truly global scope, targeting citizens from all over the world."
+        },
+        {
+            "uid": "_:eu",
+            "unique_name": "european_union",
+            "dgraph.type": "Multinational",
+            "opted_scope": true,
+            "name": "EU Scope",
+            "other_names": ["European Union Scope"],
+            "description": "For news sources with an EU-wide scope. Providing content targeting citizens of the EU."
         }
+
     ]
 }
