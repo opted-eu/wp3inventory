@@ -94,6 +94,17 @@
                 <a class="nav-link" href="{{ url_for('users.register') }}" tabindex="-1">Register</a>
             </li>
             {% endif %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                   Help
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" href="{{ url_for('main.guides_newssource') }}" tabindex="-1"><i class="fas fa-book-open me-2 fa-fw"></i>Guides</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('main.under_development') }}" tabindex="-1"><i class="fas fa-boxes me-2 fa-fw"></i>Resources</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('main.imprint') }}" tabindex="-1"><i class="fas fa-envelope-open-text me-2 fa-fw"></i>Contact us</a></li>
+                </ul>
+            </li>
         </ul>
 
     </header>
