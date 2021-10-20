@@ -203,9 +203,11 @@
         <dt class="col-sm-3">Allows user comments</dt>
         <dd class="col-sm-9">{{ entry.channel_comments }}</dd>{% endif %} {% if entry.channel_feeds %}
         <dt class="col-sm-3">Feeds</dt>
-        <dd class="col-sm-9">{% for feed in entry.channel_feeds %}<a href="{{feed.url}}" target="_blank">{{ feed.kind }}</a>{{ ", " if not loop.last else "" }} {% endfor %}</dd> {% endif %} {% if entry.channel_epaper %}
-        <dt class="col-sm-3">E-Paper</dt>
-        <dd class="col-sm-9"><a href="{{ entry.channel_epaper }}" target="_blank">Link</a></dd>{% endif %}
+        <dd class="col-sm-9">{% for feed in entry.channel_feeds %}<a href="{{feed.url}}" target="_blank">{{ feed.kind }}</a>{{ ", " if not loop.last else "" }} {% endfor %}</dd> {% endif %} 
+        {% if entry.channel_epaper %}
+        <dt class="col-sm-3">E-Paper available</dt>
+        <dd class="col-sm-9">{{ entry.channel_epaper }}</dd>
+        {% endif %}
     </dl>
 </div>
 <div class="border rounded p-3">

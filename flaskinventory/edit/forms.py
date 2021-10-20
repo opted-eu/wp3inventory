@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField
+from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField, RadioField
 from wtforms.fields.core import IntegerField, SelectMultipleField
 from wtforms.fields.simple import TextAreaField
 from wtforms.fields.html5 import IntegerField
@@ -81,12 +81,13 @@ channel_comments_choices = [('no comments', 'No Comments'),
                             ('user comments with registration',
                              'Registered Users can comment'),
                             ('user comments without registration', 'Anyone can comment'), na_option]
+
 channel_comments = SelectField(
     'Allows user comments', choices=channel_comments_choices)
 
 channel_url = StringField('Channel URL')
 
-channel_epaper = StringField('Link to E-Paper')
+channel_epaper = RadioField('E-Paper available', choices=[('yes', 'Yes'), ('no', 'No'), ('none', "NA / Don't know")])
 
 transcript_kind_choices = [
     ('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast'), na_option]

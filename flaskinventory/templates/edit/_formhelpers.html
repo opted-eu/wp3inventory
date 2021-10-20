@@ -14,6 +14,15 @@
             {{ field(class="form-check") }} 
         {% elif field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
             {{ field(class="form-select form-select-lg") }} 
+        {% elif field.type == 'RadioField' %}
+            
+            {% for subfield in field %}
+            <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+            </div>
+            {% endfor %}
+        
         {% else %}
             {{ field(class="form-control form-control-lg") }} 
         {% endif %}
