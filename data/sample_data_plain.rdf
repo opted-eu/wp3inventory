@@ -225,7 +225,6 @@ _:falterprint <geographic_scope> "national" .
 _:falterprint <country> _:austria .
 _:falterprint <languages> "de" .
 _:falterprint <audience_size> "2020" (papers_sold=51000, data_from="https://www.falter.at/media/b2b/Mediadaten2021_FALTER.pdf") .
-_:falterprint <audience_residency> "2020" (austria=100) .
 
 _:falterverlag <dgraph.type> "Organization" .
 _:falterverlag <unique_name> "falter_mbh" .
