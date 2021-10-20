@@ -28,11 +28,17 @@
         <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }}</a></td>
         {% if entity == 'Source' %}
         <td>{{ entry.channel.get('name')}}</td>
-        <td>{% if entry.get('country') %}{{ entry.country[0].get('name') }}{% endif %}</td>
         {% endif %}
-        <td>{% if entry.get('other_names') %}{{ ", ".join(entry.other_names) }}{% endif %}</td>
+        <td>{% if entry.get('country') %}{{ entry.country[0].get('name') }}{% endif %}</td>
+        <td>{% if entry.get('other_names') %}<span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ ', '.join(entry.other_names) }}">{{ ", ".join(entry.other_names) }}</span>{% endif %}</td>
         <td>{{ entry.get('entry_review_status')}}</td>
-        <td>{% if entry.get('entry_review_status') == 'draft' %}<a class="btn btn-sm btn-primary" href="{{ url_for('add.new_source', draft=entry.get('uid')) }}">Continue editing</a>{% endif %}</td>
+        <td>
+            {% if entry.get('entry_review_status') == 'draft' %}
+            <a class="btn btn-sm btn-primary" href="{{ url_for('add.new_source', draft=entry.get('uid')) }}">Continue editing</a>
+            {% else %}
+            <span class="text-muted">none</span>
+            {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
