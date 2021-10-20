@@ -10,6 +10,7 @@
     <thead>
       <tr>
         <th scope="col">Name</th>
+        <th scope="col">Other names</th>
         <th scope="col">Type</th>
         <th scope="col">Country</th>
       </tr>
@@ -19,6 +20,7 @@
       {% for entry in result %}
       <tr>
           <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }} {{ entry.title }} {% if entry.get('channel') %}({{entry.get('channel')}}){% endif %}</a></td>
+          <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ ', '.join(entry.other_names) }}">{{ ", ".join(entry.other_names) }}</span></td>
           <td>{{ entry.get("type")[0] }}</td>
           <td>{{ entry.get("country") }}</td>
       </tr>

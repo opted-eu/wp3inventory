@@ -26,6 +26,7 @@ def quicksearch():
                     uid 
                     unique_name: unique_name 
                     name: name 
+                    other_names: other_names
                     type: dgraph.type 
                     title: title
                     channel {{ channel: name }}
@@ -54,6 +55,7 @@ def search():
                         uid 
                         unique_name: unique_name 
                         name: name 
+                        other_names: other_names
                         type: dgraph.type 
                         title: title
                         channel {{ channel: name }}

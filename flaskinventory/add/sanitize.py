@@ -1434,6 +1434,10 @@ class NewOrgSanitizer(Sanitizer):
             for key, val in wikidata.items():
                 if key not in self.new.keys():
                     self.new[key] = val
+                elif key == 'other_names':
+                    if 'other_names' not in self.new.keys():
+                        self.new['other_names'] = []
+                    self.new[key] += val
         
     def parse_is_person(self):
         if self.data.get('is_person'):

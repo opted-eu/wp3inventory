@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, SelectField, DateField, BooleanField,
                      IntegerField, SubmitField, TextAreaField, RadioField)
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from flask_login import current_user
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField
@@ -44,7 +44,7 @@ class NewOrganization(FlaskForm):
 
     employees = IntegerField(
         'How many employees does the news organization have?',
-        render_kw={'placeholder': 'Most recent figure as plain number'})
+        render_kw={'placeholder': 'Most recent figure as plain number'}, validators=[Optional()])
 
     publishes = TomSelectMutlitpleField(
         'Which news sources publishes the organisation (or person)?', choices=[],

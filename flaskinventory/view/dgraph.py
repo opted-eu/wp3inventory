@@ -100,7 +100,7 @@ def get_organization(unique_name=None, uid=None):
         return None
 
     query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name channel { name } }
-                        owned_by: ~owns { uid	name unique_name } } }'''
+                        owned_by: ~owns @filter(type(Organization)) { uid name unique_name } } }'''
 
     query = query_func + query_fields
 

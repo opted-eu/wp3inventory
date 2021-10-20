@@ -3,7 +3,7 @@ from wtforms import StringField, SelectField, DateField, BooleanField, SubmitFie
 from wtforms.fields.core import IntegerField, SelectMultipleField
 from wtforms.fields.simple import TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from flask_login import current_user
 from wtforms.widgets.core import Input
 from flaskinventory import dgraph
@@ -199,7 +199,7 @@ address_string = StringField('Address')
 
 address_geo = StringField('Address Geodata', render_kw={'readonly': True})
 
-employees = StringField('Number of employees')
+employees = IntegerField('Number of employees', validators=[Optional()])
 
 publishes = TomSelectMutlitpleField('Publishes', choices=[])
 

@@ -80,7 +80,10 @@
             {% if entry.ownership_kind %}
             <dt class="col-sm-3">Type of Organization</dt>
             <dd class="col-sm-9">{{ entry.ownership_kind }}
-            </dd>{% endif %}{% if entry.employees %}
-            <p class="card-text">Employees: {{ entry.employees }}</p>{% endif %}
+            </dd>{% endif %}
+            {% if entry.employees %}
+            <dt class="col-sm-3">Employees</dt>
+            <dd class="col-sm-9">{{ entry.employees }}</dd>
+            {% endif %}
         </dd>
 </div>
