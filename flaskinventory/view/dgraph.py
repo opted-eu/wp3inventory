@@ -247,7 +247,7 @@ def get_orphan(query):
 
 
 def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize=False):
-    query_head = f'{{ q(func: type("{typename}")) '
+    query_head = f'{{ q(func: type("{typename}"), orderasc: name) '
     if filt:
         query_head += dgraph.build_filt_string(filt)
 
