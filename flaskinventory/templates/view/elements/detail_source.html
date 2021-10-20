@@ -45,12 +45,13 @@
                 {{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'facebook' %}
                 <a class="" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
-                https://facebook.com/{{ entry.channel_url }}
+                    https://facebook.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'vkontakte' %}
                 <a class="" target="_blank" href="https://vk.com/{{ entry.channel_url }}">
+                    https://vk.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'telegram' %}
                     <a class="" target="_blank" href="https://t.me/{{ entry.name }}">
-                https://t.me/{{ entry.name }}
+                    https://t.me/{{ entry.name }}
                 {% endif %}
                 <i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a>
                 </dd>
