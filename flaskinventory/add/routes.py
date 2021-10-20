@@ -23,10 +23,11 @@ add = Blueprint('add', __name__)
 def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
+        query = form.name.data
         query_string = f'''{{
-                field1 as var(func: regexp(name, /{form.name.data.ljust(3)}/i)) @filter(type("{form.entity.data}"))
-                field2 as var(func: anyofterms(name, "{form.name.data}")) @filter(type("{form.entity.data}"))
-                field3 as var(func: anyofterms(other_names, "{form.name.data}")) @filter(type("{form.entity.data}"))
+                field1 as var(func: regexp(name, /{query.replace('/', '').ljust(3)}/i)) @filter(type("{form.entity.data}"))
+                field2 as var(func: anyofterms(name, "{query}")) @filter(type("{form.entity.data}"))
+                field3 as var(func: anyofterms(other_names, "{query}")) @filter(type("{form.entity.data}"))
     
                 data(func: uid(field1, field2, field3)) {{
                     uid
