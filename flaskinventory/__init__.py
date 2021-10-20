@@ -15,8 +15,10 @@ from flaskinventory.flaskdgraph import DGraph
 
 dgraph = DGraph()
 
+
 class AnonymousUser(AnonymousUserMixin):
     user_role = 0
+
 
 login_manager = LoginManager()
 login_manager.login_view = 'users.login'
@@ -28,18 +30,19 @@ mail = Mail()
 
 limiter = Limiter(key_func=get_remote_address)
 
+
 def create_app(config_class=Config, config_json=None):
     app = Flask(__name__)
     app.logger.setLevel(logging.DEBUG)
     app.logger.addHandler(create_filehandler())
-
 
     if config_json:
         app.config.from_file(config_json, json.load)
     else:
         app.config.from_object(config_class)
 
-    
+    app.config['APP_VERSION'] = "0.8"
+
     from flaskinventory.users.routes import users
     from flaskinventory.view.routes import view
     from flaskinventory.add.routes import add
@@ -61,7 +64,5 @@ def create_app(config_class=Config, config_json=None):
     csrf = CSRFProtect(app)
 
     limiter.init_app(app)
-    
-
 
     return app
