@@ -277,10 +277,14 @@ def query():
         cols = list(set(cols))
 
         # CACHE THIS
-        c_choices = get_country_choices()
+        c_choices = get_country_choices(multinational=True)
         c_choices.insert(0, ('all', 'All'))
         form = SimpleQuery()
         form.country.choices = c_choices
+        if request.args.get('country'):
+            form.country.data = request.args.get('country')
+        if request.args.get('entity'):
+            form.entity.data = request.args.get('entity')
         return render_template('query_result.html', title='Query Result', result=data, cols=cols, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
     return redirect(url_for('main.home'))
 

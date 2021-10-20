@@ -258,16 +258,16 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
     else:
         normalize = True
         if typename == 'Source':
-            query_fields = ''' uid unique_name name founded
+            query_fields = ''' uid unique_name name founded other_names
                                 channel { name }
                                 '''
         if typename == 'Organization':
-            query_fields = ''' uid unique_name name founded
+            query_fields = ''' uid unique_name name founded other_names
                                 publishes: count(publishes)
                                 owns: count(owns)
                                 '''
         if typename in ['Archive', 'Dataset']:
-            query_fields = ''' uid unique_name name access
+            query_fields = ''' uid unique_name name access other_names
                                 sources_included: count(sources_included)
                                 '''
         if typename == 'ResearchPaper':
@@ -277,7 +277,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
                                 '''
         if typename == 'Subunit':
             normalize = False
-            query_fields = ''' uid name unique_name '''
+            query_fields = ''' uid name unique_name other_names '''
 
     query_relation = ''
     if relation_filt:

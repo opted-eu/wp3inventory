@@ -19,7 +19,7 @@ review = Blueprint('review', __name__)
 @requires_access_level(USER_ROLES.Reviewer)
 def overview():
 
-    c_choices = get_country_choices()
+    c_choices = get_country_choices(multinational=True)
     c_choices.insert(0, ('all', 'All'))
     form = ReviewFilter()
     form.country.choices = c_choices
