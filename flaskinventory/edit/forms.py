@@ -102,8 +102,8 @@ payment_model_choices = [('free', 'Free, all content is free of charge'),
 
 payment_model = SelectField('Payment model', choices=payment_model_choices)
 
-publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show'), (
-    'radio show', 'Radio Show'), ('podcast', 'Podcast'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
+publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
+    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
 
 publication_kind = SelectMultipleField(
     'Publication Kind', choices=publication_kind_choices)
