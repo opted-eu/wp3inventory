@@ -54,3 +54,15 @@ publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Ag
 
 
 publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
+
+
+topical_focus_choices = [("politics", "Politics"),
+                         ("society", "Society & Panorama"),
+                         ("economy", "Economy, Finance & Stocks"),
+                         ("religion", "Religion"),
+                         ("science", "Science & Technology"),
+                         ("media", "Media"),
+                         ("environment", "Environment"),
+                         ("education", "Education")]
+
+topical_focus_dict = {key: val for (key, val) in topical_focus_choices}

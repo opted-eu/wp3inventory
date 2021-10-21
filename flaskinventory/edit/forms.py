@@ -8,6 +8,7 @@ from flask_login import current_user
 from wtforms.widgets.core import Input
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes_list_tuples
+from flaskinventory.misc.forms import publication_kind_choices, topical_focus_choices
 import datetime
 
 
@@ -102,22 +103,10 @@ payment_model_choices = [('free', 'Free, all content is free of charge'),
 
 payment_model = SelectField('Payment model', choices=payment_model_choices)
 
-publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
-    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news site', 'News Site'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
-
 publication_kind = SelectMultipleField(
     'Publication Kind', choices=publication_kind_choices)
 
 special_interest = BooleanField('Special Interest Publication')
-
-topical_focus_choices = [("politics", "Politics"),
-                         ("society", "Society & Panorama"),
-                         ("economy", "Economy, Finance & Stocks"),
-                         ("religion", "Religion"),
-                         ("science", "Science & Technology"),
-                         ("media", "Media"),
-                         ("environment", "Environment"),
-                         ("education", "Education")]
 
 topical_focus = SelectMultipleField(
     'Topical Focus', choices=topical_focus_choices)
