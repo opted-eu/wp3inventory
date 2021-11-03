@@ -6,6 +6,7 @@ from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type, get_multinational
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
+from flaskinventory.misc.forms import publication_kind_dict, topical_focus_dict
 
 view = Blueprint('view', __name__)
 
@@ -107,9 +108,18 @@ def view_source(unique_name=None, uid=None):
         if unique_item.get('audience_size'):
             unique_item['audience_size_table'] = make_mini_table(
                 unique_item['audience_size'])
-        if unique_item.get('audience_residency'):
-            unique_item['audience_residency_table'] = make_mini_table(
-                unique_item['audience_residency'])
+        
+        # pretty print some fields
+        if unique_item.get('publication_kind'):
+            for i, item in enumerate(unique_item.get('publication_kind')):
+                if item in publication_kind_dict.keys():
+                    unique_item['publication_kind'][i] = publication_kind_dict[item]
+        if unique_item.get('topical_focus'):
+            for i, item in enumerate(unique_item.get('topical_focus')):
+                if item in topical_focus_dict.keys():
+                    unique_item['topical_focus'][i] = topical_focus_dict[item]
+
+
         related = unique_item.get('related', None)
  
         return render_template('view/source.html',

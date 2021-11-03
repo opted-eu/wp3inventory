@@ -47,3 +47,22 @@ def get_subunit_choices():
     su_choices = [(subunit.get('uid'), subunit.get('name'))
                   for subunit in subunits['q']]
     return su_choices
+
+
+publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
+    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news site', 'News Site'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
+
+
+publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
+
+
+topical_focus_choices = [("politics", "Politics"),
+                         ("society", "Society & Panorama"),
+                         ("economy", "Economy, Finance & Stocks"),
+                         ("religion", "Religion"),
+                         ("science", "Science & Technology"),
+                         ("media", "Media"),
+                         ("environment", "Environment"),
+                         ("education", "Education")]
+
+topical_focus_dict = {key: val for (key, val) in topical_focus_choices}
