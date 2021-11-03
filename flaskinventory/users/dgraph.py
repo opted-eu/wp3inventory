@@ -115,7 +115,7 @@ def check_user_by_email(email):
 
 
 def user_login(email, pw):
-    query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, {pw}) }} }}'
+    query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, "{pw}") }} }}'
     result = dgraph.query(query_string)
     if len(result['login_attempt']) == 0:
         return False
@@ -125,7 +125,6 @@ def user_login(email, pw):
 def create_user(user_data, invited_by=None):
     if type(user_data) is not dict:
         raise TypeError()
-
 
     user_data['uid'] = '_:newuser'
     user_data['dgraph.type'] = 'User'
