@@ -1,14 +1,13 @@
 # /etc/systemd/system/flaskinventory.service
 [Unit]
-Description=Flask WP3 Inventory (Gunicorn)
+Description=Flask WP3 Inventory
 After=network.target
 
 [Service]
 Type=simple
 User=ava
-Group=www-data
 WorkingDirectory=/home/ava/wp3inventory
-ExecStart=/home/ava/environments/wp3/bin/gunicorn --workers 8 --bind unix:flaskinventory.sock -m 007 flaskinventory:create_app()
+ExecStart=/home/ava/environments/wp3/bin/waitress-serve --listen=*:5000 --call 'flaskinventory:create_app'
 Restart=always
 Environment="flaskinventory_SECRETKEY=123456789"
 Environment="EMAIL_USER="

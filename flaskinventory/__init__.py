@@ -33,13 +33,16 @@ limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_class=Config, config_json=None):
     app = Flask(__name__)
-    app.logger.setLevel(logging.DEBUG)
+
     app.logger.addHandler(create_filehandler())
 
     if config_json:
         app.config.from_file(config_json, json.load)
     else:
         app.config.from_object(config_class)
+    
+    if app.debug:
+        app.logger.setLevel(logging.DEBUG)
 
     app.config['APP_VERSION'] = "0.8"
 
