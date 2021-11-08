@@ -265,7 +265,7 @@ def instagram(username):
     try:
         verified = profile.is_verified
     except:
-        verified = None
+        verified = False
 
     return {'followers': followers, 'fullname': fullname, 'verified': verified}
 
@@ -421,7 +421,7 @@ def vkontakte(screen_name):
     if 'id' not in res.keys():
         return False
 
-    return {'followers': res.get('members_count'), 'fullname': res.get('name'), 'verified': res.get('verified'), 'description': res.get('description')}
+    return {'followers': res.get('members_count'), 'fullname': res.get('name'), 'verified': res.get('verified', False), 'description': res.get('description')}
 
 
 def telegram(username):
@@ -442,7 +442,7 @@ def telegram(username):
     telegram_id = profile.get('id')
     fullname = profile.get('first_name')
     joined = profile.get('date')
-    verified = profile.get('verified')
+    verified = profile.get('verified', False)
     followers = None
 
     if profile['_'] == 'Channel':

@@ -1063,8 +1063,7 @@ class SourceSanitizer:
                     profile['followers'])}
                 self.newsource['audience_size'] = Scalar(
                     str(datetime.date.today()), facets=facets)
-            if profile.get('verified'):
-                self.newsource['verified_account'] = profile['verified']
+            self.newsource['verified_account'] = profile['verified']
 
         else:
             raise InventoryValidationError(
@@ -1092,8 +1091,7 @@ class SourceSanitizer:
                     str(datetime.date.today()), facets=facets)
             if profile.get('joined'):
                 self.newsource['founded'] = profile.get('joined').isoformat()
-            if profile.get('verified'):
-                self.newsource['verified_account'] = profile.get('verified')
+            self.newsource['verified_account'] = profile.get('verified')
 
         else:
             raise InventoryValidationError(
@@ -1119,8 +1117,7 @@ class SourceSanitizer:
                     profile['followers'])}
                 self.newsource['audience_size'] = Scalar(
                     str(datetime.date.today()), facets=facets)
-            if profile.get('verified'):
-                self.newsource['verified_account'] = profile.get('verified')
+            self.newsource['verified_account'] = profile.get('verified')
             if profile.get('description'):
                 self.newsource['description'] = profile.get('description')
 
@@ -1148,8 +1145,7 @@ class SourceSanitizer:
                     profile['followers'])}
                 self.newsource['audience_size'] = Scalar(
                     str(datetime.date.today()), facets=facets)
-            if profile.get('verified'):
-                self.newsource['verified_account'] = profile.get('verified')
+            self.newsource['verified_account'] = profile.get('verified')
             if profile.get('telegram_id'):
                 self.newsource['channel_url'] = profile.get('telegram_id')
             if profile.get('joined'):
