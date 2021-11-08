@@ -110,16 +110,23 @@ sudo service flaskinventory start
 server {
         listen 80;
         server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
+        return 301 https://wp3.opted.eu$request_uri;
+        }
+
+server {
+        listen 443 ssl;
+        ssl_certificate /etc/ssl/certificate.cer;
+        ssl_certificate_key /etc/ssl/private/key.key;
+        server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
 
         location / {
                 include proxy_params;
                 proxy_pass http://unix:/home/ava/wp3inventory/flaskinventory.sock;
         }
-        
+
         location ^~ /static/ {
                 include /etc/nginx/mime.types;
                 root /home/ava/wp3inventory/flaskinventory;
         }
-
 }
 ```
