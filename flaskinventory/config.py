@@ -7,12 +7,13 @@ from flask import has_request_context, request
 
 class Config:
     SECRET_KEY = os.environ.get('flaskinventory_SECRETKEY', secrets.token_hex(32))
-    MAIL_SERVER = 'mail.univie.ac.at'
-    MAIL_PORT = 465
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
+    MAIL_SERVER = os.environ.get('EMAIL_SERVER', 'localhost')
+    MAIL_PORT = os.environ.get('EMAIL_PORT', 25)
+    MAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', False)
+    MAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', False)
     MAIL_USERNAME = os.environ.get('EMAIL_USER', None)
     MAIL_PASSWORD = os.environ.get('EMAIL_PW', None)
+    MAIL_DEFAULT_SENDER = os.environ.get('EMAIL_DEFAULT_SENDER', None)
     TWITTER_CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY', None)
     TWITTER_CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET', None)
     TWITTER_ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN', None)
