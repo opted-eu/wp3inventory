@@ -2,7 +2,7 @@
 
 apt update
 apt upgrade
-apt install curl git ufw nano htop python3-venv python3-pip libxml2-dev libxslt-dev python-dev -y
+apt install curl git ufw nano htop python3-venv python3-pip libxml2-dev libxslt-dev python-dev nginx python3-dev build-essential libssl-dev libffi-dev python3-setuptools -y
 python3 -m pip install wheel waitress requests
 
 # change ssh port
@@ -64,6 +64,7 @@ docker run -it -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 -p 8000:8000 
 # add new user
 
 adduser ava
+sudo usermod -a -G www-data ava
 
 # login as new user
 
@@ -91,8 +92,34 @@ python tools/sample_data.py
 # Run flask with waitress to test installation
 waitress-serve --call --listen "*:5000" 'flaskinventory:create_app'
 
+## this command only uses ip4
+waitress-serve --call --listen "0.0.0.0:5000" 'flaskinventory:create_app'
+
+
 # run flask as systemd service
 # requires root access
 sudo nano /etc/systemd/system/flaskinventory.service
 sudo systemctl enable flaskinventory
 sudo service flaskinventory start
+
+# nginx config:
+
+/etc/nginx/sites-available/flaskinventory
+
+```
+server {
+        listen 80;
+        server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
+
+        location / {
+                include proxy_params;
+                proxy_pass http://unix:/home/ava/wp3inventory/flaskinventory.sock;
+        }
+        
+        location ^~ /static/ {
+                include /etc/nginx/mime.types;
+                root /home/ava/wp3inventory/flaskinventory;
+        }
+
+}
+```
