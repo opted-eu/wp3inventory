@@ -38,6 +38,13 @@ class User(UserMixin):
                 setattr(self, k, v)
             return True
         else: return False
+    
+    def change_password(self, form_data):
+        user_data = {'pw': form_data.data.get('new_password')}
+        result = dgraph.update_entry(user_data, uid=self.id)
+        if result:
+            return True
+        else: return False
 
     def __repr__(self):
         return f'<DGraph User.uid {self.id}>'
@@ -116,6 +123,15 @@ def check_user_by_email(email):
 
 def user_login(email, pw):
     query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, "{pw}") }} }}'
+    result = dgraph.query(query_string)
+    if len(result['login_attempt']) == 0:
+        return False
+    else:
+        return result['login_attempt'][0]['checkpwd(pw)']
+
+
+def user_verify(uid, pw):
+    query_string = f'{{login_attempt(func: uid({uid})) {{ checkpwd(pw, "{pw}") }} }}'
     result = dgraph.query(query_string)
     if len(result['login_attempt']) == 0:
         return False

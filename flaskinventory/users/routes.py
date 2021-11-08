@@ -4,7 +4,7 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, Markup)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm,
+from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm, UpdatePasswordForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
 from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table, make_sources_table
@@ -55,14 +55,14 @@ def logout():
     return redirect(url_for('main.home'))
 
 
-@users.route('/profile')
+@users.route('/users/profile')
 @login_required
 def profile():
     user_role = USER_ROLES.dict_reverse[current_user.user_role]
     return render_template('users/profile.html', title='Profile', show_sidebar=True, user_role=user_role)
 
 
-@users.route('/profile/update', methods=['GET', 'POST'])
+@users.route('/users/profile/update', methods=['GET', 'POST'])
 @login_required
 def update_profile():
     form = UpdateProfileForm()
@@ -80,7 +80,19 @@ def update_profile():
     return render_template('users/update_profile.html', title='Update Profile', form=form)
 
 
-@users.route("/reset_password", methods=['GET', 'POST'])
+@users.route('/users/password/change', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = UpdatePasswordForm()
+    if form.validate_on_submit():
+        current_user.change_password(form)
+        flash(f'Your password has been changed', 'success')
+        return redirect(url_for('users.profile'))
+
+    return render_template('users/change_password.html', title='Change Password', form=form)
+
+
+@users.route("/users/password/reset", methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -93,7 +105,7 @@ def reset_request():
     return render_template('users/reset_request.html', title='Reset Password', form=form)
 
 
-@users.route("/reset_password/<token>", methods=['GET', 'POST'])
+@users.route("/users/password/reset/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -131,7 +143,7 @@ def delete():
     flash(f'Your account has been deleted!', 'info')
     return redirect(url_for('main.home'))
 
-@users.route("/accept_invitation/<token>", methods=['GET', 'POST'])
+@users.route("/users/invitation/<token>", methods=['GET', 'POST'])
 def accept_invitation(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))

@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from flask_login import current_user
 from flaskinventory import dgraph
 from flaskinventory.users.constants import USER_ROLES
+from flaskinventory.users.dgraph import user_verify
 
 
 class RegistrationForm(FlaskForm):
@@ -55,6 +56,25 @@ class UpdateProfileForm(FlaskForm):
                              validators=[Length(max=20)])
 
     submit = SubmitField('Update')
+
+
+
+class UpdatePasswordForm(FlaskForm):
+    
+    old_password = PasswordField('Old Password',
+                             validators=[DataRequired(), Length(min=6)])
+
+    new_password = PasswordField('New Password',
+                                     validators=[DataRequired(), Length(min=6)])
+
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), Length(min=6), EqualTo('new_password')])
+
+    submit = SubmitField('Change Password')
+
+    def validate_old_password(self, old_password):
+        if not user_verify(current_user.uid, old_password.data):
+            raise ValidationError('Old password is incorrect!')
 
 
 class RequestResetForm(FlaskForm):

@@ -20,15 +20,16 @@
         <dt class="col-sm-3 mb-4">ORCID</dt>
         <dd class="col-sm-9"><a href="https://orcid.org/{{ current_user.user_orcid }}" target="_blank">{{ current_user.user_orcid }}</a></dd>
     </dl>
-    <a class="btn btn-outline-info" href="{{ url_for('users.update_profile') }}">Update Profile</a>
-    <button class="btn btn-sm btn-outline-danger mx-4" data-bs-toggle="modal" data-bs-target="#deleteAccount">Delete Account</button>
+    <a class="btn btn-outline-info mx-2" href="{{ url_for('users.update_profile') }}">Update Profile</a>
+    <a class="btn btn-sm btn-outline-warning mx-2" href="{{ url_for('users.change_password') }}">Change Password</a>
+    <button class="btn btn-sm btn-outline-danger mx-2" data-bs-toggle="modal" data-bs-target="#deleteAccount">Delete Account</button>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteAccountLabel">Are you sure?</h5>
+                <h5 class="modal-title" id="deleteAccountLabel">Are you sure? This cannot be undone!</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
