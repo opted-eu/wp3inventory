@@ -26,10 +26,23 @@ def register():
         new_uid = create_user(new_user)
 
         flash(
-            f'Accounted created for {form.email.data} ({new_uid})!', 'success')
+            f'Accounted created for {form.email.data} ({new_uid})! Please check your inbox and verify your email address!', 'success')
         return redirect(url_for('users.login'))
     return render_template('users/register.html', title='Register', form=form)
 
+
+@users.route('/register/verify/<token>')
+def verify_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+
+    user = User.verify_email_token(token)
+    if user is None:
+        flash('That is an invalid or expired token! Please contact us if you experiencing issues.', 'warning')
+        return redirect(url_for('main.home'))
+
+    flash('Email verified! You can now try to log in', 'success')
+    return redirect(url_for('users.login'))
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
@@ -44,7 +57,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('users.profile'))
         else:
-            flash(Markup(f'Login unsuccessful. Please check username and password. Do you need an account? <a href="{url_for("users.register")}" class="alert-link">You can register here</a>'), 'danger')
+            flash(Markup(f'Login unsuccessful. Please check username and password. Have you verified your email address? Do you need an account? <a href="{url_for("users.register")}" class="alert-link">You can register here</a>'), 'danger')
     return render_template('users/login.html', title='Login', form=form)
 
 

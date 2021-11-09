@@ -22,12 +22,23 @@ def send_reset_email(user):
     mail.send(msg)
 
 
+def send_verification_email(user):
+    if not current_app.debug:
+        token = user.get_invite_token()
+        msg = Message('OPTED WP3 Inventory: Please verify your email address',
+                    sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
+
+        msg.html = render_template('emails/verify.html', token=token)
+
+        mail.send(msg)
+
 def send_invite_email(user):
     token = user.get_invite_token()
-    msg = Message('OPTED: Invitation to join WP3 Inventory',
+    subject = 'OPTED: Invitation to join WP3 Inventory'
+    msg = Message(subject=subject,
                   sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
 
-    msg.html = render_template('emails/invitation.html', token=token)
+    msg.html = render_template('emails/invitation.html', subject=subject, token=token)
 
     mail.send(msg)
 

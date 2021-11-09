@@ -76,6 +76,20 @@ class User(UserMixin):
             dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
             return user
 
+    @staticmethod
+    def verify_email_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        user = User(uid=user_id)
+        if user:
+            dgraph.update_entry({'account_status': 'active'}, uid=user_id)
+            return user
+        else:
+            return None
+
 from flaskinventory import login_manager
 @login_manager.user_loader
 def load_user(user_id):
@@ -122,6 +136,14 @@ def check_user_by_email(email):
 
 
 def user_login(email, pw):
+    if not current_app.debug:
+        query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ account_status }} }}'
+        userstatus = dgraph.query(query_string)
+        if len(userstatus['login_attempt']) == 0:
+            return False
+        if userstatus['login_attempt'][0]['account_status'] != 'active':
+            return False
+
     query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, "{pw}") }} }}'
     result = dgraph.query(query_string)
     if len(result['login_attempt']) == 0:
@@ -148,7 +170,10 @@ def create_user(user_data, invited_by=None):
     user_data['user_displayname'] = secrets.token_urlsafe(6)
     user_data['date_joined'] = datetime.datetime.now(
         datetime.timezone.utc).isoformat()
-    user_data['account_status'] = 'active'
+    if not current_app.debug:
+        user_data['account_status'] = 'pending'
+    else:
+        user_data['account_status'] = 'active'
 
     if invited_by:
         user_data['invited_by'] = {'uid': invited_by,
