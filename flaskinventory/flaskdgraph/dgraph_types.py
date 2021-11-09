@@ -7,6 +7,7 @@
 
 
 import datetime
+import json
 from slugify import slugify
 
 
@@ -81,6 +82,7 @@ class Scalar:
             value = str(value).lower()
 
         self.value = str(value).strip()
+        self.value = json.dumps(self.value)
         if facets:
             self.facets = facets
 
@@ -94,7 +96,7 @@ class Scalar:
         if self.value == '*':
             return '*'
         else:
-            return f'''"{self.value}"'''
+            return f'''{self.value}'''
 
 
 class Geolocation:
