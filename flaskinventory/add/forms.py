@@ -15,7 +15,8 @@ class NewEntry(FlaskForm):
                          choices=[
                              ('Source', 'News Source'),
                              ('Organization', 'Media Organization'),
-                              ('Archive', 'Data Archive'),
+                             ('Archive', 'Data Archive'),
+                             ('Dataset', 'Dataset'),
                              #  ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
@@ -73,10 +74,10 @@ class NewArchive(FlaskForm):
         render_kw={'placeholder': 'Separate by comma'})
 
     access = RadioField('Is the archive freely accessible or has some sort of restriction?', choices=[
-                           ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
+        ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
 
     url = StringField('Please specify the URL to the full text archive', validators=[DataRequired()],
-                        render_kw={'placeholder': 'e.g. "http://www.archive.org"'})
+                      render_kw={'placeholder': 'e.g. "http://www.archive.org"'})
 
     sources_included = TomSelectMutlitpleField(
         'Which news sources are included in the full text archive?', choices=[],
@@ -95,17 +96,50 @@ class NewArchive(FlaskForm):
         return getattr(self, field)
 
 
-
 class NewCountry(FlaskForm):
     uid = StringField('uid', render_kw={'readonly': True})
     name = StringField('Name', validators=[DataRequired()])
     other_names = StringField('Other Names',
-        render_kw={'placeholder': 'Separate by comma'})
+                              render_kw={'placeholder': 'Separate by comma'})
 
     country_code = StringField('Country Code', validators=[DataRequired()],
-                        render_kw={'placeholder': 'e.g. at, de, tw'})
+                               render_kw={'placeholder': 'e.g. at, de, tw'})
 
     submit = SubmitField('Add New Country')
+
+    def get_field(self, field):
+        return getattr(self, field)
+
+
+class NewDataset(FlaskForm):
+    uid = StringField('uid', render_kw={'readonly': True})
+    name = StringField(
+        'What is the name of the dataset?', validators=[DataRequired()],
+        render_kw={'placeholder': 'e.g. "Media Study 2012"'})
+    other_names = StringField(
+        'Does the dataset have any other names or common abbreviations?',
+        render_kw={'placeholder': 'Separate by comma'})
+
+    access = RadioField('Is the dataset freely accessible or has some sort of restriction?', choices=[
+        ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
+
+    fulltext = RadioField('Does the dataset contain fulltext data?', choices=[('no', 'No'), ('yes', 'Yes')])
+
+    url = StringField('Please specify the URL to the dataset', validators=[DataRequired()],
+                      render_kw={'placeholder': 'e.g. "http://www.study.org/dataset"'})
+
+    sources_included = TomSelectMutlitpleField(
+        'Which news sources are included in the dataset?', choices=[],
+        render_kw={'placeholder': 'Type to search existing entries and add multiple...'})
+
+    description = TextAreaField(
+        'Can you briefly describe the dataset?',
+        render_kw={'placeholder': 'You can also paste their official self-description'})
+
+    entry_notes = TextAreaField(
+        'Do you have any other notes on the entry that you just coded?')
+
+    submit = SubmitField('Add New Dataset')
 
     def get_field(self, field):
         return getattr(self, field)

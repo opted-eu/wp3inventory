@@ -105,7 +105,7 @@ class SourceSanitizer:
         del_obj.append({
             'uid': self.newsource['uid'],
             'publication_kind': '*'})
-        
+
         del_obj.append({
             'uid': self.newsource['uid'],
             'languages': '*'})
@@ -495,7 +495,6 @@ class SourceSanitizer:
             if urls == False:
                 raise InventoryValidationError(
                     f"Could not resolve website! URL provided does not exist: {self.json.get('name')}")
-                
 
             self.newsource['name'] = self.json.get('name').replace(
                 'http://', '').replace('https://', '').lower()
@@ -647,7 +646,8 @@ class SourceSanitizer:
                     if self.json.get('geographic_scope_single'):
                         countries = []
                         if type(self.json.get('geographic_scope_single')) == str:
-                            country = self.json.get('geographic_scope_single').split(',')
+                            country = self.json.get(
+                                'geographic_scope_single').split(',')
                         for item in country:
                             try:
                                 if item.startswith('0x'):
@@ -660,7 +660,8 @@ class SourceSanitizer:
                     if self.json.get('geographic_scope_single'):
                         countries = []
                         if type(self.json.get('geographic_scope_single')) == str:
-                            country = self.json.get('geographic_scope_single').split(',')
+                            country = self.json.get(
+                                'geographic_scope_single').split(',')
                         for item in country:
                             try:
                                 if item.startswith('0x'):
@@ -726,7 +727,7 @@ class SourceSanitizer:
 
             self.newsource['audience_size'] = Scalar(
                 audience_size_year, facets=facets)
-    
+
     def parse_followers(self):
         if self.json.get('audience_size_followers'):
             facets = {'likes': int(
@@ -830,7 +831,7 @@ class SourceSanitizer:
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     org['unique_name'] = unique_name
-                    
+
                 self.orgs.append(org)
 
     def parse_person(self):
@@ -852,7 +853,7 @@ class SourceSanitizer:
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
                     pers['unique_name'] = unique_name
-               
+
                 self.orgs.append(pers)
 
     def parse_archives(self):
@@ -870,7 +871,8 @@ class SourceSanitizer:
                     arch['uid'] = NewID(item)
                     arch = self.add_entry_meta(arch)
                     arch['name'] = item
-                    arch['unique_name'] = slugify(item + '_archive', separator="_")
+                    arch['unique_name'] = slugify(
+                        item + '_archive', separator="_")
                     arch['dgraph.type'] = "Archive"
                 self.archives.append(arch)
 
@@ -890,7 +892,8 @@ class SourceSanitizer:
                     dset = self.add_entry_meta(dset)
                     dset['name'] = item
                     dset['dgraph.type'] = "Dataset"
-                    dset['unique_name'] = slugify(item + '_dataset', separator="_")
+                    dset['unique_name'] = slugify(
+                        item + '_dataset', separator="_")
                 self.archives.append(dset)
 
     def parse_entry_notes(self):
@@ -922,21 +925,29 @@ class SourceSanitizer:
                         rel_source['dgraph.type'] = 'Source'
                         rel_source['channel'] = UID(channel_uid)
                         if self.newsource.get('publication_kind'):
-                            rel_source['publication_kind'] = self.newsource.get('publication_kind')
+                            rel_source['publication_kind'] = self.newsource.get(
+                                'publication_kind')
                         if self.newsource.get('special_interest'):
-                            rel_source['special_interest'] = self.newsource.get('special_interest')
+                            rel_source['special_interest'] = self.newsource.get(
+                                'special_interest')
                         if self.newsource.get('topical_focus'):
-                            rel_source['topical_focus'] = self.newsource.get('topical_focus')
+                            rel_source['topical_focus'] = self.newsource.get(
+                                'topical_focus')
                         if self.newsource.get('special_interest'):
-                            rel_source['special_interest'] = self.newsource.get('special_interest')
+                            rel_source['special_interest'] = self.newsource.get(
+                                'special_interest')
                         if self.newsource.get('geographic_scope'):
-                            rel_source['geographic_scope'] = self.newsource.get('geographic_scope')
+                            rel_source['geographic_scope'] = self.newsource.get(
+                                'geographic_scope')
                         if self.newsource.get('country'):
-                            rel_source['country'] = self.newsource.get('country')
+                            rel_source['country'] = self.newsource.get(
+                                'country')
                         if self.newsource.get('geographic_scope_subunit'):
-                            rel_source['geographic_scope_subunit'] = self.newsource.get('geographic_scope_subunit')
+                            rel_source['geographic_scope_subunit'] = self.newsource.get(
+                                'geographic_scope_subunit')
                         if self.newsource.get('languages'):
-                            rel_source['languages'] = self.newsource.get('languages')
+                            rel_source['languages'] = self.newsource.get(
+                                'languages')
                         self.newsource['related'].append(
                             NewID(f'_:{slugify(item, separator="_")}_{channel_name}'))
                     else:
@@ -948,7 +959,6 @@ class SourceSanitizer:
                 related_uids.append(related.get('uid'))
             for related in self.related:
                 related['related'] += [item for item in related_uids if item != related['uid']]
-
 
     def resolve_geographic_name(self, query):
         geo_result = geocode(query)
@@ -1098,7 +1108,7 @@ class SourceSanitizer:
         else:
             raise InventoryValidationError(
                 'Invalid data! "name" not specified.')
-    
+
     def fetch_vk(self):
         if self.json.get('name'):
             self.newsource['channel_url'] = self.json.get(
@@ -1156,7 +1166,6 @@ class SourceSanitizer:
         else:
             raise InventoryValidationError(
                 'Invalid data! "name" not specified.')
-                
 
     def resolve_org(self, org):
 
@@ -1168,7 +1177,8 @@ class SourceSanitizer:
             except:
                 pass
             try:
-                address_lookup = reverse_geocode(geo_result.get('lat'), geo_result.get('lon'))
+                address_lookup = reverse_geocode(
+                    geo_result.get('lat'), geo_result.get('lon'))
                 org['address_string'] = address_lookup['display_name']
             except:
                 pass
@@ -1179,14 +1189,8 @@ class SourceSanitizer:
             for key, val in wikidata.items():
                 if key not in org.keys():
                     org[key] = val
-        
+
         return org
-
-
-
-
-
-
 
     def fetch_facebook(self):
         if self.json.get('name'):
@@ -1216,8 +1220,6 @@ class SourceSanitizer:
     # unique names of related & new sources are generated later (after reviewed)
 
 
-
-
 class Sanitizer:
     """ Base Class for validating data and generating mutation object
         also keeps track of user & ip address.
@@ -1235,7 +1237,6 @@ class Sanitizer:
         self.user = user
         self.user_ip = ip
         self.data = data
-
 
     def _parse(self):
         for item in dir(self):
@@ -1274,7 +1275,7 @@ class Sanitizer:
                 other_names = other_names.split(',')
 
             self.new['other_names'] += [item.strip()
-                                         for item in other_names if item.strip() != '']
+                                        for item in other_names if item.strip() != '']
 
     def parse_entry_notes(self):
         if self.data.get('entry_notes'):
@@ -1403,7 +1404,7 @@ class NewOrgSanitizer(Sanitizer):
             return f'{name}_{country}_{secrets.token_urlsafe(4)}'
 
     def _generate_unique_name(self):
-        
+
         if self.data.get('country'):
             self.new["unique_name"] = self._org_unique_name(
                 self.data['name'], country_uid=self.data['country'])
@@ -1421,7 +1422,8 @@ class NewOrgSanitizer(Sanitizer):
             except:
                 pass
             try:
-                address_lookup = reverse_geocode(geo_result.get('lat'), geo_result.get('lon'))
+                address_lookup = reverse_geocode(
+                    geo_result.get('lat'), geo_result.get('lon'))
                 self.new['address_string'] = address_lookup['display_name']
             except:
                 pass
@@ -1436,7 +1438,7 @@ class NewOrgSanitizer(Sanitizer):
                     if 'other_names' not in self.new.keys():
                         self.new['other_names'] = []
                     self.new[key] += val
-        
+
     def parse_is_person(self):
         if self.data.get('is_person'):
             if self.data.get('is_person') == 'y':
@@ -1449,7 +1451,7 @@ class NewOrgSanitizer(Sanitizer):
             self.new['ownership_kind'] = self.data.get('ownership_kind')
         else:
             self.new['ownership_kind'] = 'none'
-    
+
     def parse_country(self):
         self.new['country'] = UID(self.data.get('country'))
 
@@ -1482,9 +1484,6 @@ class NewOrgSanitizer(Sanitizer):
             for item in org_list:
                 if item.startswith('0x'):
                     self.new['publishes'].append(UID(item))
-            
-
-
 
 
 class NewArchiveSanitizer(Sanitizer):
@@ -1547,7 +1546,7 @@ class NewArchiveSanitizer(Sanitizer):
                     continue
                 if key not in self.new.keys():
                     self.new[key] = val
-        
+
     def parse_access(self):
         if self.data.get('access'):
             if self.data.get('access') == 'free':
@@ -1578,7 +1577,19 @@ class NewArchiveSanitizer(Sanitizer):
     def parse_description(self):
         if self.data.get('description'):
             self.new['description'] = self.data.get('description')
-    
+
+
+class NewDatasetSanitizer(NewArchiveSanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(data, user, ip)
+
+    def parse_fulltext(self):
+        if self.data.get('fulltext'):
+            if self.data.get('fulltext').lower() == 'yes':
+                self.new['fulltext'] = True
+            else:
+                self.new['fulltext'] = False
 
 
 class NewCountrySanitizer(Sanitizer):
@@ -1647,5 +1658,3 @@ class NewCountrySanitizer(Sanitizer):
             self.new['country_code'] = self.data.get('country_code')
         else:
             raise InventoryValidationError('Country Code is required!')
-
-    
