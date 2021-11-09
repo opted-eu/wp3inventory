@@ -58,6 +58,8 @@
         <a class="btn btn-outline-primary" href="{{ url_for('add.new_organization') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
         {% elif entity == 'Archive' %}
         <a class="btn btn-outline-primary" href="{{ url_for('add.new_archive') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+        {% elif entity == 'Dataset' %}
+        <a class="btn btn-outline-primary" href="{{ url_for('add.new_dataset') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
         {% endif %}
 </div>
 
