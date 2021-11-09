@@ -24,7 +24,8 @@ def register():
         new_user = {'email': form.email.data,
                     'pw': form.password.data}
         new_uid = create_user(new_user)
-        send_verification_email(new_uid)
+        user = User(uid=new_uid)
+        send_verification_email(user)
 
         flash(
             f'Accounted created for {form.email.data} ({new_uid})! Please check your inbox and verify your email address!', 'success')
