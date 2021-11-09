@@ -157,7 +157,7 @@
         <dd class="col-sm-9">
             {% for subunit in entry.geographic_scope_subunit %}
             <span class="">{{ subunit.name }}</span>
-                {{ ", " if not loop.last else "" }}
+                {{ "," if not loop.last else "" }}
             {% endfor %}
             </dd>
             
