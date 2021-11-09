@@ -869,7 +869,8 @@ class SourceSanitizer:
                 else:
                     arch['uid'] = NewID(item)
                     arch = self.add_entry_meta(arch)
-                    arch['name'] = item,
+                    arch['name'] = item
+                    arch['unique_name'] = slugify(item + '_archive', separator="_")
                     arch['dgraph.type'] = "Archive"
                 self.archives.append(arch)
 
@@ -889,6 +890,7 @@ class SourceSanitizer:
                     dset = self.add_entry_meta(dset)
                     dset['name'] = item
                     dset['dgraph.type'] = "Dataset"
+                    dset['unique_name'] = slugify(item + '_dataset', separator="_")
                 self.archives.append(dset)
 
     def parse_entry_notes(self):
