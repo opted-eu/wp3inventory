@@ -10,9 +10,11 @@ from flask_login import current_user
 
 def send_reset_email(user):
     token = user.get_reset_token()
-    msg = Message('Password Reset Request',
+    subject = 'Password Reset Request'
+    msg = Message(subject,
                   sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[user.email])
 
+    msg.html = render_template('emails/reset.html', token=token, subject=subject)
     msg.body = f'''To reset your password visit the following link:
         {url_for('users.reset_token', token=token, _external=True)}
 
@@ -25,10 +27,11 @@ def send_reset_email(user):
 def send_verification_email(user):
     if not current_app.debug:
         token = user.get_invite_token()
-        msg = Message('OPTED WP3 Inventory: Please verify your email address',
+        subject = 'OPTED WP3 Inventory: Please verify your email address'
+        msg = Message(subject,
                     sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
 
-        msg.html = render_template('emails/verify.html', token=token)
+        msg.html = render_template('emails/verify.html', token=token, subject=subject)
 
         mail.send(msg)
 
