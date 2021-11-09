@@ -282,7 +282,7 @@ def generate_twitter_api():
 def twitter(username):
     api = generate_twitter_api()
 
-    user = api.get_user(username)
+    user = api.get_user(screen_name=username)
 
     return {'followers': user.followers_count, 'fullname': user.screen_name, 'joined': user.created_at, 'verified': user.verified}
 
