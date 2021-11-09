@@ -52,7 +52,7 @@ class NewOrganization(FlaskForm):
         render_kw={'placeholder': 'Type to search existing news sources and add multiple...'})
 
     owns = TomSelectMutlitpleField(
-        'Which other media organisations owns this organisation (or person)?', choices=[],
+        'Which other media organisations are owned by this new organisation (or person)?', choices=[],
         render_kw={'placeholder': 'Type to search existing organisations and add multiple...'})
 
     entry_notes = TextAreaField(
