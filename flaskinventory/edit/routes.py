@@ -418,6 +418,8 @@ def archive(unique_name=None, uid=None):
         return abort(404)
 
     if check['dgraph.type'][0] != 'Archive':
+        if check['dgraph.type'][0] == 'Dataset':
+            return dataset(uid=uid)
         return abort(404)
 
     if not can_edit(check, current_user):
