@@ -224,11 +224,17 @@ def edit_user(uid):
 def my_entries():
     sources = list_entries(current_user.id)
     if sources:
-        # sources_table = make_sources_table(sources[0]['entries'])
         return render_template('users/entries.html', 
                                 title='My Entries', 
                                 show_sidebar=True, 
                                 drafts=sources[0].get('drafts'),
                                 pending=sources[0].get('pending'),
                                 accepted=sources[0].get('accepted'))
+    else:
+        return render_template('users/entries.html', 
+                                title='My Entries', 
+                                show_sidebar=True, 
+                                drafts=None,
+                                pending=None,
+                                accepted=None)
     
