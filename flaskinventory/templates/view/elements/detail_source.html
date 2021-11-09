@@ -156,8 +156,7 @@
         <dt class="col-sm-3">Subunit</dt>
         <dd class="col-sm-9">
             {% for subunit in entry.geographic_scope_subunit %}
-            <span class="">{{ subunit.name }}</span>
-                {{ "," if not loop.last else "" }}
+            <span class="badge bg-secondary">{{ subunit.name }}</span>
             {% endfor %}
             </dd>
             
