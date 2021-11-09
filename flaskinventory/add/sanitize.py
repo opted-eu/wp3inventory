@@ -1488,11 +1488,13 @@ class NewOrgSanitizer(Sanitizer):
 
 class NewArchiveSanitizer(Sanitizer):
 
+    dgraph_type = 'Archive'
+
     def __init__(self, data, user, ip):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": 'Archive'}
+                    "dgraph.type": self.dgraph_type}
         self.new = self._add_entry_meta(self.new, newentry=True)
 
         self._generate_unique_name()
@@ -1582,6 +1584,7 @@ class NewArchiveSanitizer(Sanitizer):
 class NewDatasetSanitizer(NewArchiveSanitizer):
 
     def __init__(self, data, user, ip):
+        self.dgraph_type = 'Dataset'
         super().__init__(data, user, ip)
 
     def parse_fulltext(self):
