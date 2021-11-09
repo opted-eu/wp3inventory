@@ -82,7 +82,8 @@ class Scalar:
             value = str(value).lower()
 
         self.value = str(value).strip()
-        self.value = json.dumps(self.value)
+        if self.value != '*':
+            self.value = json.dumps(self.value)
         if facets:
             self.facets = facets
 
