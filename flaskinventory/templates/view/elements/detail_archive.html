@@ -30,7 +30,7 @@
         <dd class="col-sm-9">{{ entry.access }}
         </dd>{% endif %} {% if entry.url %}
         <dt class="col-sm-3">Link</dt>
-        <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank"><i class="fas fa-external-link-alt mx-2" alt="External Link"></i>Open</a>{% else %}<span class="text-danger">Missing!</span>
+        <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank">Open<i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a>{% else %}<span class="text-danger">Missing!</span>
         </dd>{% endif %}
     </dl>
 </div>
