@@ -7,6 +7,7 @@ from flask import has_request_context, request
 
 class Config:
     SECRET_KEY = os.environ.get('flaskinventory_SECRETKEY', secrets.token_hex(32))
+    DEBUG_MODE = os.environ.get('DEBUG_MODE', False)
     MAIL_SERVER = os.environ.get('EMAIL_SERVER', 'localhost')
     MAIL_PORT = os.environ.get('EMAIL_PORT', 25)
     MAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', False)

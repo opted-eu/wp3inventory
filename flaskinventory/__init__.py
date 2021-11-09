@@ -40,6 +40,9 @@ def create_app(config_class=Config, config_json=None):
         app.config.from_file(config_json, json.load)
     else:
         app.config.from_object(config_class)
+
+    if app.config.get('DEBUG_MODE'):
+        app.debug = True
     
     if app.debug:
         app.logger.setLevel(logging.DEBUG)
