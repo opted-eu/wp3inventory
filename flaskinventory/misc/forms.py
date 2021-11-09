@@ -49,8 +49,8 @@ def get_subunit_choices():
     return su_choices
 
 
-publication_kind_choices = [('newspaper', 'Newspaper'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
-    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news site', 'News Site'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
+publication_kind_choices = [('newspaper', 'Newspaper / News Site'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
+    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
 
 
 publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
