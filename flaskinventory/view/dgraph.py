@@ -78,7 +78,7 @@ def get_archive(unique_name=None, uid=None):
     else:
         return None
 
-    query_fields = '''{ uid dgraph.type expand(_all_) num_sources: count(sources_included) } }'''
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid } num_sources: count(sources_included) } }'''
 
     query = query_func + query_fields
     data = dgraph.query(query)
