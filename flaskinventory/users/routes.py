@@ -7,7 +7,7 @@ from flaskinventory import dgraph
 from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm, UpdatePasswordForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
-from flaskinventory.users.utils import send_reset_email, send_invite_email, requires_access_level, make_users_table, make_sources_table
+from flaskinventory.users.utils import send_reset_email, send_invite_email, send_verification_email, requires_access_level, make_users_table, make_sources_table
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User, get_user_data, user_login, create_user, list_users, list_entries
 from secrets import token_hex
@@ -24,6 +24,7 @@ def register():
         new_user = {'email': form.email.data,
                     'pw': form.password.data}
         new_uid = create_user(new_user)
+        send_verification_email(new_uid)
 
         flash(
             f'Accounted created for {form.email.data} ({new_uid})! Please check your inbox and verify your email address!', 'success')
