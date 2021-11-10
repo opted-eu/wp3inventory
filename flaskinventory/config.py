@@ -67,6 +67,15 @@ class FlaskMailHandler(logging.Handler):
             toaddrs = [toaddrs]
         self.toaddrs = toaddrs
         self.subject = 'Application Error'
+        try:
+            msg = Message(self.subject,
+                        sender=self.fromaddr, recipients=self.toaddrs)
+
+            msg.body = "Email Logging Active!"
+
+            self.flskmail.send(msg)
+        except Exception as e:
+            pass
 
     def getSubject(self, record):
         """

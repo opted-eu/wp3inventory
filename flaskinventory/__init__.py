@@ -71,7 +71,6 @@ def create_app(config_class=Config, config_json=None):
         try:
             mail_handler = create_mailhandler(mail, app.config['LOGGING_MAIL_FROM'], app.config['LOGGING_MAIL_TO'])
             app.logger.addHandler(mail_handler)
-            app.logger.error('This is a test message! The Flask Server just started successfully.')
         except Exception as e:
             app.logger.error(f'Mail Logging not working: {e}')
 
