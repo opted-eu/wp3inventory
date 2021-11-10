@@ -58,13 +58,14 @@ def create_filehandler(name='main'):
 
 class FlaskMailHandler(logging.Handler):
   
-    def __init__(self, fromaddr, toaddrs):
+    def __init__(self, app):
         
         logging.Handler.__init__(self)
         
         self.mail = Mail()
-        self.mail.init_app(current_app)
-        self.fromaddr = fromaddr
+        self.mail.init_app(app)
+        self.fromaddr = app.config['LOGGING_MAIL_FROM']
+        toaddrs = app.config['LOGGING_MAIL_TO']
         if isinstance(toaddrs, str):
             toaddrs = [toaddrs]
         self.toaddrs = toaddrs
@@ -106,9 +107,9 @@ class FlaskMailHandler(logging.Handler):
 
 
 
-def create_mailhandler(fromaddr, toaddr):
+def create_mailhandler(app):
 
-    mail_handler = FlaskMailHandler(fromaddr, toaddr)
+    mail_handler = FlaskMailHandler(app)
 
     mail_handler.setLevel(logging.ERROR)
     formatter = RequestFormatter(
