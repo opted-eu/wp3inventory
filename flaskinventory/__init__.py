@@ -69,7 +69,7 @@ def create_app(config_class=Config, config_json=None):
     mail.init_app(app)
     if app.config.get('LOGGING_MAIL_ENABLED'):
         try:
-            mail_handler = create_mailhandler(app)
+            mail_handler = create_mailhandler(app, mail)
             app.logger.addHandler(mail_handler)
         except Exception as e:
             app.logger.error(f'Mail Logging not working: {e}')
