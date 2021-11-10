@@ -75,7 +75,7 @@ class FlaskMailHandler(logging.Handler):
 
             msg.body = "Email Logging Active!"
 
-            self.flskmail.send(msg)
+            self.mail.send(msg)
         except Exception as e:
             self.handleError(e)
 
