@@ -2,8 +2,8 @@ import os
 import secrets
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from flask import has_request_context, request
-from flask_mail import Message
+from flask import has_request_context, request, current_app
+from flask_mail import Mail, Message
 
 class Config:
     SECRET_KEY = os.environ.get('flaskinventory_SECRETKEY', secrets.token_hex(32))
@@ -58,10 +58,12 @@ def create_filehandler(name='main'):
 
 class FlaskMailHandler(logging.Handler):
   
-    def __init__(self, flskmail, fromaddr, toaddrs):
+    def __init__(self, fromaddr, toaddrs):
         
         logging.Handler.__init__(self)
-        self.flskmail = flskmail
+        
+        self.mail = Mail()
+        self.mail.init_app(current_app)
         self.fromaddr = fromaddr
         if isinstance(toaddrs, str):
             toaddrs = [toaddrs]
@@ -98,7 +100,7 @@ class FlaskMailHandler(logging.Handler):
 
             msg.body = self.format(record)
 
-            self.flskmail.send(msg)
+            self.mail.send(msg)
         except Exception:
             self.handleError(record)
 
