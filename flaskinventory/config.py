@@ -23,6 +23,10 @@ class Config:
     TELEGRAM_APP_ID = os.environ.get('TELEGRAM_APP_ID', None)
     TELEGRAM_APP_HASH = os.environ.get('TELEGRAM_APP_HASH', None)
     TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', None)
+    LOGGING_MAIL_ENABLED = os.environ.get('LOGGING_MAIL_ENABLED', False)
+    LOGGING_MAIL_FROM = os.environ.get('MAIL_ERROR_FROM')
+    LOGGING_MAIL_TO = os.environ.get('MAIL_ERROR_TO')
+
 
 """ Configure Logging """
 
@@ -50,3 +54,26 @@ def create_filehandler(name='main'):
                 )
     file_handler.setFormatter(formatter)
     return file_handler
+
+
+def create_mailhandler(mailhost, fromaddr, toaddr):
+
+    if type(toaddr) != list:
+        toaddr = [toaddr]
+
+    from logging.handlers import SMTPHandler
+
+    mail_handler = SMTPHandler(
+        mailhost=mailhost,
+        fromaddr=fromaddr,
+        toaddrs=toaddr,
+        subject='Application Error'
+    )
+    mail_handler.setLevel(logging.ERROR)
+    formatter = RequestFormatter(
+                '[%(asctime)s] %(remote_addr)s requested %(url)s: '
+                '%(levelname)s in %(module)s: %(message)s'
+                )
+    mail_handler.setFormatter(formatter)
+
+    return mail_handler

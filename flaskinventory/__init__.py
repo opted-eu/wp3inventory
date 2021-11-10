@@ -2,7 +2,7 @@ import logging
 import json
 
 from flask import Flask
-from .config import create_filehandler
+from .config import create_filehandler, create_mailhandler
 
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
@@ -46,6 +46,11 @@ def create_app(config_class=Config, config_json=None):
     
     if app.debug:
         app.logger.setLevel(logging.DEBUG)
+    
+    if app.config.get('LOGGING_MAIL_ENABLED'):
+        mail_handler = create_mailhandler(app.config['MAIL_SERVER'], app.config['LOGGING_MAIL_FROM'], app.config['LOGGING_MAIL_TO'])
+        app.logger.addHandler(mail_handler)
+        app.logger.error('This is a test message! The Flask Server just started successfully.')
 
     app.config['APP_VERSION'] = "0.8"
 
