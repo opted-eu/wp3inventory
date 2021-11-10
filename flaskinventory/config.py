@@ -78,7 +78,7 @@ class FlaskMailHandler(logging.Handler):
 
             self.flskmail.send(msg)
         except Exception as e:
-            pass
+            self.handleError(e)
 
     def getSubject(self, record):
         """
