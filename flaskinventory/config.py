@@ -106,9 +106,9 @@ class FlaskMailHandler(logging.Handler):
 
 
 
-def create_mailhandler(flskmail, fromaddr, toaddr):
+def create_mailhandler(fromaddr, toaddr):
 
-    mail_handler = FlaskMailHandler(flskmail, fromaddr, toaddr)
+    mail_handler = FlaskMailHandler(fromaddr, toaddr)
 
     mail_handler.setLevel(logging.ERROR)
     formatter = RequestFormatter(
