@@ -2,7 +2,7 @@ import logging
 import json
 
 from flask import Flask
-from .config import create_filehandler, create_mailhandler
+from .config import create_filehandler, create_mailhandler, create_slackhandler
 
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
@@ -46,6 +46,14 @@ def create_app(config_class=Config, config_json=None):
     
     if app.debug:
         app.logger.setLevel(logging.DEBUG)
+    
+    if app.config.get('SLACK_LOGGING_ENABLED'):
+        try:
+            slack_handler = create_slackhandler(app.config.get('SLACK_WEBHOOK'))
+            app.logger.addHandler(slack_handler)
+            app.logger.error('Initialized Slack Logging!')
+        except Exception as e:
+            app.logger.error(f'Slack Logging not working: {e}')
 
     app.config['APP_VERSION'] = "0.8"
 

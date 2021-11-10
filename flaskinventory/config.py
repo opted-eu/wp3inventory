@@ -118,3 +118,45 @@ def create_mailhandler(app, mail):
     mail_handler.setFormatter(formatter)
 
     return mail_handler
+
+
+class SlackHandler(logging.Handler):
+    """
+    A handler class which sends an Slack Message for each logging event.
+    """
+    def __init__(self, webhook):
+        """
+        Initialize the handler.
+        """
+        logging.Handler.__init__(self)
+        
+        self.webhook = webhook
+
+    def emit(self, record):
+        """
+        Emit a record.
+
+        Format the record and send it to the webhook.
+        """
+        try:
+            import requests
+
+            message = {'text': self.format(record)}
+
+            r = requests.post(self.webhook, json=message)
+
+        except Exception:
+            self.handleError(record)
+
+def create_slackhandler(webhook):
+
+    slck = SlackHandler(webhook)
+    slck.setLevel(logging.ERROR)
+
+    formatter = RequestFormatter(
+                '[%(asctime)s] %(remote_addr)s requested %(url)s: '
+                '%(levelname)s in %(module)s: %(message)s'
+                )
+    slck.setFormatter(formatter)
+
+    return slck
