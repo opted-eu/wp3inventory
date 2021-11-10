@@ -68,10 +68,13 @@ def create_app(config_class=Config, config_json=None):
     login_manager.init_app(app)
     mail.init_app(app)
     if app.config.get('LOGGING_MAIL_ENABLED'):
-        mail_handler = create_mailhandler(mail, app.config['LOGGING_MAIL_FROM'], app.config['LOGGING_MAIL_TO'])
-        app.logger.addHandler(mail_handler)
-        app.logger.error('This is a test message! The Flask Server just started successfully.')
-        
+        try:
+            mail_handler = create_mailhandler(mail, app.config['LOGGING_MAIL_FROM'], app.config['LOGGING_MAIL_TO'])
+            app.logger.addHandler(mail_handler)
+            app.logger.error('This is a test message! The Flask Server just started successfully.')
+        except Exception as e:
+            app.logger.error(f'Mail Logging not working: {e}')
+
     csrf = CSRFProtect(app)
 
     limiter.init_app(app)
