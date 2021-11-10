@@ -3,7 +3,7 @@ import secrets
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from flask import has_request_context, request
-
+from flask_mail import Message
 
 class Config:
     SECRET_KEY = os.environ.get('flaskinventory_SECRETKEY', secrets.token_hex(32))
@@ -56,19 +56,49 @@ def create_filehandler(name='main'):
     return file_handler
 
 
-def create_mailhandler(mailhost, fromaddr, toaddr):
+class FlaskMailHandler(logging.Handler):
+  
+    def __init__(self, flskmail, fromaddr, toaddrs):
+        
+        logging.Handler.__init__(self)
+        self.flskmail = flskmail
+        self.fromaddr = fromaddr
+        if isinstance(toaddrs, str):
+            toaddrs = [toaddrs]
+        self.toaddrs = toaddrs
+        self.subject = 'Application Error'
 
-    if type(toaddr) != list:
-        toaddr = [toaddr]
+    def getSubject(self, record):
+        """
+        Determine the subject for the email.
 
-    from logging.handlers import SMTPHandler
+        If you want to specify a subject line which is record-dependent,
+        override this method.
+        """
+        return self.subject
 
-    mail_handler = SMTPHandler(
-        mailhost=mailhost,
-        fromaddr=fromaddr,
-        toaddrs=toaddr,
-        subject='Application Error'
-    )
+    def emit(self, record):
+        """
+        Emit a record.
+
+        Format the record and send it to the specified addressees.
+        """
+        try:
+            msg = Message(self.subject,
+                        sender=self.fromaddr, recipients=self.toaddrs)
+
+            msg.body = self.format(record)
+
+            self.flskmail.send(msg)
+        except Exception:
+            self.handleError(record)
+
+
+
+def create_mailhandler(flskmail, fromaddr, toaddr):
+
+    mail_handler = FlaskMailHandler(flskmail, fromaddr, toaddr)
+
     mail_handler.setLevel(logging.ERROR)
     formatter = RequestFormatter(
                 '[%(asctime)s] %(remote_addr)s requested %(url)s: '
