@@ -186,8 +186,9 @@ def view_organization(unique_name=None, uid=None):
 
 
 @view.route("/view/country/<string:unique_name>")
-def view_country(unique_name):
-    unique_item = get_country(unique_name=unique_name)
+@view.route("/view/country/uid/<string:uid>")
+def view_country(unique_name, uid):
+    unique_item = get_country(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Country" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
