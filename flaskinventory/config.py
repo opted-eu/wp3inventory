@@ -26,6 +26,8 @@ class Config:
     LOGGING_MAIL_ENABLED = os.environ.get('LOGGING_MAIL_ENABLED', False)
     LOGGING_MAIL_FROM = os.environ.get('MAIL_ERROR_FROM')
     LOGGING_MAIL_TO = os.environ.get('MAIL_ERROR_TO')
+    SLACK_LOGGING_ENABLED = os.environ.get('SLACK_LOGGING_ENABLED', False)
+    SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
 
 
 """ Configure Logging """
