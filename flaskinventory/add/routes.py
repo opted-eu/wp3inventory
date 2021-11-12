@@ -431,6 +431,7 @@ def orglookup():
 @add.route('/_sourcelookup')
 def sourcelookup():
     query = request.args.get('q')
+    query = query.replace('/', '.')
     query_string = f'''{{
             field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
             field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
