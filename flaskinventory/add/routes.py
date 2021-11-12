@@ -445,6 +445,9 @@ def sourcelookup():
                 }}
             }}
     '''
-    result = dgraph.query(query_string)
-    result['status'] = True
-    return jsonify(result)
+    try:
+        result = dgraph.query(query_string)
+        result['status'] = True
+        return jsonify(result)
+    except Exception as e:
+        current_app.logger.warning(f'could not lookup source with query "{query}". {e}')
