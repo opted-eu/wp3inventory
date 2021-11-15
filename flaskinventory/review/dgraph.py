@@ -53,7 +53,9 @@ def accept_entry(uid):
 
 def reject_entry(uid):
     del_nquads = f'''<{uid}> <dgraph.type> * .
-                        <{uid}> <unique_name> * .'''
+                        <{uid}> <unique_name> * .
+                        <{uid}> <publishes> * .
+                        <{uid}> <owns> * .'''
     query = None
     dgraph.upsert(query, del_nquads=del_nquads)
 
