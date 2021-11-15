@@ -13,6 +13,7 @@ from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
 from flaskinventory.misc.forms import get_country_choices
+from flaskinventory.flaskdgraph.utils import escape_query
 import traceback
 
 add = Blueprint('add', __name__)
@@ -23,9 +24,9 @@ add = Blueprint('add', __name__)
 def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
-        query = form.name.data
+        query = escape_query(form.name.data)
         query_string = f'''{{
-                field1 as var(func: regexp(name, /{query.replace('/', '').ljust(3)}/i)) @filter(type("{form.entity.data}"))
+                field1 as var(func: regexp(name, /{query.ljust(3)}/i)) @filter(type("{form.entity.data}"))
                 field2 as var(func: allofterms(name, "{query}")) @filter(type("{form.entity.data}"))
                 field3 as var(func: allofterms(other_names, "{query}")) @filter(type("{form.entity.data}"))
     
