@@ -332,7 +332,7 @@ class EditSourceSanitizer(Sanitizer):
                     continue
                 if item.startswith('0x'):
                     self.edit['related'].append(UID(item))
-                    rel_source = {'related': [self.newsource['uid']]}
+                    rel_source = {'related': [self.edit['uid']]}
                     rel_source['uid'] = UID(item)
                     self.related.append(rel_source)
             related_uids = []
