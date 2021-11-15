@@ -258,6 +258,7 @@ class EditSourceSanitizer(Sanitizer):
         self.edit = {"uid": UID(data.get('uid'))}
         self.edit = self._add_entry_meta(self.edit)
         self.data = data
+        self.related = []
 
         self.overwrite = {self.edit['uid']: [
             'other_names', 'related', 'country',
@@ -271,6 +272,9 @@ class EditSourceSanitizer(Sanitizer):
         if len(self.newsubunits) > 0:
             for subunit in self.newsubunits:
                 nquads += dict_to_nquad(subunit)
+        if len(self.related) > 0:
+            for related in self.related:
+                nquads += dict_to_nquad(related)
 
         self.set_nquads = " \n ".join(nquads)
 
@@ -328,6 +332,14 @@ class EditSourceSanitizer(Sanitizer):
                     continue
                 if item.startswith('0x'):
                     self.edit['related'].append(UID(item))
+                    rel_source = {'related': [self.newsource['uid']]}
+                    rel_source['uid'] = UID(item)
+                    self.related.append(rel_source)
+            related_uids = []
+            for related in self.related:
+                related_uids.append(related.get('uid'))
+            for related in self.related:
+                related['related'] += [item for item in related_uids if item != related['uid']]
 
     def parse_contains_ads(self):
         if self.data.get('contains_ads'):
