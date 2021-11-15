@@ -22,7 +22,12 @@
         </dd>{% endif %} {% if entry.wikidataID %}
         <dt class="col-sm-3">Wikidata</dt>
         <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a></p>
-        </dd>{% endif %} {% if entry.founded %}
+        </dd>{% endif %} 
+        {% if entry.is_person %}
+        <dt class="col-sm-3">Is a person</dt>
+        <dd class="col-sm-9">{{ entry.is_person }}
+        </dd>{% endif %}
+        {% if entry.founded %}
         <dt class="col-sm-3">Founded</dt>
         <dd class="col-sm-9">{{ entry.founded.strftime('%Y') }}
         </dd>{% endif %}

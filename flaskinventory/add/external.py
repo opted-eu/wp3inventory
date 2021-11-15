@@ -88,13 +88,16 @@ def find_sitemaps(site):
     if r.status_code != 200:
         raise requests.RequestException(
             f'Could not reach {site}. Status: {r.status_code}')
-
-    rp = RobotFileParser()
-    rp.set_url(site + '/robots.txt')
-    rp.read()
-    if len(rp.sitemaps) > 0:
-        return rp.sitemaps
-    else:
+    try:
+        rp = RobotFileParser()
+        rp.set_url(site + '/robots.txt')
+        rp.read()
+        if len(rp.sitemaps) > 0:
+            return rp.sitemaps
+        else:
+            return []
+    except Exception as e:
+        current_app.logger.warning(f'Could not get sitemap from {site}: {e}')
         return []
 
 

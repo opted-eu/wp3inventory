@@ -431,6 +431,7 @@ def orglookup():
 @add.route('/_sourcelookup')
 def sourcelookup():
     query = request.args.get('q')
+    query = query.replace('/', '.')
     query_string = f'''{{
             field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
             field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
@@ -444,6 +445,10 @@ def sourcelookup():
                 }}
             }}
     '''
-    result = dgraph.query(query_string)
-    result['status'] = True
-    return jsonify(result)
+    try:
+        result = dgraph.query(query_string)
+        result['status'] = True
+        return jsonify(result)
+    except Exception as e:
+        current_app.logger.warning(f'could not lookup source with query "{query}". {e}')
+        return jsonify({'status': False, 'error': e})
