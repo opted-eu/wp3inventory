@@ -27,7 +27,7 @@ def get_source(unique_name=None, uid=None):
         return None
 
     query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname channel { name unique_name } }
-                        published_by: ~publishes @facets @filter(type("Organziation")) { name unique_name uid } 
+                        published_by: ~publishes @facets @filter(type("Organization")) { name unique_name uid } 
                         archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
                         datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid }
                         papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors } 
