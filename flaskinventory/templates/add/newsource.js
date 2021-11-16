@@ -1184,9 +1184,9 @@ function formResult(success, data) {
 }
 
 submitButton.addEventListener('click', function handleFormSubmit(event) {
-    var isValid = form.reportValidity();
+    // var isValid = form.reportValidity();
 
-    if (isValid) {
+    // if (isValid) {
         event.preventDefault();
         // POST form data to backend with fetch
         document.getElementById('new-source').hidden = true
@@ -1199,9 +1199,9 @@ submitButton.addEventListener('click', function handleFormSubmit(event) {
 
 
         // window.location.assign('{{ url_for("add.confirmation") }}')
-    };
+    // };
 
-    event.preventDefault();
+    // event.preventDefault();
 });
 
 const visited = [];
