@@ -13,16 +13,6 @@ document.querySelectorAll('select').forEach(function(item) {
     }
 })
 
-function compareName(a, b) {
-    console.log(a, b)
-    if (a.name < b.name) {
-        return -1;
-    }
-    if (a.name > b.name) {
-        return 1;
-    }
-    return 0;
-}
 
 function addFieldOptionsData(fieldOptions, key, selector, addother = false) {
     var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
@@ -138,7 +128,7 @@ function channelVisibility(fieldOptions, allNames, el) {
     })
 
     document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
-        elem.removeAttribute('required')
+        elem.required = false
     });
 
     document.querySelectorAll('input[name="payment_model"').forEach((elem) => {
@@ -186,7 +176,7 @@ function channelVisibility(fieldOptions, allNames, el) {
         document.getElementById('name-website-tooltip').hidden = false;
         document.querySelector("#group-channel-comments").hidden = false;
         document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
-            elem.setAttribute('required', true)
+            elem.required = true
         });
         document.querySelector("#group-source-founded").hidden = false;
         document.querySelector('#source-founded-question').innerHTML = `What year was the website founded?`
@@ -214,13 +204,13 @@ if (document.querySelector('input[name="special_interest"]')) {
             var item = event.target.value;
             if (item == 'no') {
                 document.getElementById('group-topical-focus').hidden = true;
-                document.getElementById('topical-focus-tomselected').required = false;
+                document.getElementById('topical-focus-ts-control').required = false;
                 document.getElementById('topical-focus').required = false;
 
             }
             if (item == 'yes') {
                 document.getElementById('group-topical-focus').hidden = false;
-                document.getElementById('topical-focus-tomselected').required = true;
+                document.getElementById('topical-focus-ts-control').required = true;
                 document.getElementById('topical-focus').required = true;
             }
         });
@@ -286,16 +276,16 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('group-geographic-scope-subunit').hidden = true;
 
                 document.getElementById('geographic-scope-multiple').required = true;
-                if (document.getElementById('geographic-scope-multiple-tomselected')) {
-                    document.getElementById('geographic-scope-multiple-tomselected').required = true;
+                if (document.getElementById('geographic-scope-multiple-ts-control')) {
+                    document.getElementById('geographic-scope-multiple-ts-control').required = true;
                 }
                 document.getElementById('geographic-scope-single').required = false;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
                 document.getElementById('geographic-scope-subunit').required = false;
-                if (document.getElementById('geographic-scope-subunit-tomselected')) {
-                    document.getElementById('geographic-scope-subunit-tomselected').required = false;
+                if (document.getElementById('geographic-scope-subunit-ts-control')) {
+                    document.getElementById('geographic-scope-subunit-ts-control').required = false;
                 }
                 // geographicScopeSingle.clear();
                 // geographicScopeSubunit.clear();
@@ -305,18 +295,18 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('group-geographic-scope-subunit').hidden = true;
 
                 document.getElementById('geographic-scope-multiple').required = false;
-                if (document.getElementById('geographic-scope-multiple-tomselected')) {
-                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                if (document.getElementById('geographic-scope-multiple-ts-control')) {
+                    document.getElementById('geographic-scope-multiple-ts-control').required = false;
                 }
                 document.getElementById('geographic-scope-single').required = true;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = true;
                     document.getElementById('geographic-scope-single-ts-label').innerText = "What is the national scope?"
                 }
 
                 document.getElementById('geographic-scope-subunit').required = false;
-                if (document.getElementById('geographic-scope-subunit-tomselected')) {
-                    document.getElementById('geographic-scope-subunit-tomselected').required = false;
+                if (document.getElementById('geographic-scope-subunit-ts-control')) {
+                    document.getElementById('geographic-scope-subunit-ts-control').required = false;
                     // geographicScopeMultiple.clear();
                     // geographicScopeSubunit.clear();
                 }
@@ -326,18 +316,18 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('group-geographic-scope-subunit').hidden = false;
 
                 document.getElementById('geographic-scope-multiple').required = false;
-                if (document.getElementById('geographic-scope-multiple-tomselected')) {
-                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                if (document.getElementById('geographic-scope-multiple-ts-control')) {
+                    document.getElementById('geographic-scope-multiple-ts-control').required = false;
                 }
                 document.getElementById('geographic-scope-single').required = true;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = true;
                     document.getElementById('geographic-scope-single-ts-label').innerText = "To which national context does the subnational unit belong?"
                 }
 
                 document.getElementById('geographic-scope-subunit').required = true;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = true;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = true;
                 }
 
                 // geographicScopeMultiple.clear();
@@ -347,17 +337,17 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('group-geographic-scope-subunit').hidden = true;
 
                 document.getElementById('geographic-scope-multiple').required = false;
-                if (document.getElementById('geographic-scope-multiple-tomselected')) {
-                    document.getElementById('geographic-scope-multiple-tomselected').required = false;
+                if (document.getElementById('geographic-scope-multiple-ts-control')) {
+                    document.getElementById('geographic-scope-multiple-ts-control').required = false;
                 }
                 document.getElementById('geographic-scope-single').required = false;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
 
                 document.getElementById('geographic-scope-subunit').required = false;
-                if (document.getElementById('geographic-scope-single-tomselected')) {
-                    document.getElementById('geographic-scope-single-tomselected').required = false;
+                if (document.getElementById('geographic-scope-single-ts-control')) {
+                    document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
 
                 // geographicScopeSingle.clear();
@@ -668,8 +658,8 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
@@ -687,12 +677,13 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    setFieldValidity(this.input)
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
-                    }
+                    };
                 }
             };
 
@@ -704,8 +695,8 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
@@ -730,8 +721,8 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
@@ -897,14 +888,14 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    setFieldValidity(this.input)
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
                     }
-
-                }
+                },
             };
             new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
 
@@ -916,13 +907,13 @@ ready(() => {
                     this.input.removeAttribute("aria-invalid");
                 },
                 onChange: function() { // invoke validation on change
-                    setFieldValidity(this.input);
-                    if (!this.isValid) {
+                    this.sync();
+                    if (this.input.validity.valid) {
                         this.wrapper.classList.remove('is-invalid')
                     } else {
                         this.wrapper.classList.add('is-invalid')
                     }
-                }
+                },
             };
 
             new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
@@ -1069,20 +1060,23 @@ ready(() => {
 
             for (field of currentStep.elements) {
                 if (!visited.includes(field)) {
-                    visited.push(field);
-                    // hacky solution to prevent validation loop
-                    if (field.id.includes("tomselected")) {
-                        field.checkValidity();
-                        setFieldValidity(field)
-                    } else {
+                    visited.push(field); 
+                }
+                if (!field.id.includes("ts-control")) {
+                    if (field.required) {
                         field.reportValidity();
+                        setFieldValidity(field)
                     }
                 }
+                
             };
             for (field of currentStep.elements) {
-                if (!field.validity.valid) {
-                    return;
-                };
+                if (!field.id.includes("ts-control")) {
+                    if (!field.validity.valid) {
+                        // setFieldValidity(field)
+                        return;
+                    };
+                }
             };
             nextStep = nextbutton.parentElement.nextElementSibling;
             if (nextStep.id == 'section-audience') {
@@ -1213,7 +1207,6 @@ submitButton.addEventListener('click', function handleFormSubmit(event) {
 const visited = [];
 for (const field of form.elements) {
     field.addEventListener("invalid", function handleInvalidField(event) {
-        setFieldValidity(field);
         event.preventDefault();
     });
 
@@ -1223,7 +1216,6 @@ for (const field of form.elements) {
     });
 
     field.addEventListener("blur", function handleFieldBlur() {
-
         if (!visited.includes(field)) {
             visited.push(field);
         }
@@ -1239,8 +1231,8 @@ for (const field of form.elements) {
 }
 
 function errorContainer(field) {
-    if (field.id.includes("tomselected")) {
-        field = document.getElementById(field.id.replace("-tomselected", ""))
+    if (field.id.includes("ts-control")) {
+        field = document.getElementById(field.id.replace("-ts-control", ""))
     }
     const errorContainerId = field
         .getAttribute("aria-describedby")
@@ -1255,16 +1247,18 @@ function setFieldValidity(field) {
         errorContainer(field).classList.add('invalid-feedback');
         field.setAttribute("aria-invalid", "true");
         field.classList.add('is-invalid');
-        if (field.id.includes('tomselected')) {
-            field.parentElement.parentElement.classList.add('is-invalid');
+        if (field.classList.contains('tomselected')) {
+            let ts = document.getElementById(field.id + '-ts-control')
+            ts.parentElement.parentElement.classList.add('is-invalid');
         }
     } else {
         errorContainer(field).textContent = "";
         errorContainer(field).classList.remove('invalid-feedback');
         field.removeAttribute("aria-invalid");
         field.classList.remove('is-invalid');
-        if (field.id.includes('tomselected')) {
-            field.parentElement.parentElement.classList.remove('is-invalid');
+        if (field.classList.contains('tomselected')) {
+            let ts = document.getElementById(field.id + '-ts-control')
+            ts.parentElement.parentElement.classList.remove('is-invalid');
         }
         if (field.type == 'radio') {
             document.querySelectorAll(`input[name=${field.name}]`).forEach(function(el) {
@@ -1406,7 +1400,6 @@ function prettySummary() {
                 }
             }
         } else if (e.tagName.toLowerCase() == 'select') {
-            console.log(e.name)
             if (e.multiple && e.selectedOptions) {
                 let summary_element = document.querySelector('#summary-' + e.name)
                 if (summary_element) {
