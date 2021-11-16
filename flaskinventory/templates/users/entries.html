@@ -21,7 +21,6 @@
                 <thead>
                     <tr>
                         <th scope="col">Name</th>
-                        <th scope="col">Unique Name</th>
                         <th scope="col">Type</th>
                         <th scope="col">uid</th>
                         <th scope="col">Added</th>
@@ -32,8 +31,7 @@
 
                     {% if drafts %} {% for entry in drafts %}
                     <tr>
-                        <td>{{ entry.name }}</td>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 100px;">{{ entry.unique_name }}</span></td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>
                         <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
@@ -51,7 +49,6 @@
                 <thead>
                     <tr>
                         <th scope="col">Name</th>
-                        <th scope="col">Unique Name</th>
                         <th scope="col">Type</th>
                         <th scope="col">uid</th>
                         <th scope="col">Added</th>
@@ -62,13 +59,11 @@
 
                     {% if pending %} {% for entry in pending %}
                     <tr>
-                        <td>{{ entry.name }}</td>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
-                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>                        <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("pending|timestamp") %}{{ entry.get("pending|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                         <td>
-                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a><a class="btn btn-warning" href="{{ url_for('edit.edit_uid', uid=entry.get('uid'))}}">Edit</a></div>
                         </td>
                     </tr>
                     {% endfor %} {% endif %}
@@ -81,22 +76,22 @@
                 <thead>
                     <tr>
                         <th scope="col">Name</th>
-                        <th scope="col">Unique Name</th>
                         <th scope="col">Type</th>
                         <th scope="col">uid</th>
                         <th scope="col">Added</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
 
                     {% if accepted %} {% for entry in accepted %}
                     <tr>
-                        <td>{{ entry.name }}</td>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 200px;">{{ entry.unique_name }}</span></td>
-                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>                        <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
-
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a><a class="btn btn-warning" href="{{ url_for('edit.edit_uid', uid=entry.get('uid'))}}">Edit</a></div>
+                        </td>
                     </tr>
                     {% endfor %} {% endif %}
                 </tbody>
