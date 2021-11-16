@@ -29,7 +29,6 @@
   <thead>
     <tr>
       <th scope="col">Name</th>
-      <th scope="col">Unique Name</th>
       <th scope="col">Type</th>
       <th scope="col">uid</th>
       <th scope="col">Country</th>
@@ -43,8 +42,7 @@
     {% if entries %}
     {% for entry in entries %}
     <tr>
-        <td>{{ entry.name }}</td>
-        <td><span class="d-inline-block text-truncate" style="max-width: 100px;">{{ entry.unique_name }}</span></td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>
         <td>{{ entry.get("dgraph.type")[0] }}</td>
         <td>{{ entry.uid }}</th>
         <td>{% if entry.get('country') %} {% for country in entry.get('country') %}
