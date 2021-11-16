@@ -402,7 +402,7 @@ def submit():
 
 @add.route('/_orglookup')
 def orglookup():
-    query = request.args.get('q')
+    query = escape_query(request.args.get('q'))
     person = request.args.get('person')
     if person:
         person_filter = f'AND eq(is_person, {person})'
@@ -431,8 +431,7 @@ def orglookup():
 
 @add.route('/_sourcelookup')
 def sourcelookup():
-    query = request.args.get('q')
-    query = query.replace('/', '.')
+    query = escape_query(request.args.get('q'))
     query_string = f'''{{
             field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
             field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
