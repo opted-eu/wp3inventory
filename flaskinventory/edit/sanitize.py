@@ -51,6 +51,23 @@ class Sanitizer:
                 if callable(m):
                     m()
 
+    def _check_entry(self, uid):
+        query = f'''{{ q(func: uid({uid}))'''
+        query += "{ unique_name dgraph.type entry_review_status entry_added { uid } } }"
+        data = dgraph.query(query)
+
+        if len(data['q']) == 0:
+            return False
+
+        return data['q'][0]
+
+    def _check_permissions(self, uid):
+        entry = self._check_entry(uid)
+        if self.user.user_role > 1 or entry.get('entry_added').get('uid') == self.user.id:
+            return True
+        else:
+            return False
+
     def parse_unique_name(self):
         check = dgraph.get_uid('unique_name', self.data.get('unique_name'))
         if check:
@@ -60,6 +77,9 @@ class Sanitizer:
 
     def parse_entry_review_status(self):
         if self.data.get('entry_review_status'):
+            if self.user.user_role < 2:
+                raise InventoryValidationError(
+                    'You do not have the required permissions to change the review status!')
             self.edit['entry_review_status'] = self.data.get(
                 'entry_review_status')
 
@@ -167,6 +187,11 @@ class EditOrgSanitizer(Sanitizer):
         super().__init__(user, ip)
         self.is_upsert = True
 
+        check = self._check_permissions(data.get('uid'))
+        if not check:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
+
         self.edit = {"uid": UID(data.get('uid')),
                      "is_person": data.get('is_person')}
         self.edit = self._add_entry_meta(self.edit)
@@ -254,6 +279,11 @@ class EditSourceSanitizer(Sanitizer):
     def __init__(self, data, user, ip):
         super().__init__(user, ip)
         self.is_upsert = True
+
+        check = self._check_permissions(data.get('uid'))
+        if not check:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
 
         self.edit = {"uid": UID(data.get('uid'))}
         self.edit = self._add_entry_meta(self.edit)
@@ -467,6 +497,10 @@ class EditSubunitSanitizer(Sanitizer):
         super().__init__(user, ip)
         self.is_upsert = True
 
+        if self.user.user_role < 2:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
+
         self.edit = {"uid": UID(data.get('uid'))}
         self.edit = self._add_entry_meta(self.edit)
         self.data = data
@@ -509,6 +543,10 @@ class EditMultinationalSanitizer(Sanitizer):
         super().__init__(user, ip)
         self.is_upsert = True
 
+        if self.user.user_role < 2:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
+
         self.edit = {"uid": UID(data.get('uid'))}
         self.edit = self._add_entry_meta(self.edit)
         self.data = data
@@ -540,12 +578,10 @@ class EditMultinationalSanitizer(Sanitizer):
                 datetime.timezone.utc)
 
         return entry
-    
+
     def parse_description(self):
         if self.data.get('description'):
             self.edit['description'] = self.data.get('description')
-
-
 
 
 class EditArchiveSanitizer(Sanitizer):
@@ -553,6 +589,11 @@ class EditArchiveSanitizer(Sanitizer):
     def __init__(self, data, user, ip):
         super().__init__(user, ip)
         self.is_upsert = True
+
+        check = self._check_permissions(data.get('uid'))
+        if not check:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
 
         self.edit = {"uid": UID(data.get('uid'))}
         self.edit = self._add_entry_meta(self.edit)
@@ -593,7 +634,7 @@ class EditArchiveSanitizer(Sanitizer):
     def parse_description(self):
         if self.data.get('description'):
             self.edit['description'] = self.data.get('description')
-    
+
     def parse_url(self):
         if self.data.get('url'):
             self.edit['url'] = self.data.get('url')

@@ -205,8 +205,8 @@ fulltext = BooleanField('Dataset contains fulltext')
 
 editfields_base = {
     "uid": uid,
-    "entry_review_status": entry_review_status,
-    "unique_name": unique_name,
+    # "entry_review_status": entry_review_status,
+    # "unique_name": unique_name,
     "name": name,
     "other_names": other_names,
     "entry_notes": entry_notes,
@@ -339,6 +339,17 @@ def make_form(entity, audience_size=1):
         fields = editmultinationalfields
     else:
         raise TypeError
+    
+    if current_user.user_role > 1:
+        unique_name = StringField('Unique Name',
+                            validators=[DataRequired()])
+        fields = {"unique_name": unique_name, **fields, "entry_review_status": entry_review_status}
+    else:
+        unique_name = StringField('Unique Name',
+                            validators=[DataRequired()], render_kw={'readonly': True})
+        fields = {"unique_name": unique_name, **fields}
+   
+
 
     class F(DynamicForm):
         pass
