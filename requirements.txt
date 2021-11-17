@@ -12,6 +12,7 @@ Flask-Mail
 Flask-Table
 Flask-WTF
 Flask-Limiter
+Flask-Markdown
 grpcio
 idna
 itsdangerous
