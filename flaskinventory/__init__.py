@@ -10,7 +10,7 @@ from flaskinventory.config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-
+from flaskext.markdown import Markdown
 from flaskinventory.flaskdgraph import DGraph
 
 dgraph = DGraph()
@@ -85,5 +85,7 @@ def create_app(config_class=Config, config_json=None):
     csrf = CSRFProtect(app)
 
     limiter.init_app(app)
+
+    Markdown(app)
 
     return app

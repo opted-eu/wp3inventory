@@ -54,3 +54,7 @@ def under_development():
 @main.route('/guides/newssource')
 def guides_newssource():
     return render_template('guides/newsource.html')
+
+@main.route('/guides/resources')
+def guides_resources():
+    return render_template('guides/resources.html')
