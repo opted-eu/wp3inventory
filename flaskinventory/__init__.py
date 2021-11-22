@@ -2,7 +2,7 @@ import logging
 import json
 
 from flask import Flask
-from .config import create_filehandler, create_mailhandler, create_slackhandler
+from .config import create_filehandler, create_slackhandler
 
 from flask_login import LoginManager, AnonymousUserMixin
 from flask_mail import Mail
@@ -75,12 +75,6 @@ def create_app(config_class=Config, config_json=None):
     dgraph.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-    if app.config.get('LOGGING_MAIL_ENABLED'):
-        try:
-            mail_handler = create_mailhandler(app, mail)
-            app.logger.addHandler(mail_handler)
-        except Exception as e:
-            app.logger.error(f'Mail Logging not working: {e}')
 
     csrf = CSRFProtect(app)
 
