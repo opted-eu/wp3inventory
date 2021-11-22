@@ -153,10 +153,10 @@
             {% endfor %}
         </dd>
         {% if entry.geographic_scope_subunit %}
-        <dt class="col-sm-3">Subunit</dt>
+        <dt class="col-sm-3">Subunits <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Note that entities listed in 'Subunits' are not necessarily part of the entities listed in 'Countries'."><i class="fas mx-1 fa-question-circle"></i></a></dt>
         <dd class="col-sm-9">
             {% for subunit in entry.geographic_scope_subunit %}
-            <span class="badge bg-secondary">{{ subunit.name }}</span>
+            <span class="me-2"><a href="{{ url_for('view.view_subunit', uid=subunit.uid)}}">{{ subunit.name }}</a></span>
             {% endfor %}
             </dd>
             

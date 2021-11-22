@@ -640,7 +640,7 @@ class SourceSanitizer:
                                 else:
                                     # discard other data
                                     continue
-                        self.parse_subunit()
+                        self._parse_subunit()
 
                 elif self.newsource['geographic_scope'] == 'national':
                     if self.json.get('geographic_scope_single'):
@@ -672,7 +672,7 @@ class SourceSanitizer:
                     else:
                         raise InventoryValidationError(
                             'Invalid Data! Please specify at least one country!')
-                    self.parse_subunit()
+                    self._parse_subunit()
             else:
                 raise InventoryValidationError(
                     f'Invalid data! Unknown value in "geographic_scope": {self.json.get("geographic_scope")}')
@@ -680,23 +680,29 @@ class SourceSanitizer:
             raise InventoryValidationError(
                 'Invalid data! "geographic_scope" is required')
 
-    def parse_subunit(self):
+    def _parse_subunit(self):
         """ if subunit is new, first we check its country and for potential duplication
             if the country is not in the Inventory, the subunit is rejected
             if it is duplicated, we use the existing entry
             finally, a new subunit is created and appended to the self.newsubunits list
         """
-        if self.json.get('geographic_scope_subunit'):
+        if self.newsource['geographic_scope'] == 'multinational':
+            subunit_list = self.json.get('geographic_scope_subunits', None)
+        else:
+            subunit_list = self.json.get('geographic_scope_subunit', None)
+        if subunit_list:
             self.newsource['geographic_scope_subunit'] = []
-            subunit_list = self.json.get('geographic_scope_subunit')
             if type(subunit_list) == str:
                 subunit_list = subunit_list.split(',')
 
             for item in subunit_list:
+                if item.strip() == "":
+                    continue
                 if item.strip().startswith('0x'):
                     self.newsource['geographic_scope_subunit'].append(
                         UID(item))
                 else:
+                    print('querying item: ', item)
                     geo_query = self.resolve_subunit(item)
                     if geo_query:
                         self.newsource['geographic_scope_subunit'].append(
