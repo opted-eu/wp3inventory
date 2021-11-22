@@ -320,7 +320,7 @@ def facebook(username):
         return None
 
 
-def get_wikidata(query):
+def lookup_wikidata_id(query):
 
     api = 'https://www.wikidata.org/w/api.php'
 
@@ -333,10 +333,14 @@ def get_wikidata(query):
         r = requests.get(api, params=params)
         get_id = r.json()
         wikidataid = get_id['search'][0]['id']
-        result['wikidataID'] = wikidataid.replace('Q', '')
+        return wikidataid
     except:
         return False
 
+
+def fetch_wikidata(wikidataid, query=None):
+    api = 'https://www.wikidata.org/w/api.php'
+    result = {'wikidataID': wikidataid.replace('Q', '')}
     try:
         params = {'action': 'wbgetentities', 'languages': 'en',
                   'ids': wikidataid, 'format': 'json'}
@@ -350,8 +354,9 @@ def get_wikidata(query):
         aliases = wikidata['entities'][wikidataid]['aliases']['en']
         for alias in aliases:
             result['other_names'].append(alias['value'])
-    except:
-        pass
+    except Exception as e:
+        current_app.logger.debug(
+            f"Could not get other names: {e}. Query: {query}. Wikidata ID: {wikidataid}")
 
     # P17: country, P571: inception, P1128: employees, P159: headquarters
 
@@ -360,8 +365,8 @@ def get_wikidata(query):
             '+', '')
         result['founded'] = isoparse(inception)
     except Exception as e:
-        current_app.logger.debug(f"Could not get inception date: {e}")
-        pass
+        current_app.logger.debug(
+            f"Could not get inception date: {e}. Query: {query}. Wikidata ID: {wikidataid}")
 
     try:
         country = wikidata['entities'][wikidataid]['claims']['P17'][0]['mainsnak']['datavalue']['value']['id'].replace(
@@ -372,13 +377,15 @@ def get_wikidata(query):
         country_uid = country_uid['q'][0]['uid']
         result['country'] = UID(country_uid)
     except Exception as e:
-        pass
+        current_app.logger.debug(
+            f"Could not get country: {e}. Query: {query}. Wikidata ID: {wikidataid}")
 
     try:
         result['employees'] = wikidata['entities'][wikidataid]['claims']['P1128'][
             0]['mainsnak']['datavalue']['value']['amount'].replace('+', '')
-    except:
-        pass
+    except Exception as e:
+        current_app.logger.debug(
+            f"Could not get employee count: {e}. Query: {query}. Wikidata ID: {wikidataid}")
 
     try:
         headquarters = wikidata['entities'][wikidataid]['claims']['P159'][0]['mainsnak']['datavalue']['value']['id']
@@ -393,10 +400,21 @@ def get_wikidata(query):
 
         result['address'] = address
         result['address_geo'] = address_geo
-    except:
-        pass
+    except Exception as e:
+        current_app.logger.debug(
+            f"Could not get address: {e}. Query: {query}. Wikidata ID: {wikidataid}")
 
     return result
+
+
+def get_wikidata(query):
+
+    wikidataid = lookup_wikidata_id(query)
+
+    if not wikidataid:
+        return False
+
+    return fetch_wikidata(wikidataid, query=query)
 
 
 def vkontakte(screen_name):
@@ -436,7 +454,7 @@ def telegram(username):
             profile = await bot.get_entity(username)
         except ValueError as e:
             profile = False
-        
+
         await bot.disconnect()
         return profile
 
