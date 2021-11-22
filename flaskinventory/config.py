@@ -38,9 +38,11 @@ class RequestFormatter(logging.Formatter):
         if has_request_context():
             record.url = request.url
             record.remote_addr = request.remote_addr
+            record.request_environ = request.environ
         else:
             record.url = None
             record.remote_addr = None
+            record.request_environ = None
 
         return super().format(record)
 
@@ -158,6 +160,7 @@ def create_slackhandler(webhook):
     formatter = RequestFormatter(
                 '[%(asctime)s] %(remote_addr)s requested %(url)s: '
                 '%(levelname)s in %(module)s: %(message)s'
+                '\n %(request_environ)s'
                 )
     slck.setFormatter(formatter)
 
