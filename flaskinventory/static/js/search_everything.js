@@ -33,7 +33,7 @@ $.typeahead({
             ajax: function(query) {
                 return {
                     type: "GET",
-                    url: $SCRIPT_ROOT + "/_quicksearch",
+                    url: $SCRIPT_ROOT + "/endpoint/quicksearch",
                     path: "data",
                     data: {
                         q: "{{query}}"
@@ -49,12 +49,12 @@ $.typeahead({
         // alert(JSON.stringify(item));
 
         // },
-        onSendRequest: function(node, query) {
-            console.log('request is sent')
-        },
-        onReceiveRequest: function(node, query) {
-            console.log('request is received')
-        }
+        // onSendRequest: function(node, query) {
+        //     console.log('request is sent')
+        // },
+        // onReceiveRequest: function(node, query) {
+        //     console.log('request is received')
+        // }
     },
     debug: true
 });

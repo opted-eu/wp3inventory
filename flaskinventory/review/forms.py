@@ -1,5 +1,4 @@
 from wtforms.fields.simple import HiddenField, SubmitField
-from flaskinventory.add.routes import submit
 from flask_wtf import FlaskForm
 from wtforms import SelectField
 from wtforms.validators import DataRequired

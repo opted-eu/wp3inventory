@@ -7,7 +7,6 @@ from flaskinventory import dgraph
 from flaskinventory.add.forms import NewCountry, NewEntry, NewOrganization, NewArchive, NewDataset
 from flaskinventory.add.utils import check_draft
 from flaskinventory.add.sanitize import NewCountrySanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
-from flaskinventory.add.dgraph import generate_fieldoptions
 from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
@@ -346,110 +345,4 @@ def from_draft(entity=None, uid=None):
     else:
         return redirect(url_for('users.my_entries'))
 
-# API Endpoints
 
-# cache this route
-@add.route("/add/fieldoptions")
-async def fieldoptions():
-    data = await generate_fieldoptions()
-    return jsonify(data)
-
-
-@add.route('/new/submit', methods=['POST'])
-def submit():
-    try:
-        sanitizer = SourceSanitizer(
-            request.json, current_user, get_ip())
-        current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-        current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
-    except Exception as e:
-        error = {'error': f'{e}'}
-        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-        current_app.logger.error(tb_str)
-        return jsonify(error)
-
-    if sanitizer.is_upsert:
-        try:
-            result = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-        except Exception as e:
-            error = {'error': f'{e}'}
-            tb_str = ''.join(traceback.format_exception(
-                None, e, e.__traceback__))
-            current_app.logger.error(tb_str)
-            return jsonify(error)
-
-    try:
-        result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-    except Exception as e:
-        error = {'error': f'{e}'}
-        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
-        current_app.logger.error(tb_str)
-        return jsonify(error)
-
-    if result:
-        if sanitizer.is_upsert:
-            uid = str(sanitizer.uid)
-        else:
-            newuids = dict(result.uids)
-            uid = newuids['newsource']
-        response = {'redirect': url_for(
-            'view.view_source', uid=uid)}
-
-        return jsonify(response)
-    else:
-        return jsonify({'error': 'DGraph Error - Could not perform mutation'})
-
-
-@add.route('/_orglookup')
-def orglookup():
-    query = strip_query(request.args.get('q'))
-    person = request.args.get('person')
-    if person:
-        person_filter = f'AND eq(is_person, {person})'
-    else:
-        person_filter = ''
-    # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_string = f'''{{
-            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Organization") {person_filter})
-            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Organization") {person_filter})
-  
-	        data(func: uid(field1, field2)) {{
-                uid
-                unique_name
-                name
-                dgraph.type
-                is_person
-                other_names
-                country {{ name }}
-                }}
-            }}
-    '''
-    result = dgraph.query(query_string)
-    result['status'] = True
-    return jsonify(result)
-
-
-@add.route('/_sourcelookup')
-def sourcelookup():
-    query = strip_query(request.args.get('q'))
-    query_string = f'''{{
-            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
-            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
-  
-	        data(func: uid(field1, field2)) {{
-                uid
-                unique_name
-                name
-                channel {{ name }}
-                country {{ name }}
-                }}
-            }}
-    '''
-    try:
-        result = dgraph.query(query_string)
-        result['status'] = True
-        return jsonify(result)
-    except Exception as e:
-        current_app.logger.warning(f'could not lookup source with query "{query}". {e}')
-        return jsonify({'status': False, 'error': e})

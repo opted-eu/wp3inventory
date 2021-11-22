@@ -62,6 +62,7 @@ def create_app(config_class=Config, config_json=None):
     from flaskinventory.add.routes import add
     from flaskinventory.edit.routes import edit
     from flaskinventory.review.routes import review
+    from flaskinventory.endpoints.routes import endpoint
     from flaskinventory.main.routes import main
     from flaskinventory.errors.handlers import errors
     app.register_blueprint(users)
@@ -69,6 +70,7 @@ def create_app(config_class=Config, config_json=None):
     app.register_blueprint(add)
     app.register_blueprint(edit)
     app.register_blueprint(review)
+    app.register_blueprint(endpoint)
     app.register_blueprint(main)
     app.register_blueprint(errors)
 

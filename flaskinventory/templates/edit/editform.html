@@ -49,7 +49,7 @@ var TomSelectPublishesConfig = {
         selectOnTab: true,
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
+            var url = '{{ url_for("endpoint.sourcelookup") }}?q=' + encodeURIComponent(query);
             fetch(url)
             .then(response => response.json())
             .then(json => {
@@ -103,7 +103,7 @@ var TomSelectOrganisationConfig = {
         // createFilter: function(input) { return input.length >= 3 },
         load: function(query, callback) {
             if ( query.length < 3 ) return callback();
-            var url = '{{ url_for("add.orglookup") }}?q=' + encodeURIComponent(query);
+            var url = '{{ url_for("endpoint.orglookup") }}?q=' + encodeURIComponent(query);
             fetch(url)
             .then(response => response.json())
             .then(json => {
@@ -161,7 +161,7 @@ var TomSelectRelatedSourcesConfig = {
     },
     load: function(query, callback) {
         if ( query.length < 3 ) return callback();
-        var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
+        var url = '{{ url_for("endpoint.sourcelookup") }}?q=' + encodeURIComponent(query);
         fetch(url)
         .then(response => response.json())
         .then(json => {

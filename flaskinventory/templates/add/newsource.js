@@ -539,7 +539,7 @@ ready(() => {
     // var persistentForm = document.querySelector(`#${formId}`)
 
     // Load Select options from json api
-    getFieldOptions('{{ url_for("add.fieldoptions") }}')
+    getFieldOptions('{{ url_for("endpoint.fieldoptions") }}')
         .then(response => response.json())
         .then(function(data) {
 
@@ -555,9 +555,9 @@ ready(() => {
             var countries = data.country;
             var subunits = data.subunit;
             var multinational = data.multinational
-            // Sort values alphabetically
-            // countries.sort((a,b) => a.name > b.name ? 1 : -1);
-            // subunits.sort((a,b) => a.name > b.name ? 1 : -1);
+                // Sort values alphabetically
+                // countries.sort((a,b) => a.name > b.name ? 1 : -1);
+                // subunits.sort((a,b) => a.name > b.name ? 1 : -1);
 
             var inputGeographicScopeMultiple = document.getElementById('geographic-scope-multiple');
 
@@ -774,7 +774,7 @@ ready(() => {
                 // createFilter: function(input) { return input.length >= 3 },
                 load: function(query, callback) {
                     if (query.length < 3) return callback();
-                    var url = '{{ url_for("add.orglookup") }}?person=false&q=' + encodeURIComponent(query);
+                    var url = '{{ url_for("endpoint.orglookup") }}?person=false&q=' + encodeURIComponent(query);
                     fetch(url)
                         .then(response => response.json())
                         .then(json => {
@@ -830,7 +830,7 @@ ready(() => {
                 // createFilter: function(input) { return input.length >= 3 },
                 load: function(query, callback) {
                     if (query.length < 3) return callback();
-                    var url = '{{ url_for("add.orglookup") }}?person=true&q=' + encodeURIComponent(query);
+                    var url = '{{ url_for("endpoint.orglookup") }}?person=true&q=' + encodeURIComponent(query);
                     fetch(url)
                         .then(response => response.json())
                         .then(json => {
@@ -991,7 +991,7 @@ ready(() => {
                 },
                 load: function(query, callback) {
                     if (query.length < 3) return callback();
-                    var url = '{{ url_for("add.sourcelookup") }}?q=' + encodeURIComponent(query);
+                    var url = '{{ url_for("endpoint.sourcelookup") }}?q=' + encodeURIComponent(query);
                     fetch(url)
                         .then(response => response.json())
                         .then(json => {
@@ -1060,7 +1060,7 @@ ready(() => {
 
             for (field of currentStep.elements) {
                 if (!visited.includes(field)) {
-                    visited.push(field); 
+                    visited.push(field);
                 }
                 if (!field.id.includes("ts-control")) {
                     if (field.required) {
@@ -1068,7 +1068,7 @@ ready(() => {
                         setFieldValidity(field)
                     }
                 }
-                
+
             };
             for (field of currentStep.elements) {
                 if (!field.id.includes("ts-control")) {
@@ -1187,18 +1187,18 @@ submitButton.addEventListener('click', function handleFormSubmit(event) {
     // var isValid = form.reportValidity();
 
     // if (isValid) {
-        event.preventDefault();
-        // POST form data to backend with fetch
-        document.getElementById('new-source').hidden = true
-        document.getElementById('loading-form').hidden = false
-        document.getElementById('loading-spinner').hidden = false
-        document.getElementById('loading-status').innerText = "Processing data..."
-        document.getElementById('loading-status-message').innerText = "Please be patient for a short while"
-        document.getElementById('loading-status').hidden = false
-        submitForm('{{ url_for("add.submit") }}', form, formResult);
+    event.preventDefault();
+    // POST form data to backend with fetch
+    document.getElementById('new-source').hidden = true
+    document.getElementById('loading-form').hidden = false
+    document.getElementById('loading-spinner').hidden = false
+    document.getElementById('loading-status').innerText = "Processing data..."
+    document.getElementById('loading-status-message').innerText = "Please be patient for a short while"
+    document.getElementById('loading-status').hidden = false
+    submitForm('{{ url_for("endpoint.submit") }}', form, formResult);
 
 
-        // window.location.assign('{{ url_for("add.confirmation") }}')
+    // window.location.assign('{{ url_for("add.confirmation") }}')
     // };
 
     // event.preventDefault();
