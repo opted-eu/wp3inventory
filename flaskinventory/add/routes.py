@@ -12,6 +12,7 @@ from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer,
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
+from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.flaskdgraph.utils import escape_query
 import traceback
@@ -110,7 +111,7 @@ def new_organization(draft=None):
         if draft:
             try:
                 sanitizer = EditOrgSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
                 current_app.logger.debug(
                     f'Set Nquads: {sanitizer.delete_nquads}')
@@ -124,7 +125,7 @@ def new_organization(draft=None):
         else:
             try:
                 sanitizer = NewOrgSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             except Exception as e:
                 if current_app.debug:
@@ -170,7 +171,7 @@ def new_archive(draft=None):
         if draft:
             try:
                 sanitizer = EditArchiveSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
                 current_app.logger.debug(
                     f'Set Nquads: {sanitizer.delete_nquads}')
@@ -184,7 +185,7 @@ def new_archive(draft=None):
         else:
             try:
                 sanitizer = NewArchiveSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             except Exception as e:
                 if current_app.debug:
@@ -230,7 +231,7 @@ def new_dataset(draft=None):
         if draft:
             try:
                 sanitizer = EditDatasetSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
                 current_app.logger.debug(
                     f'Set Nquads: {sanitizer.delete_nquads}')
@@ -244,7 +245,7 @@ def new_dataset(draft=None):
         else:
             try:
                 sanitizer = NewDatasetSanitizer(
-                    form.data, current_user, request.remote_addr)
+                    form.data, current_user, get_ip())
                 current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             except Exception as e:
                 if current_app.debug:
@@ -285,7 +286,7 @@ def new_country():
     if form.validate_on_submit():
         try:
             sanitizer = NewCountrySanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         except Exception as e:
             if current_app.debug:
@@ -358,7 +359,7 @@ async def fieldoptions():
 def submit():
     try:
         sanitizer = SourceSanitizer(
-            request.json, current_user, request.remote_addr)
+            request.json, current_user, get_ip())
         current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
     except Exception as e:

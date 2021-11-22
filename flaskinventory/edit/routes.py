@@ -6,6 +6,7 @@ from flaskinventory.edit.utils import can_edit
 from flaskinventory.edit.sanitize import (EditArchiveSanitizer, EditOrgSanitizer, EditSourceSanitizer,
                                           EditSubunitSanitizer, EditDatasetSanitizer, EditMultinationalSanitizer)
 from flaskinventory.review.dgraph import check_entry
+from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
 
 from flaskinventory import dgraph
@@ -57,7 +58,7 @@ def organization(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditOrgSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
@@ -146,7 +147,7 @@ def source(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditSourceSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
@@ -223,7 +224,7 @@ def subunit(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditSubunitSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
@@ -293,7 +294,7 @@ def multinational(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditMultinationalSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
@@ -361,7 +362,7 @@ def dataset(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditDatasetSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
@@ -433,7 +434,7 @@ def archive(unique_name=None, uid=None):
     if form.validate_on_submit():
         try:
             sanitizer = EditArchiveSanitizer(
-                form.data, current_user, request.remote_addr)
+                form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
