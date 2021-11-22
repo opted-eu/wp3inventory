@@ -1,9 +1,6 @@
 {% extends "layout.html" %} {% block content %}
 
 
-<div class="content-section pt-4">
-<div class="row">
-<div class="col-8">
     {% from "edit/_formhelpers.html" import render_field %}
     <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
@@ -19,9 +16,6 @@
             {{ form.submit(class="btn btn-outline-info my-4") }}
         </div>
     </form>
-</div>
-</div>
-</div>
 <script>
 
 {% if 'other_names' in fields %}
@@ -278,4 +272,10 @@ new TomSelect('#publication_cycle_weekday', {plugins: ['remove_button', 'checkbo
 {% endif %}
 
 </script>
-{% endblock content %} {% block sidebar %} {% endblock sidebar %}
+{% endblock content %} 
+
+{% block sidebar %} 
+
+{% include "edit/sidebar.html" %}
+
+{% endblock sidebar %}

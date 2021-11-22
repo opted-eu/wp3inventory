@@ -38,7 +38,7 @@ def check_entry(uid=None, unique_name=None):
     elif unique_name:
         query = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
 
-    query += "{ unique_name dgraph.type entry_review_status entry_added { uid } } }"
+    query += "{ uid unique_name dgraph.type entry_review_status entry_added { uid } } }"
     data = dgraph.query(query)
 
     if len(data['q']) == 0:

@@ -1,13 +1,16 @@
 from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort)
 from flask_login import current_user, login_required
-from flaskinventory.edit.forms import make_form
+from flaskinventory.edit.forms import make_form, RefreshWikidataForm
 from flaskinventory.edit.utils import can_edit
 from flaskinventory.edit.sanitize import (EditArchiveSanitizer, EditOrgSanitizer, EditSourceSanitizer,
-                                          EditSubunitSanitizer, EditDatasetSanitizer, EditMultinationalSanitizer)
+                                          EditSubunitSanitizer, EditDatasetSanitizer, EditMultinationalSanitizer,
+                                          WikiDataSanitizer)
+from flaskinventory.edit.dgraph import get_entry
 from flaskinventory.review.dgraph import check_entry
 from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
+from flaskinventory.add.external import fetch_wikidata
 
 from flaskinventory import dgraph
 
@@ -51,6 +54,8 @@ def organization(unique_name=None, uid=None):
 
     if not unique_name:
         unique_name = check.get('unique_name')
+    if not uid:
+        uid = check.get('uid')
 
     form, fields = make_form('organization')
 
@@ -77,11 +82,7 @@ def organization(unique_name=None, uid=None):
             flash(f'Organization could not be updated: {e}', 'danger')
             return redirect(url_for('edit.organization', unique_name=form.unique_name.data))
 
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ name unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name)
     if result:
         for key, value in result['q'][0].items():
             if not hasattr(form, key):
@@ -100,7 +101,10 @@ def organization(unique_name=None, uid=None):
 
             setattr(getattr(form, key), 'data', value)
 
-        return render_template('edit/editform.html', title='Edit Organization', form=form, fields=fields.keys())
+        wikidata_form = RefreshWikidataForm()
+        wikidata_form.uid.data = uid
+        sidebar_items = {'form': wikidata_form, 'meta': result['q'][0]}
+        return render_template('edit/editform.html', title='Edit Organization', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
     else:
         return abort(404)
 
@@ -120,16 +124,7 @@ def source(unique_name=None, uid=None):
     if not can_edit(check, current_user):
         return abort(403)
 
-    if unique_name:
-        query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-                            uid expand(_all_) {{ name unique_name uid }}
-                            }} }}'''
-    elif uid:
-        query_string = f'''{{ q(func: uid({uid})) {{
-                                uid expand(_all_) {{ name unique_name uid }}
-                                }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name, uid=uid)
     if len(result['q']) == 0:
         return abort(404)
 
@@ -197,7 +192,9 @@ def source(unique_name=None, uid=None):
 
         setattr(getattr(form, key), 'data', value)
 
-    return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys())
+    sidebar_items = {'meta': result['q'][0]}
+
+    return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
 
 
 @edit.route('/edit/subunit/<string:unique_name>', methods=['GET', 'POST'])
@@ -243,11 +240,7 @@ def subunit(unique_name=None, uid=None):
             flash(f'Subunit could not be updated: {e}', 'danger')
             return redirect(url_for('edit.subunit', unique_name=form.unique_name.data))
 
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ name unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name)
     if result:
         for key, value in result['q'][0].items():
             if not hasattr(form, key):
@@ -266,7 +259,9 @@ def subunit(unique_name=None, uid=None):
 
             setattr(getattr(form, key), 'data', value)
 
-        return render_template('edit/editform.html', title='Edit Subunit', form=form, fields=fields.keys())
+        sidebar_items = {'meta': result['q'][0]}
+
+        return render_template('edit/editform.html', title='Edit Subunit', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
     else:
         return abort(404)
 
@@ -313,11 +308,7 @@ def multinational(unique_name=None, uid=None):
             flash(f'Multinational Entity could not be updated: {e}', 'danger')
             return redirect(url_for('edit.multinational', unique_name=form.unique_name.data))
 
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ name unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name)
     if result:
         for key, value in result['q'][0].items():
             if not hasattr(form, key):
@@ -334,7 +325,9 @@ def multinational(unique_name=None, uid=None):
 
             setattr(getattr(form, key), 'data', value)
 
-        return render_template('edit/editform.html', title='Edit Multinational Construct', form=form, fields=fields.keys())
+        sidebar_items = {'meta': result['q'][0]}
+
+        return render_template('edit/editform.html', title='Edit Multinational Construct', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
     else:
         return abort(404)
 
@@ -376,16 +369,12 @@ def dataset(unique_name=None, uid=None):
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
             flash(f'Dataset has been updated', 'success')
-            return redirect(url_for('view.view_subunit', unique_name=form.unique_name.data))
+            return redirect(url_for('view.view_dataset', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Dataset could not be updated: {e}', 'danger')
             return redirect(url_for('edit.dataset', unique_name=form.unique_name.data))
 
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ name unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name)
     if result:
         for key, value in result['q'][0].items():
             if not hasattr(form, key):
@@ -403,8 +392,8 @@ def dataset(unique_name=None, uid=None):
                             'choices', choices)
 
             setattr(getattr(form, key), 'data', value)
-
-        return render_template('edit/editform.html', title='Edit Dataset', form=form, fields=fields.keys())
+        sidebar_items = {'meta': result['q'][0]}
+        return render_template('edit/editform.html', title='Edit Dataset', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
     else:
         return abort(404)
 
@@ -428,6 +417,8 @@ def archive(unique_name=None, uid=None):
 
     if not unique_name:
         unique_name = check.get('unique_name')
+    if not uid:
+        uid = check.get('uid')
 
     form, fields = make_form('archive')
 
@@ -448,16 +439,12 @@ def archive(unique_name=None, uid=None):
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
             flash(f'Archive has been updated', 'success')
-            return redirect(url_for('view.view_subunit', unique_name=form.unique_name.data))
+            return redirect(url_for('view.view_archive', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Archive could not be updated: {e}', 'danger')
             return redirect(url_for('edit.archive', unique_name=form.unique_name.data))
 
-    query_string = f'''{{ q(func: eq(unique_name, "{unique_name}")) {{
-		uid expand(_all_) {{ name unique_name uid }}
-         }} }}'''
-
-    result = dgraph.query(query_string)
+    result = get_entry(unique_name=unique_name)
     if result:
         for key, value in result['q'][0].items():
             if not hasattr(form, key):
@@ -476,6 +463,69 @@ def archive(unique_name=None, uid=None):
 
             setattr(getattr(form, key), 'data', value)
 
-        return render_template('edit/editform.html', title='Edit Archive', form=form, fields=fields.keys())
+        sidebar_items = {'meta': result['q'][0]}
+
+        return render_template('edit/editform.html', title='Edit Archive', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
     else:
         return abort(404)
+
+
+@edit.route('/edit/wikidata', methods=['POST'])
+@login_required
+def refresh_wikidata():
+
+    uid = request.form.get('uid')
+    if not uid:
+        flash('Need to specify a UID', 'danger')
+        return redirect(url_for('users.my_entries'))
+
+    check = check_entry(uid=uid)
+    if not check:
+        flash('UID not found!', 'danger')
+        return redirect(url_for('users.my_entries'))
+
+    if check.get('dgraph.type')[0] != "Organization":
+        flash('Only works with organizations!', 'danger')
+        return redirect(url_for('view.view_uid', uid=uid))
+
+    if not can_edit(check, current_user):
+        flash('You do not have permissions to edit this entry', 'danger')
+        return redirect(url_for('view.view_uid', uid=uid))
+
+    query_string = f'''{{ q(func: uid({uid})) {{wikidataID}} }}'''
+
+    entry = dgraph.query(query_string)
+    try:
+        wikidataid = entry['q'][0]['wikidataID']
+    except:
+        flash(f"Entry {uid} does not have a wikidata ID", 'danger')
+        return redirect(url_for('view.view_uid', uid=uid))
+
+    result = fetch_wikidata(f"Q{wikidataid}")
+
+    if result:
+        result['uid'] = uid
+    else:
+        flash(f"Could not retrieve wikidata", 'danger')
+        return redirect(url_for('view.view_uid', uid=uid))
+
+    try:
+        sanitizer = WikiDataSanitizer(
+            result, current_user, get_ip())
+        current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+        current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
+    except Exception as e:
+        flash(f'Entry could not be updated: {e}', 'danger')
+        return redirect(url_for('edit.edit_uid', uid=uid))
+
+    try:
+        delete = dgraph.upsert(
+            sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+        current_app.logger.debug(delete)
+        result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+        current_app.logger.debug(result)
+        flash(f'WikiData has been refreshed', 'success')
+        return redirect(url_for('edit.edit_uid', uid=uid))
+    except Exception as e:
+        flash(f'Could not refresh WikiData: {e}', 'danger')
+        return redirect(url_for('edit.edit_uid', uid=uid))
