@@ -9,7 +9,10 @@
                 <strong class="mb-1 text-truncate">{{ sidebar_items.meta.entry_added.user_displayname }}</strong>
                 <small class="text-muted">(created)</small>
             </div>
-            <div class="col-10 mb-1 small">{% if sidebar_items.meta.get('creation_date') %}{{ sidebar_items.meta.creation_date.strftime('%d&nbsp;%b')|safe }}{% endif %}</div>
+            <div class="col-10 mb-1 small">{% if sidebar_items.meta.get('creation_date') %}
+                {{ sidebar_items.meta.creation_date.strftime('%d&nbsp;%b&nbsp;%Y - %H:%M')|safe }} 
+                {% endif %}
+            </div>
         </div>
         {% endif %}
         {% if sidebar_items.meta.get('entry_edit_history') %}
