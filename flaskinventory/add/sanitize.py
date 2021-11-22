@@ -702,7 +702,6 @@ class SourceSanitizer:
                     self.newsource['geographic_scope_subunit'].append(
                         UID(item))
                 else:
-                    print('querying item: ', item)
                     geo_query = self.resolve_subunit(item)
                     if geo_query:
                         self.newsource['geographic_scope_subunit'].append(
