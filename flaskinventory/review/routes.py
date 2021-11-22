@@ -29,8 +29,6 @@ def overview():
     else:
         overview = get_overview("all")
 
-    print(overview)
-
     return render_template('review/overview.html', 
                                 title='Entries for Review', 
                                 show_sidebar=True, 
@@ -95,7 +93,6 @@ def entry(uid=None):
 @login_required
 @requires_access_level(USER_ROLES.Reviewer)
 def submit():
-    print(request.form)
     uid = request.form.get('uid')
     if uid:
         if request.form.get('accept'):
