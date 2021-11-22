@@ -159,7 +159,6 @@ def create_slackhandler(webhook):
     formatter = RequestFormatter(
                 '[%(asctime)s] %(remote_addr)s requested %(url)s: '
                 '%(levelname)s in %(module)s: %(message)s'
-                '\n %(request_environ)s'
                 )
     slck.setFormatter(formatter)
 
