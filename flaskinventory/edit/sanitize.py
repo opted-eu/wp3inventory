@@ -668,3 +668,38 @@ class EditDatasetSanitizer(EditArchiveSanitizer):
                     continue
                 if item.startswith('0x'):
                     self.edit['sources_included'].append(UID(item))
+
+class WikiDataSanitizer(Sanitizer):
+
+    def __init__(self, data, user, ip):
+        super().__init__(user, ip)
+        self.is_upsert = True
+
+        check = self._check_permissions(data.get('uid'))
+        if not check:
+            raise InventoryValidationError(
+                'You do not have the required permissions to edit this entry!')
+
+        self.edit = {"uid": UID(data.get('uid'))}
+        self.edit = self._add_entry_meta(self.edit)
+
+        overwrite = list(data.keys())
+        overwrite.remove('uid')
+
+        self.overwrite = {self.edit['uid']: overwrite}
+
+        for item in overwrite:
+            self.edit[item] = data[item]
+
+        nquads = dict_to_nquad(self.edit)
+
+        self.set_nquads = " \n ".join(nquads)
+
+        self.delete_nquads = self._make_delete_nquads()
+
+    def _add_entry_meta(self, entry):
+        facets = {'timestamp': datetime.datetime.now(
+                datetime.timezone.utc),
+                'ip': self.user_ip}
+        entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
+        return entry

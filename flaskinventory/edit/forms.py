@@ -367,3 +367,10 @@ def make_form(entity, audience_size=1):
         setattr(F, key, val)
 
     return F(), fields
+
+
+from markupsafe import Markup
+class RefreshWikidataForm(FlaskForm):
+
+    uid = uid
+    submit = SubmitField('Refresh WikiData')
