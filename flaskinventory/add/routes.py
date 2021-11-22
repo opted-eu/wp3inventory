@@ -14,7 +14,7 @@ from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
 from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.flaskdgraph.utils import escape_query
+from flaskinventory.flaskdgraph.utils import strip_query
 import traceback
 
 add = Blueprint('add', __name__)
@@ -25,7 +25,7 @@ add = Blueprint('add', __name__)
 def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
-        query = escape_query(form.name.data)
+        query = strip_query(form.name.data)
         query_string = f'''{{
                 field1 as var(func: regexp(name, /{query.ljust(3)}/i)) @filter(type("{form.entity.data}"))
                 field2 as var(func: allofterms(name, "{query}")) @filter(type("{form.entity.data}"))
@@ -403,7 +403,7 @@ def submit():
 
 @add.route('/_orglookup')
 def orglookup():
-    query = escape_query(request.args.get('q'))
+    query = strip_query(request.args.get('q'))
     person = request.args.get('person')
     if person:
         person_filter = f'AND eq(is_person, {person})'
@@ -432,7 +432,7 @@ def orglookup():
 
 @add.route('/_sourcelookup')
 def sourcelookup():
-    query = escape_query(request.args.get('q'))
+    query = strip_query(request.args.get('q'))
     query_string = f'''{{
             field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
             field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
