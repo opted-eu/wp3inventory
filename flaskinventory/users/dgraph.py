@@ -197,7 +197,7 @@ def list_users():
 def list_entries(user, onlydrafts=False):
     query_string = f"""{{ q(func: uid({user})) {{
         drafts: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "draft"))
-        {{ uid unique_name name dgraph.type entry_review_status }} 
+        {{ uid unique_name name dgraph.type entry_review_status channel {{ name }} }} 
         """
 
     if onlydrafts:
@@ -205,9 +205,9 @@ def list_entries(user, onlydrafts=False):
     else:
         query_string += f"""
             pending: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "pending"))
-            {{ uid unique_name name dgraph.type entry_review_status }} 
+            {{ uid unique_name name dgraph.type entry_review_status channel {{ name }} }} 
             accepted: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "accepted"))
-            {{ uid unique_name name dgraph.type entry_review_status }}
+            {{ uid unique_name name dgraph.type entry_review_status channel {{ name }} }}
             }} }}
             """
 

@@ -31,7 +31,13 @@
 
                     {% if drafts %} {% for entry in drafts %}
                     <tr>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} {% if entry.get('channel') %} ({{ entry.channel.name }}) {% endif %} <{{ entry.unique_name }}>">
+                                {{ entry.name }}
+                                {% if entry.get('channel') %} <small>({{ entry.channel.name }})</small>
+                                {% endif %}
+                            </span>
+                        </td>
                         <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
@@ -59,7 +65,14 @@
 
                     {% if pending %} {% for entry in pending %}
                     <tr>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} {% if entry.get('channel') %} ({{ entry.channel.name }}) {% endif %} <{{ entry.unique_name }}>">
+                                {{ entry.name }}
+                                {% if entry.get('channel') %} <small>({{ entry.channel.name }})</small>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("pending|timestamp") %}{{ entry.get("pending|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                         <td>
@@ -86,7 +99,14 @@
 
                     {% if accepted %} {% for entry in accepted %}
                     <tr>
-                        <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} ({{ entry.unique_name }})">{{ entry.name }}</span></td>                        <td>{{ entry.get("dgraph.type")[0] }}</td>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} {% if entry.get('channel') %} ({{ entry.channel.name }}) {% endif %} <{{ entry.unique_name }}>">
+                                {{ entry.name }}
+                                {% if entry.get('channel') %} <small>({{ entry.channel.name }})</small>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ entry.get("dgraph.type")[0] }}</td>
                         <td>{{ entry.uid }}</td>
                         <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                         <td>
