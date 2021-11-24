@@ -88,7 +88,8 @@ channel_comments = SelectField(
 
 channel_url = StringField('Channel URL')
 
-channel_epaper = RadioField('E-Paper available', choices=[('yes', 'Yes'), ('no', 'No'), ('none', "NA / Don't know")])
+channel_epaper = RadioField(
+    'E-Paper available', choices=[('yes', 'Yes'), ('no', 'No'), ('none', "NA / Don't know")])
 
 transcript_kind_choices = [
     ('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast'), na_option]
@@ -174,10 +175,10 @@ papers = SelectMultipleField('Research Papers that include this source')
 
 is_person = BooleanField('Is a person')
 
-ownership_kind_choices = [('public ownership', 'Mainly public ownership'),
+ownership_kind_choices = [('none', 'Missing!'),
+                          ('public ownership', 'Mainly public ownership'),
                           ('private ownership', 'Mainly private Ownership'),
-                          ('unknown', 'Unknown Ownership'),
-                          ('none', 'Missing!')]
+                          ('unknown', 'Unknown Ownership')]
 
 ownership_kind = SelectField(
     'Type of Organization', choices=ownership_kind_choices, validators=[DataRequired()])
@@ -339,17 +340,16 @@ def make_form(entity, audience_size=1):
         fields = editmultinationalfields
     else:
         raise TypeError
-    
+
     if current_user.user_role > 1:
         unique_name = StringField('Unique Name',
-                            validators=[DataRequired()])
-        fields = {"unique_name": unique_name, **fields, "entry_review_status": entry_review_status}
+                                  validators=[DataRequired()])
+        fields = {"unique_name": unique_name, **fields,
+                  "entry_review_status": entry_review_status}
     else:
         unique_name = StringField('Unique Name',
-                            validators=[DataRequired()], render_kw={'readonly': True})
+                                  validators=[DataRequired()], render_kw={'readonly': True})
         fields = {"unique_name": unique_name, **fields}
-   
-
 
     class F(DynamicForm):
         pass
@@ -369,7 +369,6 @@ def make_form(entity, audience_size=1):
     return F(), fields
 
 
-from markupsafe import Markup
 class RefreshWikidataForm(FlaskForm):
 
     uid = uid
