@@ -54,9 +54,10 @@ def entry(uid=None):
             return redirect(url_for('review.overview'))
 
         dgraphtype = check.get('dgraph.type')[0]
-
+        show_sidebar = False
         related = None
         if dgraphtype == 'Source':
+            show_sidebar = True
             result = get_source(uid=uid)
             if result.get('audience_size'):
                 result['audience_size_table'] = make_mini_table(
@@ -82,7 +83,7 @@ def entry(uid=None):
                                title=result.get('name'),
                                dgraphtype=dgraphtype,
                                entry=result,
-                               show_sidebar=True,
+                               show_sidebar=show_sidebar,
                                related=related,
                                review_actions=review_actions)
 
