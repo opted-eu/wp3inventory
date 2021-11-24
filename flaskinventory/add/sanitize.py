@@ -5,6 +5,7 @@ from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
                                          parse_meta, reverse_geocode, siterankdata, find_sitemaps, find_feeds,
                                          build_url, twitter, facebook, get_wikidata, telegram, vkontakte)
+from flaskinventory.add.dgraph import get_subunit_country
 from flaskinventory import dgraph
 from flask import current_app
 from slugify import slugify
@@ -701,11 +702,18 @@ class SourceSanitizer:
                 if item.strip().startswith('0x'):
                     self.newsource['geographic_scope_subunit'].append(
                         UID(item))
+                    country_uid = get_subunit_country(item.strip())
+                    if country_uid:
+                        self.newsource['country'].append(UID(country_uid))
                 else:
                     geo_query = self.resolve_subunit(item)
                     if geo_query:
                         self.newsource['geographic_scope_subunit'].append(
                             geo_query['uid'])
+                        country_uid = get_subunit_country(
+                            country_code=geo_query['country_code'])
+                        if country_uid:
+                            self.newsource['country'].append(UID(country_uid))
 
     def parse_languages(self):
         if self.json.get('languages'):
