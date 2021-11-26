@@ -65,7 +65,7 @@
             {% endif %}
         </dd>
 </div>
-
+{% if not entry.is_person %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-2"><h5>Owned by</h5></dt>
@@ -92,3 +92,4 @@
             {% endif %}
         </dd>
 </div>
+{% endif %}
