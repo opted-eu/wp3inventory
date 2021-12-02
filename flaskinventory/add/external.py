@@ -213,11 +213,15 @@ def schemaorg(soup):
     url = None
 
     for item in schemas:
-        parsed = json.loads(item.string)
-        if parsed.get('@type'):
-            if parsed.get('@type').lower() == "webpage":
-                url = parsed.get('url')
-                name = parsed.get('name')
+        try:
+            parsed = json.loads(item.string.replace('&q;', '"'))
+            if parsed.get('@type'):
+                if parsed.get('@type').lower() == "webpage":
+                    url = parsed.get('url')
+                    name = parsed.get('name')
+        except Exception as e:
+            current_app.logger.debug(f'Could not parse json schema.org: {e}')
+            continue
 
     return name, url
 
