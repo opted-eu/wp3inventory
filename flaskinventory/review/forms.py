@@ -17,8 +17,6 @@ class ReviewFilter(FlaskForm):
     
     country = SelectField('Filter by Country')
 
-    submit = SubmitField('Filter')
-
 
 class ReviewActions(FlaskForm):
 

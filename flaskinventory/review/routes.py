@@ -24,10 +24,18 @@ def overview():
     form = ReviewFilter()
     form.country.choices = c_choices
 
-    if form.validate_on_submit():
-        overview = get_overview(form.entity.data, country=form.country.data)
+    if request.args:
+        overview = get_overview(request.args.get('entity'), 
+                                country=request.args.get('country'), 
+                                user=request.args.get('user'))
+
+        if request.args.get('country'):
+            form.country.data = request.args.get('country')
+        if request.args.get('entity'):
+            form.entity.data = request.args.get('entity')
+    
     else:
-        overview = get_overview("all")
+        overview = get_overview('all')
 
     return render_template('review/overview.html', 
                                 title='Entries for Review', 
@@ -100,14 +108,14 @@ def submit():
             try:
                 accept_entry(uid)
                 flash('Entry has been accepted!', category='success')
-                return redirect(url_for('review.overview'))
+                return redirect(url_for('review.overview', **request.args))
             except Exception as e:
                 return e
         elif request.form.get('reject'):
             try:
                 reject_entry(uid)
                 flash('Entry has been rejected!', category='info')
-                return redirect(url_for('review.overview'))
+                return redirect(url_for('review.overview', **request.args))
             except Exception as e:
                 return e
         elif request.form.get('edit'):

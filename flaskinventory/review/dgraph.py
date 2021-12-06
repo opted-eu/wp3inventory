@@ -3,25 +3,30 @@ from flaskinventory import dgraph
 
 
 
-def get_overview(dgraphtype, country=None):
+def get_overview(dgraphtype, country=None, user=None):
     if dgraphtype == 'all':
-        query_head = f'''{{ q(func: has(dgraph.type)) @filter(eq(entry_review_status, "pending")) '''
+        query_head = f'''{{ q(func: has(dgraph.type)) @filter(eq(entry_review_status, "pending") '''
     else:
-        query_head = f'''{{ q(func: type({dgraphtype})) @filter(eq(entry_review_status, "pending")) '''
+        query_head = f'''{{ q(func: type({dgraphtype})) @filter(eq(entry_review_status, "pending") '''
     
-    query_fields = f''' uid name unique_name dgraph.type entry_added @facets(timestamp) {{ uid user_displayname }}'''
+    query_fields = f''' uid name unique_name dgraph.type 
+                        entry_added @facets(timestamp) {{ uid user_displayname }}
+                        country {{ uid unique_name name }} 
+                        channel {{ uid unique_name name }} '''
 
-    filt_string = f''''''
-
+    filt_string = ''
     if country:
         if country != 'all':
-            filt_string = f''' @filter(uid({country})) '''
-            query_head += '@cascade'
+            filt_string += f''' AND uid_in(country, {country}) '''
 
-   
-    query_fields += f''' country {filt_string}  {{ uid unique_name name }} channel {{ uid unique_name name }} '''
+    if user:
+        if user != 'any':
+            filt_string += f''' AND uid_in(entry_added, {user})'''
 
-    query = f'{query_head} {{ {query_fields} }} }}'
+    filt_string += ')'
+    
+
+    query = f'{query_head} {filt_string} {{ {query_fields} }} }}'
 
     data = dgraph.query(query)
 
