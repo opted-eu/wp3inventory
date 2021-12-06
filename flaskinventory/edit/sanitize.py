@@ -106,8 +106,6 @@ class Sanitizer:
     def parse_wikidata(self):
         if self.data.get('wikidataID'):
             self.edit['wikidataID'] = self.data.get('wikidataID')
-        else:
-            self.edit['wikidataID'] = '*'
 
     def parse_founded(self):
         if self.data.get('founded'):
@@ -200,7 +198,7 @@ class EditOrgSanitizer(Sanitizer):
         self.data = data
 
         self.overwrite = {self.edit['uid']: [
-            'other_names', 'owns', 'publishes', 'country']}
+            'other_names', 'owns', 'publishes', 'country', 'wikidataID']}
 
         self._parse()
 
