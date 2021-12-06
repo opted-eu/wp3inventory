@@ -106,6 +106,8 @@ class Sanitizer:
     def parse_wikidata(self):
         if self.data.get('wikidataID'):
             self.edit['wikidataID'] = self.data.get('wikidataID')
+        else:
+            self.edit['wikidataID'] = '*'
 
     def parse_founded(self):
         if self.data.get('founded'):
