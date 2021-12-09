@@ -31,7 +31,7 @@ async def generate_fieldoptions():
 
 def get_subunit_country(uid=None, country_code=None):
     if uid:
-        query_string = f''' {{ q(func: uid({uid})) {{ country {{ uid }} }} '''
+        query_string = f''' {{ q(func: uid({uid})) {{ country {{ uid }} }} }}'''
     if country_code:
         query_string = f''' {{ q(func: eq(country_code, "{country_code}")) 
                                 @filter(type("Country")) {{
