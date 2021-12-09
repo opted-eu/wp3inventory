@@ -128,5 +128,9 @@ server {
                 include /etc/nginx/mime.types;
                 root /home/ava/wp3inventory/flaskinventory;
         }
+        
+        location /favicon.ico {
+                alias /home/ava/wp3inventory/flaskinventory/static/favicon.ico;
+        }
 }
 ```
