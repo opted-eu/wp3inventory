@@ -43,7 +43,7 @@ def get_subunit_country(uid=None, country_code=None):
         return False
     
     if uid:
-        return result['q'][0]['country']['uid']
+        return result['q'][0]['country'][0]['uid']
     
     if country_code:
         return result['q'][0]['uid']
