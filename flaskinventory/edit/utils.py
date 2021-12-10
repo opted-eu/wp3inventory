@@ -1,9 +1,11 @@
+from flaskinventory.users.constants import USER_ROLES
+
 
 def can_edit(entry, user):
     if "entry_review_status" in entry.keys():
         if entry.get('entry_review_status') in ['pending', 'accepted']:
             if user.is_authenticated:
-                if user.user_role > 1 or entry.get('entry_added').get('uid') == user.id:
+                if user.user_role > USER_ROLES.Contributor or entry.get('entry_added').get('uid') == user.id:
                     return True
                 else:
                     return False
@@ -11,7 +13,7 @@ def can_edit(entry, user):
                 return False
         elif entry.get('entry_review_status') == 'draft':
             if user.is_authenticated:
-                if user.user_role > 2 or entry.get('entry_added').get('uid') == user.id:
+                if user.user_role > USER_ROLES.Reviewer or entry.get('entry_added').get('uid') == user.id:
                     return True
                 else: 
                     return False
