@@ -10,7 +10,7 @@ main = Blueprint('main', __name__)
 @main.route('/home')
 def home():
     # needs caching!
-    c_choices = get_country_choices()
+    c_choices = get_country_choices(multinational=True)
     c_choices.insert(0, ('all', 'All'))
     form = SimpleQuery()
     form.country.choices = c_choices
