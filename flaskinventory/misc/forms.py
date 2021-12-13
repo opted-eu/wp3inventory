@@ -58,7 +58,7 @@ publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
 
 topical_focus_choices = [("politics", "Politics"),
                          ("society", "Society & Panorama"),
-                         ("economy", "Economy, Finance & Stocks"),
+                         ("economy", "Business, Economy, Finance & Stocks"),
                          ("religion", "Religion"),
                          ("science", "Science & Technology"),
                          ("media", "Media"),
