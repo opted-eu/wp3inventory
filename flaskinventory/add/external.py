@@ -467,6 +467,10 @@ def telegram(username):
             profile = await bot.get_entity(username)
         except ValueError as e:
             profile = False
+            try: 
+                profile = await bot.get_entity(username + '_bot')
+            except ValueError as e:
+                profile = False
 
         await bot.disconnect()
         return profile
