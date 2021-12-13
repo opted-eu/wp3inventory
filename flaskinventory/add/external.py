@@ -84,7 +84,10 @@ def find_sitemaps(site):
     if site.endswith('/'):
         site = site[:-1]
 
-    r = requests.get(site)
+    headers = {"user-agent":
+               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
+    r = requests.get(site, headers=headers)
+
     if r.status_code != 200:
         raise requests.RequestException(
             f'Could not reach {site}. Status: {r.status_code}')
@@ -109,15 +112,18 @@ def find_feeds(site):
     if site.endswith('/'):
         site = site[:-1]
 
+    headers = {"user-agent":
+               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
+
     # first: naive approach
     try:
-        r = requests.get(site + '/rss')
+        r = requests.get(site + '/rss', headers=headers)
         if 'xml' in r.headers['Content-Type'] or 'rss' in r.headers['Content-Type']:
             return [site + '/rss']
     except Exception:
         pass
 
-    r = requests.get(site)
+    r = requests.get(site, headers=headers)
     result = []
     possible_feeds = []
     html = bs4(r.content, 'lxml')
@@ -165,7 +171,10 @@ def parse_meta(url):
     if not site:
         return False, False
 
-    r = requests.get(site)
+    headers = {'user-agent':
+               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
+
+    r = requests.get(site, headers=headers)
 
     if not r.ok:
         return False, False

@@ -11,7 +11,7 @@ from flaskinventory.review.dgraph import check_entry
 from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
 from flaskinventory.add.external import fetch_wikidata
-
+from flaskinventory.users.constants import USER_ROLES
 from flaskinventory import dgraph
 
 import traceback
@@ -136,7 +136,10 @@ def source(unique_name=None, uid=None):
     form, fields = make_form(
         result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
 
-    form.country.choices = get_country_choices(multinational=True)
+    if current_user.user_role >= USER_ROLES.Reviewer:
+        form.country.choices = get_country_choices(multinational=True, opted=False)
+    else:
+        form.country.choices = get_country_choices(multinational=True)
     form.geographic_scope_subunit.choices = get_subunit_choices()
 
     if form.validate_on_submit():
