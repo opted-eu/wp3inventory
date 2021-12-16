@@ -169,11 +169,11 @@ class Sanitizer:
             duplicate_check = dgraph.get_uid(
                 'unique_name', geo_query['unique_name'])
             if duplicate_check:
-                geo_query['uid'] = UID(duplicate_check)
+                geo_query = {'uid': UID(duplicate_check)}
             else:
                 geo_query['uid'] = NewID(
                     f"_:{slugify(secrets.token_urlsafe(8))}")
-            self.newsubunits.append(geo_query)
+                self.newsubunits.append(geo_query)
 
             return geo_query
         else:
