@@ -88,7 +88,7 @@ def entry(uid=None):
             return redirect(url_for('review.overview'))
 
         return render_template('review/detail.html',
-                               title=result.get('name'),
+                               title=f"Review: {result.get('name')}",
                                dgraphtype=dgraphtype,
                                entry=result,
                                show_sidebar=show_sidebar,
