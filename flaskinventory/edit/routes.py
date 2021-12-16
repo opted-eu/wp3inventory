@@ -149,9 +149,9 @@ def source(unique_name=None, uid=None):
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
-            tb_str = ''.join(traceback.format_exception(
-                None, e, e.__traceback__))
-            current_app.logger.error(e, tb_str)
+            # tb_str = ''.join(traceback.format_exception(
+            #     None, e, e.__traceback__))
+            current_app.logger.error(e)
             flash(
                 f'Source could not be updated. Sanitizer raised error: {e}', 'danger')
             return redirect(url_for('edit.source', uid=form.uid.data))
