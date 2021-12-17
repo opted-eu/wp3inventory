@@ -67,6 +67,9 @@ def test_url(site):
         return False
     try:
         r = requests.head(site, timeout=5)
+    except requests.exceptions.SSLError:
+        site = site.replace('https', 'http')
+        r = requests.get(site)
     except Exception as e:
         return False
 
@@ -86,7 +89,11 @@ def find_sitemaps(site):
 
     headers = {"user-agent":
                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
-    r = requests.get(site, headers=headers)
+    try:
+        r = requests.get(site, headers=headers)
+    except requests.exceptions.SSLError:
+        site = site.replace('https', 'http')
+        r = requests.get(site)
 
     if r.status_code != 200:
         raise requests.RequestException(
@@ -120,6 +127,9 @@ def find_feeds(site):
         r = requests.get(site + '/rss', headers=headers)
         if 'xml' in r.headers['Content-Type'] or 'rss' in r.headers['Content-Type']:
             return [site + '/rss']
+    except requests.exceptions.SSLError:
+        site = site.replace('https', 'http')
+        r = requests.get(site)
     except Exception:
         pass
 
@@ -174,7 +184,10 @@ def parse_meta(url):
     headers = {'user-agent':
                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
 
-    r = requests.get(site, headers=headers)
+    try:
+        r = requests.get(site, headers=headers)
+    except requests.exceptions.SSLError:
+        r = requests.get(site.replace('https', 'http'))
 
     if not r.ok:
         return False, False
