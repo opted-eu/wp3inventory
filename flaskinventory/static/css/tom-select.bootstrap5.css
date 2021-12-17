@@ -2,7 +2,7 @@
  * Tom Select bootstrap 5
  */
 /**
- * tom-select.css (v2.0.0-rc.5)
+ * tom-select.css (v2.0.0)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -142,7 +142,7 @@
   text-decoration: none;
   vertical-align: middle;
   display: inline-block;
-  padding: 1px 5px;
+  padding: 0 5px;
   border-left: 1px solid #dee2e6;
   border-radius: 0 2px 2px 0;
   box-sizing: border-box;

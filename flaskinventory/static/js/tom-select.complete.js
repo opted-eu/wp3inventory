@@ -1,5 +1,5 @@
 /**
-* Tom Select v2.0.0-rc.5
+* Tom Select v2.0.0
 * Licensed under the Apache License, Version 2.0 (the "License");
 */
 
@@ -838,7 +838,7 @@
 	    return query;
 	  }
 
-	  if (query.indexOf('<') > -1) {
+	  if (isHtmlString(query)) {
 	    let div = document.createElement('div');
 	    div.innerHTML = query.trim(); // Never return a text node of whitespace as the result
 
@@ -846,6 +846,13 @@
 	  }
 
 	  return document.querySelector(query);
+	};
+	const isHtmlString = arg => {
+	  if (typeof arg === 'string' && arg.indexOf('<') > -1) {
+	    return true;
+	  }
+
+	  return false;
 	};
 	const escapeQuery = query => {
 	  return query.replace(/['"\\]/g, '\\$&');
@@ -1136,7 +1143,7 @@
 	  itemClass: 'item',
 	  optionClass: 'option',
 	  dropdownParent: null,
-	  //controlInput: null,
+	  controlInput: '<input type="text" autocomplete="off" size="1" />',
 	  copyClassesToDropdown: false,
 	  placeholder: null,
 	  hidePlaceholder: null,
@@ -1251,8 +1258,10 @@
 	  fn.apply(self, []);
 	  self.trigger = trigger; // trigger queued events
 
-	  for (type in event_args) {
-	    trigger.apply(self, event_args[type]);
+	  for (type of types) {
+	    if (type in event_args) {
+	      trigger.apply(self, event_args[type]);
+	    }
 	  }
 	};
 	/**
@@ -1612,8 +1621,8 @@
 	    append(dropdown, dropdown_content);
 	    getDom(settings.dropdownParent || wrapper).appendChild(dropdown); // default controlInput
 
-	    if (!settings.hasOwnProperty('controlInput')) {
-	      control_input = getDom('<input type="text" autocomplete="off" size="1" />'); // set attributes
+	    if (isHtmlString(settings.controlInput)) {
+	      control_input = getDom(settings.controlInput); // set attributes
 
 	      var attrs = ['autocorrect', 'autocapitalize', 'autocomplete'];
 	      iterate(attrs, attr => {
@@ -1625,10 +1634,10 @@
 	      });
 	      control_input.tabIndex = -1;
 	      control.appendChild(control_input);
-	      this.focus_node = control_input; // custom controlInput
+	      this.focus_node = control_input; // dom element	
 	    } else if (settings.controlInput) {
 	      control_input = getDom(settings.controlInput);
-	      this.focus_node = control_input; // controlInput = null
+	      this.focus_node = control_input;
 	    } else {
 	      control_input = getDom('<input/>');
 	      this.focus_node = control;
@@ -1990,7 +1999,7 @@
 	  onPaste(e) {
 	    var self = this;
 
-	    if (self.isFull() || self.isInputHidden || self.isLocked) {
+	    if (self.isInputHidden || self.isLocked) {
 	      preventDefault(e);
 	      return;
 	    } // If a regex or string is included, this will split the pasted
@@ -3278,7 +3287,7 @@
 
 
 	  addItem(value, silent) {
-	    var events = silent ? [] : ['change'];
+	    var events = silent ? [] : ['change', 'dropdown_close'];
 	    debounce_events(this, events, () => {
 	      var item, wasFull;
 	      const self = this;
@@ -3838,7 +3847,6 @@
 
 
 	  lock() {
-	    this.close();
 	    this.isLocked = true;
 	    this.refreshState();
 	  }
@@ -3863,6 +3871,7 @@
 	    self.control_input.disabled = true;
 	    self.focus_node.tabIndex = -1;
 	    self.isDisabled = true;
+	    this.close();
 	    self.lock();
 	  }
 	  /**
