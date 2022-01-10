@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import current_app
 import requests
 from requests.models import PreparedRequest
@@ -389,7 +390,11 @@ def fetch_wikidata(wikidataid, query=None):
     try:
         inception = wikidata['entities'][wikidataid]['claims']['P571'][0]['mainsnak']['datavalue']['value']['time'].replace(
             '+', '')
-        result['founded'] = isoparse(inception)
+        if re.match(r'\d{4}-00-00', inception):
+            year = re.match(r'\d{4}-00-00', inception)[0].replace('-00-00', '')
+            result['founded'] = datetime(year=int(year), month=1, day=1)
+        else:
+            result['founded'] = isoparse(inception)
     except Exception as e:
         current_app.logger.debug(
             f"Could not get inception date: {e}. Query: {query}. Wikidata ID: {wikidataid}")
