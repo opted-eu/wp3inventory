@@ -32,6 +32,7 @@ type Source {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     wikidataID
@@ -68,6 +69,7 @@ type Channel {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     form_name_question
     form_name_placeholder
@@ -82,6 +84,7 @@ type Organization {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     wikidataID
@@ -103,6 +106,7 @@ type Country {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     wikidataID
@@ -119,6 +123,7 @@ type Multinational {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
 }
@@ -132,6 +137,7 @@ type Subunit {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     wikidataID
@@ -146,6 +152,7 @@ type Archive {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     wikidataID
@@ -163,6 +170,7 @@ type Dataset {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     access
@@ -185,6 +193,7 @@ type Corpus {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     access
@@ -207,6 +216,7 @@ type Tool {
     creation_date
     entry_edit_history
     entry_review_status
+    reviewed_by
     entry_notes
     other_names
     access
@@ -235,6 +245,7 @@ type ResearchPaper {
     sources_included
     country
     entry_review_status
+    reviewed_by
     entry_added
     creation_date
     entry_edit_history
@@ -243,6 +254,7 @@ type ResearchPaper {
 
 type Rejected {
     entry_review_status
+    reviewed_by
     entry_added
     creation_date
     entry_edit_history
@@ -269,7 +281,8 @@ name: string @index(term, trigram) .
 entry_added: uid @reverse .
 creation_date: dateTime @index(day) .
 entry_edit_history: [uid] @reverse .
-entry_review_status: string @index(hash).
+entry_review_status: string @index(hash) .
+reviewed_by: uid @reverse .
 entry_notes: string .
 other_names: [string] @index(term, trigram) .
 wikidataID: int @index(int) .
