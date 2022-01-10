@@ -1,5 +1,5 @@
 from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, make_nquad, dict_to_nquad)
+                                        Geolocation, Variable, dgraph_types, make_nquad, dict_to_nquad)
 from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
@@ -832,12 +832,17 @@ class SourceSanitizer:
                        'is_person': False}
                 if item.startswith('0x'):
                     org['uid'] = UID(item)
-
                 else:
-                    org = self.add_entry_meta(org)
-                    org['uid'] = NewID(item)
-                    org['name'] = item
-                    org['dgraph.type'] = 'Organization'
+                    # check for entry with exactly the same name
+                    query = f'{{ q(func: eq(name, {item.strip()})) {{ uid }}'
+                    res = dgraph.query(query)
+                    if len(res['q']) > 0:
+                        org['uid'] = UID(res['q'][0]['uid'])
+                    else:
+                        org = self.add_entry_meta(org)
+                        org['uid'] = NewID(item)
+                        org['name'] = item.strip()
+                        org['dgraph.type'] = 'Organization'
 
                     try:
                         self.resolve_org(org)
