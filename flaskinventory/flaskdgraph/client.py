@@ -3,6 +3,8 @@ from dateutil.parser import isoparse
 from flask import current_app, _app_ctx_stack
 import pydgraph
 import logging
+from .dgraph_types import (UID, NewID, Predicate, Scalar,
+                                        Geolocation, Variable, make_nquad, dict_to_nquad)
 
 
 class DGraph(object):
@@ -182,7 +184,7 @@ class DGraph(object):
             raise TypeError()
 
         if uid:
-            input_data['uid'] = uid
+            input_data['uid'] = str(uid)
 
         txn = self.connection.txn()
 
@@ -206,8 +208,8 @@ class DGraph(object):
                 query = '{' + query + '}'
         self.logger.debug("Performing upsert:")
         self.logger.debug(f'Query: {query}')
-        self.logger.debug(f'nquad: {set_nquads}')
-
+        self.logger.debug(f'set nquads: {set_nquads}')
+        self.logger.debug(f'delete nquads: {del_nquads}')
         txn = self.connection.txn()
         mutation = txn.create_mutation(set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
         request = txn.create_request(query=query, mutations=[

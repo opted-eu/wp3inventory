@@ -1,6 +1,7 @@
 from flask import current_app
 from flaskinventory import dgraph
-
+from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
+                                        Geolocation, Variable, make_nquad, dict_to_nquad)
 
 
 def get_overview(dgraphtype, country=None, user=None):
@@ -57,14 +58,33 @@ def accept_entry(uid):
     dgraph.update_entry(accepted, uid=uid)
 
 def reject_entry(uid):
-    del_nquads = f'''<{uid}> <dgraph.type> * .
-                        <{uid}> <unique_name> * .
-                        <{uid}> <publishes> * .
-                        <{uid}> <owns> * .'''
-    query = None
+
+    current_app.logger.debug(f'Rejecting entry: UID {uid}')
+
+    uid = UID(uid)
+    related = Variable('v', 'uid')
+    publishes = Variable('p', 'uid')
+    owns = Variable('o', 'uid')
+    query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query()})) {{
+			            {related.query()} }} 
+                    publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query()})) {{
+                        {publishes.query()} }}
+                    owns(func: type(Organization)) @filter(uid_in(owns, {uid.query()})) {{
+                        {owns.query()} }}
+                }}'''
+
+    delete_predicates = [Predicate('dgraph.type'), Predicate('unique_name'), Predicate('publishes'),
+                        Predicate('owns'), Predicate('related')]
+    
+    del_nquads = [make_nquad(uid, item, Scalar('*')) for item in delete_predicates]
+    del_nquads += [make_nquad(related, Predicate('related'), uid)]
+    del_nquads += [make_nquad(publishes, Predicate('publishes'), uid)]
+    del_nquads += [make_nquad(owns, Predicate('owns'), uid)]
+
+    del_nquads = " \n ".join(del_nquads)
+    
     dgraph.upsert(query, del_nquads=del_nquads)
 
     rejected = {'entry_review_status': 'rejected', 'dgraph.type': 'Rejected'}
 
     dgraph.update_entry(rejected, uid=uid)
-
