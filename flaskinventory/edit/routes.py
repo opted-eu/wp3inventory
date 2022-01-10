@@ -147,7 +147,7 @@ def source(unique_name=None, uid=None):
             sanitizer = EditSourceSanitizer(
                 form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
+            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
             # tb_str = ''.join(traceback.format_exception(
             #     None, e, e.__traceback__))
@@ -187,7 +187,7 @@ def source(unique_name=None, uid=None):
                 value = [str(val) for val in value]
             else:
                 choices = [(subval['uid'], subval['unique_name'])
-                           for subval in value]
+                           for subval in value if subval.get('unique_name')]
                 value = [subval['uid'] for subval in value]
                 if key not in ['country', 'geographic_scope_subunit']:
                     setattr(getattr(form, key),
