@@ -81,6 +81,10 @@ class SourceSanitizer:
         else:
             raise NotImplementedError('Cannot process submitted news source.')
 
+        if len(self.newsource['other_names']) > 0:
+            if self.newsource['name'] in self.newsource['other_names']:
+                self.newsource['other_names'].remove(self.newsource['name'])
+
         if self.is_upsert:
             self.delete_nquads = self.make_delete_nquads()
 
@@ -1000,6 +1004,9 @@ class SourceSanitizer:
 
             if not name:
                 name = query
+            
+            if name in other_names:
+                other_names.remove(name)
 
             new_subunit = {'name': name,
                            'country': UID(country_uid),
