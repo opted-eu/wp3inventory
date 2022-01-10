@@ -753,8 +753,14 @@ class SourceSanitizer:
 
     def parse_followers(self):
         if self.json.get('audience_size_followers'):
-            facets = {'likes': int(
-                self.json.get('audience_size_followers'))}
+            try:
+                facets = {'likes': int(
+                    self.json.get('audience_size_followers'))}
+            except ValueError:
+                raise InventoryValidationError(f'''Wrong value for "How many likes does the social media page have now?" \n 
+                                                    Please check if you entered a proper number into this field. 
+                                                    Your input is {self.json.get("audience_size_followers")} \n
+                                                    Are there any commas or periods in your input?''')
 
             audience_size_year = datetime.date.today()
 
@@ -1015,7 +1021,7 @@ class SourceSanitizer:
 
             if not name:
                 name = query
-            
+
             if name in other_names:
                 other_names.remove(name)
 
