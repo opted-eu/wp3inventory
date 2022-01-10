@@ -12,6 +12,9 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="accepted-tab" data-bs-toggle="tab" data-bs-target="#accepted" type="button" role="tab" aria-controls="accepted" aria-selected="false">Accepted</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button" role="tab" aria-controls="accepted" aria-selected="false">Rejected</button>
+        </li>
     </ul>
     <div class="tab-content" id="entryTabContent">
         <div class="tab-pane fade show active" id="drafts" role="tabpanel" aria-labelledby="drafts-tab">
@@ -111,6 +114,38 @@
                         <td>{% if entry.get("accepted|timestamp") %}{{ entry.get("accepted|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a><a class="btn btn-warning" href="{{ url_for('edit.edit_uid', uid=entry.get('uid'))}}">Edit</a></div>
+                        </td>
+                    </tr>
+                    {% endfor %} {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+            <h4 class="my-4">My Rejected Entries</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">uid</th>
+                        <th scope="col">Added</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% if rejected %} {% for entry in rejected %}
+                    <tr>
+                        <td>
+                            <span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ entry.name }} {% if entry.get('channel') %} ({{ entry.channel.name }}) {% endif %} <{{ entry.uid }}>">
+                                {{ entry.name }}
+                                {% if entry.get('channel') %} <small>({{ entry.channel.name }})</small>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>{{ entry.uid }}</td>
+                        <td>{% if entry.get("rejected|timestamp") %}{{ entry.get("rejected|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">View</a></div>
                         </td>
                     </tr>
                     {% endfor %} {% endif %}

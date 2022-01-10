@@ -208,7 +208,10 @@ def list_entries(user, onlydrafts=False):
             {{ uid unique_name name dgraph.type entry_review_status channel {{ name }} }} 
             accepted: ~entry_added @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "accepted"))
             {{ uid unique_name name dgraph.type entry_review_status channel {{ name }} }}
-            }} }}
+            rejected: ~entry_added  @facets(orderdesc: timestamp) @filter(eq(entry_review_status, "rejected")) 
+            {{ uid name entry_review_status channel {{ name }} }}
+            }}
+            }}
             """
 
     data = dgraph.query(query_string)
