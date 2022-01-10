@@ -101,11 +101,11 @@ def view_uid():
 @view.route("/view/source/<string:unique_name>")
 def view_source(unique_name=None, uid=None):
     if uid:
-        unique_item = get_source(uid=uid)
-    elif unique_name:
-        unique_item = get_source(unique_name=unique_name)
-    else:
-        return abort(404)
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
+    unique_item = get_source(unique_name=unique_name, uid=uid)
+    
     if unique_item:
         if "Source" not in unique_item.get('dgraph.type'):
             entry_type = unique_item.get('dgraph.type')[0]
@@ -140,6 +140,10 @@ def view_source(unique_name=None, uid=None):
 @view.route("/view/archive/<string:unique_name>")
 @view.route("/view/archive/uid/<string:uid>")
 def view_archive(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_archive(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Archive" not in unique_item.get('dgraph.type'):
@@ -158,6 +162,10 @@ def view_archive(unique_name=None, uid=None):
 @view.route("/view/dataset/uid/<string:uid>")
 @view.route("/view/dataset/<string:unique_name>")
 def view_dataset(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_archive(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Dataset" not in unique_item.get('dgraph.type'):
@@ -178,6 +186,10 @@ def view_dataset(unique_name=None, uid=None):
 @view.route("/view/organization/uid/<string:uid>")
 @view.route("/view/organisation/uid/<string:uid>")
 def view_organization(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_organization(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Organization" not in unique_item.get('dgraph.type'):
@@ -196,6 +208,10 @@ def view_organization(unique_name=None, uid=None):
 @view.route("/view/country/<string:unique_name>")
 @view.route("/view/country/uid/<string:uid>")
 def view_country(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_country(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Country" not in unique_item.get('dgraph.type'):
@@ -214,6 +230,10 @@ def view_country(unique_name=None, uid=None):
 @view.route("/view/subunit/<string:unique_name>")
 @view.route("/view/subunit/uid/<string:uid>")
 def view_subunit(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_subunit(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Subunit" not in unique_item.get('dgraph.type'):
@@ -232,6 +252,10 @@ def view_subunit(unique_name=None, uid=None):
 @view.route("/view/multinational/<string:unique_name>")
 @view.route("/view/multinational/uid/<string:uid>")
 def view_multinational(unique_name=None, uid=None):
+    if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return abort(404)
     unique_item = get_multinational(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Multinational" not in unique_item.get('dgraph.type'):
@@ -265,6 +289,9 @@ def view_channel(unique_name):
 
 @view.route("/view/researchpaper/<string:uid>")
 def view_researchpaper(uid):
+    uid = validate_uid(uid)
+    if not uid:
+        return abort(404)
     unique_item = get_paper(uid)
     if unique_item:
         if "ResearchPaper" not in unique_item.get('dgraph.type'):

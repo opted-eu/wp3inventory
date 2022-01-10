@@ -24,7 +24,7 @@ def get_source(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ source(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ source(func: uid({uid}))'
+        query_func = f'{{ source(func: uid({uid})) @filter(type(Source))'
     else:
         return None
 
@@ -76,7 +76,7 @@ def get_archive(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ archive(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ archive(func: uid({uid}))'
+        query_func = f'{{ archive(func: uid({uid})) @filter(type(Archive))'
     else:
         return None
 
@@ -97,7 +97,7 @@ def get_organization(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ organization(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ organization(func: uid({uid}))'
+        query_func = f'{{ organization(func: uid({uid})) @filter(type(Organization))'
     else:
         return None
 
@@ -120,7 +120,7 @@ def get_channel(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ channel(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ channel(func: uid({uid}))'
+        query_func = f'{{ channel(func: uid({uid})) @filter(type(Channel))'
     else:
         return None
 
@@ -142,7 +142,7 @@ def get_country(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ country(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ country(func: uid({uid}))'
+        query_func = f'{{ country(func: uid({uid})) @filter(type(Country))'
     else:
         return None
 
@@ -165,7 +165,7 @@ def get_subunit(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ subunit(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ subunit(func: uid({uid}))'
+        query_func = f'{{ subunit(func: uid({uid})) @filter(type(Subunit))'
     else:
         return None
 
@@ -188,7 +188,7 @@ def get_multinational(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ multinational(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ multinational(func: uid({uid}))'
+        query_func = f'{{ multinational(func: uid({uid})) @filter(type(Multinational))'
     else:
         return None
 
@@ -208,7 +208,7 @@ def get_multinational(unique_name=None, uid=None):
 
 
 def get_paper(uid):
-    query_func = f'{{ paper(func: uid({uid}))'
+    query_func = f'{{ paper(func: uid({uid})) @filter(type(ResearchPaper))'
 
     query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name channel { name } } } }'''
 
