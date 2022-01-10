@@ -140,6 +140,22 @@ function channelVisibility(fieldOptions, allNames, el) {
         elem.removeAttribute('required');
     })
 
+    document.querySelector("#form-check-contains-ads-1").hidden = false
+    document.querySelector("#contains_ads1").required = true
+    document.querySelector('label[for="contains_ads1"]').innerHTML = 'Yes, for all audiences'
+
+    document.querySelector("#form-check-contains-ads-2").hidden = false
+    document.querySelector("#contains_ads2").required = true
+    document.querySelector('label[for="contains_ads2"]').innerHTML = 'Yes, but not for paying users'
+
+    document.querySelector("#form-check-contains-ads-3").hidden = false
+    document.querySelector("#contains_ads3").required = true
+    document.querySelector('label[for="contains_ads3"]').innerHTML = 'No, not at all'
+
+    document.querySelector("#form-check-contains-ads-4").hidden = false
+    document.querySelector("#contains_ads4").required = true
+    document.querySelector('label[for="contains_ads4"]').innerHTML = "Don't know"
+
     if (value == 'print') {
         document.getElementById('name-print-tooltip').hidden = false;
         document.querySelector("#group-epaper").hidden = false;
@@ -191,10 +207,33 @@ function channelVisibility(fieldOptions, allNames, el) {
         document.querySelector('#group-source-founded').hidden = false
         document.querySelector('#source-founded-question').innerHTML = `What year was the facebook page created?`
         document.querySelector('#group-audience-size-followers').hidden = false
+
+        document.querySelector('label[for="contains_ads1"]').innerHTML = 'Yes'
+
+        document.querySelector("#form-check-contains-ads-2").hidden = true
+        document.querySelector("#contains_ads2").required = false
+
+        document.querySelector('label[for="contains_ads3"]').innerHTML = 'No'
+
     } else if (value == 'instagram') {
         document.getElementById('name-instagram-tooltip').hidden = false;
+
+        document.querySelector('label[for="contains_ads1"]').innerHTML = 'Yes'
+
+        document.querySelector("#form-check-contains-ads-2").hidden = true
+        document.querySelector("#contains_ads2").required = false
+
+        document.querySelector('label[for="contains_ads3"]').innerHTML = 'No'
+
     } else if (value == 'twitter') {
         document.getElementById('name-twitter-tooltip').hidden = false;
+
+        document.querySelector('label[for="contains_ads1"]').innerHTML = 'Yes'
+
+        document.querySelector("#form-check-contains-ads-2").hidden = true
+        document.querySelector("#contains_ads2").required = false
+
+        document.querySelector('label[for="contains_ads3"]').innerHTML = 'No'
     }
 };
 
