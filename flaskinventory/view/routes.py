@@ -3,10 +3,12 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.view.dgraph import get_dgraphtype, get_archive, get_channel, get_country, get_organization, get_paper, get_source, get_subunit, list_by_type, get_multinational
+from flaskinventory.view.dgraph import (get_dgraphtype, get_archive, get_channel, get_country,
+                                        get_organization, get_paper, get_rejected, get_source, get_subunit, list_by_type, get_multinational)
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
 from flaskinventory.misc.forms import publication_kind_dict, topical_focus_dict
+from flaskinventory.flaskdgraph.utils import validate_uid
 
 view = Blueprint('view', __name__)
 
@@ -81,13 +83,15 @@ def search():
         flash("Please enter a search query in the top search bar", "info")
         return redirect(url_for('main.home'))
 
+
 @view.route("/view")
 def view_uid():
     if request.args.get('uid'):
         dgraphtype = get_dgraphtype(request.args.get('uid'))
         if dgraphtype:
             return redirect(url_for('view.view_' + dgraphtype.lower(), uid=request.args.get('uid')))
-    else: return abort(404)
+    else:
+        return abort(404)
 
 
 @view.route("/view/source/uid/<string:uid>")
@@ -108,7 +112,7 @@ def view_source(unique_name=None, uid=None):
         if unique_item.get('audience_size'):
             unique_item['audience_size_table'] = make_mini_table(
                 unique_item['audience_size'])
-        
+
         # pretty print some fields
         if unique_item.get('publication_kind'):
             for i, item in enumerate(unique_item.get('publication_kind')):
@@ -119,9 +123,8 @@ def view_source(unique_name=None, uid=None):
                 if item in topical_focus_dict.keys():
                     unique_item['topical_focus'][i] = topical_focus_dict[item]
 
-
         related = unique_item.get('related', None)
- 
+
         return render_template('view/source.html',
                                title=unique_item.get('name'),
                                entry=unique_item,
@@ -148,6 +151,7 @@ def view_archive(unique_name=None, uid=None):
     else:
         return abort(404)
 
+
 @view.route("/view/dataset/uid/<string:uid>")
 @view.route("/view/dataset/<string:unique_name>")
 def view_dataset(unique_name=None, uid=None):
@@ -164,6 +168,7 @@ def view_dataset(unique_name=None, uid=None):
                                entry=unique_item)
     else:
         return abort(404)
+
 
 @view.route("/view/organization/<string:unique_name>")
 @view.route("/view/organisation/<string:unique_name>")
@@ -201,6 +206,7 @@ def view_country(unique_name=None, uid=None):
                                entry=unique_item)
     else:
         return abort(404)
+
 
 @view.route("/view/subunit/<string:unique_name>")
 @view.route("/view/subunit/uid/<string:uid>")
@@ -269,6 +275,25 @@ def view_researchpaper(uid):
     else:
         return abort(404)
 
+@login_required
+@view.route("/view/rejected/<uid>")
+def view_rejected(uid):
+    uid = validate_uid(uid)
+    if not uid:
+        flash('Invalid ID provided!', "warning")
+        return abort(404)
+
+    data = get_rejected(uid)
+
+    if not data:
+        return abort(404)
+    
+    if not can_view(data, current_user):
+        return abort(403)
+    
+    return render_template('view/rejected.html',
+                               title=f"Rejected: {data.get('name')}",
+                               entry=data)
 
 @view.route("/query", methods=['GET', 'POST'])
 def query():
@@ -284,7 +309,7 @@ def query():
         if data:
             for item in data:
                 cols += item.keys()
-      
+
         cols = list(set(cols))
 
         # CACHE THIS

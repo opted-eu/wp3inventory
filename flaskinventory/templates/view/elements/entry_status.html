@@ -5,3 +5,8 @@
 {% if entry.entry_review_status == "draft" %}
 <span data-bs-toggle="tooltip" data-bs-placement="top" title="This entry is currently a draft and is only visible to you."  class="badge bg-secondary">Draft</span> 
 {% endif %}
+
+
+{% if entry.entry_review_status == "rejected" %}
+<span data-bs-toggle="tooltip" data-bs-placement="top" title="This entry was rejected."  class="badge bg-danger">Rejected</span> 
+{% endif %}

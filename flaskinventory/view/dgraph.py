@@ -3,6 +3,8 @@ from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes
 import json
 
+from flaskinventory.flaskdgraph import dgraph_types
+
 
 """
     Inventory Detail View Functions
@@ -226,6 +228,21 @@ def get_paper(uid):
                 '[', '').replace(']', '').split(';')
 
     return data
+
+def get_rejected(uid):
+    query_string = f'''{{ q(func: uid({uid})) @filter(type(Rejected)) 
+                        {{ uid name unique_name other_names 
+                            creation_date entry_added {{ uid user_displayname }} 
+                            entry_notes entry_review_status
+                        }}
+                        }}'''
+
+    res = dgraph.query(query_string)
+
+    if len(res['q']) > 0:
+        return res['q'][0]
+    else:
+        return False
 
 
 def get_orphan(query):

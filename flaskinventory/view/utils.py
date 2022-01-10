@@ -87,7 +87,7 @@ viewed by the user who created the item or reviewers/admins
 """
 def can_view(entry, user):
     if "entry_review_status" in entry.keys():
-        if entry.get('entry_review_status') == 'pending':
+        if entry.get('entry_review_status') in ['pending', 'rejected']:
             if user.is_authenticated:
                 if user.user_role > 1 or entry.get('entry_added').get('uid') == user.id:
                     return True
