@@ -729,8 +729,14 @@ class SourceSanitizer:
 
     def parse_audience_size(self):
         if self.json.get('audience_size_subscribers'):
-            facets = {'copies_sold': int(
-                self.json.get('audience_size_subscribers'))}
+            try:
+                facets = {'copies_sold': int(
+                    self.json.get('audience_size_subscribers'))}
+            except ValueError:
+                raise InventoryValidationError(f'''Wrong value for "How many copies of this newspaper are sold per issue?" \n 
+                                                    Please check if you entered a proper number into this field. 
+                                                    Your input is {self.json.get("audience_size_subscribers")} \n
+                                                    Are there any commas or periods in your input?''')
             if self.json.get('audience_size_datafrom'):
                 facets['data_from'] = self.json.get(
                     'audience_size_datafrom')
