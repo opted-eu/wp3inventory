@@ -1,6 +1,6 @@
 from flask import (Blueprint, render_template, url_for,
-                   flash, redirect, request, abort)
-from flask_login import login_required
+                   flash, redirect, request, abort, current_app)
+from flask_login import login_required, current_user
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.review.forms import ReviewActions, ReviewFilter
@@ -106,23 +106,27 @@ def submit():
     if uid:
         if request.form.get('accept'):
             try:
-                accept_entry(uid)
+                accept_entry(uid, current_user)
                 flash('Entry has been accepted!', category='success')
                 return redirect(url_for('review.overview', **request.args))
             except Exception as e:
-                return e
+                current_app.logger.error(f'Could not accept entry with uid {uid}: {e}')
+                flash(f'Reviewing entry failed! Error: {e}', category='danger')
+                return redirect(url_for('review.overview', **request.args))
         elif request.form.get('reject'):
             try:
-                reject_entry(uid)
+                reject_entry(uid, current_user)
                 flash('Entry has been rejected!', category='info')
                 return redirect(url_for('review.overview', **request.args))
             except Exception as e:
-                return e
+                current_app.logger.error(f'Could not reject entry with uid {uid}: {e}')
+                flash(f'Reviewing entry failed! Error: {e}', category='danger')
         elif request.form.get('edit'):
             try:
                 return redirect(url_for('edit.edit_uid', uid=uid))
             except Exception as e:
-                return e
+                current_app.logger.error(f'Could not edit entry with uid {uid}: {e}')
+                flash(f'Reviewing entry failed! Error: {e}', category='danger')
         else:
             return abort(404)
     else:

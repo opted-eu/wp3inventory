@@ -52,12 +52,14 @@ def check_entry(uid=None, unique_name=None):
     
     return data['q'][0]
 
-def accept_entry(uid):
-    accepted = {'entry_review_status': 'accepted'}
+def accept_entry(uid, user):
+    accepted = {'uid': UID(uid), 'entry_review_status': 'accepted', "reviewed_by": UID(user.id)}
 
-    dgraph.update_entry(accepted, uid=uid)
+    set_nquads = " \n ".join(dict_to_nquad(accepted))
 
-def reject_entry(uid):
+    dgraph.upsert(None, set_nquads=set_nquads)
+
+def reject_entry(uid, user):
 
     current_app.logger.debug(f'Rejecting entry: UID {uid}')
 
@@ -83,8 +85,9 @@ def reject_entry(uid):
 
     del_nquads = " \n ".join(del_nquads)
     
+
+    rejected = {'uid': uid, 'entry_review_status': 'rejected', 'dgraph.type': 'Rejected', "reviewed_by": UID(user.id)}
+    set_nquads = " \n ".join(dict_to_nquad(rejected))
+
     dgraph.upsert(query, del_nquads=del_nquads)
-
-    rejected = {'entry_review_status': 'rejected', 'dgraph.type': 'Rejected'}
-
-    dgraph.update_entry(rejected, uid=uid)
+    dgraph.upsert(None, set_nquads=set_nquads)
