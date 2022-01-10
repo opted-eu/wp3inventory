@@ -49,6 +49,9 @@ function addFieldOptions(fieldOptions, key, selector, addother, othernames = fal
                 item_label += ' (' + item.other_names.join(', ') + ')'
             }
         }
+        if ('country' in item) {
+            item_label += ' [' + item.country[0]['name'] + ']'
+        }
         opt.innerText = item_label
         document.querySelector(selector).append(opt);
     });
@@ -632,6 +635,9 @@ ready(() => {
                 let item_label = item.name
                 if ('other_names' in item) {
                     item_label += ' (' + item.other_names.join(', ') + ')'
+                }
+                if ('country' in item) {
+                    item_label += ' [' + item.country[0]['name'] + ']'
                 }
                 opt.innerText = item_label
                 optgroupSubunits.append(opt)
