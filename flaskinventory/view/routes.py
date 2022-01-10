@@ -87,9 +87,12 @@ def search():
 @view.route("/view")
 def view_uid():
     if request.args.get('uid'):
-        dgraphtype = get_dgraphtype(request.args.get('uid'))
+        uid = validate_uid(request.args.get('uid'))
+        if not uid:
+            return abort(404)
+        dgraphtype = get_dgraphtype(uid)
         if dgraphtype:
-            return redirect(url_for('view.view_' + dgraphtype.lower(), uid=request.args.get('uid')))
+            return redirect(url_for('view.view_' + dgraphtype.lower(), uid=uid))
     else:
         return abort(404)
 
