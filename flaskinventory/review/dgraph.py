@@ -40,7 +40,7 @@ def get_overview(dgraphtype, country=None, user=None):
 def check_entry(uid=None, unique_name=None):
 
     if uid:
-        query = f'''{{ q(func: uid({uid}))'''
+        query = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type))'''
     elif unique_name:
         query = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
 
