@@ -1,7 +1,9 @@
+from datetime import datetime
 from flask import current_app
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
                                         Geolocation, Variable, make_nquad, dict_to_nquad)
+from flaskinventory.flaskdgraph.utils import validate_uid
 
 
 def get_overview(dgraphtype, country=None, user=None):
@@ -9,7 +11,7 @@ def get_overview(dgraphtype, country=None, user=None):
         query_head = f'''{{ q(func: has(dgraph.type)) @filter(eq(entry_review_status, "pending") '''
     else:
         query_head = f'''{{ q(func: type({dgraphtype})) @filter(eq(entry_review_status, "pending") '''
-    
+
     query_fields = f''' uid name unique_name dgraph.type 
                         entry_added @facets(timestamp) {{ uid user_displayname }}
                         country {{ uid unique_name name }} 
@@ -25,7 +27,6 @@ def get_overview(dgraphtype, country=None, user=None):
             filt_string += f''' AND uid_in(entry_added, {user})'''
 
     filt_string += ')'
-    
 
     query = f'{query_head} {filt_string} {{ {query_fields} }} }}'
 
@@ -37,27 +38,34 @@ def get_overview(dgraphtype, country=None, user=None):
     data = data['q']
     return data
 
+
 def check_entry(uid=None, unique_name=None):
 
     if uid:
+        uid = validate_uid(uid)
+        if not uid:
+            return False
         query = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type))'''
     elif unique_name:
         query = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
 
-    query += "{ uid unique_name dgraph.type entry_review_status entry_added { uid } } }"
+    query += "{ uid unique_name dgraph.type entry_review_status entry_added { uid } channel { unique_name } } }"
     data = dgraph.query(query)
 
     if len(data['q']) == 0:
         return False
-    
+
     return data['q'][0]
 
+
 def accept_entry(uid, user):
-    accepted = {'uid': UID(uid), 'entry_review_status': 'accepted', "reviewed_by": UID(user.id)}
+    accepted = {'uid': UID(uid), 'entry_review_status': 'accepted',
+                "reviewed_by": UID(user.id, facets={'timestamp': datetime.now()})}
 
     set_nquads = " \n ".join(dict_to_nquad(accepted))
 
     dgraph.upsert(None, set_nquads=set_nquads)
+
 
 def reject_entry(uid, user):
 
@@ -76,17 +84,18 @@ def reject_entry(uid, user):
                 }}'''
 
     delete_predicates = [Predicate('dgraph.type'), Predicate('unique_name'), Predicate('publishes'),
-                        Predicate('owns'), Predicate('related')]
-    
-    del_nquads = [make_nquad(uid, item, Scalar('*')) for item in delete_predicates]
+                         Predicate('owns'), Predicate('related')]
+
+    del_nquads = [make_nquad(uid, item, Scalar('*'))
+                  for item in delete_predicates]
     del_nquads += [make_nquad(related, Predicate('related'), uid)]
     del_nquads += [make_nquad(publishes, Predicate('publishes'), uid)]
     del_nquads += [make_nquad(owns, Predicate('owns'), uid)]
 
     del_nquads = " \n ".join(del_nquads)
-    
 
-    rejected = {'uid': uid, 'entry_review_status': 'rejected', 'dgraph.type': 'Rejected', "reviewed_by": UID(user.id)}
+    rejected = {'uid': uid, 'entry_review_status': 'rejected', 'dgraph.type': 'Rejected',
+                "reviewed_by": UID(user.id, facets={'timestamp': datetime.now()})}
     set_nquads = " \n ".join(dict_to_nquad(rejected))
 
     dgraph.upsert(query, del_nquads=del_nquads)
