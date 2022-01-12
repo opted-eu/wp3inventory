@@ -1,4 +1,27 @@
 <div class="d-flex flex-column align-items-stretch bg-white">
+    {% if sidebar_items.get('actions') %}
+    <div href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+        <span class="fs-5 fw-semibold">Actions</span>
+    </div>
+    <div class="list-group list-group-flush border-bottom scrollarea">
+    
+        {% if sidebar_items.actions.get('wikidata') %}
+            <form method="POST" action="{{ url_for('edit.refresh_wikidata') }}">
+                {{ sidebar_items.actions.wikidata.hidden_tag() }}
+                {{ sidebar_items.actions.wikidata.uid(hidden=True) }}
+                <div class="form-group mb-3">
+                    <button class="list-group-item list-group-item-action border-0" id="submit" name="submit" type="submit" value="Refresh WikiData"><i class="fab fa-wikipedia-w me-3 fa-fw"></i>Refresh WikiData</button>
+                </div>
+            </form>
+        {% endif %}
+
+        {% if sidebar_items.actions.get('audience_size') %}
+            <a class="list-group-item list-group-item-action border-0" href="{{ sidebar_items.actions.audience_size }}"><i class="fas fa-edit me-3 fa-fw"></i>Edit Audience Size</a>
+
+        {% endif %}
+    </div>
+    {% endif %}
+
     <div href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
         <span class="fs-5 fw-semibold">Entry History</span>
     </div>
@@ -11,6 +34,18 @@
             </div>
             <div class="col-10 mb-1 small">{% if sidebar_items.meta.get('creation_date') %}
                 {{ sidebar_items.meta.creation_date.strftime('%d&nbsp;%b&nbsp;%Y - %H:%M')|safe }} 
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% if sidebar_items.meta.get('reviewed_by') %}
+        <div  class="list-group-item list-group-item-action py-1 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1 text-truncate">{{ sidebar_items.meta.reviewed_by.user_displayname }}</strong>
+                <small class="text-muted">(reviewed)</small>
+            </div>
+            <div class="col-10 mb-1 small">{% if sidebar_items.meta.reviewed_by.get('reviewed_by|timestamp') %}
+                {{ sidebar_items.meta.reviewed_by.get('reviewed_by|timestamp').strftime('%d&nbsp;%b&nbsp;%Y - %H:%M')|safe }} 
                 {% endif %}
             </div>
         </div>
@@ -31,22 +66,6 @@
         {% endif%}
 
     </div>
-
-    {% if sidebar_items.get('form') %}
-    <div href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-        <span class="fs-5 fw-semibold">Tasks</span>
-    </div>
-
-    <div class="list-group list-group-flush border-bottom scrollarea">
-        <form method="POST" action="{{ url_for('edit.refresh_wikidata') }}">
-            {{ sidebar_items.form.hidden_tag() }}
-            {{ sidebar_items.form.uid(hidden=True) }}
-            <div class="form-group mb-3">
-                <button class="list-group-item list-group-item-action border-0" id="submit" name="submit" type="submit" value="Refresh WikiData"><i class="fab fa-wikipedia-w me-3 fa-fw"></i>Refresh WikiData</button>
-            </div>
-        </form>
-    </div>
-    {% endif %}
 
 
 </div>
