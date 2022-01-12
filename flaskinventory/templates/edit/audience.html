@@ -1,0 +1,265 @@
+{% extends "layout.html" %} {% block content %}
+<h3 class="mb-3">Edit Audience Size: {{entry.get('name')}} <span class="text-muted">({{entry.channel.name}})</span></h3>
+<div id="message-placeholder"></div>
+<table class="table" id="audience-size">
+        <thead>
+            <tr>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <button id="addRow" onclick="addRow()" class="btn btn-sm btn-primary">Add</button>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+<div class="form-group mb-3">
+    <button class="btn btn-primary my-4" onclick="submitForm()">Commit Changes</button>
+</div>
+<script id="data" type="application/json">
+{{ data|tojson|safe }}
+</script>
+
+<script>
+
+const htmltable = document.getElementById('audience-size')
+const htmlcols = document.querySelector('#audience-size tr')
+const htmlrows = document.querySelector('#audience-size tbody')
+const csrftoken = "{{ csrf_token() }}"
+const endpoint = "{{ url_for('edit.source_audience', uid=entry.get('uid') ) }}"
+
+function editRow(rowNum) {
+    let cells = document.querySelectorAll(`#row-${rowNum} input`)
+    for (input of cells) {
+        input.removeAttribute('disabled')
+        input.classList.remove('border-0')
+        input.classList.remove('bg-transparent')
+    }
+    document.querySelector(`#deleteButton-${rowNum}`).disabled = false
+}
+
+function addRow() {
+    let rowNum = htmlrows.children.length
+    let tr = document.createElement('tr')
+    tr.setAttribute('id', 'row-' + rowNum)
+    for (col of cols) {
+        let el = document.createElement('input')
+        el.setAttribute('type', 'text')
+        el.classList.add('form-control')
+        el.setAttribute('name', 'audience_size_' + rowNum + '_' + col)
+        el.setAttribute('row', rowNum)
+        el.setAttribute('column', col)
+        if (col == 'date') {
+            el.setAttribute('type', 'date')
+        }
+        let td = document.createElement('td')
+        td.setAttribute('data-cell', col)
+        td.append(el)
+        tr.append(td)
+    }
+    let td = document.createElement('td')
+    td.setAttribute('data-cell', 'edit')
+    let deleteButton = document.createElement('button')
+    deleteButton.setAttribute('onclick', `deleteRow(${rowNum})`)
+    deleteButton.innerHTML = 'Delete'
+    deleteButton.classList.add('btn')
+    deleteButton.classList.add('btn-sm')
+    deleteButton.classList.add('btn-danger')
+    td.append(deleteButton)
+    tr.append(td)
+    htmlrows.append(tr)
+
+}
+
+function deleteRow(rowNum) {
+    document.getElementById('row-' + rowNum).remove()
+}
+
+function flash(message) {
+    let placeholder = document.getElementById('message-placeholder')
+    let oldmsg = document.getElementById('flash-alert')
+    if (oldmsg) {
+        oldmsg.remove()
+    }
+    let el = `<div id='flash-alert' class="alert alert-danger alert-dismissible fade show">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`
+
+    placeholder.insertAdjacentHTML('beforeend', el) 
+
+}
+
+function tableToJSON() {
+    var outputArray = new Array
+
+    for (j = 0; j < htmlrows.children.length; j++) {
+        let obj = new Object
+        cols.forEach((key) => {
+            obj[key] = ''
+        });
+        outputArray.push(obj)
+    };
+
+    // let inputs = document.querySelectorAll('#audience-size input')
+
+    let rows = htmlrows.children
+
+    let row = 0
+    for (tr of rows) {
+        let inputs = document.querySelectorAll(`#${tr.id} input`)
+        for (item of inputs) {
+            let column = item.getAttribute('column')
+            outputArray[row][column] = item.value
+        };
+        row++
+    };
+
+    return outputArray
+}
+
+function submitForm() {
+    var xhr = new XMLHttpRequest();
+    var url = endpoint;
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var json = JSON.parse(xhr.responseText);
+                console.log(json);
+                if (json.status === 'success') {
+                    window.location.href = json.redirect
+                }
+                else {
+                    console.log(json.status)
+                    flash(json.error)
+                }
+            } else {
+                console.log("error", xhr.statusText, xhr.responseText)
+                let success = false
+                var error = xhr.statusText
+            }
+        }
+    };
+    var data = JSON.stringify(tableToJSON());
+    xhr.send(data);
+
+};
+
+/* load table data */
+var data = JSON.parse(document.getElementById('data').textContent);
+/* first create table header */
+const cols = data.cols
+var rows = data.rows
+
+for (col of cols) {
+    let el = document.createElement('th')
+    el.innerHTML = col.replace('_', ' ')
+    el.setAttribute('scope', 'col')
+    el.setAttribute('id', 'col-' + col)
+    el.classList.add('text-capitalize')
+    htmlcols.append(el)
+};
+
+/* append col for actions */
+let el = document.createElement('th')
+el.innerHTML = 'Actions'
+el.setAttribute('scope', 'col')
+el.setAttribute('id', 'col-' + 'action')
+htmlcols.append(el)
+
+/* append cols in footer */
+for (let i = 0; i < cols.length; i++) {
+    let addRowBtn = document.getElementById('addRow').parentElement
+    let footerRow = addRowBtn.parentElement
+    let el = document.createElement('td')
+    footerRow.insertBefore(el, addRowBtn)
+
+}
+
+if (rows.length == 0) {
+    addRow()
+} else {
+    /* create blank rows */
+    let numRows = rows.length;
+    if (numRows == 0) {
+        numRows++
+    }
+
+    for (let i = 0; i < numRows; i++) {
+        let tr = document.createElement('tr')
+        tr.setAttribute('id', 'row-' + i)
+        for (col of cols) {
+            let td = document.createElement('td')
+            td.setAttribute('data-cell', col)
+            tr.append(td)
+        }
+        let td = document.createElement('td')
+        td.setAttribute('data-cell', 'edit')
+        tr.append(td)
+        htmlrows.append(tr)
+    }
+    /* populate blank rows */
+    let i = 0
+    for (item of rows) {
+        for (key of Object.keys(item)) {
+            let td = document.querySelector(`#row-${i} td[data-cell="${key}"]`)
+                // el.innerHTML = item[key]
+            let el = document.createElement('input')
+                // type="text" class="form-control" placeholder="Username" name="username">
+            el.setAttribute('type', 'text')
+            el.classList.add('form-control')
+            el.classList.add('border-0')
+            el.classList.add('bg-transparent')
+            el.setAttribute('name', 'audience_size_' + i + '_' + key)
+            el.setAttribute('row', i)
+            el.setAttribute('column', key)
+            if (key == 'date') {
+                el.setAttribute('type', 'date')
+                var val = Date.parse(item[key])
+                el.valueAsNumber = val
+            } else {
+                var val = item[key]
+                el.value = val
+            }
+
+            el.disabled = true
+            td.append(el)
+        }
+        let btnGroup = document.createElement('div')
+        btnGroup.classList.add('btn-group')
+
+        let editButton = document.createElement('button')
+        editButton.setAttribute('onclick', `editRow(${i})`)
+        editButton.innerHTML = 'Edit'
+        editButton.classList.add('btn')
+        editButton.classList.add('btn-sm')
+        editButton.classList.add('btn-warning')
+        let deleteButton = document.createElement('button')
+        deleteButton.setAttribute('onclick', `deleteRow(${i})`)
+        deleteButton.setAttribute('id', `deleteButton-${i}`)
+        deleteButton.disabled = true
+        deleteButton.innerHTML = 'Delete'
+        deleteButton.classList.add('btn')
+        deleteButton.classList.add('btn-sm')
+        deleteButton.classList.add('btn-danger')
+
+        btnGroup.append(editButton)
+        btnGroup.append(deleteButton)
+        document.querySelector(`#row-${i} td[data-cell="edit"]`).append(btnGroup)
+        i++
+    }
+}
+</script>
+{% endblock content %} 
+
+{% block sidebar %} 
+{% include "edit/sidebar.html" %}
+
+
+{% endblock sidebar %}
