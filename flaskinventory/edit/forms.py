@@ -149,13 +149,6 @@ geographic_scope_subunit = TomSelectMutlitpleField('Subunit', choices=[])
 
 languages = SelectMultipleField('Languages', choices=icu_codes_list_tuples)
 
-audience_size_value = IntegerField('Audience Size')
-audience_size_unit = StringField(
-    'Audience Size Unit', description="e.g. subscribers, followers, papers sold", default='Subscribers')
-
-audience_size = DateField(
-    'Audience Size (Date of Measurement)', render_kw={'type': 'date'})
-
 published_by = SelectMultipleField('Published by')
 
 contains_ads_choices = [('yes', 'Yes'),
@@ -311,7 +304,7 @@ class DynamicForm(FlaskForm):
         return getattr(self, field)
 
 
-def make_form(entity, audience_size=1):
+def make_form(entity):
     if entity == 'organization':
         fields = editorganizationfields
     elif entity == 'print':
@@ -355,15 +348,6 @@ def make_form(entity, audience_size=1):
         pass
 
     for key, val in list(fields.items()):
-        # if key == 'audience_size':
-        #     fields.pop(key)
-        #     for i in range(audience_size):
-        #         setattr(F, f'audience_size_{i}', val)
-        #         setattr(F, f'audience_size_value_{i}', audience_size_value)
-        #         setattr(F, f'audience_size_unit_{i}', audience_size_unit)
-        #         fields[f'audience_size_{i}'] = val
-        #         fields[f'audience_size_value_{i}'] = audience_size_value
-        #         fields[f'audience_size_unit_{i}'] = audience_size_unit
         setattr(F, key, val)
 
     return F(), fields

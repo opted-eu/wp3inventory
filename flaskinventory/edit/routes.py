@@ -128,13 +128,8 @@ def source(unique_name=None, uid=None):
     if len(result['q']) == 0:
         return abort(404)
 
-    if result['q'][0].get('audience_size'):
-        audience_size_entries = len(result['q'][0]['audience_size'])
-    else:
-        audience_size_entries = 0
-
     form, fields = make_form(
-        result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
+        result['q'][0]['channel']['unique_name'])
 
     if current_user.user_role >= USER_ROLES.Reviewer:
         form.country.choices = get_country_choices(
