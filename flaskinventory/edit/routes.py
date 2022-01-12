@@ -1,12 +1,12 @@
 from flask import (current_app, Blueprint, render_template, url_for,
-                   flash, redirect, request, abort)
+                   flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory.edit.forms import make_form, RefreshWikidataForm
 from flaskinventory.edit.utils import can_edit
 from flaskinventory.edit.sanitize import (EditArchiveSanitizer, EditOrgSanitizer, EditSourceSanitizer,
                                           EditSubunitSanitizer, EditDatasetSanitizer, EditMultinationalSanitizer,
-                                          WikiDataSanitizer)
-from flaskinventory.edit.dgraph import get_entry
+                                          WikiDataSanitizer, EditAudienceSizeSanitizer)
+from flaskinventory.edit.dgraph import get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
 from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
@@ -103,7 +103,7 @@ def organization(unique_name=None, uid=None):
 
         wikidata_form = RefreshWikidataForm()
         wikidata_form.uid.data = uid
-        sidebar_items = {'form': wikidata_form, 'meta': result['q'][0]}
+        sidebar_items = {'actions': {'wikidata': wikidata_form}, 'meta': result['q'][0]}
         return render_template('edit/editform.html', title='Edit Organization', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
     else:
         return abort(404)
@@ -137,7 +137,8 @@ def source(unique_name=None, uid=None):
         result['q'][0]['channel']['unique_name'], audience_size=audience_size_entries)
 
     if current_user.user_role >= USER_ROLES.Reviewer:
-        form.country.choices = get_country_choices(multinational=True, opted=False)
+        form.country.choices = get_country_choices(
+            multinational=True, opted=False)
     else:
         form.country.choices = get_country_choices(multinational=True)
     form.geographic_scope_subunit.choices = get_subunit_choices()
@@ -147,7 +148,8 @@ def source(unique_name=None, uid=None):
             sanitizer = EditSourceSanitizer(
                 form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
+            current_app.logger.debug(
+                f'Delete Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
             # tb_str = ''.join(traceback.format_exception(
             #     None, e, e.__traceback__))
@@ -196,8 +198,60 @@ def source(unique_name=None, uid=None):
         setattr(getattr(form, key), 'data', value)
 
     sidebar_items = {'meta': result['q'][0]}
+    if result['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
+        sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=result['q'][0]['uid'])}
 
     return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
+
+
+@edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
+@login_required
+def source_audience(uid):
+    check = check_entry(uid=uid)
+    if not check:
+        return abort(404)
+
+    if check['dgraph.type'][0] != 'Source':
+        return abort(404)
+
+    if not can_edit(check, current_user):
+        return abort(403)
+
+    if check['channel']['unique_name'] not in ['print', 'facebook']:
+        flash('You can only edit the audience size for print and Facebook news sources', 'info')
+        return redirect(url_for('edit.source', uid=uid))
+
+    if request.method == 'POST':
+        current_app.logger.debug(
+            f'received POST request: {request.get_json()}')
+        try:
+            sanitizer = EditAudienceSizeSanitizer(
+            uid, request.get_json(), current_user, get_ip())
+        except Exception as e:
+            return jsonify({'status': 'error', 'error': f'{e}'})
+        
+        try:
+            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
+
+            delete = dgraph.upsert(
+                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+            current_app.logger.debug(delete)
+            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            current_app.logger.debug(result)
+        except Exception as e:
+            return jsonify({'status': 'error', 'error': f'{e}'})
+
+        flash('Audience size updated!', 'success')
+
+        return jsonify({'status': 'success', 'redirect': url_for('view.view_source', uid=uid)})
+
+    audience_size = get_audience(uid=uid)
+    entry = get_entry(uid=uid)
+    entry = entry['q'][0]
+    sidebar_items = {'meta': entry}
+
+    return render_template('edit/audience.html', title='Edit Source', entry=entry, data=audience_size, show_sidebar=True, sidebar_items=sidebar_items)
 
 
 @edit.route('/edit/subunit/<string:unique_name>', methods=['GET', 'POST'])
