@@ -46,9 +46,15 @@
     <dl class="row">
         <dt class="col-sm-3 mb-2"><h5>Publishes</h5></dt>
         <dd class="col-sm-9">
-            {% if entry.publishes %} {% for source in entry.publishes %}
-            <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{ source.name }} ({{ source.channel.name }})</a></p>
-            {% endfor %} {% else %}
+            {% if entry.publishes %} 
+                {% for source in entry.publishes %}
+                    {% if 'Rejected' not in source.get('dgraph.type') %}
+                    <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{ source.name }} ({{ source.channel.name }})</a></p>
+                    {% else %}
+                    <p class="card-text text-muted">{{ source.name }} ({{ source.channel.name }}) - rejected entry</p>
+                    {% endif %}
+                {% endfor %} 
+            {% else %}
             <p class="card-text text-muted">None</p>
             {% endif %}
         </dd>
