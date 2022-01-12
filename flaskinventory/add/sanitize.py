@@ -846,7 +846,7 @@ class SourceSanitizer:
                     org['uid'] = UID(item)
                 else:
                     # check for entry with exactly the same name
-                    query = f'{{ q(func: eq(name, {item.strip()})) {{ uid }}'
+                    query = f'{{ q(func: eq(name, "{item.strip()}")) {{ uid }}'
                     res = dgraph.query(query)
                     if len(res['q']) > 0:
                         org['uid'] = UID(res['q'][0]['uid'])
