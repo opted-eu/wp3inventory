@@ -33,3 +33,4 @@ tools
 school
 university
 times-circle
+edit
