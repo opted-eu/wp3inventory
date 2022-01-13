@@ -96,7 +96,7 @@ def sourcelookup():
         return jsonify(result)
     except Exception as e:
         current_app.logger.warning(f'could not lookup source with query "{query}". {e}')
-        return jsonify({'status': False, 'error': e})
+        return jsonify({'status': False, 'error': f'e'})
 
 # cache this route
 @endpoint.route("/endpoint/new/fieldoptions")
