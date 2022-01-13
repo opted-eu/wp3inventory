@@ -450,9 +450,9 @@ class EditSourceSanitizer(Sanitizer):
             self.edit['geographic_scope_subunit'] = []
 
             for item in src_list:
-                if item == str(self.edit['uid']):
+                if item.strip() == str(self.edit['uid']):
                     continue
-                if item.startswith('0x'):
+                if item.strip().startswith('0x'):
                     self.edit['geographic_scope_subunit'].append(UID(item))
                 else:
                     geo_query = self._resolve_subunit(item)
