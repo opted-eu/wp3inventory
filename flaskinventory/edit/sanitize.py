@@ -138,6 +138,9 @@ class Sanitizer:
 
             if not name:
                 name = query
+            
+            if name in other_names:
+                other_names.remove(name)
 
             new_subunit = {'name': name,
                            'country': UID(country_uid),
