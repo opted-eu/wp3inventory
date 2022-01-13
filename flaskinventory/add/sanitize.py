@@ -610,7 +610,7 @@ class SourceSanitizer:
             if self.json.get('publication_cycle').lower() in self.publication_cycle:
                 self.newsource['publication_cycle'] = self.json.get(
                     'publication_cycle').lower()
-                if self.newsource['publication_cycle'] in ["multiple times per week", "weekly"]:
+                if self.newsource['publication_cycle'] in ["multiple times per week"]:
                     days_list = []
                     for item in self.json.keys():
                         if item.startswith('publication_cycle_weekday_'):
@@ -621,6 +621,13 @@ class SourceSanitizer:
                                 days_list.append(
                                     int(item.replace('publication_cycle_weekday_', '')))
                     self.newsource["publication_cycle_weekday"] = days_list
+                elif self.newsource['publication_cycle'] in ['weekly']:
+                    if self.json.get('publication_cycle_weekday'):
+                        try:
+                            self.newsource['publication_cycle_weekday'] = int(self.json.get('publication_cycle_weekday'))
+                        except Exception as e:
+                            current_app.logger.warning(f'Could not parse publication_cycle_weekday: {e}')
+                            
             else:
                 raise InventoryValidationError(
                     f'Invalid data! Unknown value in "publication_cycle": {self.json.get("publication_cycle")}')
