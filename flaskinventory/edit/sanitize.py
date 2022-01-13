@@ -219,7 +219,7 @@ class EditOrgSanitizer(Sanitizer):
                 datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
-            entry['entry_review_status'] = 'accepted'
+            entry['entry_review_status'] = 'pending'
             entry['creation_date'] = datetime.datetime.now(
                 datetime.timezone.utc)
 
@@ -319,7 +319,7 @@ class EditSourceSanitizer(Sanitizer):
                 datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
-            entry['entry_review_status'] = 'accepted'
+            entry['entry_review_status'] = 'pending'
             entry['creation_date'] = datetime.datetime.now(
                 datetime.timezone.utc)
 
@@ -526,7 +526,7 @@ class EditSubunitSanitizer(Sanitizer):
                 datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
-            entry['entry_review_status'] = 'accepted'
+            entry['entry_review_status'] = 'pending'
             entry['creation_date'] = datetime.datetime.now(
                 datetime.timezone.utc)
 
@@ -572,7 +572,7 @@ class EditMultinationalSanitizer(Sanitizer):
                 datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
-            entry['entry_review_status'] = 'accepted'
+            entry['entry_review_status'] = 'pending'
             entry['creation_date'] = datetime.datetime.now(
                 datetime.timezone.utc)
 
@@ -620,7 +620,7 @@ class EditArchiveSanitizer(Sanitizer):
                 datetime.timezone.utc),
                 'ip': self.user_ip}
             entry['entry_added'] = UID(self.user.uid, facets=facets)
-            entry['entry_review_status'] = 'accepted'
+            entry['entry_review_status'] = 'pending'
             entry['creation_date'] = datetime.datetime.now(
                 datetime.timezone.utc)
 
