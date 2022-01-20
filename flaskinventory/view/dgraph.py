@@ -11,7 +11,7 @@ from flaskinventory.flaskdgraph import dgraph_types
 """
 
 def get_dgraphtype(uid):
-    query_string = f'''{{ q(func: uid({uid})) {{  dgraph.type  }} }}'''
+    query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
 
     data = dgraph.query(query_string)
     if len(data['q']) == 0:

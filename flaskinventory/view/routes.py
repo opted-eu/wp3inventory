@@ -93,6 +93,8 @@ def view_uid():
         dgraphtype = get_dgraphtype(uid)
         if dgraphtype:
             return redirect(url_for('view.view_' + dgraphtype.lower(), uid=uid))
+        else:
+            return abort(404)
     else:
         return abort(404)
 
