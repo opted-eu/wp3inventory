@@ -41,6 +41,8 @@ type Source {
     channel
     channel_url
     channel_comments
+    website_allows_comments
+    website_comments_registration_required
     channel_feeds
     channel_epaper
     transcript_kind
@@ -302,6 +304,8 @@ form_name_helptext: string .
 related: [uid] @reverse .
 channel: uid @reverse .
 channel_comments: string .
+website_allows_comments: string @index(hash) .
+website_comments_registration_required: string @index(hash) .
 channel_url: string .
 channel_feeds: [string] .
 channel_epaper: string .
@@ -309,7 +313,7 @@ transcript_kind: string .
 payment_model: string .
 contains_ads: string .
 publication_kind: [string] .
-special_interest: bool .
+special_interest: bool @index(bool) .
 topical_focus: [string] .
 publication_cycle: string .
 publication_cycle_weekday: [int] .

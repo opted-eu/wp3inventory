@@ -78,6 +78,8 @@
         _:derstandardat <channel> _:website .
         _:derstandardat <channel_url> "https://www.derstandard.at/" .
         _:derstandardat <channel_comments> "registration required" .
+        _:derstandardat <website_allows_comments> "yes" .
+        _:derstandardat <website_comments_registration_required> "yes" .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml" (kind="sitemap") .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/sitemap.xml" (kind="sitemap") .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/rss" (kind="rss") .
