@@ -4,7 +4,7 @@ from wtforms import (StringField, SelectField, DateField, BooleanField,
 from wtforms.validators import DataRequired, Optional
 from flask_login import current_user
 from flaskinventory import dgraph
-from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField
+from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField, ownership_kind_choices
 
 
 class NewEntry(FlaskForm):
@@ -34,9 +34,8 @@ class NewOrganization(FlaskForm):
     is_person = RadioField('Is the media organisation a person?', choices=[
                            ('n', 'No'), ('y', 'Yes')], validators=[DataRequired()])
 
-    ownership_kind_choices = [('private ownership', 'Mainly private ownership'),
-                              ('public ownership', 'Mainly public ownership'),
-                              ('unknown', 'Unknown ownership')]
+    ownership_kind_choices = ownership_kind_choices[1:]
+
     ownership_kind = SelectField(
         'Is the media organization mainly privately owned or publicly owned?', choices=ownership_kind_choices, validators=[DataRequired()])
 

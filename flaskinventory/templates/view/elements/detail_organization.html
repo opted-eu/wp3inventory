@@ -1,6 +1,11 @@
 <div class="col d-flex align-items-start mb-4">
     <div class="icon-square me-3">
-        <h2><i class="fas fa-building" alt="Organisation"></i></h2>
+        <h2>{% if entry.ownership_kind == "political party" %}
+            <i class="fas fa-flag" alt="Political Party"></i>
+            {% else %}
+            <i class="fas fa-building" alt="Organisation"></i>
+            {% endif %}
+        </h2>
     </div>
     <div class="w-100">
         <h2>{{ entry.name }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h2>

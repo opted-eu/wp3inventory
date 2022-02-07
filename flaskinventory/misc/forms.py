@@ -66,3 +66,13 @@ topical_focus_choices = [("politics", "Politics"),
                          ("education", "Education")]
 
 topical_focus_dict = {key: val for (key, val) in topical_focus_choices}
+
+
+ownership_kind_choices = [('none', 'Missing!'),
+                          ('public ownership', 'Mainly public ownership'),
+                          ('private ownership', 'Mainly private Ownership'),
+                          ('political party', 'Political Party'),
+                          ('unknown', 'Unknown Ownership')]
+
+ownership_kind_dict = {key: val for (key, val) in ownership_kind_choices}
+

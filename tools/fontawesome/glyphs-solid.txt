@@ -34,3 +34,11 @@ school
 university
 times-circle
 edit
+flag
+hammer
+wrench
+screwdriver
+file-alt
+table
+layer-group
+cubes

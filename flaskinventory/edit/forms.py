@@ -8,7 +8,7 @@ from flask_login import current_user
 from wtforms.widgets.core import Input
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes_list_tuples
-from flaskinventory.misc.forms import publication_kind_choices, topical_focus_choices
+from flaskinventory.misc.forms import publication_kind_choices, topical_focus_choices, ownership_kind_choices
 import datetime
 
 
@@ -182,13 +182,8 @@ papers = SelectMultipleField('Research Papers that include this source')
 
 is_person = BooleanField('Is a person')
 
-ownership_kind_choices = [('none', 'Missing!'),
-                          ('public ownership', 'Mainly public ownership'),
-                          ('private ownership', 'Mainly private Ownership'),
-                          ('unknown', 'Unknown Ownership')]
-
 ownership_kind = SelectField(
-    'Type of Organization', choices=ownership_kind_choices, validators=[DataRequired()])
+    'Type of Organization', choices=ownership_kind_choices[1:], validators=[DataRequired()])
 
 country = SelectField('Country', choices=[])
 
