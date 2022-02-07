@@ -102,7 +102,7 @@ website_comments_registration = SelectField('Registration required to comment', 
 channel_url = StringField('Channel URL')
 
 channel_epaper = RadioField(
-    'E-Paper available', choices=[('yes', 'Yes'), ('no', 'No'), ('none', "NA / Don't know")])
+    'E-Paper available', choices=[('yes', 'Yes'), ('no', 'No'), na_option])
 
 transcript_kind_choices = [
     ('tv' 'TV'), ('radio', 'Radio'), ('podcast', 'Podcast'), na_option]
@@ -113,7 +113,7 @@ transcript_kind = SelectField(
 payment_model_choices = [('free', 'Free, all content is free of charge'),
                          ('partly free', 'Some content is free of charge'),
                          ('not free', 'No content is free of charge'),
-                         ('none', "Don't know / NA")]
+                         na_option]
 
 payment_model = SelectField('Payment model', choices=payment_model_choices)
 
@@ -133,7 +133,7 @@ publication_cycle_choices = [('continuous', 'Continuous'),
                              ('twice a month', 'Twice a month'),
                              ('monthly', 'Monthly'),
                              ('less than monthly', 'Less frequent than monthly'),
-                             ('none', "Don't know / NA")]
+                             na_option]
 
 publication_cycle = SelectField(
     'Publication Cycle', choices=publication_cycle_choices)
@@ -145,14 +145,14 @@ publication_cycle_weekday_choices = [(1, 'Monday'),
                                      (5, 'Friday'),
                                      (6, 'Saturday'),
                                      (7, 'Sunday'),
-                                     ('none', "Don't know / NA")]
+                                     na_option]
 
 publication_cycle_weekday = TomSelectMutlitpleField(
     'Publication weekdays', choices=publication_cycle_weekday_choices)
 
 geographic_scope_choices = [('multinational', 'Multinational'),
                             ('national', 'National'),
-                            ('subnational', 'Subnational'), ('none', "Don't know / NA")]
+                            ('subnational', 'Subnational'), na_option]
 
 geographic_scope = SelectField('Geographic Scope', validators=[
                                DataRequired()], choices=geographic_scope_choices)
@@ -168,7 +168,7 @@ published_by = SelectMultipleField('Published by')
 contains_ads_choices = [('yes', 'Yes'),
                         ('no', 'No'),
                         ('non subscribers', 'Only for non-subscribers'),
-                        ('none', "Don't know / NA")]
+                        na_option]
 
 contains_ads = SelectField('Contains Ads', choices=contains_ads_choices)
 
