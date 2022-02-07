@@ -164,7 +164,12 @@
         
         {% if entry.languages %}
         <dt class="col-sm-3">Languages</dt>
-        <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>{% endif %}
+        <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>
+        {% endif %}
+        {% if entry.party_affiliated %}
+        <dt class="col-sm-3">News Source close to a political party <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Close means that a political party or a party-related association or company owns at least 50% of the news source OR that persons who have a central role in the news source (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
+        <dd class="col-sm-9">{{ entry.party_affiliated }}</dd>
+        {% endif %}
     </dl>
 </div>
 

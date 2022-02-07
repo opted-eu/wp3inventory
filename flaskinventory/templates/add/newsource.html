@@ -577,6 +577,30 @@
             <div id="entry-notes-feedback"></div>
         </div>
 
+        <div id="group-party_affiliated" class="mb-5 form-group">
+            <p class="form-label fw-bold fs-5">Is the news source close to a political party?<span class="text-muted mx-1">(optional)</span>{{ make_tooltip('Central roles in a news source include the main editors, publishers, or producers. Central roles in a political party are here defined as party leaders or party executives (mere party membership is not sufficient). Relevant party leading or executive roles can concern the national, subnational, and supranational level. Former party executive roles are also relevant unless former functionaries have explicitly turned their backs on the party.')}}</p>
+            <p class="form-label">Close means that a political party or a party-related association or company owns at least 50% of the news source OR that persons who have a central role in the news source (or the affiliated associations) have or had also a central role in a political party.</p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="party_affiliated" id="party_affiliated1" value="yes" aria-describedby="party_affiliated-feedback">
+                <label class="form-check-label" for="party_affiliated1">
+                    Yes
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="party_affiliated" id="party_affiliated2" value="no" aria-describedby="party_affiliated-feedback">
+                <label class="form-check-label" for="party_affiliated2">
+                    No
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="party_affiliated" id="party_affiliated4" value="NA" aria-describedby="party_affiliated-feedback">
+                <label class="form-check-label" for="party_affiliated4">
+                    Don't know
+                </label>
+                <div id="party_affiliated-feedback"></div>
+            </div>
+        </div>
+
         <!-- Optional Field -->
         <div id="group-related-sources" class="mb-5 form-group">
             <label for="related-sources" class="form-label fw-bold fs-5">For the source that you just coded, does it have other closely related sources? Please type their names below and start a new entry<span class="text-muted mx-1">(optional)</span></label>
@@ -879,6 +903,14 @@
             <div id='summary-entry_notes' hidden>
                 <h6 class="text-muted mb-1">
                     Do you have any other notes on the source that you just coded?
+                </h6>
+                <h4 class="mb-4">
+                    Value
+                </h4>
+            </div>
+            <div id='summary-party_affiliated' hidden>
+                <h6 class="text-muted mb-1">
+                    Is the news source close to a political party?
                 </h6>
                 <h4 class="mb-4">
                     Value

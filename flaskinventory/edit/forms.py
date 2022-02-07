@@ -87,16 +87,18 @@ channel_comments = SelectField(
     'Allows user comments', choices=channel_comments_choices)
 
 website_allows_comments_choices = [('yes', 'Yes'),
-                                    ('no', 'No'),
-                                    na_option]
+                                   ('no', 'No'),
+                                   na_option]
 
-website_allows_comments = SelectField('Allows user comments', choices=website_allows_comments_choices)
+website_allows_comments = SelectField(
+    'Allows user comments', choices=website_allows_comments_choices)
 
 website_comments_registration_required = [('yes', 'Yes'),
-                                    ('no', 'No'),
-                                    na_option]
+                                          ('no', 'No'),
+                                          na_option]
 
-website_comments_registration = SelectField('Registration required to comment', choices=website_comments_registration_required)
+website_comments_registration = SelectField(
+    'Registration required to comment', choices=website_comments_registration_required)
 
 
 channel_url = StringField('Channel URL')
@@ -178,6 +180,13 @@ archives = SelectMultipleField('Archives that include this source')
 datasets = SelectMultipleField('Datasets that include this source')
 papers = SelectMultipleField('Research Papers that include this source')
 
+party_affiliated_choices = [na_option,
+                            ('yes', 'Yes'),
+                            ('no', 'No')]
+
+party_affiliated = SelectField(
+    'Affiliated with a political party', choices=party_affiliated_choices)
+
 # Organization Fields
 
 is_person = BooleanField('Is a person')
@@ -221,6 +230,7 @@ editorganizationfields = {
     "is_person": is_person,
     "founded": founded,
     "ownership_kind": ownership_kind,
+    "party_affiliated": party_affiliated,
     "country": country,
     "address_string": address_string,
     "address_geo": address_geo,
@@ -237,6 +247,7 @@ editsourcefields = {
     "publication_kind": publication_kind,
     "special_interest": special_interest,
     "topical_focus": topical_focus,
+    "party_affiliated": party_affiliated,
     "publication_cycle": publication_cycle,
     "publication_cycle_weekday": publication_cycle_weekday,
     "geographic_scope": geographic_scope,

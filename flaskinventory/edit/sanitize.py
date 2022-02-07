@@ -201,7 +201,7 @@ class EditOrgSanitizer(Sanitizer):
         self.data = data
 
         self.overwrite = {self.edit['uid']: [
-            'other_names', 'owns', 'publishes', 'country', 'wikidataID']}
+            'other_names', 'owns', 'publishes', 'country', 'wikidataID', 'party_affiliated']}
 
         self._parse()
 
@@ -275,6 +275,11 @@ class EditOrgSanitizer(Sanitizer):
             for item in org_list:
                 if item.startswith('0x'):
                     self.edit['publishes'].append(UID(item))
+    
+    def parse_party_affiliated(self):
+        if self.data.get('party_affiliated'):
+            if self.edit['ownership_kind'] != 'political party':
+                self.edit['party_affiliated'] = self.data.get('party_affiliated')
 
 
 class EditSourceSanitizer(Sanitizer):
@@ -493,6 +498,10 @@ class EditSourceSanitizer(Sanitizer):
     def parse_transcript_kind(self):
         if self.data.get('transcript_kind'):
             self.edit['transcript_kind'] = self.data.get('transcript_kind')
+    
+    def parse_party_affiliated(self):
+        if self.data.get('party_affiliated'):
+            self.edit['party_affiliated'] = self.data.get('party_affiliated')
 
 
 class EditSubunitSanitizer(Sanitizer):

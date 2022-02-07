@@ -36,6 +36,10 @@
         <dt class="col-sm-3">Founded</dt>
         <dd class="col-sm-9">{{ entry.founded.strftime('%Y') }}
         </dd>{% endif %}
+        {% if entry.party_affiliated %}
+        <dt class="col-sm-3">Affiliated with a political party<a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Affiliated means that a political party or a party-related association or company owns at least 50% of the organization OR that persons who have a central role in the organization (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
+        <dd class="col-sm-9">{{ entry.party_affiliated }}</dd>
+        {% endif %}
         <dt class="col-sm-3">Country</dt>
         <dd class="col-sm-9">{% for country in entry.country %}
             <a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> {% endfor %}

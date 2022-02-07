@@ -28,7 +28,8 @@ class SourceSanitizer:
     special_interest = ['yes', 'no']
     publication_cycle = ['continuous', 'daily', 'multiple times per week',
                          'weekly', 'twice a month', 'monthly', 'less than monthly', 'NA', 'none']
-    geographic_scope = ['multinational', 'national', 'subnational', 'NA', 'none']
+    geographic_scope = ['multinational',
+                        'national', 'subnational', 'NA', 'none']
     transcript_kind = ['tv', 'radio', 'podcast', 'NA']
     channel_comments = ['no comments', 'user comments with registration',
                         'user comments without registration', 'NA', 'none']
@@ -213,6 +214,7 @@ class SourceSanitizer:
 
         # other information
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         # generate unique name
@@ -249,6 +251,7 @@ class SourceSanitizer:
 
         # other information
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -288,6 +291,7 @@ class SourceSanitizer:
 
         # other information
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         # get feeds
@@ -325,6 +329,7 @@ class SourceSanitizer:
 
         # other
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -356,6 +361,7 @@ class SourceSanitizer:
 
         # other
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -389,6 +395,7 @@ class SourceSanitizer:
 
         # other
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -420,6 +427,7 @@ class SourceSanitizer:
 
         # other
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -451,6 +459,7 @@ class SourceSanitizer:
 
         # other
         self.parse_entry_notes()
+        self.parse_party_affiliated()
         self.parse_related()
 
         self.generate_unique_name()
@@ -489,6 +498,15 @@ class SourceSanitizer:
     def parse_epaper(self):
         if self.json.get('channel_epaper'):
             self.newsource['channel_epaper'] = self.json.get('channel_epaper')
+
+    def parse_party_affiliated(self):
+        if self.json.get('party_affiliated'):
+            if self.json.get('party_affiliated') in self.yes_no_na:
+                self.newsource['party_affiliated'] = self.json.get(
+                    'party_affiliated')
+            else:
+                raise InventoryValidationError(
+                    f'Invalid value for party_affiliated: {self.json.get("party_affiliated")}')
 
     def resolve_website(self):
         if self.json.get('name'):
@@ -980,6 +998,7 @@ class SourceSanitizer:
                         rel_source['unique_name'] = secrets.token_urlsafe(8)
                         rel_source['dgraph.type'] = 'Source'
                         rel_source['channel'] = UID(channel_uid)
+                        # inherit predicated from main entry
                         if self.newsource.get('publication_kind'):
                             rel_source['publication_kind'] = self.newsource.get(
                                 'publication_kind')
@@ -1004,6 +1023,9 @@ class SourceSanitizer:
                         if self.newsource.get('languages'):
                             rel_source['languages'] = self.newsource.get(
                                 'languages')
+                        if self.newsource.get('party_affiliated'):
+                            rel_source['party_affiliated'] = self.newsource.get(
+                                'party_affiliated')
                         self.newsource['related'].append(
                             NewID(f'_:{slugify(item, separator="_")}_{channel_name}'))
                     else:

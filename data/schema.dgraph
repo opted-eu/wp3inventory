@@ -61,6 +61,7 @@ type Source {
     audience_residency
     languages
     verified_account
+    party_affiliated
 }
 
 type Channel {
@@ -98,7 +99,8 @@ type Organization {
     address_geo
     employees
     publishes
-    owns   
+    owns
+    party_affiliated   
 }
 
 type Country {
@@ -324,6 +326,7 @@ languages: [string] @index(hash) .
 audience_size: [dateTime] .
 audience_residency: [dateTime] .
 verified_account: bool @index(bool) .
+party_affiliated: string @index(hash)
 
 # Organization Predicates
 is_person: bool .
