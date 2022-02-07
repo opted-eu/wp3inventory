@@ -309,15 +309,15 @@ website_comments_registration_required: string @index(hash) .
 channel_url: string .
 channel_feeds: [string] .
 channel_epaper: string .
-transcript_kind: string .
-payment_model: string .
-contains_ads: string .
+transcript_kind: string @index(hash) .
+payment_model: string @index(hash) .
+contains_ads: string @index(hash) .
 publication_kind: [string] .
 special_interest: bool @index(bool) .
 topical_focus: [string] .
-publication_cycle: string .
+publication_cycle: string @index(hash) .
 publication_cycle_weekday: [int] .
-geographic_scope: string .
+geographic_scope: string @index(hash) .
 geographic_scope_subunit: [uid] @reverse .
 geographic_scope_subunit_geo: geo @index(geo) .
 languages: [string] @index(hash) .
@@ -327,7 +327,7 @@ verified_account: bool @index(bool) .
 
 # Organization Predicates
 is_person: bool .
-ownership_kind: string .
+ownership_kind: string @index(hash).
 address_string: string .
 address_geo: geo @index(geo) .
 employees: string .

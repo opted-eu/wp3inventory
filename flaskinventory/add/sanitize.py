@@ -1509,7 +1509,7 @@ class NewOrgSanitizer(Sanitizer):
         if self.data.get('ownership_kind'):
             self.new['ownership_kind'] = self.data.get('ownership_kind')
         else:
-            self.new['ownership_kind'] = 'none'
+            self.new['ownership_kind'] = 'NA'
 
     def parse_country(self):
         self.new['country'] = UID(self.data.get('country'))
