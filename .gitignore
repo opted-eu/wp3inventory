@@ -138,3 +138,11 @@ tools/backup.json
 logs/
 
 .vscode/
+bot.session-journal
+graph_d3js.json
+data/fieldoptions.rds
+flaskinventory/test_sanitizer.py
+flaskinventory/add/sanitize.py
+
+tools/*.csv
+tools/*.json
