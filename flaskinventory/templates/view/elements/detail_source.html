@@ -199,9 +199,15 @@
         <dd></dd>
         
 
-        {% if entry.channel_comments %}
-        <dt class="col-sm-3">Allows user comments</dt>
-        <dd class="col-sm-9">{{ entry.channel_comments }}</dd>{% endif %} {% if entry.channel_feeds %}
+        {% if entry.website_allows_comments %}
+        <dt class="col-sm-3">News Source allows users to leave comments</dt>
+        <dd class="col-sm-9">{{ entry.website_allows_comments }}</dd>
+        {% endif %} 
+        {% if entry.website_comments_registration_required %}
+        <dt class="col-sm-3">User registration required to leave comments</dt>
+        <dd class="col-sm-9">{{ entry.website_comments_registration_required }}</dd>
+        {% endif %} 
+        {% if entry.channel_feeds %}
         <dt class="col-sm-3">Feeds</dt>
         <dd class="col-sm-9">{% for feed in entry.channel_feeds %}<a href="{{feed.url}}" target="_blank">{{ feed.kind }}</a>{{ ", " if not loop.last else "" }} {% endfor %}</dd> {% endif %} 
         {% if entry.channel_epaper %}

@@ -46,7 +46,7 @@ class NullableDateField(DateField):
 # generic fields
 
 
-na_option = ('none', "Don't Know / NA")
+na_option = ('NA', "Don't Know / NA")
 
 entry_review_status_choices = [
     ('draft', 'Draft'), ('pending', 'Pending'), ('accepted', 'Accepted')]
@@ -86,6 +86,19 @@ channel_comments_choices = [('no comments', 'No Comments'),
 channel_comments = SelectField(
     'Allows user comments', choices=channel_comments_choices)
 
+website_allows_comments_choices = [('yes', 'Yes'),
+                                    ('no', 'No'),
+                                    na_option]
+
+website_allows_comments = SelectField('Allows user comments', choices=website_allows_comments_choices)
+
+website_comments_registration_required = [('yes', 'Yes'),
+                                    ('no', 'No'),
+                                    na_option]
+
+website_comments_registration = SelectField('Registration required to comment', choices=website_comments_registration_required)
+
+
 channel_url = StringField('Channel URL')
 
 channel_epaper = RadioField(
@@ -119,6 +132,7 @@ publication_cycle_choices = [('continuous', 'Continuous'),
                              ('weekly', 'Weekly'),
                              ('twice a month', 'Twice a month'),
                              ('monthly', 'Monthly'),
+                             ('less than monthly', 'Less frequent than monthly'),
                              ('none', "Don't know / NA")]
 
 publication_cycle = SelectField(
@@ -250,7 +264,8 @@ editinstagramfields = {**editsourcefields,
 
 editwebsitefields = {**editsourcefields,
                      "channel_url": channel_url,
-                     "channel_comments": channel_comments,
+                     "website_allows_comments": website_allows_comments,
+                     "website_comments_registration_required": website_comments_registration_required,
                      "founded": founded,
                      "payment_model": payment_model}
 

@@ -485,8 +485,10 @@ class EditSourceSanitizer(Sanitizer):
             self.edit['channel_url'] = self.data.get('channel_url')
 
     def parse_channel_comments(self):
-        if self.data.get('channel_comments'):
-            self.edit['channel_comments'] = self.data.get('channel_comments')
+        if self.data.get('website_allows_comments'):
+            self.edit['website_allows_comments'] = self.data.get('website_allows_comments')
+        if self.data.get('website_comments_registration_required'):
+            self.edit['website_comments_registration_required'] = self.data.get('website_comments_registration_required')
 
     def parse_transcript_kind(self):
         if self.data.get('transcript_kind'):

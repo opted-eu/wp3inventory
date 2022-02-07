@@ -130,7 +130,11 @@ function channelVisibility(fieldOptions, allNames, el) {
         elem.removeAttribute('required')
     })
 
-    document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
+    document.querySelectorAll('input[name="website_allows_comments"]').forEach((elem) => {
+        elem.required = false
+    });
+
+    document.querySelectorAll('input[name="website_comments_registration_required"]').forEach((elem) => {
         elem.required = false
     });
 
@@ -193,8 +197,8 @@ function channelVisibility(fieldOptions, allNames, el) {
 
     } else if (value == 'website') {
         document.getElementById('name-website-tooltip').hidden = false;
-        document.querySelector("#group-channel-comments").hidden = false;
-        document.querySelectorAll('input[name="channel_comments"]').forEach((elem) => {
+        document.querySelector("#group-website_allows_comments").hidden = false;
+        document.querySelectorAll('input[name="website_allows_comments"]').forEach((elem) => {
             elem.required = true
         });
         document.querySelector("#group-source-founded").hidden = false;
@@ -290,6 +294,16 @@ if (document.querySelector('#publication-cycle')) {
         }
     });
 };
+
+document.addEventListener('input', (e) => {
+
+    if (e.target.getAttribute('name') == "website_allows_comments")
+        if (e.target.value == 'yes') {
+            document.getElementById('group-website_comments_registration_required').hidden = false;
+        } else {
+            document.getElementById('group-website_comments_registration_required').hidden = true;
+        };
+})
 
 if (document.querySelector('#publication-cycle-weekday-none')) {
     document.getElementById('publication-cycle-weekday-none').addEventListener("change", function(event) {
@@ -680,7 +694,7 @@ ready(() => {
 
 
             // handle field visibility / dependency logic
-            const channelVisibilityFields = document.querySelectorAll('#group-name, #group-epaper, #group-channel-comments, #group-transcript-kind, #group-audience-size, #group-source-founded, #group-payment-model');
+            const channelVisibilityFields = document.querySelectorAll('#group-name, #group-epaper, #group-website_allows_comments, #group-website_comments_registration_required, #group-transcript-kind, #group-audience-size, #group-source-founded, #group-payment-model');
             channelVisibilityFields.forEach((elem) => elem.hidden = true);
             document.getElementById('channel-select').addEventListener('change', (element) => {
                     channelVisibility(data, channelVisibilityFields, element);

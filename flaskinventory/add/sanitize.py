@@ -21,17 +21,19 @@ class SourceSanitizer:
         Relevant return attribute are upsert_query (string), set_nquads (string), delete_nquads (string)
     """
 
-    payment_model = ['free', 'partly free', 'not free', 'none']
-    contains_ads = ['yes', 'no', 'non subscribers', 'none']
+    payment_model = ['free', 'partly free', 'not free', 'NA', 'none']
+    contains_ads = ['yes', 'no', 'non subscribers', 'NA', 'none']
     ownership_kind = ['public ownership',
-                      'private ownership', 'unknown', 'none']
+                      'private ownership', 'unknown', 'NA', 'none']
     special_interest = ['yes', 'no']
     publication_cycle = ['continuous', 'daily', 'multiple times per week',
-                         'weekly', 'twice a month', 'monthly', 'less than monthly', 'none']
-    geographic_scope = ['multinational', 'national', 'subnational', 'none']
-    transcript_kind = ['tv', 'radio', 'podcast', 'none']
+                         'weekly', 'twice a month', 'monthly', 'less than monthly', 'NA', 'none']
+    geographic_scope = ['multinational', 'national', 'subnational', 'NA', 'none']
+    transcript_kind = ['tv', 'radio', 'podcast', 'NA']
     channel_comments = ['no comments', 'user comments with registration',
-                        'user comments without registration', 'none']
+                        'user comments without registration', 'NA', 'none']
+
+    yes_no_na = ['yes', 'no', 'NA']
 
     is_upsert = False
     upsert_query = None
@@ -528,15 +530,26 @@ class SourceSanitizer:
                 'Invalid data! "name" not specified.')
 
     def parse_channel_comments(self):
-        if self.json.get('channel_comments'):
-            if self.json.get('channel_comments').lower() in self.channel_comments:
-                self.newsource['channel_comments'] = self.json.get(
-                    'channel_comments').lower()
+        if self.json.get('website_allows_comments'):
+            if self.json.get('website_allows_comments').lower() in self.yes_no_na:
+                self.newsource['website_allows_comments'] = self.json.get(
+                    'website_allows_comments').lower()
             else:
                 raise InventoryValidationError(
-                    f"Invalid data! Provided value for 'channel_comments' does not match: {self.json.get('channel_comments')}")
+                    f"Invalid data! Provided value for 'website_allows_comments' does not match schema: {self.json.get('website_allows_comments')}")
         else:
-            self.newsource['channel_comments'] = 'none'
+            self.newsource['website_allows_comments'] = 'NA'
+
+        if self.newsource['website_allows_comments'] == 'yes':
+            if self.json.get('website_comments_registration_required'):
+                if self.json.get('website_comments_registration_required').lower() in self.yes_no_na:
+                    self.newsource['website_comments_registration_required'] = self.json.get(
+                        'website_comments_registration_required').lower()
+                else:
+                    raise InventoryValidationError(
+                        f"Invalid data! Provided value for 'website_comments_registration_required' does not match schema: {self.json.get('website_comments_registration_required')}")
+            else:
+                self.newsource['website_comments_registration_required'] = 'NA'
 
     def parse_founded(self):
         if self.json.get('founded'):

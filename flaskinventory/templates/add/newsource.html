@@ -102,36 +102,53 @@
             <div id="other-names-feedback"></div>
         </div>
 
-        <div id="group-channel-comments" class="mb-5 form-group fs-5" hidden>
+        <div id="group-website_allows_comments" class="mb-5 form-group fs-5" hidden>
             <p class="form-label fw-bold fs-5">Does the online news source have user comments below individual news articles? 
                 {{make_researchtip('Please visit the website, click on a few individual articles, check whether there are comments and whether it is possible to add a comment as non-registered user. Hints like “You must be logged in to post a comment.” point you to selecting the second option. ')}}
 
             </p>
 
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments1" value="no comments" aria-describedby="channel-comments-feedback">
-                <label class="form-check-label" for="channel_comments1">
-                    No user comments
-                    </label>
+                <input class="form-check-input" type="radio" name="website_allows_comments" id="website_allows_comments1" value="yes" aria-describedby="website_allows_comments-feedback">
+                <label class="form-check-label" for="website_allows_comments1">
+                    Yes
+                </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments2" value="user comments with registration" aria-describedby="channel-comments-feedback">
-                <label class="form-check-label" for="channel_comments2">
-                    Yes, but only  with registration
-                    </label>
+                <input class="form-check-input" type="radio" name="website_allows_comments" id="website_allows_comments2" value="no" aria-describedby="website_allows_comments-feedback">
+                <label class="form-check-label" for="website_allows_comments2">
+                    No
+                </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments3" value="user comments without registration" aria-describedby="channel-comments-feedback">
-                <label class="form-check-label" for="channel_comments3">
-                    Yes, and anyone can comment
-                    </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="channel_comments" id="channel_comments4" value="none" aria-describedby="channel-comments-feedback">
-                <label class="form-check-label" for="channel_comments4">
+                <input class="form-check-input" type="radio" name="website_allows_comments" id="website_allows_comments4" value="NA" aria-describedby="website_allows_comments-feedback">
+                <label class="form-check-label" for="website_allows_comments4">
                         Don't know
-                    </label>
-                <div id="channel-comments-feedback"></div>
+                </label>
+                <div id="website_allows_comments-feedback"></div>
+            </div>
+        </div>
+
+        <div id="group-website_comments_registration_required" class="mb-5 form-group fs-5" hidden>
+            <p class="form-label fw-bold fs-5">Is a registration or an account required to leave comments?</p>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="website_comments_registration_required" id="website_comments_registration_required1" value="yes" aria-describedby="website_comments_registration_required-feedback">
+                <label class="form-check-label" for="website_comments_registration_required1">
+                    Yes
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="website_comments_registration_required" id="website_comments_registration_required2" value="no" aria-describedby="website_comments_registration_required-feedback">
+                <label class="form-check-label" for="website_comments_registration_required2">
+                    No
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="website_comments_registration_required" id="website_comments_registration_required4" value="NA" aria-describedby="website_comments_registration_required-feedback">
+                <label class="form-check-label" for="website_comments_registration_required4">
+                    Don't know
+                </label>
+                <div id="website_comments_registration_required-feedback"></div>
             </div>
         </div>
 
@@ -614,9 +631,17 @@
                     Value
                 </h4>
             </div>
-            <div id='summary-channel_comments' hidden>
+            <div id='summary-website_allows_comments' hidden>
                 <h6 class="text-muted mb-1">
                     Does the online news source have user comments below individual news articles?
+                </h6>
+                <h4 class="mb-4">
+                    Value
+                </h4>
+            </div>
+            <div id='summary-website_comments_registration_required' hidden>
+                <h6 class="text-muted mb-1">
+                    Is a registration or an account required to leave comments?
                 </h6>
                 <h4 class="mb-4">
                     Value
