@@ -3,12 +3,39 @@
 
 <div class="row mt-5">
         <div class="col-8">
-        <h1 class="mb-4">About</h1>
+        {% filter markdown %}
 
-        <p class="lead">The OPTED inventory for European media is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe. Please visit <a href="https://opted.eu/"
-                target="_blank">opted.eu</a> for more information about the project.</p>
-        <p>The OPTED inventory for European media is designed by Work Package 3 (<a href="https://compcommlab.univie.ac.at/" target="_blank">University of Vienna</a>)</p>
-        </div>
+# About
+
+The OPTED inventory for European media is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe. 
+Please visit [opted.eu](https://opted.eu) for more information about the project.
+
+The OPTED inventory for European media is designed by Work Package 3 ([University of Vienna](https://compcommlab.univie.ac.at/))</p>
+
+# Contact
+
+You can reach us via various means. If you have feedback or questions your can either send us an email to [wp3@opted.eu](mailto:wp3@opted.eu)
+or also poke us with a tweet [@OPTED_H2020](https://twitter.com/OPTED_H2020).
+
+In case some technical aspect is not working you can raise an issue in our [github repository](https://github.com/opted-eu) or directly send an email to [Paul](mailto:paul.balluff@univie.ac.at)
+
+
+
+## Contributors
+
+- **Work Package Leaders:** Univ.-Prof. Dr. Annie Waldherr, Univ.-Prof. Hajo Boomgaarden, PhD
+- **Scientific Team:** Dr. Fabienne Lind, Paul Balluff
+- **Technical Implementation:** Paul Balluff
+
+
+# Changelog
+
+### 07 Feb 2022
+
+ - News Sources: added option for publication cycles that are less frequent than monthly
+
+        {% endfilter %}
+</div>
 </div>
 
 {% endblock content %}
