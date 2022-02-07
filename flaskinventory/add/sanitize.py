@@ -27,7 +27,7 @@ class SourceSanitizer:
                       'private ownership', 'unknown', 'none']
     special_interest = ['yes', 'no']
     publication_cycle = ['continuous', 'daily', 'multiple times per week',
-                         'weekly', 'twice a month', 'monthly', 'none']
+                         'weekly', 'twice a month', 'monthly', 'less than monthly', 'none']
     geographic_scope = ['multinational', 'national', 'subnational', 'none']
     transcript_kind = ['tv', 'radio', 'podcast', 'none']
     channel_comments = ['no comments', 'user comments with registration',
@@ -624,10 +624,12 @@ class SourceSanitizer:
                 elif self.newsource['publication_cycle'] in ['weekly']:
                     if self.json.get('publication_cycle_weekday'):
                         try:
-                            self.newsource['publication_cycle_weekday'] = int(self.json.get('publication_cycle_weekday'))
+                            self.newsource['publication_cycle_weekday'] = int(
+                                self.json.get('publication_cycle_weekday'))
                         except Exception as e:
-                            current_app.logger.warning(f'Could not parse publication_cycle_weekday: {e}')
-                            
+                            current_app.logger.warning(
+                                f'Could not parse publication_cycle_weekday: {e}')
+
             else:
                 raise InventoryValidationError(
                     f'Invalid data! Unknown value in "publication_cycle": {self.json.get("publication_cycle")}')
