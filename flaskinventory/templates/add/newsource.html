@@ -946,4 +946,10 @@ const csrftoken = "{{ csrf_token() }}";
 {{ draft|safe }}
 </script>
 {% endif %}
+
+{% if existing %}
+<script type="application/json" id="existing">
+{{ existing|safe }}
+</script>
+{% endif %}
 {% endblock content %} {% block sidebar %} {% endblock sidebar %}

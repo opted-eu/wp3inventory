@@ -686,7 +686,7 @@ ready(() => {
             document.getElementById('heading-name').innerText = ': ' + entry_name
 
             // Populate form with draft data from embedded json
-            var embeddedJSON = document.getElementById('draft')
+            var embeddedJSON = document.getElementById('draft') || document.getElementById('existing')
             if (embeddedJSON) {
                 embeddedJSON = JSON.parse(embeddedJSON.innerHTML)
                 populateForm(embeddedJSON)

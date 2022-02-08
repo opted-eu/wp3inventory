@@ -5,7 +5,7 @@ from flask import (current_app, Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.add.forms import NewCountry, NewEntry, NewOrganization, NewArchive, NewDataset
-from flaskinventory.add.utils import check_draft
+from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.add.sanitize import NewCountrySanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
 from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.users.constants import USER_ROLES
@@ -13,7 +13,7 @@ from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
 from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.flaskdgraph.utils import strip_query
+from flaskinventory.flaskdgraph.utils import strip_query, validate_uid
 import traceback
 
 add = Blueprint('add', __name__)
@@ -60,38 +60,18 @@ def new_entry():
 
 @add.route("/add/source")
 @login_required
-def new_source(draft=None):
-    if draft is None:
-        draft = request.args.get('draft')
+def new_source():
+    draft = request.args.get('draft')
+    existing = request.args.get('existing')
+
+    draft = validate_uid(draft)
+    existing = validate_uid(existing)
     if draft:
-        query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ uid
-                                expand(_all_) {{ uid unique_name name dgraph.type channel {{ name }}
-                                            }}
-                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
-                                    uid unique_name name }} 
-                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
-                                    uid unique_name name }} 
-                                }} }}"""
-        draft = dgraph.query(query_string)
-        if len(draft['q']) > 0:
-            draft = draft['q'][0]
-            entry_added = draft.pop('entry_added')
-            draft = json.dumps(draft, default=str)
-            # check permissions
-            if current_user.uid != entry_added['uid']:
-                if current_user.user_role >= USER_ROLES.Reviewer:
-                    flash("You are editing another user's draft", category='info')
-                else:
-                    draft = None
-                    flash('You can only edit your own drafts!',
-                          category='warning')
-        else:
-            draft = None
-    return render_template("add/newsource.html", draft=draft)
+        draft = get_draft(draft)
+    elif existing:
+        existing = get_existing(existing)
+    
+    return render_template("add/newsource.html", draft=draft, existing=existing)
 
 
 @add.route("/add/organisation", methods=['GET', 'POST'])

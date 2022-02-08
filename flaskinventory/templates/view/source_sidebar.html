@@ -6,14 +6,14 @@
         {% if related %} 
         {% for item in related %}
             {% if item.entry_review_status == "accepted" %}
-        <a href="{{ url_for('view.view_source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
-                    {{ item.name }} ({{item.channel.name}})</strong>
-                <small></small>
-            </div>
-            <div class="col-10 mb-1 small"></div>
-        </a>
+                <a href="{{ url_for('view.view_source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+                    <div class="d-flex w-100 align-items-center justify-content-between">
+                        <strong class="mb-1"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
+                            {{ item.name }} ({{item.channel.name}})</strong>
+                        <small></small>
+                    </div>
+                    <div class="col-10 mb-1 small"></div>
+                </a>
             {% endif %}
         {% endfor %} 
 
@@ -28,6 +28,13 @@
         </a>
 
         {% endif %}
-
+        <a href="{{ url_for('add.new_source', existing=entry.get('uid')) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1"><i class="fas fa-plus-circle fa-fw mx-1" alt="Add related"></i>
+                    Add new related</strong>
+                <small></small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
     </div>
 </div>

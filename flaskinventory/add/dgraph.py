@@ -1,4 +1,7 @@
 from flaskinventory import dgraph
+from flask_login import current_user
+from flaskinventory.users.constants import USER_ROLES
+from flask import url_for, current_app, flash
 from flaskinventory.auxiliary import icu_codes_list
 from pydgraph import Txn
 import json
@@ -48,3 +51,89 @@ def get_subunit_country(uid=None, country_code=None):
     if country_code:
         return result['q'][0]['uid']
         
+
+def check_draft(draft, form):
+    query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ 
+                            uid expand(_all_) {{ name unique_name uid }}
+                            }} }}"""
+    draft = dgraph.query(query_string)
+    if len(draft['q']) > 0:
+        draft = draft['q'][0]
+        entry_added = draft.pop('entry_added')
+        for key, value in draft['q'][0].items():
+            if not hasattr(form, key):
+                continue
+            if type(value) is list:
+                if type(value[0]) is str:
+                    value = ",".join(value)
+                else:
+                    choices = [(subval['uid'], subval['name']) for subval in value]
+                    value = [subval['uid'] for subval in value]
+                    setattr(getattr(form, key),
+                                'choices', choices)
+                    
+            setattr(getattr(form, key), 'data', value)
+        # check permissions
+        if current_user.uid != entry_added['uid']:
+            if current_user.user_role >= USER_ROLES.Reviewer:
+                flash("You are editing another user's draft", category='info')
+            else:
+                draft = None
+                flash('You can only edit your own drafts!', category='warning')
+    else:
+        draft = None
+    return draft
+
+
+def get_draft(uid):
+    query_string = f"""{{ q(func: uid({uid}))  @filter(eq(entry_review_status, "draft")) {{ uid
+                                expand(_all_) {{ uid unique_name name dgraph.type channel {{ name }}
+                                            }}
+                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
+                                    uid unique_name name }} 
+                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
+                                    uid unique_name name }} 
+                                }} }}"""
+    draft = dgraph.query(query_string)
+    if len(draft['q']) > 0:
+        draft = draft['q'][0]
+        entry_added = draft.pop('entry_added')
+        draft = json.dumps(draft, default=str)
+        # check permissions
+        if current_user.uid != entry_added['uid']:
+            if current_user.user_role >= USER_ROLES.Reviewer:
+                flash("You are editing another user's draft", category='info')
+            else:
+                draft = None
+                flash('You can only edit your own drafts!',
+                        category='warning')
+    else:
+        draft = None
+    return draft
+
+
+
+def get_existing(uid):
+    query_string = f"""{{ q(func: uid({uid})) @filter(type(Source)) {{ 
+                                uid expand(_all_) {{
+                                    uid unique_name name dgraph.type channel {{ name }} }}
+                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
+                                    uid unique_name name ownership_kind country {{ name }} }}
+                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
+                                    uid unique_name name }} 
+                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
+                                    uid unique_name name }} 
+                                }} }}"""
+    existing = dgraph.query(query_string)
+    if len(existing['q']) > 0:
+        existing = existing['q'][0]
+        existing = json.dumps(existing, default=str)
+    else:
+        existing = None
+    return existing
