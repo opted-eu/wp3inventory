@@ -86,19 +86,15 @@ channel_comments_choices = [('no comments', 'No Comments'),
 channel_comments = SelectField(
     'Allows user comments', choices=channel_comments_choices)
 
-website_allows_comments_choices = [('yes', 'Yes'),
-                                   ('no', 'No'),
-                                   na_option]
+website_allows_comments_choices = [na_option,
+                                   ('yes', 'Yes'),
+                                   ('no', 'No')]
 
 website_allows_comments = SelectField(
     'Allows user comments', choices=website_allows_comments_choices)
 
-website_comments_registration_required = [('yes', 'Yes'),
-                                          ('no', 'No'),
-                                          na_option]
-
-website_comments_registration = SelectField(
-    'Registration required to comment', choices=website_comments_registration_required)
+website_comments_registration_required = SelectField(
+    'Registration required to comment', choices=website_allows_comments_choices)
 
 
 channel_url = StringField('Channel URL')
@@ -317,6 +313,9 @@ editarchivefields = {**editfields_base,
                      "sources_included": sources_included}
 
 
+accept = SubmitField('Edit and Accept')
+
+
 class DynamicForm(FlaskForm):
     submit = SubmitField('Commit Changes')
 
@@ -325,7 +324,7 @@ class DynamicForm(FlaskForm):
         return getattr(self, field)
 
 
-def make_form(entity):
+def make_form(entity, review_status='accepted'):
     if entity == 'organization':
         fields = editorganizationfields
     elif entity == 'print':
@@ -358,8 +357,9 @@ def make_form(entity):
     if current_user.user_role > 1:
         unique_name = StringField('Unique Name',
                                   validators=[DataRequired()])
-        fields = {"unique_name": unique_name, **fields,
-                  "entry_review_status": entry_review_status}
+        fields = {"unique_name": unique_name, **fields}
+        if review_status == 'accepted':
+            fields["entry_review_status"] = entry_review_status
     else:
         unique_name = StringField('Unique Name',
                                   validators=[DataRequired()], render_kw={'readonly': True})
@@ -368,8 +368,11 @@ def make_form(entity):
     class F(DynamicForm):
         pass
 
-    for key, val in list(fields.items()):
+    for key, val in fields.items():
         setattr(F, key, val)
+
+    if current_user.user_role > 1 and review_status == 'pending':
+        setattr(F, "accept", accept)
 
     return F(), fields
 

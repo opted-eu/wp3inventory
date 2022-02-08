@@ -14,6 +14,9 @@
         </fieldset>
         <div class="form-group mb-3">
             {{ form.submit(class="btn btn-primary my-4") }}
+            {% if 'accept' in form %}
+                {{ form.accept(class="btn btn-success my-4") }}
+            {%endif %}
         </div>
     </form>
 <script>

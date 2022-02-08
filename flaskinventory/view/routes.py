@@ -3,12 +3,15 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
+from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.view.dgraph import (get_dgraphtype, get_archive, get_channel, get_country,
                                         get_organization, get_paper, get_rejected, get_source, get_subunit, list_by_type, get_multinational)
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
 from flaskinventory.misc.forms import publication_kind_dict, topical_focus_dict
 from flaskinventory.flaskdgraph.utils import validate_uid
+from flaskinventory.review.forms import ReviewActions
+from flaskinventory.review.utils import create_review_actions
 
 view = Blueprint('view', __name__)
 
@@ -92,7 +95,7 @@ def view_uid():
             return abort(404)
         dgraphtype = get_dgraphtype(uid)
         if dgraphtype:
-            return redirect(url_for('view.view_' + dgraphtype.lower(), uid=uid))
+            return redirect(url_for('view.view_' + dgraphtype.lower(), **request.args))
         else:
             return abort(404)
     else:
@@ -129,12 +132,14 @@ def view_source(unique_name=None, uid=None):
                     unique_item['topical_focus'][i] = topical_focus_dict[item]
 
         related = unique_item.get('related', None)
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
 
         return render_template('view/source.html',
                                title=unique_item.get('name'),
                                entry=unique_item,
                                show_sidebar=True,
-                               related=related)
+                               related=related,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -153,10 +158,13 @@ def view_archive(unique_name=None, uid=None):
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
             return abort(403)
+        
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
 
         return render_template('view/archive.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -176,9 +184,12 @@ def view_dataset(unique_name=None, uid=None):
         if not can_view(unique_item, current_user):
             return abort(403)
 
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
+
         return render_template('view/archive.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -199,11 +210,14 @@ def view_organization(unique_name=None, uid=None):
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
             return abort(403)
+        
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
 
         return render_template('view/organization.html',
                                title=unique_item.get('name'),
                                entry=unique_item,
-                               show_sidebar=True)
+                               show_sidebar=True,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -245,9 +259,12 @@ def view_subunit(unique_name=None, uid=None):
         if not can_view(unique_item, current_user):
             return abort(403)
 
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
+
         return render_template('view/subunit.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -267,9 +284,12 @@ def view_multinational(unique_name=None, uid=None):
         if not can_view(unique_item, current_user):
             return abort(403)
 
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
+
         return render_template('view/multinational.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               review_actions=review_actions)
     else:
         return abort(404)
 
@@ -301,10 +321,13 @@ def view_researchpaper(uid):
             return abort(404)
         if not can_view(unique_item, current_user):
             return abort(403)
+        
+        review_actions = create_review_actions(current_user, unique_item['uid'], unique_item['entry_review_status'])
 
         return render_template('view/paper.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               review_actions=review_actions)
     else:
         return abort(404)
 

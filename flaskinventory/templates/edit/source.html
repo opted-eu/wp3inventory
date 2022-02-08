@@ -13,13 +13,12 @@
                 {{ render_field(form.get_field(field)) }}        
             {% endfor %}
 
-            
-
-            
-
         </fieldset>
         <div class="form-group mb-3">
             {{ form.submit(class="btn btn-outline-info my-4") }}
+            {% if current_user.user_role > 1 %}
+            {{ form.accept(class="btn btn-outline-info my-4") }}
+            {%endif %}
         </div>
     </form>
 </div>

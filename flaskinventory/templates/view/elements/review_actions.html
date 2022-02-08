@@ -1,0 +1,14 @@
+{% if current_user.user_role > 1 %}
+    {% if review_actions %}
+        <form method="POST" action="{{ url_for('review.submit', **request.args) }}">
+            {{ review_actions.hidden_tag() }}
+            <div class="btn-group" role="group" aria-label="Review Actions">
+    {% endif %}
+        <a class="btn btn-primary" href="{{ url_for('edit.edit_uid', uid=entry.uid, **request.args) }}">Edit</a> 
+    {% if review_actions %}
+            {{ review_actions.reject(class="btn btn-danger") }} 
+            {{ review_actions.accept(class="btn btn-success") }}
+            </div>
+        </form>
+    {% endif %}
+{% endif %}

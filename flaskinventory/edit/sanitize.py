@@ -76,7 +76,13 @@ class Sanitizer:
         self.edit['unique_name'] = self.data.get('unique_name')
 
     def parse_entry_review_status(self):
-        if self.data.get('entry_review_status'):
+        if self.data.get('accept'):
+            if self.user.user_role < 2:
+                raise InventoryValidationError(
+                    'You do not have the required permissions to change the review status!')
+            self.edit['entry_review_status'] = 'accepted' 
+            self.edit['reviewed_by'] = UID(self.user.uid, facets={'timestamp': datetime.datetime.now(datetime.timezone.utc)})
+        elif self.data.get('entry_review_status'):
             if self.user.user_role < 2:
                 raise InventoryValidationError(
                     'You do not have the required permissions to change the review status!')

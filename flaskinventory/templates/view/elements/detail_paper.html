@@ -6,6 +6,9 @@
         <h3>{{ entry.title }} <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small></h3>
         <h6>{% if entry.authors is string %}{{ entry.authors }}{%else%}{{ ", ".join(entry.authors )}}{%endif%}</h6>
     </div>
+    <div>
+        {% include "view/elements/review_actions.html" %}
+    </div>
 </div>
 
 <div class="border rounded p-3">

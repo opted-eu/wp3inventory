@@ -23,5 +23,3 @@ class ReviewActions(FlaskForm):
     uid = HiddenField(label='UID', validators=[DataRequired()])
     accept = SubmitField('Accept')
     reject = SubmitField('Reject')
-    edit = SubmitField('Edit')
-

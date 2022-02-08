@@ -31,7 +31,7 @@ def edit_uid(uid):
         return abort(404)
 
     if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization', 'Subunit', 'Archive', 'Dataset']:
-        return redirect(url_for('edit.' + result['q'][0]['dgraph.type'][0].lower(), unique_name=result['q'][0]['unique_name']))
+        return redirect(url_for('edit.' + result['q'][0]['dgraph.type'][0].lower(), unique_name=result['q'][0]['unique_name'], **request.args))
     else:
         return abort(404)
 
@@ -57,7 +57,7 @@ def organization(unique_name=None, uid=None):
     if not uid:
         uid = check.get('uid')
 
-    form, fields = make_form('organization')
+    form, fields = make_form('organization', review_status=check['entry_review_status'])
 
     form.country.choices = get_country_choices(opted=False)
     if form.validate_on_submit():
@@ -76,8 +76,12 @@ def organization(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Organization has been updated', 'success')
-            return redirect(url_for('view.view_organization', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Organization has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Organization has been updated', 'success')
+                return redirect(url_for('view.view_organization', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Organization could not be updated: {e}', 'danger')
             return redirect(url_for('edit.organization', unique_name=form.unique_name.data))
@@ -129,7 +133,7 @@ def source(unique_name=None, uid=None):
         return abort(404)
 
     form, fields = make_form(
-        result['q'][0]['channel']['unique_name'])
+        result['q'][0]['channel']['unique_name'], review_status=check['entry_review_status'])
 
     if current_user.user_role >= USER_ROLES.Reviewer:
         form.country.choices = get_country_choices(
@@ -159,8 +163,12 @@ def source(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Source has been updated', 'success')
-            return redirect(url_for('view.view_source', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Source has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Source has been updated', 'success')
+                return redirect(url_for('view.view_source', unique_name=form.unique_name.data))
         except Exception as e:
             tb_str = ''.join(traceback.format_exception(
                 None, e, e.__traceback__))
@@ -267,7 +275,7 @@ def subunit(unique_name=None, uid=None):
     if not unique_name:
         unique_name = check.get('unique_name')
 
-    form, fields = make_form('subunit')
+    form, fields = make_form('subunit', review_status=check['entry_review_status'])
 
     form.country.choices = get_country_choices(opted=False)
     if form.validate_on_submit():
@@ -286,8 +294,12 @@ def subunit(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Subunit has been updated', 'success')
-            return redirect(url_for('view.view_subunit', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Subunit has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Subunit has been updated', 'success')
+                return redirect(url_for('view.view_subunit', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Subunit could not be updated: {e}', 'danger')
             return redirect(url_for('edit.subunit', unique_name=form.unique_name.data))
@@ -336,7 +348,7 @@ def multinational(unique_name=None, uid=None):
     if not unique_name:
         unique_name = check.get('unique_name')
 
-    form, fields = make_form('multinational')
+    form, fields = make_form('multinational', review_status=check['entry_review_status'])
 
     if form.validate_on_submit():
         try:
@@ -354,8 +366,12 @@ def multinational(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Multinational Entity has been updated', 'success')
-            return redirect(url_for('view.view_multinational', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Multinational Entity has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Multinational Entity has been updated', 'success')
+                return redirect(url_for('view.view_multinational', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Multinational Entity could not be updated: {e}', 'danger')
             return redirect(url_for('edit.multinational', unique_name=form.unique_name.data))
@@ -402,7 +418,7 @@ def dataset(unique_name=None, uid=None):
     if not unique_name:
         unique_name = check.get('unique_name')
 
-    form, fields = make_form('dataset')
+    form, fields = make_form('dataset', review_status=check['entry_review_status'])
 
     if form.validate_on_submit():
         try:
@@ -420,8 +436,12 @@ def dataset(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Dataset has been updated', 'success')
-            return redirect(url_for('view.view_dataset', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Dataset has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Dataset has been updated', 'success')
+                return redirect(url_for('view.view_dataset', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Dataset could not be updated: {e}', 'danger')
             return redirect(url_for('edit.dataset', unique_name=form.unique_name.data))
@@ -472,14 +492,14 @@ def archive(unique_name=None, uid=None):
     if not uid:
         uid = check.get('uid')
 
-    form, fields = make_form('archive')
+    form, fields = make_form('archive', review_status=check['entry_review_status'])
 
     if form.validate_on_submit():
         try:
             sanitizer = EditArchiveSanitizer(
                 form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
+            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
         except Exception as e:
             flash(f'Archive could not be updated: {e}', 'danger')
             return redirect(url_for('edit.archive', unique_name=form.unique_name.data))
@@ -490,8 +510,12 @@ def archive(unique_name=None, uid=None):
             current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Archive has been updated', 'success')
-            return redirect(url_for('view.view_archive', unique_name=form.unique_name.data))
+            if request.form.get('accept'):
+                flash(f'Archive has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'Archive has been updated', 'success')
+                return redirect(url_for('view.view_archive', unique_name=form.unique_name.data))
         except Exception as e:
             flash(f'Archive could not be updated: {e}', 'danger')
             return redirect(url_for('edit.archive', unique_name=form.unique_name.data))
