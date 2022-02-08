@@ -417,10 +417,16 @@ if (document.querySelector('input[name="geographic_scope"]')) {
 
 // populate form on page load
 function populateForm(jsonData) {
-    document.getElementById("uid-hidden").value = jsonData["uid"]
-    document.getElementById("channel-select").value = jsonData["channel"].unique_name
-    document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
-    document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
+    if ('uid' in jsonData) {
+        document.getElementById("uid-hidden").value = jsonData["uid"]
+    };
+    if ('channel' in jsonData) {
+        document.getElementById("channel-select").value = jsonData["channel"].unique_name
+        document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
+    };
+    if ('name' in jsonData) {
+        document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
+    };
     if ("other_names" in jsonData) {
         document.getElementById("other-names").value = jsonData["other_names"].join(",");
     };
@@ -562,12 +568,13 @@ function populateForm(jsonData) {
     };
     if ("related" in jsonData) {
         jsonData["related"].forEach(function(item) {
-            let opt = document.createElement('option')
-            opt.setAttribute('value', item.uid)
-            opt.innerText = item.name + ' (' + item.channel.name + ')'
-            opt.selected = true
-            document.getElementById("related-sources").append(opt);
-        })
+                let opt = document.createElement('option')
+                opt.setAttribute('value', item.uid)
+                opt.innerText = item.name + ' (' + item.channel.name + ')'
+                opt.selected = true
+                document.getElementById("related-sources").append(opt);
+            })
+            // add self to related
     };
 };
 

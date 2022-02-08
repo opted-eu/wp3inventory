@@ -32,6 +32,7 @@ async def generate_fieldoptions():
 
     return data
 
+
 def get_subunit_country(uid=None, country_code=None):
     if uid:
         query_string = f''' {{ q(func: uid({uid})) {{ country {{ uid }} }} }}'''
@@ -39,18 +40,18 @@ def get_subunit_country(uid=None, country_code=None):
         query_string = f''' {{ q(func: eq(country_code, "{country_code}")) 
                                 @filter(type("Country")) {{
 		                            uid }} }}'''
-    
+
     result = dgraph.query(query_string)
 
     if len(result['q']) == 0:
         return False
-    
+
     if uid:
         return result['q'][0]['country'][0]['uid']
-    
+
     if country_code:
         return result['q'][0]['uid']
-        
+
 
 def check_draft(draft, form):
     query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ 
@@ -67,11 +68,12 @@ def check_draft(draft, form):
                 if type(value[0]) is str:
                     value = ",".join(value)
                 else:
-                    choices = [(subval['uid'], subval['name']) for subval in value]
+                    choices = [(subval['uid'], subval['name'])
+                               for subval in value]
                     value = [subval['uid'] for subval in value]
                     setattr(getattr(form, key),
-                                'choices', choices)
-                    
+                            'choices', choices)
+
             setattr(getattr(form, key), 'data', value)
         # check permissions
         if current_user.uid != entry_added['uid']:
@@ -110,11 +112,10 @@ def get_draft(uid):
             else:
                 draft = None
                 flash('You can only edit your own drafts!',
-                        category='warning')
+                      category='warning')
     else:
         draft = None
     return draft
-
 
 
 def get_existing(uid):
@@ -133,6 +134,12 @@ def get_existing(uid):
     existing = dgraph.query(query_string)
     if len(existing['q']) > 0:
         existing = existing['q'][0]
+        related = {'uid': existing.pop('uid'), 'unique_name': existing.pop(
+            'unique_name'), 'channel': existing.pop('channel'), 'name': existing['name']}
+        if 'related' not in existing.keys():
+            existing['related'] = [related]
+        else:
+            existing['related'].append(related)
         existing = json.dumps(existing, default=str)
     else:
         existing = None
