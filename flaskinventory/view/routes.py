@@ -202,7 +202,8 @@ def view_organization(unique_name=None, uid=None):
 
         return render_template('view/organization.html',
                                title=unique_item.get('name'),
-                               entry=unique_item)
+                               entry=unique_item,
+                               show_sidebar=True)
     else:
         return abort(404)
 
