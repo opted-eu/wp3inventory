@@ -551,7 +551,7 @@ function populateForm(jsonData) {
 
     };
     if ("channel_epaper" in jsonData) {
-        document.getElementById("channel-epaper").value = jsonData["channel_epaper"]
+        document.querySelector(`input[name=channel_epaper][value='${jsonData["channel_epaper"]}']`).checked = true
     };
     if ("archives" in jsonData) {
         for (archive of jsonData["archives"]) {
