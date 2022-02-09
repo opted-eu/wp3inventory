@@ -308,7 +308,7 @@ def confirmation():
 def from_draft(entity=None, uid=None):
     if entity and uid:
         if entity == 'Source':
-            return new_source(draft=uid)
+            return redirect(url_for('add.new_source', draft=uid))
         else:
             return render_template("not_implemented.html")
 
@@ -321,7 +321,7 @@ def from_draft(entity=None, uid=None):
 
     result = dgraph.query(query_string)
     if result['q'][0].get('drafts'):
-        return new_source(draft=result['q'][0]['drafts'][0]['uid'])
+        return redirect(url_for('add.new_source', draft=result['q'][0]['drafts'][0]['uid']))
     else:
         return redirect(url_for('users.my_entries'))
 
