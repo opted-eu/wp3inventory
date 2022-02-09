@@ -13,6 +13,8 @@ import secrets
 
 import datetime
 
+from flaskinventory.flaskdgraph.utils import validate_uid
+
 
 class SourceSanitizer:
     """ Class for validating data and generating mutation object
@@ -990,6 +992,8 @@ class SourceSanitizer:
                     if self.json.get(f'newsource_{item}'):
                         channel_name, channel_uid = self.json.get(
                             'newsource_' + item).split(',')
+                        if not validate_uid(channel_uid):
+                            continue
                         rel_source = self.add_entry_meta(
                             rel_source, entry_status="draft")
                         rel_source['name'] = item
