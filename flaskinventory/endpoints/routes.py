@@ -147,5 +147,6 @@ def submit():
 
         return jsonify(response)
     else:
+        current_app.logger.error(f'DGraph Error - Could not perform mutation: {sanitizer.set_nquads}')
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
