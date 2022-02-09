@@ -126,6 +126,7 @@ def submit():
             tb_str = ''.join(traceback.format_exception(
                 None, e, e.__traceback__))
             current_app.logger.error(tb_str)
+            current_app.logger.error(f'Set nquads: {sanitizer.set_nquads}')
             return jsonify(error)
 
     try:
@@ -134,6 +135,7 @@ def submit():
         error = {'error': f'{e}'}
         tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
         current_app.logger.error(tb_str)
+        current_app.logger.error(f'Set nquads: {sanitizer.set_nquads}')
         return jsonify(error)
 
     if result:
