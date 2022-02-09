@@ -984,6 +984,38 @@ ready(() => {
 
             new TomSelect('#topical-focus', TomSelectTopicalFocusConfig);
 
+            function guessChannel(sourcename) {
+                sourcename = sourcename.toLowerCase()
+                let fb = ['fb', 'facebook']
+                let ig = ['ig', 'instagram']
+                let tg = ['tg', 'telegram']
+                let tw = ['tw', 'twitter']
+                let vk = ['vk', 'vkontakte']
+                let www = ['website']
+                let print = ['print']
+                let transcript = ['transcript']
+
+                if (sourcename.includes('facebook')) {
+                    return 'facebook'
+                } else if (sourcename.includes('instagram')) {
+                    return 'instagram'
+                } else if (sourcename.includes('telegram')) {
+                    return 'telegram'
+                } else if (sourcename.includes('twitter')) {
+                    return 'twitter'
+                } else if (sourcename.includes('vkontakte')) {
+                    return 'vkontakte'
+                } else if (sourcename.includes('website')) {
+                    return 'website'
+                } else if (sourcename.includes('print')) {
+                    return 'print'
+                } else if (sourcename.includes('transcript')) {
+                    return 'transcript'
+                } else {
+                    return false
+                }
+            };
+
             // autocomplete related sources
 
             function createNewSourceField(container, sourceName) {
@@ -994,6 +1026,7 @@ ready(() => {
                 label.classList.add('col-sm-2', 'col-form-label')
                 label.setAttribute('for', 'newsource_' + sourceName)
                 label.innerText = sourceName;
+                let guessedChannel = guessChannel(sourceName)
                 row.append(label)
                 var col = document.createElement('div');
                 col.classList.add('col-sm-10');
@@ -1009,7 +1042,13 @@ ready(() => {
                     }
                     // this is a lazy way of getting two bits of data into one field
                     // we have to split this later at the comma to get the unique_name and uid
-                    option.value = option.value + ',' + option.getAttribute('data-value')
+                    if (option.value) {
+                        if (option.value == guessedChannel) {
+                            select.value = guessedChannel
+                        }
+                        option.setAttribute('data-channel-name', option.value)
+                        option.value = option.value + ',' + option.getAttribute('data-value')
+                    }
                 }
 
                 // append elements
