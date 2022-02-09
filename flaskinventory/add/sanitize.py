@@ -21,20 +21,20 @@ class SourceSanitizer:
         Relevant return attribute are upsert_query (string), set_nquads (string), delete_nquads (string)
     """
 
-    payment_model = ['free', 'partly free', 'not free', 'NA', 'none']
-    contains_ads = ['yes', 'no', 'non subscribers', 'NA', 'none']
+    payment_model = ['free', 'partly free', 'not free', 'NA', 'none', 'na']
+    contains_ads = ['yes', 'no', 'non subscribers', 'NA', 'none', 'na']
     ownership_kind = ['public ownership',
-                      'private ownership', 'unknown', 'NA', 'none']
+                      'private ownership', 'unknown', 'NA', 'none', 'na']
     special_interest = ['yes', 'no']
     publication_cycle = ['continuous', 'daily', 'multiple times per week',
-                         'weekly', 'twice a month', 'monthly', 'less than monthly', 'NA', 'none']
+                         'weekly', 'twice a month', 'monthly', 'less than monthly', 'NA', 'none', 'na']
     geographic_scope = ['multinational',
-                        'national', 'subnational', 'NA', 'none']
-    transcript_kind = ['tv', 'radio', 'podcast', 'NA']
+                        'national', 'subnational', 'NA', 'none', 'na']
+    transcript_kind = ['tv', 'radio', 'podcast', 'NA', 'na']
     channel_comments = ['no comments', 'user comments with registration',
-                        'user comments without registration', 'NA', 'none']
+                        'user comments without registration', 'NA', 'none', 'na']
 
-    yes_no_na = ['yes', 'no', 'NA']
+    yes_no_na = ['yes', 'no', 'NA', 'na']
 
     is_upsert = False
     upsert_query = None
