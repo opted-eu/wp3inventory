@@ -76,7 +76,7 @@ def get_archive(unique_name=None, uid=None):
     if unique_name:
         query_func = f'{{ archive(func: eq(unique_name, "{unique_name}"))'
     elif uid:
-        query_func = f'{{ archive(func: uid({uid})) @filter(type(Archive))'
+        query_func = f'{{ archive(func: uid({uid})) @filter(type(Archive) OR type(Dataset))'
     else:
         return None
 
