@@ -4,9 +4,9 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.add.forms import NewCountry, NewEntry, NewOrganization, NewArchive, NewDataset
+from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization, NewArchive, NewDataset
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
-from flaskinventory.add.sanitize import NewCountrySanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
+from flaskinventory.add.sanitize import NewMultinationalSanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
 from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
@@ -256,15 +256,15 @@ def new_dataset(draft=None):
     return render_template('add/generic.html', title='Add Dataset', form=form, fields=fields)
 
 
-@add.route("/add/country", methods=['GET', 'POST'])
+@add.route("/add/multinational", methods=['GET', 'POST'])
 @login_required
 @requires_access_level(USER_ROLES.Admin)
-def new_country():
-    form = NewCountry(uid="_:newcountry")
+def new_multinational():
+    form = NewMultinational(uid="_:newcountry")
 
     if form.validate_on_submit():
         try:
-            sanitizer = NewCountrySanitizer(
+            sanitizer = NewMultinationalSanitizer(
                 form.data, current_user, get_ip())
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         except Exception as e:
@@ -272,8 +272,8 @@ def new_country():
                 e_trace = traceback.format_exception(
                     None, e, e.__traceback__)
                 current_app.logger.debug(e_trace)
-            flash(f'Country could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_country'))
+            flash(f'Multinational could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_multinational'))
 
         try:
             if sanitizer.delete_nquads is not None:
@@ -282,19 +282,19 @@ def new_country():
                 current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             current_app.logger.debug(result)
-            flash(f'Country has been added!', 'success')
-            return redirect(url_for('view.view_country', unique_name=sanitizer.new['unique_name']))
+            flash(f'Multinational has been added!', 'success')
+            return redirect(url_for('view.view_multinational', unique_name=sanitizer.new['unique_name']))
         except Exception as e:
             if current_app.debug:
                 e_trace = traceback.format_exception(None, e, e.__traceback__)
                 current_app.logger.debug(e_trace)
-            flash(f'Country could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_country'))
+            flash(f'Multinational could not be added: {e}', 'danger')
+            return redirect(url_for('add.new_multinational'))
 
     fields = list(form.data.keys())
     fields.remove('submit')
     fields.remove('csrf_token')
-    return render_template('add/generic.html', title='Add Country', form=form, fields=fields)
+    return render_template('add/generic.html', title='Add Multinational', form=form, fields=fields)
 
 
 @add.route("/add/confirmation")

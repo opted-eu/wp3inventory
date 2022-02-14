@@ -95,16 +95,17 @@ class NewArchive(FlaskForm):
         return getattr(self, field)
 
 
-class NewCountry(FlaskForm):
+class NewMultinational(FlaskForm):
     uid = StringField('uid', render_kw={'readonly': True})
     name = StringField('Name', validators=[DataRequired()])
     other_names = StringField('Other Names',
                               render_kw={'placeholder': 'Separate by comma'})
 
-    country_code = StringField('Country Code', validators=[DataRequired()],
-                               render_kw={'placeholder': 'e.g. at, de, tw'})
+    description = TextAreaField(
+        'Can you briefly describe the Multinational Construct??',
+        render_kw={'placeholder': 'Explain what you mean by this construct'})
 
-    submit = SubmitField('Add New Country')
+    submit = SubmitField('Add New Multinational')
 
     def get_field(self, field):
         return getattr(self, field)
