@@ -147,14 +147,16 @@
         <dt class="col-sm-3">Countries</dt>
         <dd class="col-sm-9">
             {% for country in entry.country %}
-            <a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a> 
+            <span><a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a></span>
+            {{ ", " if not loop.last else "" }}
             {% endfor %}
         </dd>
         {% if entry.geographic_scope_subunit %}
         <dt class="col-sm-3">Subunits <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Note that entities listed in 'Subunits' are not necessarily part of all the entities listed in 'Countries'."><i class="fas mx-1 fa-question-circle"></i></a></dt>
         <dd class="col-sm-9">
             {% for subunit in entry.geographic_scope_subunit %}
-            <span class="me-2"><a href="{{ url_for('view.view_subunit', uid=subunit.uid)}}">{{ subunit.name }}</a></span>
+            <span><a href="{{ url_for('view.view_subunit', uid=subunit.uid)}}">{{ subunit.name }}</a></span>
+            {{ ", " if not loop.last else "" }}
             {% endfor %}
             </dd>
             
@@ -162,7 +164,11 @@
         
         {% if entry.languages %}
         <dt class="col-sm-3">Languages</dt>
-        <dd class="col-sm-9"> {{ ",".join(entry.languages_pretty) }}</dd>
+        <dd class="col-sm-9">
+            {% for language in entry.languages_pretty %}
+             <span>{{ language }}</span> {{ ", " if not loop.last else "" }}
+             {% endfor %}
+            </dd>
         {% endif %}
         {% if entry.party_affiliated %}
         <dt class="col-sm-3">News Source close to a political party <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Close means that a political party or a party-related association or company owns at least 50% of the news source OR that persons who have a central role in the news source (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
