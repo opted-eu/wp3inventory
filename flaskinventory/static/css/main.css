@@ -133,3 +133,18 @@ dt {
 .ts-no-arrow {
     background-image: none!important;
 }
+
+
+/* Markdown styling */
+
+.toclink {
+    color: var(--bs-body-color);
+    text-decoration: none;
+}
+
+.toclink:hover::before {
+    content: "#";
+    float: left;
+    padding-right: 4px;
+    margin-left: -24px;
+}
