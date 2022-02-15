@@ -1,16 +1,16 @@
 {% extends "layout.html" %} {% block content %}
 
 
-<div class="row mt-5">
-        <div class="col-8">
-        {% filter markdown %}
+<h1>About</h1>
 
-# About
+<p class="lead">The OPTED inventory for European media is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe. 
+Please visit <a href="https://opted.eu" target="_blank">opted.eu</a> for more information about the project.</p>
 
-The OPTED inventory for European media is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe. 
-Please visit [opted.eu](https://opted.eu) for more information about the project.
+<p class="lead">
+The OPTED inventory for European media is designed by Work Package 3 (<a href="https://compcommlab.univie.ac.at/" target="_blank">University of Vienna</a>)
+</p>
 
-The OPTED inventory for European media is designed by Work Package 3 ([University of Vienna](https://compcommlab.univie.ac.at/))</p>
+{% filter markdown %}
 
 # Contact
 
@@ -47,8 +47,14 @@ In case some technical aspect is not working you can raise an issue in our [gith
 #### Reviewing
  - Reviewing and editing an entry can now be done in one go.
 
-        {% endfilter %}
-</div>
-</div>
+[TOC]
+
+{% endfilter %}
 
 {% endblock content %}
+
+{% block sidebar %}
+
+{% include "guides/sidebar_toc.html" %} 
+
+{% endblock sidebar %}
