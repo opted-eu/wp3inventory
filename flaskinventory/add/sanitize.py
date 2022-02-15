@@ -1680,14 +1680,13 @@ class NewDatasetSanitizer(NewArchiveSanitizer):
                 self.new['fulltext'] = False
 
 
-class NewCountrySanitizer(Sanitizer):
+class NewMultinationalSanitizer(Sanitizer):
 
     def __init__(self, data, user, ip):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": 'Country',
-                    "opted_scope": False}
+                    "dgraph.type": 'Multinational'}
 
         self.new = self._add_entry_meta(self.new, newentry=True)
 
@@ -1700,12 +1699,12 @@ class NewCountrySanitizer(Sanitizer):
         self.set_nquads = " \n ".join(nquads)
 
     @staticmethod
-    def _country_unique_name(name):
+    def _multinational_unique_name(name):
         name = slugify(name, separator="_")
 
         query_string = f'''{{
                             field1 as var(func: eq(unique_name, "{name}"))
-                            field2 as var(func: eq(unique_name, "{name}_country"))
+                            field2 as var(func: eq(unique_name, "{name}_multinational"))
                         
                             data1(func: uid(field1)) {{
                                     unique_name
@@ -1724,12 +1723,12 @@ class NewCountrySanitizer(Sanitizer):
         if len(result['data1']) == 0:
             return f'{name}'
         elif len(result['data2']) == 0:
-            return f'{name}_archive'
+            return f'{name}_multinational'
         else:
-            return f'{name}_archive_{secrets.token_urlsafe(4)}'
+            return f'{name}_multinational_{secrets.token_urlsafe(4)}'
 
     def _generate_unique_name(self):
-        self.new["unique_name"] = self._archive_unique_name(
+        self.new["unique_name"] = self._multinational_unique_name(
             self.data['name'])
 
     def _resolve_wikidata(self):
@@ -1741,8 +1740,6 @@ class NewCountrySanitizer(Sanitizer):
                 if key not in self.new.keys():
                     self.new[key] = val
 
-    def parse_country_code(self):
-        if self.data.get('country_code'):
-            self.new['country_code'] = self.data.get('country_code')
-        else:
-            raise InventoryValidationError('Country Code is required!')
+    def parse_description(self):
+        if self.data.get('description'):
+            self.new['description'] = self.data.get('description')
