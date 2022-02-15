@@ -1,15 +1,10 @@
 {% extends "layout.html" %} {% block content %}
+<h1>Resources</h1>
 
+<p class="lead">This is a collection of online resources that provide useful background and meta information on the media landscape in Europe.
+All resources are curated by the WP3 Team and the list is updated irregularly.</p>
 
-
-<div class="row mt-5">
-    <div class="col-8">
-        
-        {% filter markdown %}
-# Resources
-
-This is a collection of online resources that provide useful background and meta information on the media landscape in Europe.
-All resources are curated by the WP3 Team and the list is updated irregularly.
+{% filter markdown %}
 
 ## Circulation and Audience Size
 
@@ -56,9 +51,15 @@ All resources are curated by the WP3 Team and the list is updated irregularly.
 - [Eurotopics](https://www.eurotopics.net/): News aggregator and information about media selected outlets (EU)
 - [MediaDB](https://www.mediadb.eu/): Information about the media landscape in German (EU)
 - [DieMedien.at](https://diemedien.at/): Background information about media (Austria)
+
+[TOC]
+
 {% endfilter %}
-        
-    </div>
-</div>
 
 {% endblock content %}
+
+{% block sidebar %}
+
+{% include "guides/sidebar_toc.html" %} 
+
+{% endblock sidebar %}

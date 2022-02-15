@@ -1,13 +1,12 @@
 {% extends "layout.html" %} {% block content %}
 
+<h1>Detailed Guide for adding News Sources</h1>
 
+<p class="lead">Thank you for participating!</p>
 
-<div class="row mt-5">
-    <div class="col-8">
 {% filter markdown %}
-# Detailed Guide for adding News Sources
 
-Thank you for participating!
+# What is included in this inventory?
 
 Before you start, please carefully read the following instructions to
 learn about the type of news sources we are looking for:
@@ -17,7 +16,7 @@ accessible in various formats and via various channels. For the OPTED
 inventory of European news sources, we focus on a specific type of news
 producing sources. Please carefully read the following definition.
 
-### By news sources, we mean sources that:
+**By news sources, we mean sources that:**
 
 -   have the primary purpose to regularly report and comment on recent
     events and ideas
@@ -26,7 +25,7 @@ producing sources. Please carefully read the following definition.
 -   can be regarded as a rather complex organisations and has
     standardized practises (not a one-man or one women operation)
 
-### Important, we look for:
+**Important, we look for:**
 
 -   Sources mainly associated with EU countries + UK, Switzerland,
     Norway, and Israel
@@ -46,7 +45,7 @@ producing sources. Please carefully read the following definition.
     the moment (to the best of your knowledge) in which you enter the
     information.
 
-### More specifically the inventory includes:
+**More specifically the inventory includes:**
 
 -   Print news sources
 -   Online news sources
@@ -68,7 +67,7 @@ producing sources. Please carefully read the following definition.
     alternative view in contrast to mainstream media, e.g.,
     [order-order.com](https://order-order.com/) )
 
-### Please note, the inventory does not include:
+**Please note, the inventory does not include:**
 
 -   News aggregation sites (e.g. Google news, Apple News, Upday,
     Flipboard)
@@ -83,12 +82,12 @@ producing sources. Please carefully read the following definition.
 -   Collective political actors (e.g., parties, governments) and
     (political) advertisement/public relations
 
-## List of credible resources
+# List of credible resources
 
 We provide a curated and growing list of resources that we found useful
 for adding entries to the inventory.
 
-### Audience Size for Print Newspapers
+## Audience Size for Print Newspapers
 
 Getting detailed information about the reach of a printed news source
 can be challenging. However, there are interest groups that collect such
@@ -99,8 +98,17 @@ Circulations](https://www.ifabc.org/members/full-member-list-alphabetically)
 to find an appropriate source for many European countries. E.g., for
 Austria the [OEAK](https://www.oeak.at/auflagedetails/) or Germany the
 [IVW](https://www.ivw.eu/print/print).
+
+[TOC]
+
 {% endfilter %}
-    </div>
-</div>
+
 
 {% endblock content %}
+
+
+{% block sidebar %}
+
+{% include "guides/sidebar_toc.html" %} 
+
+{% endblock sidebar %}
