@@ -323,6 +323,6 @@ def from_draft(entity=None, uid=None):
     if result['q'][0].get('drafts'):
         return redirect(url_for('add.new_source', draft=result['q'][0]['drafts'][0]['uid']))
     else:
-        return redirect(url_for('users.my_entries'))
+        return redirect(url_for('add.new_entry'))
 
 
