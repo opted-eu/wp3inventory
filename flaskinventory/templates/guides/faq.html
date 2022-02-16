@@ -1,0 +1,229 @@
+{% extends "layout.html" %} 
+
+{% block content %}
+<h1>Frequently Asked Questions</h1>
+
+<p class="lead">Making entries to the inventory can sometimes be confusing. Therfore, we collected some frequently asked questions here. 
+All questions are curated by the WP3 Team and the list is updated irregularly. If your question is not answered here, you can <a href="{{ url_for('main.about') }}">ask us and we are happy to help</a>.</p>
+
+{% filter markdown %} 
+
+# Ownership
+
+**How can I find ownership information?**
+
+**Answer:** There are many ways to investigate the ownership of a news source. It depends on various factors, such as the country where the news source is active, the organizational structure of the media organizations, as well as the channel of the news source. We collected useful sites for tracing ownership in the resource section. But there are also some general tips we can give:
+
+*Website of the news source*
+
+If the news source has a website, please check their about section and
+contact page. Sometimes they mention the copyright holder of the
+website's content, or also an address of their office. You can also
+check their privacy policy because there they usually state which
+company is processing your personal information.
+
+*Stock Listed Companies*
+
+Some large media organizations are stock listed companies, which means
+that they regularly publish a report for their shareholders. In such
+reports they typically disclose all businesses that they are involved
+with. For example, "Reach PLC" disclose all their subsidiaries in an
+annual report. You can check their annual reports here:
+[https://www.reachplc.com/financial-information/annual-reports](https://www.reachplc.com/financial-information/annual-reports)
+and see at page 149 all their subsidiaries in Ireland.
+
+**If a newspaper is owned by a media group from a different country, should I enter the foreign organization owning the news source?**
+
+*For example: Irish Daily Mirror is owned by Reach PLC in Great Britain*
+
+**Answer:** You should always try to find the **direct owner** of the
+news source. We know that it is often difficult to find the correct
+company, as some news sources are not very transparent about it. But if
+a foreign company is involved in publishing the news source, we are
+interested in tracing these cross-border ownership structures. We are
+happy to help with complicated cases like this. In this particular case,
+*Irish Daily Mirror* is directly owned by *Reach Publishing (Ireland)
+Limited*. In case the direct owner cannot be determined, it is
+acceptable to enter the indirect owner.
+
+**Where can I change the ownership field?**
+
+**Answer:** Currently, you can only edit the ownership at the
+organization level. This means, you can edit the news sources an
+organization owns. Maybe we will change that in the future and we
+acknowledge that editing organizations is not very user friendly at this
+stage.
+
+*How to do that?*
+
+1. Go to Tasks \> **[My Entries]({{ url_for('users.my_entries')}})**
+
+2. Find the organization you want to edit (in one of the tabs) and click
+on "Edit". 
+![]({{ url_for('static', filename='guides/my_entries.png') }})
+
+3. Scroll down to the field "Publishes" and search for the sources that
+you would like to add:
+![]({{ url_for('static', filename='guides/selection_publishes.png') }})
+
+
+4. Finally, click on "Commit changes"
+
+**Websites of some broadcasters are public services, what should I code as their owner?**
+
+*For example, the orf.at Website is part of the public broadcasting in Austria.*
+
+**Answer:** Public broadcasters such as BBC, ORF, ARD have a legally
+registered organization that publishes and manages their news sources.
+You should always code the organization and mark their ownership as
+"mainly public".
+
+# Websites
+
+**Where can I find the founding year of a website? What if I cannot find the founding year of the website?**
+
+*For example, the websites of "krone.at" and "neue.at" do not mention anything.*
+
+**Answer:** Finding the founding year of a website is hard and often not
+mentioned anywhere. It is ok to skip it in such cases.
+
+**I coded the websites for different TV-Channels, but should I also include the Website where you can rewatch the news and so on?**
+
+*For example, the public broadcaster in Austria maintains tvthek.orf.at, or the German public broadcaster operates zdf.de.*
+
+**Answer:** No, we do not include news sources where their primary
+content are videos (hence we also do not include youtube based news
+sources).
+
+**How do I enter news sources with different regional editions?**
+
+*For example, there are three different regional papers: Northside People East, Northside People West and Southside People.*
+
+**Answer:** If the 3 regional papers are entirely different (different
+content) then each is coded individually. If only a few pages change
+then just one is coded.
+
+Please find more guidance on this here: **[Guides]({{ url_for('main.guides_newssource' )}})**.
+
+# Social Media
+
+**Are social media channels typically owned by the same media group as the newspaper? Is there an easy way to check who owns a Social Media-Account?**
+
+Related: *Is there an easy way to check when a Facebook page was created? I tried to google it and look at the "About" button but haven't found any infos yet.*
+
+**Answer:** This question points at the bigger problem that social media
+platforms are opaque. But there are some ways of determining the owner /
+responsible entity for accounts. See a detailed description for
+different platforms below. In case you cannot determine the owner of the
+account, we generally assume that it is the same entity that operates
+the website. We make this assumption when the social media based news
+source includes a link to a website in their profile.
+
+*Facebook*
+
+Scroll down on the FB Page until you see the area "Page transparency".
+Note that not all FB pages have this section (we do not know the
+reason).
+
+![]({{ url_for('static', filename='guides/fb_about.png') }})
+
+
+Click on "See all":
+
+![]({{ url_for('static', filename='guides/fb_transparency.png') }})
+
+You can see in the screenshot that the page was created on 6 March 2011
+and that it is managed by Reach PLC (UK).
+
+*Twitter*
+
+They do not provide information like that. Some news sources state the
+company in their short biography text, but that is an exception. So we
+just code the same owner as is declared in the website that the profile
+links to.
+
+![]({{ url_for('static', filename='guides/tw_about.png') }})
+
+
+*Instagram*
+
+There is also no designated section on Instagram. But because Instagram
+is part of "Meta" (AKA Facebook), you can just code the same owner as
+for the Facebook page.
+
+*Other Social Media (Telegram, VK)*
+
+Very intransparent, just code the owner of the related website
+
+**There are some newspapers who dedicate their Instagram-account only for sports-content. Should I code these too or leave them out?**
+
+**Answer:** "Sources with a main focus on celebrities, sport, travel,
+music, arts, movies, event announcements, highly specific industries"
+are **not part** of the inventory. You find this information here:
+[Guides]({{ url_for('main.guides_newssource')}}).
+
+# Advertisements
+
+**What is considered to be an ad?**
+
+We generally consider advertisements as content that was authored by a
+third-party and the third-party paid the news source for displaying said
+content. The third-party typically pays with monetary means, but other
+arrangements are also possible. The third-party's name (or logo) has to
+be clearly visible. This information (ad/no ad) is included in the
+inventory to distinguish media in respect to their *business models*.
+So, if a news outlet includes ads very rarely (maybe as a once a year
+event) this will not be centrally important for their funding, if they
+include ads very regularly (e.g., in every print outlet, on the start
+page of the website) then, this variable should be coded with "yes,
+includes ads".
+
+In more concrete terms we consider ads in the following cases:
+
+- A print news source has the text "ad" or similar above the third-party content
+- A website has a content section reserved that is labeled as "ad", "sponsored", or similar
+- A digital news source publishes posts that are explicitly labeled as ads. Either in the post caption (e.g., \#ad, "Sponsored Post", or similar) or directly in the post image or video (e.g., small text in the corner "advertisement")
+
+We consider the following **not** to be ads:
+
+- Newspapers promoting subscriptions to their own publication is not counted as an ad.
+- Fundraising campaigns for charitable causes
+- One-off free giveaways, where no sponsor is mentioned
+
+# Business Model
+
+**The news source has a free trial subscription. Should I enter "some content is free of charge" or "no content is free of charge"**
+
+**Answer:** Trial periods and trial subscriptions are **not** considered
+as "some content is free of charge".
+
+
+# Geography
+
+**What is the scope of OPTED?**
+
+**Answer**: EU member states + UK, Switzerland, Norway, Israel.
+
+**How can I code a news source that is prepared (stories, perspectives) for the audience in a country that is part of the inventory scope, but also includes content that is explicitly targeting a country that cannot be selected?**
+
+*For example, a news source is targeting an audience in Spain (a country in OPTED's scope) but also explicitly includes content for an audience in Andorra (not in OPTED's scope)?*
+
+**Anwer:** If a news source has a clear additional focus on an audience
+outside of OPTED's scope (e.g., by reporting about stories happening in
+Andorra), such a source is coded as **multinational**. This is step 1.
+Step 2 is the selection of the multiple nations.
+
+Normally, one would code here now 2 countries, "Spain" and "Andorra".
+Since our inventory is mainly focused on EU courses and Andorra is not
+part of the OPTED countries, you can not select it manually here. In
+this special case, please add the information "has also main focus on
+Andorra" in the other notes section before you submit your entry.
+
+[TOC]
+
+{% endfilter %} 
+
+{% endblock content %} 
+
+{% block sidebar %} {% include "guides/sidebar_toc.html" %} 
+{% endblock sidebar %}

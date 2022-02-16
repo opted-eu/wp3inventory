@@ -63,3 +63,7 @@ def guides_newssource():
 @main.route('/guides/resources')
 def guides_resources():
     return render_template('guides/resources.html', show_sidebar=True)
+
+@main.route('/guides/faq')
+def guides_faq():
+    return render_template('guides/faq.html', show_sidebar=True)
