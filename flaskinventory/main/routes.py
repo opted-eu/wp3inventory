@@ -37,7 +37,7 @@ def home():
 @main.route('/about')
 @main.route('/about/')
 def about():
-    return render_template('main/about.html', title="About Page")
+    return render_template('main/about.html', title="About Page", show_sidebar=True)
 
 @main.route('/imprint')
 def imprint():
