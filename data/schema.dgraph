@@ -25,17 +25,20 @@ type User {
     account_status
 }
 
-type Source {
+type Entry {
     unique_name
     name
+    other_names
     entry_added
     creation_date
     entry_edit_history
     entry_review_status
-    reviewed_by
     entry_notes
-    other_names
+    reviewed_by
     wikidataID
+}
+
+type Source {
     related
     founded
     channel
@@ -65,15 +68,7 @@ type Source {
 }
 
 type Channel {
-    unique_name
-    name
     description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
     form_name_question
     form_name_placeholder
     form_name_addon
@@ -81,16 +76,6 @@ type Channel {
 }
 
 type Organization {
-    unique_name
-    name
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
-    wikidataID
     founded
     is_person
     ownership_kind
@@ -104,157 +89,104 @@ type Organization {
 }
 
 type Country {
-    unique_name
-    name
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
-    wikidataID
     country_code
     opted_scope
 }
 
 
 type Multinational {
-    unique_name
-    name
     description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
 }
 
 type Subunit {
-    unique_name
-    name
     country
     country_code
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
-    wikidataID
     location_point
 }
 
-type Archive {
-    unique_name
-    name
+type Resource {
     description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
-    wikidataID
+    authors
+    published_date
+    last_updated
+    url
+    doi
+    arxiv
+}
+
+
+type Archive {
     access
     sources_included
-    url
+    fulltext
 }
 
 
 type Dataset {
-    unique_name
-    name
-    description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
     access
+    materials
+    related_publications
+    languages
+    file_format
     sources_included
-    url
-    annotations
-    fulltext
-    doi
-    arxiv
-    isbn
-    authors
-    published_date
+    country
+    start_date
+    end_date
+    initial_source
+    meta_vars
 }
 
 type Corpus {
-    unique_name
-    name
-    description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
     access
+    materials
+    related_publications
+    languages
+    file_format
     sources_included
-    url
+    start_date
+    end_date
+    initial_source
+    meta_vars
+    text_units
+    country
     annotations
-    doi
-    arxiv
-    isbn
-    authors
-    published_date
 }
 
 
 type Tool {
-    unique_name
-    name
-    description
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_review_status
-    reviewed_by
-    entry_notes
-    other_names
     access
-    sources_included
-    url
-    annotations
-    doi
-    arxiv
-    isbn
-    authors
-    published_date
+    materials
+    platform
+    programming_language
+    used_for
+    language_independent
+    languages
+    validation
+    validation_corpus
+    related_publications
+    input_file_format
+    output_file_format
+    input_data
+    output_data
 }
 
 
 type ResearchPaper {
-    doi
-    arxiv
-    isbn
     title
-    authors
-    published_date
-    description
+    isbn
     paper_kind
     journal
-    url
     sources_included
     country
-    entry_review_status
-    reviewed_by
-    entry_added
-    creation_date
-    entry_edit_history
-    entry_notes
 }
+
+
+type Operation {}
+type FileFormat {}
+type MetaVar {}
+type TextUnit {}
+type Annotation {}
+type IOData {}
 
 type Rejected {
     entry_review_status
@@ -282,18 +214,20 @@ account_status: string @index(hash) .
 # Generic Predicates 
 unique_name: string @index(hash, trigram) @upsert .
 name: string @index(term, trigram) . 
+other_names: [string] @index(term, trigram) .
 entry_added: uid @reverse .
 creation_date: dateTime @index(day) .
 entry_edit_history: [uid] @reverse .
 entry_review_status: string @index(hash) .
-reviewed_by: uid @reverse .
 entry_notes: string .
-other_names: [string] @index(term, trigram) .
+reviewed_by: uid @reverse .
 wikidataID: int @index(int) .
+
+
 founded: dateTime @index(year) .
 country: [uid] @reverse .
 country_code: string @index(exact).
-description: string .
+description: string @index(fulltext).
 location_point: geo @index(geo) .
 
 # Channel Predicates
@@ -326,7 +260,7 @@ languages: [string] @index(hash) .
 audience_size: [dateTime] .
 audience_residency: [dateTime] .
 verified_account: bool @index(bool) .
-party_affiliated: string @index(hash)
+party_affiliated: string @index(hash) .
 
 # Organization Predicates
 is_person: bool .
@@ -340,23 +274,45 @@ publishes: [uid] @reverse .
 # Country Predicates
 opted_scope: bool .
 
-# Archive and ResearchPaper Predicates
-sources_included: [uid] @reverse .
+# Resource Predicates
+authors: [string] @index(term) .
+published_date: dateTime @index(day) .
+last_updated: dateTime @index(day) .
 url: string .
-
-# Archive Predicates
-access: string .
-
-# Dataset Predicates
-annotations: [string] .
-fulltext: bool .
-
-# ResearchPaper Predicates
 doi: string .
 arxiv: string .
+
+# Shared Predicates (dataset, corpus, tool, archive)
+sources_included: [uid] @reverse .
+access: string .
+materials: [string] .
+related_publications: [uid] @reverse .
+file_format: [uid] @reverse .
+start_date: dateTime @index(day) .
+end_date: dateTime @index(day) .
+initial_source: [uid] @reverse .
+meta_vars: [uid] @reverse .
+text_units: [uid] @reverse .
+annotations: [uid] @reverse .
+
+# Archive Predicates
+fulltext: bool .
+
+# Tool Predicates
+platform: [string] @index(hash) .
+programming_language: [string] @index(hash) .
+used_for: [uid] @reverse .
+language_independent: bool @index(bool) .
+validation: string @index(hash) .
+validation_corpus: [uid] @reverse .
+input_file_format: [uid] @reverse .
+output_file_format: [uid] @reverse .
+input_data: [uid] @reverse .
+output_data: [uid] @reverse .
+
+
+# ResearchPaper Predicates
 isbn: string .
 title: string @index(term) .
-authors: string @index(term) .
-published_date: dateTime .
 paper_kind: string .
 journal: string .
