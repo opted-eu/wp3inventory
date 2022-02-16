@@ -1235,8 +1235,12 @@ class SourceSanitizer:
             try:
                 profile = telegram(self.json.get('name').replace('@', ''))
             except Exception as e:
+                current_app.logger.error(
+                    f'Telegram could not be resolved. username: {self.json.get("name")}. Exception: {e}')
                 raise InventoryValidationError(
-                    f"Telegram user or channel not found: {self.json.get('name')}. {e}")
+                    f"""Telegram user or channel not found: {self.json.get('name')}. 
+                        Please check whether you typed the username correctly. 
+                        If the issue persists, please contact us and we will look into this issue.""")
 
             self.newsource['name'] = self.json.get(
                 'name').lower().replace('@', '')
