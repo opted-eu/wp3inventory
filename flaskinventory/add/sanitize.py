@@ -951,7 +951,7 @@ class SourceSanitizer:
 
                 else:
                     arch['uid'] = NewID(item)
-                    arch['dgraph.type'] = ["Archive"]
+                    arch['dgraph.type'] = ["Archive", "Resource"]
                     arch = self.add_entry_meta(arch)
                     arch['name'] = item
                     arch['unique_name'] = slugify(
@@ -971,7 +971,7 @@ class SourceSanitizer:
 
                 else:
                     dset['uid'] = NewID(item)
-                    dset['dgraph.type'] = ["Dataset"]
+                    dset['dgraph.type'] = ["Resource", "Dataset"]
                     dset = self.add_entry_meta(dset)
                     dset['name'] = item
                     dset['unique_name'] = slugify(
@@ -1585,13 +1585,13 @@ class NewOrgSanitizer(Sanitizer):
 
 class NewArchiveSanitizer(Sanitizer):
 
-    dgraph_type = 'Archive'
+    dgraph_type = ['Archive', 'Resource']
 
     def __init__(self, data, user, ip):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": [self.dgraph_type]}
+                    "dgraph.type": self.dgraph_type}
         self.new = self._add_entry_meta(self.new, newentry=True)
 
         self._generate_unique_name()
@@ -1681,7 +1681,7 @@ class NewArchiveSanitizer(Sanitizer):
 class NewDatasetSanitizer(NewArchiveSanitizer):
 
     def __init__(self, data, user, ip):
-        self.dgraph_type = 'Dataset'
+        self.dgraph_type = ['Dataset', 'Resource']
         super().__init__(data, user, ip)
 
     def parse_fulltext(self):
