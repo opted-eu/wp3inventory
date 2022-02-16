@@ -36,6 +36,11 @@ def get_overview(dgraphtype, country=None, user=None):
         return False
 
     data = data['q']
+    for item in data:
+        if 'Entry' in item['dgraph.type']:
+            item['dgraph.type'].remove('Entry')
+        if 'Resource' in item['dgraph.type']:
+            item['dgraph.type'].remove('Resource')
     return data
 
 

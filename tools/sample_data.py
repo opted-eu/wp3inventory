@@ -57,6 +57,7 @@ def main():
         q(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql)) { v as uid } }"""
     nquad = """
         uid(v) <entry_review_status> "accepted" .
+        uid(v) <dgraph.type> "Entry" .
         """
     mutation = txn.create_mutation(set_nquads=nquad)
     request = txn.create_request(query=query, mutations=[mutation], commit_now=True)

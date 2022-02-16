@@ -14,6 +14,7 @@ $.typeahead({
         if (item.channel != null) {
             channel_label = '- {{channel}}'
         } else { channel_label = '' }
+        item.type = item.type.filter(function(e) { return e !== 'Entry' })
         return '<span>{{name}}{{tile}} ' + channel_label + '<small"> (Type: {{type}}) <span class="text-muted">(uid: {{uid}})</span></small></span>'
     },
     emptyTemplate: "no result for {{query}}",

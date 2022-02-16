@@ -171,8 +171,8 @@ class Sanitizer:
     def _resolve_subunit(self, subunit):
         geo_query = self._resolve_geographic_name(subunit)
         if geo_query:
+            geo_query['dgraph.type'] = ['Subunit']
             geo_query = self._add_entry_meta(geo_query, newentry=True)
-            geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
             # prevent duplicates
             duplicate_check = dgraph.get_uid(
@@ -218,6 +218,12 @@ class EditOrgSanitizer(Sanitizer):
         self.delete_nquads = self._make_delete_nquads()
 
     def _add_entry_meta(self, entry, newentry=False):
+        if not entry.get('dgraph.type'):
+            entry['dgraph.type'] = ["Entry"]
+        else:
+            if type(entry['dgraph.type']) != list:
+                entry['dgraph.type'] = [entry['dgraph.type']]
+            entry['dgraph.type'].append('Entry')
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
                 datetime.timezone.utc),

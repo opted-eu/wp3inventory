@@ -218,4 +218,13 @@ def list_entries(user, onlydrafts=False):
 
     if len(data['q']) == 0:
         return False
+
+    for item in data['q'][0].keys():
+        for entry in data['q'][0][item]:
+            if entry.get('dgraph.type'):
+                if 'Entry' in entry['dgraph.type']:
+                    entry['dgraph.type'].remove('Entry')
+                if 'Resource' in entry['dgraph.type']:
+                    entry['dgraph.type'].remove('Resource')
+
     return data['q']

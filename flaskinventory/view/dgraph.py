@@ -16,6 +16,14 @@ def get_dgraphtype(uid):
     data = dgraph.query(query_string)
     if len(data['q']) == 0:
         return False
+    if 'User' in data['q'][0]['dgraph.type']:
+        return False
+    
+    if 'Entry' in data['q'][0]['dgraph.type']:
+        data['q'][0]['dgraph.type'].remove('Entry')
+    
+    if 'Resource' in data['q'][0]['dgraph.type']:
+        data['q'][0]['dgraph.type'].remove('Resource')
 
     return data['q'][0]['dgraph.type'][0]
 

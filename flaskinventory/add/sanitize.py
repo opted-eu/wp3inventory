@@ -56,7 +56,7 @@ class SourceSanitizer:
         else:
             self.uid = NewID(self.uid)
         self.newsource = {'uid': self.uid,
-                          'dgraph.type': "Source",
+                          'dgraph.type': ["Source"],
                           'country': [],
                           'other_names': []}
 
@@ -175,6 +175,12 @@ class SourceSanitizer:
         return " \n ".join(nquads)
 
     def add_entry_meta(self, entry, entry_status="pending"):
+        if not entry.get('dgraph.type'):
+            entry['dgraph.type'] = ["Entry"]
+        else:
+            if type(entry['dgraph.type']) != list:
+                entry['dgraph.type'] = [entry['dgraph.type']]
+            entry['dgraph.type'].append('Entry')
         facets = {'timestamp': datetime.datetime.now(
             datetime.timezone.utc),
             'ip': self.user_ip}
@@ -893,10 +899,10 @@ class SourceSanitizer:
                     if len(res['q']) > 0:
                         org['uid'] = UID(res['q'][0]['uid'])
                     else:
+                        org['dgraph.type'] = ['Organization']
                         org = self.add_entry_meta(org)
                         org['uid'] = NewID(item)
                         org['name'] = item.strip()
-                        org['dgraph.type'] = 'Organization'
 
                     try:
                         self.resolve_org(org)
@@ -922,9 +928,9 @@ class SourceSanitizer:
                 if item.startswith('0x'):
                     pers['uid'] = UID(item)
                 else:
+                    pers['dgraph.type'] = ["Organization"]
                     pers = self.add_entry_meta(pers)
                     pers['name'] = item
-                    pers['dgraph.type'] = "Organization"
                     unique_name = slugify(item, separator="_")
                     if dgraph.get_uid('unique_name', unique_name):
                         unique_name += secrets.token_urlsafe(3)
@@ -945,11 +951,11 @@ class SourceSanitizer:
 
                 else:
                     arch['uid'] = NewID(item)
+                    arch['dgraph.type'] = ["Archive"]
                     arch = self.add_entry_meta(arch)
                     arch['name'] = item
                     arch['unique_name'] = slugify(
                         item + '_archive', separator="_")
-                    arch['dgraph.type'] = "Archive"
                 self.archives.append(arch)
 
     def parse_datasets(self):
@@ -965,9 +971,9 @@ class SourceSanitizer:
 
                 else:
                     dset['uid'] = NewID(item)
+                    dset['dgraph.type'] = ["Dataset"]
                     dset = self.add_entry_meta(dset)
                     dset['name'] = item
-                    dset['dgraph.type'] = "Dataset"
                     dset['unique_name'] = slugify(
                         item + '_dataset', separator="_")
                 self.archives.append(dset)
@@ -994,13 +1000,13 @@ class SourceSanitizer:
                             'newsource_' + item).split(',')
                         if not validate_uid(channel_uid):
                             continue
+                        rel_source['dgraph.type'] = ['Source']
                         rel_source = self.add_entry_meta(
                             rel_source, entry_status="draft")
                         rel_source['name'] = item
                         rel_source['uid'] = NewID(
                             f'_:{slugify(item, separator="_")}_{channel_name}')
                         rel_source['unique_name'] = secrets.token_urlsafe(8)
-                        rel_source['dgraph.type'] = 'Source'
                         rel_source['channel'] = UID(channel_uid)
                         # inherit predicated from main entry
                         if self.newsource.get('publication_kind'):
@@ -1096,8 +1102,8 @@ class SourceSanitizer:
     def resolve_subunit(self, subunit):
         geo_query = self.resolve_geographic_name(subunit)
         if geo_query:
+            geo_query['dgraph.type'] = ['Subunit']
             geo_query = self.add_entry_meta(geo_query)
-            geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
             # prevent duplicates
             duplicate_check = dgraph.get_uid(
@@ -1331,6 +1337,12 @@ class Sanitizer:
                     m()
 
     def _add_entry_meta(self, entry, newentry=False):
+        if not entry.get('dgraph.type'):
+            entry['dgraph.type'] = ["Entry"]
+        else:
+            if type(entry['dgraph.type']) != list:
+                entry['dgraph.type'] = [entry['dgraph.type']]
+            entry['dgraph.type'].append('Entry')
         if not newentry:
             facets = {'timestamp': datetime.datetime.now(
                 datetime.timezone.utc),
@@ -1418,8 +1430,8 @@ class Sanitizer:
     def _resolve_subunit(self, subunit):
         geo_query = self._resolve_geographic_name(subunit)
         if geo_query:
+            geo_query['dgraph.type'] = ['Subunit']
             geo_query = self._add_entry_meta(geo_query, newentry=True)
-            geo_query['dgraph.type'] = 'Subunit'
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
             # prevent duplicates
             duplicate_check = dgraph.get_uid(
@@ -1443,7 +1455,7 @@ class NewOrgSanitizer(Sanitizer):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": 'Organization'}
+                    "dgraph.type": ['Organization']}
         self.new = self._add_entry_meta(self.new, newentry=True)
 
         self._generate_unique_name()
@@ -1579,7 +1591,7 @@ class NewArchiveSanitizer(Sanitizer):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": self.dgraph_type}
+                    "dgraph.type": [self.dgraph_type]}
         self.new = self._add_entry_meta(self.new, newentry=True)
 
         self._generate_unique_name()
@@ -1686,7 +1698,7 @@ class NewMultinationalSanitizer(Sanitizer):
         super().__init__(data, user, ip)
 
         self.new = {"uid": UID(data.get('uid')),
-                    "dgraph.type": 'Multinational'}
+                    "dgraph.type": ['Multinational']}
 
         self.new = self._add_entry_meta(self.new, newentry=True)
 

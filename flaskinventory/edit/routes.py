@@ -30,6 +30,14 @@ def edit_uid(uid):
     if len(result['q']) == 0:
         return abort(404)
 
+    if not result['q'][0].get('dgraph.type'):
+        return abort(404)
+
+    if 'Entry' in result['q'][0]['dgraph.type']:
+        result['q'][0]['dgraph.type'].remove('Entry')
+    if 'Resource' in result['q'][0]['dgraph.type']:
+        result['q'][0]['dgraph.type'].remove('Resource')
+
     if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization', 'Subunit', 'Archive', 'Dataset']:
         return redirect(url_for('edit.' + result['q'][0]['dgraph.type'][0].lower(), unique_name=result['q'][0]['unique_name'], **request.args))
     else:
@@ -46,7 +54,7 @@ def organization(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Organization':
+    if 'Organization' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -122,7 +130,7 @@ def source(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Source':
+    if 'Source' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -214,7 +222,7 @@ def source_audience(uid):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Source':
+    if 'Source' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -266,7 +274,7 @@ def subunit(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Subunit':
+    if 'Subunit' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -339,7 +347,7 @@ def multinational(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Multinational':
+    if 'Multinational' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -409,7 +417,7 @@ def dataset(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Dataset':
+    if 'Dataset' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -479,9 +487,7 @@ def archive(unique_name=None, uid=None):
     if not check:
         return abort(404)
 
-    if check['dgraph.type'][0] != 'Archive':
-        if check['dgraph.type'][0] == 'Dataset':
-            return dataset(uid=uid)
+    if 'Archive' not in check['dgraph.type']:
         return abort(404)
 
     if not can_edit(check, current_user):
@@ -560,7 +566,7 @@ def refresh_wikidata():
         flash('UID not found!', 'danger')
         return redirect(url_for('users.my_entries'))
 
-    if check.get('dgraph.type')[0] != "Organization":
+    if "Organization" not in check.get('dgraph.type'):
         flash('Only works with organizations!', 'danger')
         return redirect(url_for('view.view_uid', uid=uid))
 
