@@ -265,7 +265,11 @@ _:apa <sources_included> _:falterprint (from=1998) .
 _:paper1 <dgraph.type> "ResearchPaper" .
 _:paper1 <doi> "10.1080/1461670X.2020.1745667" .
 _:paper1 <title> "From Novelty to Normalization? How Journalists Use the Term “Fake News” in their Reporting" .
-_:paper1 <authors> "[Jana Laura Egelhofer; Loes Aaldering; Jakob-Moritz Eberl; Sebastian Galyga; Sophie Lecheler]" .        
+_:paper1 <authors> "Jana Laura Egelhofer" (sequence=1) .
+_:paper1 <authors> "Loes Aaldering" (sequence=2) .
+_:paper1 <authors> "Jakob-Moritz Eberl" (sequence=3) .
+_:paper1 <authors> "Sebastian Galyga" (sequence=4) .
+_:paper1 <authors> "Sophie Lecheler" (sequence=5) .
 _:paper1 <published_date> "2020-03-20" .
 _:paper1 <description> "During recent years, worries about fake news have been a salient aspect of mediated debates..." .
 _:paper1 <paper_kind> "Journal Article" .

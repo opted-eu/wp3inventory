@@ -4,7 +4,7 @@ from flaskinventory.auxiliary import icu_codes
 import json
 
 from flaskinventory.flaskdgraph import dgraph_types
-
+from flaskinventory.flaskdgraph.utils import author_sequence
 
 """
     Inventory Detail View Functions
@@ -223,9 +223,8 @@ def get_paper(uid):
 
     # split authors
     if data.get('authors'):
-        if data['authors'].startswith('['):
-            data['authors'] = data['authors'].replace(
-                '[', '').replace(']', '').split(';')
+        if type(data['authors']) == list:
+            data['authors'] = author_sequence(data)
 
     return data
 
