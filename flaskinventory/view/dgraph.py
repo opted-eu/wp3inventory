@@ -32,7 +32,7 @@ def get_source(unique_name=None, uid=None):
                         published_by: ~publishes @facets @filter(type("Organization")) { name unique_name uid } 
                         archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
                         datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid }
-                        papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors } 
+                        papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors @facets } 
                         } }'''
 
     query = query_func + query_fields
@@ -47,9 +47,9 @@ def get_source(unique_name=None, uid=None):
     # split author names
     if data.get('papers'):
         for paper in data.get('papers'):
-            if paper['authors'].startswith('['):
-                paper['authors'] = paper['authors'].replace(
-                    '[', '').replace(']', '').split(';')
+            if paper.get('authors'):
+                if type(paper['authors']) == list:
+                    paper['authors'] = author_sequence(paper)
 
     # flatten facets
     if data.get('channel_feeds'):
