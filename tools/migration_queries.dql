@@ -1,0 +1,132 @@
+# Count every single type before committing
+# there is a chance that some entries get lost
+
+# find nodes without type:
+{
+	q(func: has(name)) @filter(not(has(dgraph.type))) {
+		uid expand(Entry) { user_displayname uid }
+  }
+}
+
+upsert {
+  query {
+			q(func: type(ResearchPaper)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+                uid(u) <dgraph.type> "Entry" .
+				uid(u) <dgraph.type> "Resource" .
+      }
+    }
+}
+
+
+upsert {
+  query {
+			q(func: type(Archive)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+                uid(u) <dgraph.type> "Entry" .
+				uid(u) <dgraph.type> "Resource" .
+      }
+    }
+}
+
+
+upsert {
+  query {
+			q(func: type(Dataset)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+                uid(u) <dgraph.type> "Entry" .
+				uid(u) <dgraph.type> "Resource" .
+      }
+    }
+}
+
+upsert {
+  query {
+			q(func: type(Source)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+                uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
+
+upsert {
+  query {
+			q(func: type(Country)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+				uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
+
+upsert {
+  query {
+			q(func: type(Organization)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+				uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
+
+upsert {
+  query {
+			q(func: type(Subunit)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+				uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
+
+upsert {
+  query {
+			q(func: type(Multinational)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+				uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
+
+
+upsert {
+  query {
+			q(func: type(Channel)) {
+				u as uid
+      }
+    }
+  mutation {
+    set {
+				uid(u) <dgraph.type> "Entry" .
+      }
+    }
+}
