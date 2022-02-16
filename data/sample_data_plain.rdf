@@ -265,6 +265,7 @@ _:apa <sources_included> _:falterprint (from=1998) .
 _:paper1 <dgraph.type> "ResearchPaper" .
 _:paper1 <doi> "10.1080/1461670X.2020.1745667" .
 _:paper1 <title> "From Novelty to Normalization? How Journalists Use the Term “Fake News” in their Reporting" .
+_:paper1 <unique_name> "10.1080/1461670X.2020.1745667" .
 _:paper1 <authors> "Jana Laura Egelhofer" (sequence=1) .
 _:paper1 <authors> "Loes Aaldering" (sequence=2) .
 _:paper1 <authors> "Jakob-Moritz Eberl" (sequence=3) .
