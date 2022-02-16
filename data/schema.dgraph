@@ -134,6 +134,7 @@ type Dataset {
     end_date
     initial_source
     meta_vars
+    concept_vars
 }
 
 type Corpus {
@@ -292,6 +293,7 @@ start_date: dateTime @index(day) .
 end_date: dateTime @index(day) .
 initial_source: [uid] @reverse .
 meta_vars: [uid] @reverse .
+concept_vars: [uid] @reverse .
 text_units: [uid] @reverse .
 annotations: [uid] @reverse .
 
