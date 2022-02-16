@@ -49,7 +49,7 @@
         <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.title }}</a></td>
         {% endif %}
         {% if 'authors' in cols %}
-        <td>{{ entry.authors }}</a></td>
+        <td>{{ ", ".join(entry.authors) }}</a></td>
         {% endif %}
         {% if 'other_names' in cols %}
         <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ ', '.join(entry.other_names) }}">{{ ", ".join(entry.get('other_names', [])) }}</span></td>

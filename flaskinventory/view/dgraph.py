@@ -288,7 +288,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
                                 '''
         if typename == 'ResearchPaper':
             normalize = False
-            query_fields = ''' uid title authors published_date journal
+            query_fields = ''' uid title authors @facets published_date journal
                                 sources_included: count(sources_included)
                                 '''
         if typename == 'Subunit':
@@ -323,4 +323,10 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
         return False
 
     data = data['q']
+    if typename == 'ResearchPaper':
+        for paper in data:
+            if paper.get('authors'):
+                if type(paper['authors']) == list:
+                    paper['authors'] = author_sequence(paper)
+
     return data
