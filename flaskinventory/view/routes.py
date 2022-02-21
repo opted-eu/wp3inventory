@@ -113,6 +113,7 @@ def view_source(unique_name=None, uid=None):
     
     if unique_item:
         if "Source" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -154,6 +155,7 @@ def view_archive(unique_name=None, uid=None):
     unique_item = get_archive(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Archive" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -179,6 +181,7 @@ def view_dataset(unique_name=None, uid=None):
     unique_item = get_archive(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Dataset" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -206,6 +209,7 @@ def view_organization(unique_name=None, uid=None):
     unique_item = get_organization(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Organization" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -232,6 +236,7 @@ def view_country(unique_name=None, uid=None):
     unique_item = get_country(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Country" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -254,6 +259,7 @@ def view_subunit(unique_name=None, uid=None):
     unique_item = get_subunit(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Subunit" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -279,6 +285,7 @@ def view_multinational(unique_name=None, uid=None):
     unique_item = get_multinational(unique_name=unique_name, uid=uid)
     if unique_item:
         if "Multinational" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
@@ -299,6 +306,7 @@ def view_channel(unique_name):
     unique_item = get_channel(unique_name=unique_name)
     if unique_item:
         if "Channel" not in unique_item.get('dgraph.type'):
+            unique_item['dgraph.type'].remove('Entry') if 'Entry' in unique_item['dgraph.type'] else None
             entry_type = unique_item.get('dgraph.type')[0]
             return redirect(url_for('view.view_' + entry_type.lower(), unique_name=unique_name))
         if not can_view(unique_item, current_user):
