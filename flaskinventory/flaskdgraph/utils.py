@@ -11,7 +11,7 @@ def strip_query(query):
 def escape_query(query):
     return re.sub(r'("|/|\\|\(|\)|<|>|\{|\}|\[|\]|\$|&|#|\+|\^|\?|\*)', r'\\\1', query)
 
-def validate_uid(uid: Any) -> Union(str, bool):
+def validate_uid(uid: Any) -> Union[str, bool]:
     """
         Utility function for validating if object is a UID
         Tries to coerce object to a str (uid)
