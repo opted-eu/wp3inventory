@@ -357,7 +357,11 @@ def query():
         if request.args.get('country') == 'all':
             relation_filt = None
         else:
-            relation_filt = {'country': {'uid': request.args.get('country')}}
+            uid = validate_uid(request.args.get('country'))
+            if uid:
+                relation_filt = {'country': {'uid': request.args.get('country')}}
+            else:
+                relation_filt = None
         data = list_by_type(
             request.args['entity'], relation_filt=relation_filt, filt={'eq': {'entry_review_status': 'accepted'}})
 
