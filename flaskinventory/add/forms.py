@@ -6,6 +6,8 @@ from flask_login import current_user
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField, ownership_kind_choices
 
+from flaskinventory.main.model import (organization_name, organization_other_names, is_person, ownership_kind, organization_country, employees, publishes, owns, entry_notes) 
+from flaskinventory.main.model import Schema
 
 class NewEntry(FlaskForm):
     name = StringField('Name of New Entity',
@@ -20,6 +22,27 @@ class NewEntry(FlaskForm):
                              #  ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
+
+def organization_form():
+
+    # fields = [organization_name, organization_other_names, is_person, ownership_kind, organization_country, employees, publishes, owns, entry_notes]
+    
+    fields = Schema.get_predicates('Organization')
+
+    class Organization(FlaskForm):
+
+        submit = SubmitField('Add New Organization')
+
+        def get_field(self, field):
+            return getattr(self, field)
+
+        
+    for field in fields:
+        setattr(Organization, field.predicate, field.wtf_field)
+
+
+    return Organization()
+        
 
 
 class NewOrganization(FlaskForm):

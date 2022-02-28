@@ -1,8 +1,8 @@
 from datetime import datetime
 from flask import current_app
 from flaskinventory import dgraph
-from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, make_nquad, dict_to_nquad)
+from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
+                                        GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
 
 
@@ -88,14 +88,14 @@ def reject_entry(uid, user):
                         {owns.query()} }}
                 }}'''
 
-    delete_predicates = [Predicate('dgraph.type'), Predicate('unique_name'), Predicate('publishes'),
-                         Predicate('owns'), Predicate('related')]
+    delete_predicates = ['dgraph.type', 'unique_name', 'publishes',
+                         'owns', 'related']
 
     del_nquads = [make_nquad(uid, item, Scalar('*'))
                   for item in delete_predicates]
-    del_nquads += [make_nquad(related, Predicate('related'), uid)]
-    del_nquads += [make_nquad(publishes, Predicate('publishes'), uid)]
-    del_nquads += [make_nquad(owns, Predicate('owns'), uid)]
+    del_nquads += [make_nquad(related, 'related', uid)]
+    del_nquads += [make_nquad(publishes, 'publishes', uid)]
+    del_nquads += [make_nquad(owns, 'owns', uid)]
 
     del_nquads = " \n ".join(del_nquads)
 

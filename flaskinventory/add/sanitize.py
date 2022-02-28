@@ -1,5 +1,5 @@
-from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, dgraph_types, make_nquad, dict_to_nquad)
+from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
+                                        GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
@@ -1058,7 +1058,7 @@ class SourceSanitizer:
             except Exception:
                 raise InventoryValidationError(
                     f"Country not found in inventory: {geo_result['address']['country_code']}")
-            geo_data = Geolocation('Point', [
+            geo_data = GeoScalar('Point', [
                 float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
             name = None
@@ -1267,7 +1267,7 @@ class SourceSanitizer:
         geo_result = geocode(org['name'])
         if geo_result:
             try:
-                org['address_geo'] = Geolocation('Point', [
+                org['address_geo'] = GeoScalar('Point', [
                     float(geo_result.get('lon')), float(geo_result.get('lat'))])
             except:
                 pass
@@ -1393,7 +1393,7 @@ class Sanitizer:
             except Exception:
                 raise InventoryValidationError(
                     f"Country not found in inventory: {geo_result['address']['country_code']}")
-            geo_data = Geolocation('Point', [
+            geo_data = GeoScalar('Point', [
                 float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
             name = None
@@ -1518,7 +1518,7 @@ class NewOrgSanitizer(Sanitizer):
         geo_result = geocode(self.new['name'])
         if geo_result:
             try:
-                self.new['address_geo'] = Geolocation('Point', [
+                self.new['address_geo'] = GeoScalar('Point', [
                     float(geo_result.get('lon')), float(geo_result.get('lat'))])
             except:
                 pass

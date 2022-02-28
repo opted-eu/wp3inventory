@@ -1,6 +1,6 @@
 from wtforms.validators import ValidationError
-from flaskinventory.flaskdgraph import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, make_nquad, dict_to_nquad)
+from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
+                                        GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.add.validators import InventoryValidationError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
@@ -127,7 +127,7 @@ class Sanitizer:
             except Exception:
                 raise InventoryValidationError(
                     f"Country not found in inventory: {geo_result['address']['country_code']}")
-            geo_data = Geolocation('Point', [
+            geo_data = GeoScalar('Point', [
                 float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
             name = None
@@ -252,7 +252,7 @@ class EditOrgSanitizer(Sanitizer):
                 'address_string').strip()
             try:
                 address_geo = geocode(self.data.get('address_string'))
-                self.edit["address_geo"] = Geolocation('Point', [
+                self.edit["address_geo"] = GeoScalar('Point', [
                     float(address_geo.get('lon')), float(address_geo.get('lat'))])
 
             except:

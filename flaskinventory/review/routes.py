@@ -5,9 +5,6 @@ from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.review.forms import ReviewActions, ReviewFilter
 from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, check_entry
-from flaskinventory.view.dgraph import get_archive, get_dgraphtype, get_organization, get_source, get_subunit
-from flaskinventory.view.utils import make_mini_table
-from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 
@@ -42,61 +39,6 @@ def overview():
                                 show_sidebar=True, 
                                 entries=overview,
                                 form=form)
-
-# @review.route('/review/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# @requires_access_level(USER_ROLES.Reviewer)
-# def entry(uid):
-#     uid = validate_uid(uid)
-#     if not uid:
-#         return abort(404)
-
-#     review_actions = ReviewActions()
-#     review_actions.uid.data = uid
-
-#     check = check_entry(uid=uid)
-
-#     if not check:
-#         return abort(404)
-    
-#     if check.get('entry_review_status') != 'pending':
-#         flash(f"Entry is not reviewable! Entry status: {check.get('entry_review_status')}", category='warning')
-#         return redirect(url_for('review.overview'))
-
-#     dgraphtype = check.get('dgraph.type')[0]
-#     show_sidebar = False
-#     related = None
-#     if dgraphtype == 'Source':
-#         show_sidebar = True
-#         result = get_source(uid=uid)
-#         if result.get('audience_size'):
-#             result['audience_size_table'] = make_mini_table(
-#             result['audience_size'])
-#         if result.get('audience_residency'):
-#             result['audience_residency_table'] = make_mini_table(
-#                 result['audience_residency'])
-#         related = result.get('related', None)
-    
-#     elif dgraphtype == 'Organization':
-#         result = get_organization(uid=uid)
-#     elif dgraphtype == 'Archive':
-#         result = get_archive(uid=uid)
-#     elif dgraphtype == 'Dataset':
-#         result = get_archive(uid=uid)
-#     elif dgraphtype == 'Subunit':
-#         result = get_subunit(uid=uid)
-#     else:
-#         flash(f"Entry is not reviewable! Entry status: {check.get('entry_review_status')}", category='warning')
-#         return redirect(url_for('review.overview'))
-
-#     return render_template('review/detail.html',
-#                             title=f"Review: {result.get('name')}",
-#                             dgraphtype=dgraphtype,
-#                             entry=result,
-#                             show_sidebar=show_sidebar,
-#                             related=related,
-#                             review_actions=review_actions)
-
 
 @review.route('/review/submit', methods=['POST'])
 @login_required

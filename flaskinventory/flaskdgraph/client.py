@@ -3,9 +3,6 @@ from dateutil.parser import isoparse
 from flask import current_app, _app_ctx_stack
 import pydgraph
 import logging
-from .dgraph_types import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, make_nquad, dict_to_nquad)
-
 
 class DGraph(object):
     '''Class for dgraph database connection'''
@@ -148,6 +145,23 @@ class DGraph(object):
         if len(data['q']) == 0:
             return None
         return data['q'][0]['uid']
+
+    def get_dgraphtype(self, uid, clean=['Entry', 'Resource']):
+        query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
+
+        data = self.query(query_string)
+        if len(data['q']) == 0:
+            return False
+        if 'User' in data['q'][0]['dgraph.type']:
+            return False
+        
+        if len(clean) > 0:
+            for item in clean:
+                data['q'][0]['dgraph.type'].remove(item) if item in data['q'][0]['dgraph.type'] else None
+            return data['q'][0]['dgraph.type'][0]
+
+        else:
+            return data['q'][0]['dgraph.type']
 
     """
         New Entries

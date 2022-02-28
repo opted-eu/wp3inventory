@@ -3,30 +3,11 @@ from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes
 import json
 
-from flaskinventory.flaskdgraph import dgraph_types
 from flaskinventory.flaskdgraph.utils import author_sequence
 
 """
     Inventory Detail View Functions
 """
-
-def get_dgraphtype(uid):
-    query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
-
-    data = dgraph.query(query_string)
-    if len(data['q']) == 0:
-        return False
-    if 'User' in data['q'][0]['dgraph.type']:
-        return False
-    
-    if 'Entry' in data['q'][0]['dgraph.type']:
-        data['q'][0]['dgraph.type'].remove('Entry')
-    
-    if 'Resource' in data['q'][0]['dgraph.type']:
-        data['q'][0]['dgraph.type'].remove('Resource')
-
-    return data['q'][0]['dgraph.type'][0]
-
 
 def get_source(unique_name=None, uid=None):
     if unique_name:

@@ -15,8 +15,6 @@ from telethon import TelegramClient
 import asyncio
 from dateutil.parser import isoparse
 from flaskinventory import dgraph
-from flaskinventory.flaskdgraph.dgraph_types import UID, Geolocation
-
 
 def geocode(address):
     payload = {'q': address,
@@ -366,6 +364,7 @@ def lookup_wikidata_id(query):
 
 
 def fetch_wikidata(wikidataid, query=None):
+    from flaskinventory.flaskdgraph.dgraph_types import UID, GeoScalar
     api = 'https://www.wikidata.org/w/api.php'
     result = {'wikidataID': wikidataid.replace('Q', '')}
     try:
@@ -426,7 +425,7 @@ def fetch_wikidata(wikidataid, query=None):
         wikidata = r.json()
         address = wikidata['entities'][headquarters]['labels']['en']['value']
         geo_result = geocode(address)
-        address_geo = Geolocation('Point', [
+        address_geo = GeoScalar('Point', [
             float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
         result['address'] = address

@@ -17,9 +17,10 @@ class TomSelectField(SelectField):
 # cache this function
 
 
-def get_country_choices(opted=True, multinational=False):
+def get_country_choices(opted=True, multinational=False) -> list:
     """ Helper function to get form choices 
         Queries for all countries and returns a list of tuples
+        [(<uid>, 'Country Name'), ...]
         Filters countries by default according to OPTED scope
     """
     query_string = '''{ q(func: type("Country"), orderasc: name)'''

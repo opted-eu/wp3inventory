@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.view.dgraph import (get_dgraphtype, get_archive, get_channel, get_country,
+from flaskinventory.view.dgraph import (get_archive, get_channel, get_country,
                                         get_organization, get_paper, get_rejected, get_source, get_subunit, list_by_type, get_multinational)
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
@@ -93,7 +93,7 @@ def view_uid():
         uid = validate_uid(request.args.get('uid'))
         if not uid:
             return abort(404)
-        dgraphtype = get_dgraphtype(uid)
+        dgraphtype = dgraph.get_dgraphtype(uid)
         if dgraphtype:
             return redirect(url_for('view.view_' + dgraphtype.lower(), **request.args))
         else:
