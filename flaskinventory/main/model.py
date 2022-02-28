@@ -1,4 +1,3 @@
-from inspect import ismethod
 from flaskinventory.flaskdgraph.dgraph_types import (String, Integer, Boolean,
                                                      SingleChoice, DateTime,
                                                      ListString, ListRelationship,
