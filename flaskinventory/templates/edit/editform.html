@@ -1,7 +1,7 @@
 {% extends "layout.html" %} {% block content %}
 
 
-    {% from "edit/_formhelpers.html" import render_field %}
+    {% from "helpers/_formhelpers.html" import render_field %}
     <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <fieldset class="form-group mb-3">

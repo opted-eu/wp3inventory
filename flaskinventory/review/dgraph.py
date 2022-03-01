@@ -80,12 +80,12 @@ def reject_entry(uid, user):
     related = Variable('v', 'uid')
     publishes = Variable('p', 'uid')
     owns = Variable('o', 'uid')
-    query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query()})) {{
-			            {related.query()} }} 
-                    publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query()})) {{
-                        {publishes.query()} }}
-                    owns(func: type(Organization)) @filter(uid_in(owns, {uid.query()})) {{
-                        {owns.query()} }}
+    query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query})) {{
+			            {related.query} }} 
+                    publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query})) {{
+                        {publishes.query} }}
+                    owns(func: type(Organization)) @filter(uid_in(owns, {uid.query})) {{
+                        {owns.query} }}
                 }}'''
 
     delete_predicates = ['dgraph.type', 'unique_name', 'publishes',

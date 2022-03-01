@@ -11,7 +11,9 @@ from flaskinventory.users.dgraph import User
 from flaskinventory import dgraph
 from flask import current_app
 
-from flaskinventory.main.model import (entry_fields, organization_fields)
+from flaskinventory.main.model import Entry, Organization, Schema
+from flaskinventory.misc import get_ip
+from flask_login import current_user
 
 # External Utilities
 
@@ -31,21 +33,20 @@ class Sanitizer:
 
     upsert_query = None
 
-    def __init__(self, data: dict, user: User, ip: str, fields: list = None, **kwargs):
+    def __init__(self, data: dict, fields: dict = None, **kwargs):
 
-        self._validate_inputdata(data, user, ip)
-        self.fields = entry_fields
-        if fields:
-            self.fields += fields
-        
-        if user.user_role < USER_ROLES.Contributor:
+        self.user = current_user
+        self.user_ip = get_ip()
+        self._validate_inputdata(data, self.user, self.user_ip)
+        self.fields = fields or Entry.predicates()
+
+        if self.user.user_role < USER_ROLES.Contributor:
             raise InventoryPermissionError
 
         self.data = data
-        self.user = user
-        self.user_ip = ip
 
         self.is_upsert = kwargs.get('is_upsert', False)
+        self.skip_keys = kwargs.get('skip_keys', [])
         self.overwrite = {}
         self.newsubunits = []
 
@@ -63,8 +64,8 @@ class Sanitizer:
         return True
 
     @classmethod
-    def edit(cls, data: dict, user: User, ip: str):
-        cls._validate_inputdata(data, user, ip)
+    def edit(cls, data: dict, **kwargs):
+        cls._validate_inputdata(data, current_user, get_ip())
 
         if 'uid' not in data.keys():
             raise InventoryValidationError(
@@ -75,11 +76,11 @@ class Sanitizer:
             raise InventoryValidationError(
                 f'Entry can not be edited! UID does not exist: {data["uid"]}')
 
-        if not user.user_role >= USER_ROLES.Reviewer or check.get('entry_added').get('uid') == user.id:
+        if not current_user.user_role >= USER_ROLES.Reviewer or check.get('entry_added').get('uid') == current_user.id:
             raise InventoryPermissionError(
                 'You do not have the required permissions to edit this entry!')
 
-        return cls(data, user, ip, is_upsert=True)
+        return cls(data, is_upsert=True, **kwargs)
 
     @property
     def set_nquads(self):
@@ -210,62 +211,56 @@ class Sanitizer:
                 f'Invalid Data! Could not resolve geographic subunit {subunit}')
 
     def _parse(self):
+        if self.data.get('uid'):
+            uid = self.data.pop('uid')
+            validated_uid = self.fields['uid'].validate(uid)
+            self.entry['uid'] = validated_uid
+            self.skip_keys.append(self.fields['uid'].predicate)
+
         for item in dir(self):
             if item.startswith('parse_'):
                 m = getattr(self, item)
                 if callable(m):
                     m()
 
-        if self.is_upsert:
-            self.overwrite[self.entry['uid']] = []
-            
-        for item in self.fields:
-            if self.data.get(item.predicate):
-                validated = item.validate(self.data[item.predicate])
+        for key, item in self.fields.items():
+            if key in self.skip_keys: continue
+            if self.data.get(key) and hasattr(item, 'validate'):
+                validated = item.validate(self.data[key])
                 if type(validated) == dict:
                     self.entry = {**self.entry, **validated}
-                elif type(validated) == list and item.predicate in self.entry.keys():
-                    self.entry[item.predicate] += validated
-                elif type(validated) == set and item.predicate in self.entry.keys():
-                    self.entry[item.predicate] = set.union(validated, self.entry[item.predicate])
+                elif type(validated) == list and key in self.entry.keys():
+                    self.entry[key] += validated
+                elif type(validated) == set and key in self.entry.keys():
+                    self.entry[key] = set.union(validated, self.entry[key])
                 else:
-                    self.entry[item.predicate] = validated
+                    self.entry[key] = validated
             elif hasattr(item, 'autocode'):
                 if item.autoinput in self.data.keys():
                     autocoded = item.autocode(self.data[item.autoinput])
                     if type(autocoded) == dict:
                         self.entry = {**self.entry, **autocoded}
-                    elif type(autocoded) == list and item.predicate in self.entry.keys():
-                        self.entry[item.predicate] += autocoded
-                    elif type(autocoded) == set and item.predicate in self.entry.keys():
-                        self.entry[item.predicate] = set.union(autocoded, self.entry[item.predicate])
+                    elif type(autocoded) == list and key in self.entry.keys():
+                        self.entry[key] += autocoded
+                    elif type(autocoded) == set and key in self.entry.keys():
+                        self.entry[key] = set.union(autocoded, self.entry[key])
                     else:
-                        self.entry[item.predicate] = autocoded
+                        self.entry[key] = autocoded
 
             elif item.default:
-                self.entry[item.predicate] = item.default
+                self.entry[key] = item.default
 
             if hasattr(item, 'allow_new'):
                 if item.allow_new:
                     print('generate unique name for new item')
 
-            if item.overwrite and self.is_upsert:
-                self.overwrite[self.entry['uid']].append(item.predicate)
         
-        if not self.is_upsert:
-            self.generate_unique_name()
-
-    def parse_uid(self):
-        # we already checked if the UID is valid with the edit() constructor
-        uid = self.data.get('uid', '_:newentry')
-
-        if not validate_uid(uid):
-            self.entry['uid'] = NewID(uid)
-            self.entry = self._add_entry_meta(self.entry, newentry=True)
-        else:
-            self.entry['uid'] = UID(uid)
+        if self.is_upsert:
             self.entry = self._add_entry_meta(self.entry)
-            self.is_upsert = True
+            self.overwrite[self.entry['uid']] = [item.predicate for _, item in self.fields.items() if item.overwrite]
+        else:
+            self.generate_unique_name()
+            self.entry = self._add_entry_meta(self.entry, newentry=True)
 
     def parse_entry_review_status(self):
         if self.data.get('accept'):
@@ -341,15 +336,32 @@ class Sanitizer:
 
 class OrganizationSanitizer(Sanitizer):
 
-    def __init__(self, data, user, ip, **kwargs):
+    def __init__(self, data, **kwargs):
 
-        fields = organization_fields
+        fields = Organization.predicates()
 
-        super().__init__(data, user, ip, fields=fields, **kwargs)
+        super().__init__(data, fields=fields, **kwargs)
 
         if not self.is_upsert:
             self.entry['dgraph.type'].append('Organization')
 
         
+def make_sanitizer(data: dict, dgraph_type, edit=False):
 
+    if not isinstance(dgraph_type, str):
+        dgraph_type = dgraph_type.__name__
+    
+    fields = Schema.get_predicates(dgraph_type)
 
+    class S(Sanitizer):
+
+        def __init__(self, d, dtype='Entry', **kwargs):
+
+            super().__init__(d, **kwargs)
+
+            if not self.is_upsert:
+                self.entry['dgraph.type'].append(dtype)
+
+    if edit:
+        return S.edit(data, fields=fields, dtype=dgraph_type)
+    return S(data, fields, dtype=dgraph_type)

@@ -13,6 +13,8 @@ from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
 from flaskinventory.add.external import fetch_wikidata
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory import dgraph
+from flaskinventory.main.model import Schema, Organization, Entry
+from flaskinventory.main.sanitizer import make_sanitizer
 
 import traceback
 
@@ -65,25 +67,25 @@ def organization(unique_name=None, uid=None):
     if not uid:
         uid = check.get('uid')
 
-    form, fields = make_form('organization', review_status=check['entry_review_status'])
+    # form, fields = make_form('organization', review_status=check['entry_review_status'])
+    form = Organization.generate_edit_entry_form(entry_review_status=check['entry_review_status'])
+    fields = Organization.predicates()
 
     form.country.choices = get_country_choices(opted=False)
     if form.validate_on_submit():
         try:
-            sanitizer = EditOrgSanitizer(
-                form.data, current_user, get_ip())
-            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
+            sanitizer = make_sanitizer(form.data, Organization, edit=True)
         except Exception as e:
+            if current_app.debug:
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
             flash(f'Organization could not be updated: {e}', 'danger')
             return redirect(url_for('edit.organization', unique_name=form.unique_name.data))
-
         try:
             delete = dgraph.upsert(
                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-            current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
             if request.form.get('accept'):
                 flash(f'Organization has been edited and accepted', 'success')
                 return redirect(url_for('review.overview', **request.args))

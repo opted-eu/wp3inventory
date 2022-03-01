@@ -366,7 +366,7 @@ def lookup_wikidata_id(query):
 def fetch_wikidata(wikidataid, query=None):
     from flaskinventory.flaskdgraph.dgraph_types import UID, GeoScalar
     api = 'https://www.wikidata.org/w/api.php'
-    result = {'wikidataID': wikidataid.replace('Q', '')}
+    result = {'wikidataID': int(wikidataid.replace('Q', ''))}
     try:
         params = {'action': 'wbgetentities', 'languages': 'en',
                   'ids': wikidataid, 'format': 'json'}

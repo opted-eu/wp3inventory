@@ -221,9 +221,9 @@ class DGraph(object):
             if not query.startswith('{'):
                 query = '{' + query + '}'
         self.logger.debug("Performing upsert:")
-        self.logger.debug(f'Query: {query}')
-        self.logger.debug(f'set nquads: {set_nquads}')
-        self.logger.debug(f'delete nquads: {del_nquads}')
+        self.logger.debug(f'Query:\n{query}')
+        self.logger.debug(f'set nquads:\n{set_nquads}')
+        self.logger.debug(f'delete nquads:\n{del_nquads}')
         txn = self.connection.txn()
         mutation = txn.create_mutation(set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
         request = txn.create_request(query=query, mutations=[

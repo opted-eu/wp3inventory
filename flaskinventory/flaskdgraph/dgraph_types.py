@@ -22,7 +22,7 @@ from .utils import validate_uid
 
 from flaskinventory.errors import InventoryPermissionError, InventoryValidationError
 from flaskinventory.add.external import geocode, reverse_geocode
-
+from flaskinventory.users.constants import USER_ROLES
 
 from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField, RadioField
 from wtforms.fields.core import SelectMultipleField
@@ -92,11 +92,16 @@ class Predicate:
     # corresponds to the type of the predicate
     dgraph_predicate_type = 'string'
 
-    def __init__(self, predicate: str,
+    def __init__(self,
                  label: str = None,
                  default: str = None,
                  required=False,
                  overwrite=False,
+                 new=True,
+                 edit=True,
+                 permission=USER_ROLES.Contributor,
+                 read_only=False,
+                 hidden=False,
                  description='',
                  tom_select=False,
                  render_kw: dict = None,
@@ -104,8 +109,6 @@ class Predicate:
         """
             Contruct a new predicate
 
-            :param predicate:
-                name of the predicate as it corresponds to dgraph
             :param label:
                 User facing label for predicate, 
                 default: automatically generated from 'predicate'
@@ -113,6 +116,14 @@ class Predicate:
                 Default value when validating when nothing is specified
             :param overwrite:
                 delete all values first before writing new ones.
+            :param new:
+                show this predicate when a new entry is made.
+            :param edit:
+                show this predicate when entry is edited.
+            :param read_only:
+                if 'True' users cannot edit this field.
+            :param hidden:
+                if 'True' form field will be hidden from users.
             :param required:
                 Sets required flag for generated WTF Field.
             :param description:
@@ -123,8 +134,13 @@ class Predicate:
                 If true renders a TextAreaField
         """
 
-        self.predicate = predicate.strip()
-        self.label = label or self.predicate.replace('_', ' ').title()
+        self.predicate = None
+        self._label = label
+        self.read_only = read_only
+        self.hidden = hidden
+        self.new = new
+        self.edit = edit
+        self.permission = permission
 
         # WTF Forms
         self.required = required
@@ -132,6 +148,17 @@ class Predicate:
         self.tom_select = tom_select
         self.render_kw = render_kw
         self.large_textfield = large_textfield
+
+        if hidden and self.render_kw:
+            self.render_kw.update(hidden=hidden)
+        else:
+            self.render_kw = {'hidden': hidden}
+        
+        if read_only and self.render_kw:
+            self.render_kw.update(readonly=read_only)
+        else:
+            self.render_kw = {'readonly': read_only}
+        
 
         # default value applied when nothing is specified
         self._default = default
@@ -147,11 +174,28 @@ class Predicate:
         return f'{self.predicate}'
 
     def __repr__(self) -> str:
-        return f'<DGraph Predicate "{self.predicate}">'
+        if self.predicate:
+            return f'<DGraph Predicate "{self.predicate}">'
+        else:
+            return f'<Unbound DGraph Predicate>'
+
+    @classmethod
+    def from_key(cls, key):
+        cls_ = cls()
+        cls_.predicate = key
+        return cls_
+
 
     @property
     def default(self):
         return self._default
+
+    @property
+    def label(self):
+        if self._label:
+            return self._label
+        else:
+            return self.predicate.replace('_', ' ').title()
 
     @property
     def nquad(self) -> str:
@@ -277,6 +321,18 @@ class String(Predicate):
         else:
             return str(data)
 
+class UIDPredicate(Predicate):
+
+    dgraph_predicate_type = 'uid'
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(read_only=True, hidden=True, new=False, default=NewID('_:newentry'), *args, **kwargs)
+
+    def validate(self, uid):
+        if not validate_uid(uid):
+            raise InventoryValidationError(f'This is not a uid: {uid}')
+        else:
+            return UID(uid)
 
 class Integer(Predicate):
 
@@ -302,6 +358,7 @@ class ListString(String):
     dgraph_predicate_type = '[string]'
 
     def validate(self, data, strip=True):
+        print(data, type(data))
         if type(data) == str:
             data = data.split(',')
 
@@ -317,21 +374,21 @@ class UniqueName(String):
     def default(self):
         return slugify(secrets.token_urlsafe(8), separator="_")
 
-    def validate(self, data, uid):
-        data = str(data)
-        check = dgraph.get_uid(self.dgraph_name, data)
-        if check:
-            if check != str(uid):
-                raise InventoryValidationError(
-                    'Unique Name already taken!')
-        return slugify(data, separator="_")
+    # def validate(self, data, uid):
+    #     data = str(data)
+    #     check = dgraph.get_uid(self.dgraph_name, data)
+    #     if check:
+    #         if check != str(uid):
+    #             raise InventoryValidationError(
+    #                 'Unique Name already taken!')
+    #     return slugify(data, separator="_")
 
 
 class SingleChoice(String):
 
-    def __init__(self, predicate, choices: dict = None, default='NA', *args, **kwargs) -> None:
+    def __init__(self, choices: dict = None, default='NA', *args, **kwargs) -> None:
 
-        super().__init__(predicate, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.choices = choices or {'NA': 'NA'}
         self.choices_tuple = [(k, v) for k, v in self.choices.items()]
@@ -474,12 +531,12 @@ class SingleRelationship(Predicate):
 
     dgraph_predicate_type = 'uid'
 
-    def __init__(self, predicate, relationship_constraint: str = None, allow_new=True, choices=[], *args, **kwargs) -> None:
+    def __init__(self, relationship_constraint: str = None, allow_new=True, choices=[], *args, **kwargs) -> None:
         self.relationship_constraint = relationship_constraint
         self.allow_new = allow_new
         self.choices = choices
 
-        super().__init__(predicate, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate(self, data) -> Union[UID, NewID]:
         uid = validate_uid(data)
@@ -551,7 +608,7 @@ def make_nquad(s, p, o) -> str:
         p = NewID(p)
 
     if not isinstance(p, Predicate):
-        p = Predicate(p)
+        p = Predicate.from_key(p)
 
     if not isinstance(o, (list, set, Scalar, Variable, UID, NewID)):
         o = Scalar(o)
@@ -581,7 +638,7 @@ def dict_to_nquad(d) -> list:
     nquads = []
     for key, val in d.items():
         if not isinstance(key, Predicate):
-            key = Predicate(key)
+            key = Predicate.from_key(key)
         if isinstance(val, (list, set)):
             if len(val) > 0:
                 for item in val:

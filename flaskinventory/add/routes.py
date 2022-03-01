@@ -4,11 +4,12 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization, NewArchive, NewDataset, organization_form
+from flaskinventory.main.model import Schema, Organization
+from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization, NewArchive, NewDataset
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.add.sanitize import NewMultinationalSanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
 from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
-from flaskinventory.main.sanitizer import OrganizationSanitizer
+from flaskinventory.main.sanitizer import OrganizationSanitizer, make_sanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
@@ -80,9 +81,9 @@ def new_source():
 @login_required
 def new_organization(draft=None):
     # form = NewOrganization(uid="_:neworganization", is_person='n')
-    form = organization_form()
+    form = Organization.generate_new_entry_form()
     form.country.choices = get_country_choices(opted=False)
-
+    
     if draft is None:
         draft = request.args.get('draft')
     if draft:
@@ -93,9 +94,6 @@ def new_organization(draft=None):
             try:
                 sanitizer = EditOrgSanitizer(
                     form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: \n{sanitizer.set_nquads}')
-                current_app.logger.debug(
-                    f'Set Nquads: {sanitizer.delete_nquads}')
             except Exception as e:
                 if current_app.debug:
                     e_trace = traceback.format_exception(
@@ -105,9 +103,7 @@ def new_organization(draft=None):
                 return redirect(url_for('add.new_organization', draft=form.data))
         else:
             try:
-                sanitizer = OrganizationSanitizer(
-                    form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+                sanitizer = make_sanitizer(form.data, Organization)
             except Exception as e:
                 if current_app.debug:
                     e_trace = traceback.format_exception(
@@ -120,9 +116,7 @@ def new_organization(draft=None):
             if hasattr(sanitizer, 'delete_nquads'):
                 delete = dgraph.upsert(
                     sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-                current_app.logger.debug(delete)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
             flash(f'Organization has been added!', 'success')
             return redirect(url_for('view.view_organization', unique_name=sanitizer.entry['unique_name']))
         except Exception as e:
