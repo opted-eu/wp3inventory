@@ -63,12 +63,14 @@ def submit():
             except Exception as e:
                 current_app.logger.error(f'Could not reject entry with uid {uid}: {e}')
                 flash(f'Reviewing entry failed! Error: {e}', category='danger')
+                return redirect(url_for('review.overview', **request.args))
         elif request.form.get('edit'):
             try:
                 return redirect(url_for('edit.edit_uid', uid=uid))
             except Exception as e:
                 current_app.logger.error(f'Could not edit entry with uid {uid}: {e}')
                 flash(f'Reviewing entry failed! Error: {e}', category='danger')
+                return redirect(url_for('review.overview', **request.args))
         else:
             return abort(404)
     else:
