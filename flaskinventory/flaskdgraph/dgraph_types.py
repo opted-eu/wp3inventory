@@ -146,18 +146,14 @@ class Predicate:
         self.required = required
         self.form_description = description
         self.tom_select = tom_select
-        self.render_kw = render_kw
+        self.render_kw = render_kw or {}
         self.large_textfield = large_textfield
 
-        if hidden and self.render_kw:
+        if hidden:
             self.render_kw.update(hidden=hidden)
-        else:
-            self.render_kw = {'hidden': hidden}
         
-        if read_only and self.render_kw:
+        if read_only:
             self.render_kw.update(readonly=read_only)
-        else:
-            self.render_kw = {'readonly': read_only}
         
 
         # default value applied when nothing is specified
@@ -370,6 +366,9 @@ class ListString(String):
 
 class UniqueName(String):
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(required=True, new=False, permission=USER_ROLES.Reviewer, *args, **kwargs)
+
     @property
     def default(self):
         return slugify(secrets.token_urlsafe(8), separator="_")
@@ -581,7 +580,7 @@ class ListRelationship(SingleRelationship):
                     entry_type = dgraph.get_dgraphtype(uid)
                     if entry_type != self.relationship_constraint:
                         raise InventoryValidationError(
-                            f'UID specified does not match constrain, UID is not a {self.relationship_constraint}! uid <{uid}> <dgraph.type> <{entry_type}>')
+                            f'UID specified does not match constraint, UID is not a {self.relationship_constraint}! uid <{uid}> <dgraph.type> <{entry_type}>')
                 uids.append(UID(uid))
         return set(uids)
 
@@ -591,7 +590,11 @@ class ListRelationship(SingleRelationship):
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectMutlitpleField(label=self.label, validators=validators, description=self.form_description, choices=self.choices, render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.label, 
+                                        validators=validators, 
+                                        description=self.form_description, 
+                                        choices=self.choices, 
+                                        render_kw=self.render_kw)
 
 
 """ Functions for making nquad statements """
@@ -637,6 +640,8 @@ def dict_to_nquad(d) -> list:
         uid = NewID('_:newentry')
     nquads = []
     for key, val in d.items():
+        if val is None:
+            continue
         if not isinstance(key, Predicate):
             key = Predicate.from_key(key)
         if isinstance(val, (list, set)):

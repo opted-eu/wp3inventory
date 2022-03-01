@@ -76,7 +76,7 @@ class Sanitizer:
             raise InventoryValidationError(
                 f'Entry can not be edited! UID does not exist: {data["uid"]}')
 
-        if not current_user.user_role >= USER_ROLES.Reviewer or check.get('entry_added').get('uid') == current_user.id:
+        if not current_user.user_role >= USER_ROLES.Reviewer or check.get('entry_added').get('uid') != current_user.id:
             raise InventoryPermissionError(
                 'You do not have the required permissions to edit this entry!')
 
@@ -270,6 +270,7 @@ class Sanitizer:
             self.entry['entry_review_status'] = 'accepted'
             self.entry['reviewed_by'] = UID(self.user.uid, facets={
                                             'timestamp': datetime.datetime.now(datetime.timezone.utc)})
+            self.skip_keys.append('entry_review_status')
         elif self.data.get('entry_review_status'):
             if self.user.user_role < USER_ROLES.Reviewer:
                 raise InventoryPermissionError(

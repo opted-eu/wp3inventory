@@ -16,6 +16,8 @@
 {% else %}
 
 <div class="mb-5">
+    {% if field.render_kw.hidden %}
+    {% else %}
     <label for="{{ field.id}}" class="form-label fw-bold fs-5">
         {% if field.description %}
             {{ field.description }}
@@ -29,6 +31,7 @@
             <span class="text-muted">(optional)</span>
         {% endif %}
     </label>
+    {% endif %}
     {% if field.errors %} 
         {{ field(class="form-control form-control-lg is-invalid") }}
         <div class="invalid-feedback">

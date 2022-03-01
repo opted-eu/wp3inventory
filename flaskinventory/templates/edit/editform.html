@@ -212,7 +212,22 @@ var TomSelectCountriesConfig = {
     }
 };
 
-new TomSelect('#country', TomSelectCountriesConfig);
+var TomSelectCountryConfig = {
+    selectOnTab: true,
+    onItemAdd:function(){ // clear input after item was selected
+        this.setTextboxValue();
+        this.refreshOptions();
+    }
+};
+
+var country_selector = document.getElementById('country')
+
+if (country_selector.hasAttribute('multiple')) {
+    new TomSelect('#country', TomSelectCountriesConfig);
+} else {
+    new TomSelect('#country', TomSelectCountryConfig);
+}
+
 
 {% endif %}
 
