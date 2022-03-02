@@ -105,6 +105,7 @@ class Predicate:
                  description='',
                  tom_select=False,
                  render_kw: dict = None,
+                 predicate_alias: list = None,
                  large_textfield=False) -> None:
         """
             Contruct a new predicate
@@ -151,10 +152,9 @@ class Predicate:
 
         if hidden:
             self.render_kw.update(hidden=hidden)
-        
+
         if read_only:
             self.render_kw.update(readonly=read_only)
-        
 
         # default value applied when nothing is specified
         self._default = default
@@ -162,9 +162,9 @@ class Predicate:
         # delete all values first before writing new ones
         self.overwrite = overwrite
 
-        # for k, v in kwargs.items():
-        #     if hasattr(self, k):
-        #         setattr(self, k, v)
+        # other references to this predicate (might delete later)
+        self.predicate_alias = predicate_alias
+
 
     def __str__(self) -> str:
         return f'{self.predicate}'
@@ -180,7 +180,6 @@ class Predicate:
         cls_ = cls()
         cls_.predicate = key
         return cls_
-
 
     @property
     def default(self):
@@ -317,18 +316,21 @@ class String(Predicate):
         else:
             return str(data)
 
+
 class UIDPredicate(Predicate):
 
     dgraph_predicate_type = 'uid'
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(read_only=True, hidden=True, new=False, default=NewID('_:newentry'), *args, **kwargs)
+        super().__init__(read_only=True, hidden=True, new=False,
+                         default=NewID('_:newentry'), *args, **kwargs)
 
     def validate(self, uid):
         if not validate_uid(uid):
             raise InventoryValidationError(f'This is not a uid: {uid}')
         else:
             return UID(uid)
+
 
 class Integer(Predicate):
 
@@ -366,7 +368,8 @@ class ListString(String):
 class UniqueName(String):
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(required=True, new=False, permission=USER_ROLES.Reviewer, *args, **kwargs)
+        super().__init__(required=True, new=False,
+                         permission=USER_ROLES.Reviewer, *args, **kwargs)
 
     @property
     def default(self):
@@ -374,7 +377,7 @@ class UniqueName(String):
 
     # def validate(self, data, uid):
     #     data = str(data)
-    #     check = dgraph.get_uid(self.dgraph_name, data)
+    #     check = dgraph.get_uid(self.predicate, data)
     #     if check:
     #         if check != str(uid):
     #             raise InventoryValidationError(
@@ -384,37 +387,73 @@ class UniqueName(String):
 
 class SingleChoice(String):
 
-    def __init__(self, choices: dict = None, default='NA', *args, **kwargs) -> None:
+    def __init__(self, choices: dict = None, default='NA', radio_field=False, *args, **kwargs) -> None:
 
         super().__init__(*args, **kwargs)
 
         self.choices = choices or {'NA': 'NA'}
-        self.choices_tuple = [(k, v) for k, v in self.choices.items()]
+        self.choices_tuples = [(k, v) for k, v in self.choices.items()]
         self.values = list(self.choices.keys())
+        self.radio_field = radio_field
 
     def validate(self, data):
         if str(data) in self.values:
             return data
         else:
             raise InventoryValidationError(
-                f"Wrong value provided for {self.dgraph_name}: {data}. Value has to be one of {', '.join(self.values)}")
+                f"Wrong value provided for {self.predicate}: {data}. Value has to be one of {', '.join(self.values)}")
 
     def set_choices(self, choices: dict) -> None:
         self.choices = choices
-        self.choices_tuple = [(k, v) for k, v in self.choices.items()]
+        self.choices_tuples = [(k, v) for k, v in self.choices.items()]
         self.values = list(self.choices.keys())
 
     @property
-    def wtf_field(self) -> Union[SelectField, TomSelectField]:
+    def wtf_field(self) -> Union[SelectField, TomSelectField, RadioField]:
         if self.required:
             validators = [DataRequired()]
         else:
             validators = [Optional()]
         if self.tom_select:
             return TomSelectField(label=self.label, validators=validators, description=self.form_description,
-                                  choices=self.choices_tuple)
-        return SelectField(label=self.label, validators=validators, description=self.form_description,
-                           choices=self.choices_tuple)
+                                  choices=self.choices_tuples)
+        elif self.radio_field:
+            return RadioField(label=self.label, validators=validators, description=self.form_description,
+                              choices=self.choices_tuples)
+        else:
+            return SelectField(label=self.label, validators=validators, description=self.form_description,
+                               choices=self.choices_tuples)
+
+
+class MultipleChoice(SingleChoice):
+
+    dgraph_predicate_type = '[string]'
+
+    def validate(self, data):
+        if isinstance(data, str):
+            data = data.split(',')
+        if not isinstance(data, list):
+            raise InventoryValidationError(
+                f'Error in <{self.predicate}>! Provided data cannot be coerced to "list": {data}')
+        for val in data:
+            val = val.strip()
+            if val not in self.values:
+                raise InventoryValidationError(
+                    f"Wrong value provided for {self.predicate}: {val}. Value has to be one of {', '.join(self.values)}")
+
+        return [val.strip() for val in data]
+
+    @property
+    def wtf_field(self) -> Union[SelectMultipleField, TomSelectMutlitpleField]:
+        if self.required:
+            validators = [DataRequired()]
+        else:
+            validators = [Optional()]
+        if self.tom_select:
+            return TomSelectMutlitpleField(label=self.label, validators=validators, description=self.form_description,
+                                           choices=self.choices_tuples)
+        return SelectMultipleField(label=self.label, validators=validators, description=self.form_description,
+                                   choices=self.choices_tuples)
 
 
 class DateTime(Predicate):
@@ -443,6 +482,30 @@ class DateTime(Predicate):
             return DateField(label=self.label, description=self.form_description, render_kw=render_kw)
         else:
             return NullableDateField(label=self.label, description=self.form_description, render_kw=render_kw)
+
+
+class Year(DateTime):
+
+    def validate(self, data):
+        if type(data) in [datetime.date, datetime.datetime]:
+            return data
+        else:
+            try:
+                return datetime.datetime(year=int(data))
+            except:
+                raise InventoryValidationError(
+                    f'Cannot parse provided value to year: {data}')
+
+    @property
+    def wtf_field(self) -> IntegerField:
+        render_kw = {'step': 1, 'min': 1500, 'max': 2100}
+        if self.render_kw:
+            render_kw = {**self.render_kw, **render_kw}
+        if self.required:
+            validators = [DataRequired()]
+        else:
+            validators = None
+        return DateField(label=self.label, description=self.form_description, render_kw=render_kw, validators=validators)
 
 
 class Boolean(Predicate):
@@ -529,41 +592,84 @@ class SingleRelationship(Predicate):
 
     dgraph_predicate_type = 'uid'
 
-    def __init__(self, relationship_constraint: str = None, allow_new=True, choices=[], *args, **kwargs) -> None:
+    def __init__(self, 
+                 relationship_constraint = None, 
+                 allow_new=True, 
+                 autoload_choices=False, 
+                 reverse=False,
+                 reverse_predicate:str = None, 
+                 *args, **kwargs) -> None:
+        if isinstance(relationship_constraint, str):
+            relationship_constraint = [relationship_constraint]
         self.relationship_constraint = relationship_constraint
         self.allow_new = allow_new
-        self.choices = choices
+        self.reverse = reverse
+        self.reverse_predicate = reverse_predicate
+
+        # if we want the form field to show all choices automatically.
+        self.autoload_choices = autoload_choices
+        self.choices = {}
+        self.choices_tuples = []
 
         super().__init__(*args, **kwargs)
 
-    def validate(self, data) -> Union[UID, NewID]:
+    def validate(self, data, node=None) -> Union[UID, NewID, dict]:
         uid = validate_uid(data)
         if not uid:
             if not self.allow_new:
                 raise InventoryValidationError(
-                    f'Error in {self.dgraph_name}! provided value is not a UID: {data}')
+                    f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+            if self.reverse:
+                return {NewID(data): {self.reverse_predicate: node}}
             return NewID(data)
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
-            if entry_type != self.relationship_constraint:
+            if entry_type not in self.relationship_constraint:
                 raise InventoryValidationError(
-                    f'UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
+                    f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
+        if self.reverse:
+            return {UID(uid): {self.reverse_predicate: node}}
+        
         return UID(uid)
+
+    def get_choices(self):
+        
+        query_string = '{ '
+
+        for dgraph_type in self.relationship_constraint:
+            query_string += f'''{dgraph_type.lower()}(func: type("{dgraph_type}"), orderasc: name) {{ uid name unique_name }} '''
+
+        query_string += '}'
+
+        choices = dgraph.query(query_string=query_string)
+
+        if len(self.relationship_constraint) == 1:
+            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+
+        else:
+            self.choices = {}
+            self.choices_tuples = {}
+            for dgraph_type in self.relationship_constraint:
+                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
         if self.required:
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectField(label=self.label, validators=validators, description=self.form_description, choices=self.choices, render_kw=self.render_kw)
+        return TomSelectField(label=self.label, validators=validators, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class ListRelationship(SingleRelationship):
 
     dgraph_predicate_type = '[uid]'
 
-    def validate(self, data) -> list:
+    def validate(self, data, node=None) -> list:
         if type(data) == str:
             data = data.split(',')
         uids = []
@@ -572,29 +678,67 @@ class ListRelationship(SingleRelationship):
             if not uid:
                 if not self.allow_new:
                     raise InventoryValidationError(
-                        f'Error in <{self.dgraph_name}>! provided value is not a UID: {data}')
-                uids.append(NewID(item))
+                        f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+                if self.reverse:
+                    uids.append({NewID(item): {self.reverse_predicate: node}})
+                else:
+                    uids.append(NewID(item))
             else:
                 if self.relationship_constraint:
                     entry_type = dgraph.get_dgraphtype(uid)
-                    if entry_type != self.relationship_constraint:
+                    if entry_type not in self.relationship_constraint:
                         raise InventoryValidationError(
-                            f'UID specified does not match constraint, UID is not a {self.relationship_constraint}! uid <{uid}> <dgraph.type> <{entry_type}>')
-                uids.append(UID(uid))
+                            f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}! uid <{uid}> <dgraph.type> <{entry_type}>')
+                if self.reverse:
+                    uids.append({UID(uid): {self.reverse_predicate: node}})
+                else:
+                    uids.append(UID(uid))
         return set(uids)
 
     @property
     def wtf_field(self) -> TomSelectMutlitpleField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
         if self.required:
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectMutlitpleField(label=self.label, 
-                                        validators=validators, 
-                                        description=self.form_description, 
-                                        choices=self.choices, 
-                                        render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.label,
+                                       validators=validators,
+                                       description=self.form_description,
+                                       choices=self.choices_tuples,
+                                       render_kw=self.render_kw)
 
+
+class SourceCountrySelection(ListRelationship):
+
+    """
+        Special field with constraint to only include countries with Scope of OPTED
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+
+        super().__init__(relationship_constraint = ['Multinational', 'Country'], allow_new=False, autoload_choices=True, overwrite=True, *args, **kwargs)
+
+    def get_choices(self):
+
+        query_country = '''country(func: type("Country"), orderasc: name) @filter(eq(opted_scope, true)) { uid unique_name name  }'''
+        query_multinational = '''multinational(func: type("Multinational"), orderasc: name) { uid unique_name name other_names }'''
+
+        query_string = '{ ' + query_country + query_multinational + ' }'
+
+        choices = dgraph.query(query_string=query_string)
+
+        if len(self.relationship_constraint) == 1:
+            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+
+        else:
+            self.choices = {}
+            self.choices_tuples = {}
+            for dgraph_type in self.relationship_constraint:
+                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
 
 """ Functions for making nquad statements """
 
