@@ -4,7 +4,7 @@ from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.main.model import Schema, Organization
+from flaskinventory.main.model import Organization
 from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization, NewArchive, NewDataset
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.add.sanitize import NewMultinationalSanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer

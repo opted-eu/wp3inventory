@@ -1,99 +1,16 @@
+from typing import List
 from flaskinventory.flaskdgraph.dgraph_types import (String, Integer, Boolean, UIDPredicate,
-                                                     SingleChoice, DateTime,
+                                                     SingleChoice, MultipleChoice,
+                                                     DateTime, Year,
                                                      ListString, ListRelationship,
                                                      Geo, SingleRelationship, UniqueName,
-                                                     AddressAutocode, GeoAutoCode)
-from flask_wtf import FlaskForm
-from wtforms import SubmitField
+                                                     AddressAutocode, GeoAutoCode,
+                                                     SourceCountrySelection)
+
 
 from flaskinventory.users.constants import USER_ROLES
-
-
-class Schema:
-
-    _types = {}
-
-    def __init_subclass__(cls) -> None:
-        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
-        ) if hasattr(getattr(cls, key), 'predicate')}
-        # inherit predicates from parent classes
-        for parent in cls.__bases__:
-            if parent.__name__ != Schema.__name__:
-                predicates.update({k: v for k, v in Schema.get_predicates(
-                    parent.__name__).items() if k not in predicates.keys()})
-        Schema._types[cls.__name__] = predicates
-        for predicate in cls.__dict__.keys():
-            if not predicate.startswith('__'):
-                setattr(getattr(cls, predicate), 'predicate', predicate)
-
-    @classmethod
-    def get_types(cls):
-        return list(cls._types.keys())
-
-    @classmethod
-    def get_predicates(cls, _cls):
-        if isinstance(_cls, Schema):
-            _cls = _cls.__name__
-        return cls._types[_cls]
-
-    @classmethod
-    def predicates(cls):
-        return cls._types[cls.__name__]
-
-    @classmethod
-    def predicate_names(cls):
-        return list(cls._types[cls.__name__].keys())
-
-    @classmethod
-    def generate_new_entry_form(cls, dgraph_type=None):
-
-        if dgraph_type:
-            fields = cls.get_predicates(dgraph_type)
-        else:
-            fields = cls.predicates()
-
-        class F(FlaskForm):
-
-            submit = SubmitField(f'Add New {cls.__name__}')
-
-            def get_field(self, field):
-                return getattr(self, field)
-
-        for k, v in fields.items():
-            if v.new:
-                setattr(F, k, v.wtf_field)
-
-        return F()
-
-    @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, entry_review_status='pending'):
-
-        if dgraph_type:
-            fields = cls.get_predicates(dgraph_type)
-        else:
-            fields = cls.predicates()
-
-        class F(FlaskForm):
-
-            submit = SubmitField(f'Edit this {cls.__name__}')
-
-            def get_field(self, field):
-                try:
-                    return getattr(self, field)
-                except AttributeError:
-                    return None
-
-        from flask_login import current_user
-
-        for k, v in fields.items():
-            if v.edit and current_user.user_role >= v.permission:
-                setattr(F, k, v.wtf_field)
-
-        if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':
-            setattr(F, "accept", SubmitField('Edit and Accept'))
-
-        return F()
-
+from flaskinventory.flaskdgraph import Schema
+from flaskinventory.auxiliary import icu_codes
 
 """
     Entry
@@ -185,5 +102,123 @@ class Organization(Entry):
     founded = DateTime(new=False)
 
 
+class Source(Entry):
+
+    channel = SingleRelationship(description='Through which channel is the news source distributed?',
+                                 edit=False,
+                                 autoload_choices=True,
+                                 relationship_constraint='Channel',
+                                 read_only=True,
+                                 required=True)
+
+    name = String(label='Name of the News Source',
+                  required=True,
+                  description='What is the name of the news source?',
+                  render_kw={'placeholder': "e.g. 'The Royal Gazette'"})
+    
+    other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
+                             render_kw={'placeholder': 'Separate by comma'}, 
+                             overwrite=True)
+
+    founded = DateTime(description="What year was the print news source founded?")
+
+    publication_kind = MultipleChoice(description='What label or labels describe the main source?',
+                                      choices={'newspaper': 'Newspaper / News Site', 
+                                                'news agency': 'News Agency', 
+                                                'magazine': 'Magazine', 
+                                                'tv show': 'TV Show / TV Channel', 
+                                                'radio show': 'Radio Show / Radio Channel', 
+                                                'podcast': 'Podcast', 
+                                                'news blog': 'News Blog', 
+                                                'alternative media': 'Alternative Media'},
+                                        tom_select=True,
+                                        required=True)
+
+    special_interest = Boolean(description='Does the news source have one main topical focus?',
+                                label='Yes, is a special interest publication')
+    
+    topical_focus = MultipleChoice(description="What is the main topical focus of the news source?",
+                                    choices={'politics': 'Politics', 
+                                             'society': 'Society & Panorama', 
+                                             'economy': 'Business, Economy, Finance & Stocks', 
+                                             'religion': 'Religion', 
+                                             'science': 'Science & Technology', 
+                                             'media': 'Media', 
+                                             'environment': 'Environment', 
+                                             'education': 'Education'},
+                                    tom_select=True)
+    
+    publication_cycle = SingleChoice(description="What is the publication cycle of the source?",
+                                        choices={'continuous': 'Continuous', 
+                                                 'daily': 'Daily (7 times a week)', 
+                                                 'multiple times per week': 'Multiple times per week', 
+                                                 'weekly': 'Weekly', 
+                                                 'twice a month': 'Twice a month', 
+                                                 'monthly': 'Monthly', 
+                                                 'less than monthly': 'Less frequent than monthly', 
+                                                 'NA': "Don't Know / NA"},
+                                                 required=True)
+
+    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s)",
+                                                choices={1: 'Monday', 
+                                                        2: 'Tuesday', 
+                                                        3: 'Wednesday', 
+                                                        4: 'Thursday', 
+                                                        5: 'Friday', 
+                                                        6: 'Saturday', 
+                                                        7: 'Sunday', 
+                                                        'NA': "Don't Know / NA"},
+                                                tom_select=True)
+
+    geographic_scope = SingleChoice(description="What is the geographic scope of the news source?",
+                                    choices={'multinational': 'Multinational', 
+                                             'national': 'National', 
+                                             'subnational': 'Subnational', 
+                                             'NA': "Don't Know / NA"},
+                                    required=True,
+                                    radio_field=True)
+
+    country = SourceCountrySelection(label='Countries', 
+                                        description='Which countries are in the geographic scope?',
+                                        required=True)
+
+    geographic_scope_subunit = ListRelationship(label='Subunits',
+                                                description='What is the subnational scope?',
+                                                relationship_constraint='Subunit',
+                                                autoload_choices=True,
+                                                overwrite=True,
+                                                tom_select=True)
+
+    languages = MultipleChoice(description="In which language(s) does the news source publish its news texts?",
+                                required=True,
+                                choices=icu_codes,
+                                tom_select=True)
+
+    payment_model = SingleChoice(description="Is the content produced by the news source accessible free of charge?",
+                                    choices={'free': 'Free, all content is free of charge', 
+                                            'partly free': 'Some content is free of charge', 
+                                            'not free': 'No content is free of charge', 
+                                            'NA': "Don't Know / NA"},
+                                    required=True,
+                                    radio_field=True)
+
+    contains_ads = SingleChoice(description="Does the news source contain advertisements?",
+                                    choices={'yes': 'Yes', 
+                                                'no': 'No', 
+                                                'non subscribers': 'Only for non-subscribers', 
+                                                'NA': "Don't Know / NA"},
+                                    required=True,
+                                    radio_field=True)
+
+    published_by = ListRelationship(relationship_constraint='Organization',
+                                    reverse=True,
+                                    allow_new=True,
+                                    autoload_choices=True,
+                                    reverse_predicate='publishes',
+                                    predicate_alias=['publishes_org', 'publishes_person', '~publishes'])
+
+
 # entry_countries = ListRelationship(
 #     'country', relationship_constraint='Country', allow_new=False, overwrite=True)
+
+

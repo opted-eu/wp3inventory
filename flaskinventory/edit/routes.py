@@ -13,7 +13,7 @@ from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
 from flaskinventory.add.external import fetch_wikidata
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory import dgraph
-from flaskinventory.main.model import Schema, Organization, Entry
+from flaskinventory.main.model import Organization, Entry
 from flaskinventory.main.sanitizer import make_sanitizer
 
 import traceback

@@ -1,3 +1,4 @@
+from flaskinventory.flaskdgraph import Schema
 from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
                                         GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
@@ -11,7 +12,7 @@ from flaskinventory.users.dgraph import User
 from flaskinventory import dgraph
 from flask import current_app
 
-from flaskinventory.main.model import Entry, Organization, Schema
+from flaskinventory.main.model import Entry, Organization
 from flaskinventory.misc import get_ip
 from flask_login import current_user
 
