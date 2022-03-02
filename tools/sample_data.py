@@ -13,8 +13,13 @@ def main():
         sys.exit()
     
     # load sample_data
-    with open('./data/sample_data_plain.rdf', 'r') as f:
-        sample_data = f.read()
+    with open('./data/sample_data.rdf', 'r') as f:
+        sample_data = [line.strip() for line in f]
+
+    # skip first two lines and last line
+    sample_data = sample_data[2:]
+    sample_data = sample_data[:-3]
+    sample_data = "\n".join(sample_data)
 
     with open('./data/countries_noaustria.json', 'r') as f:
         countries = json.load(f)
