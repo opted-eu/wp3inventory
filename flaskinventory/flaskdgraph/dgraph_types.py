@@ -354,7 +354,6 @@ class ListString(String):
     dgraph_predicate_type = '[string]'
 
     def validate(self, data, strip=True):
-        print(data, type(data))
         if type(data) == str:
             data = data.split(',')
 
