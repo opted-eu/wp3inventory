@@ -107,8 +107,10 @@ async def fieldoptions():
 @endpoint.route('/endpoint/new/submit', methods=['POST'])
 def submit():
     try:
+        current_app.logger.debug(f'Received JSON: \n{request.json}')
         sanitizer = SourceSanitizer(
             request.json, current_user, get_ip())
+        current_app.logger.debug(f'Processed Entry: \n{sanitizer.newsource}\n{sanitizer.newsubunits}\n{sanitizer.orgs}\n{sanitizer.related}')
         current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
     except Exception as e:
