@@ -253,14 +253,17 @@ def siterankdata(site):
     if site.endswith('/'):
         site = site[:-1]
 
-    r = requests.get("https://siterankdata.com/" + site)
+    current_app.logger.debug(f'requesting: {"https://siterankdata.com/" + site}')
+    r = requests.get("https://siterankdata.com/" + site, timeout=30)
 
     if r.status_code != 200:
+        current_app.logger.debug(f'Getting siterankdata failed! Status code: {r.status_code}')
         return False
 
-    soup = bs4(r.content, 'lxml')
+    current_app.logger('Succeeded in grabbing siterankdata! Now parsing...')
 
     try:
+        soup = bs4(r.content, 'lxml')
         visitor_string = soup.find(text=re.compile('Daily Unique Visitors'))
         visitors = visitor_string.parent.parent.h3.getText(strip=True)
         visitors = int(visitors.replace(',', ''))

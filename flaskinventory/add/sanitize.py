@@ -816,7 +816,11 @@ class SourceSanitizer:
                 audience_size_year, facets=facets)
 
     def fetch_siterankdata(self):
-        daily_visitors = siterankdata(self.newsource['name'])
+        try:
+            daily_visitors = siterankdata(self.newsource['name'])
+        except Exception as e:
+            current_app.logger.warning(f'Could not fetch siterankdata for {self.newsource["name"]}! Exception: {e}')
+            daily_visitors = None
 
         if daily_visitors:
             self.newsource['audience_size'] = Scalar(datetime.date.today(), facets={
