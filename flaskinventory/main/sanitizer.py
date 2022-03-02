@@ -58,7 +58,7 @@ class Sanitizer:
         if not isinstance(data, dict):
             raise TypeError('Data object has to be type dict!')
         if not isinstance(user, User):
-            raise TypeError('User Object is not class User!')
+            raise InventoryPermissionError('User Object is not class User!')
         if not isinstance(ip, str):
             raise TypeError('IP Address is not string!')
         return True
@@ -76,9 +76,10 @@ class Sanitizer:
             raise InventoryValidationError(
                 f'Entry can not be edited! UID does not exist: {data["uid"]}')
 
-        if not current_user.user_role >= USER_ROLES.Reviewer or check.get('entry_added').get('uid') != current_user.id:
-            raise InventoryPermissionError(
-                'You do not have the required permissions to edit this entry!')
+        if current_user.user_role < USER_ROLES.Reviewer:
+            if check.get('entry_added').get('uid') != current_user.id:
+                raise InventoryPermissionError(
+                    'You do not have the required permissions to edit this entry!')
 
         return cls(data, is_upsert=True, **kwargs)
 
@@ -356,13 +357,13 @@ def make_sanitizer(data: dict, dgraph_type, edit=False):
 
     class S(Sanitizer):
 
-        def __init__(self, d, dtype='Entry', **kwargs):
+        def __init__(self, d, dtype='Entry', *args, **kwargs):
 
-            super().__init__(d, **kwargs)
+            super().__init__(d, *args, **kwargs)
 
             if not self.is_upsert:
                 self.entry['dgraph.type'].append(dtype)
 
     if edit:
         return S.edit(data, fields=fields, dtype=dgraph_type)
-    return S(data, fields, dtype=dgraph_type)
+    return S(data, fields=fields, dtype=dgraph_type)
