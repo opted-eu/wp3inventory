@@ -14,7 +14,7 @@ from flaskinventory.users.constants import USER_ROLES
 from flaskinventory import create_app, dgraph
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
 from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
-from flaskinventory.main.model import Entry, Organization
+from flaskinventory.main.model import Entry, Organization, Source
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.flaskdgraph.dgraph_types import UID
 import secrets
@@ -259,6 +259,16 @@ class TestSanitizers(unittest.TestCase):
                 sanitizer = make_sanitizer(mock_org_edit, Organization, edit=True)
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
                 self.assertEqual(type(sanitizer.entry['founded']), datetime)
+
+    def test_new_source(self):
+        with self.client:
+            response = self.client.post('/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
+            self.assertEqual(current_user.user_displayname, 'Contributor')
+
+            with self.app.app_context():
+                Source.country.get_choices()
+                Organization.country.get_choices()
+                Source.published_by
 
 
 if __name__ == "__main__":

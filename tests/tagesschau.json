@@ -1,0 +1,39 @@
+{
+    "uid": "_:newsource",
+    "channel": "website",
+    "channel_uid": "0x2954",
+    "name": "https://www.tagesschau.de/",
+    "other_names": "Tagesschau,Tagesthemen",
+    "website_allows_comments": "no",
+    "founded": "2000",
+    "publication_kind": "tv show",
+    "special_interest": "yes",
+    "topical_focus": "politics",
+    "publication_cycle": "multiple times per week",
+    "publication_cycle_weekday_1": "yes",
+    "publication_cycle_weekday_2": "yes",
+    "publication_cycle_weekday_3": "yes",
+    "publication_cycle_weekday_4": "yes",
+    "publication_cycle_weekday_5": "yes",
+    "publication_cycle_weekday_6": "yes",
+    "publication_cycle_weekday_7": "yes",
+    "geographic_scope": "national",
+    "geographic_scope_single": "0x295e",
+    "languages": "de",
+    "payment_model": "free",
+    "contains_ads": "no",
+    "publishes_org": [
+        "ARD",
+        "0x2957"
+    ],
+    "publishes_person": "Caren Mioska",
+    "archive_sources_included": "0x294b",
+    "entry_notes": "Some notes",
+    "party_affiliated": "no",
+    "related_sources": [
+        "https://twitter.com/tagesschau",
+        "https://www.facebook.com/tagesschau"
+    ],
+    "newsource_https://twitter.com/tagesschau": "twitter,0x2955",
+    "newsource_https://www.facebook.com/tagesschau": "facebook,0x294f"
+}
