@@ -359,7 +359,7 @@ class EditSourceSanitizer(Sanitizer):
         related = Variable('related', 'uid')
         self.upsert_query += f""" q_related(func: type(Source)) 
                             @filter(uid_in(related, {self.edit['uid']})) 
-                            {{ {related.query()} }} """
+                            {{ {related.query } }} """
         del_obj.append({
             'uid': related,
             'related': self.edit['uid']
