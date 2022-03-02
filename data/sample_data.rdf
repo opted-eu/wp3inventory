@@ -25,7 +25,7 @@
         _:print <unique_name> "print" .
         _:print <name> "Print" .
         _:print <form_name_question> "What is the name of the print news source?" .
-        _:print <form_name_placeholder> "e.g. 'The Royal Gazette" .
+        _:print <form_name_placeholder> "e.g. 'The Royal Gazette'" .
 
         _:twitter <dgraph.type> "Channel" .
         _:twitter <unique_name> "twitter" .
