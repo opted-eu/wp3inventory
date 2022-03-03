@@ -5,7 +5,7 @@ from flaskinventory.flaskdgraph.dgraph_types import (String, Integer, Boolean, U
                                                      ListString, ListRelationship,
                                                      Geo, SingleRelationship, UniqueName,
                                                      AddressAutocode, GeoAutoCode,
-                                                     SourceCountrySelection)
+                                                     SourceCountrySelection, ReverseRelationship, ReverseListRelationship)
 
 
 from flaskinventory.users.constants import USER_ROLES
@@ -100,6 +100,25 @@ class Organization(Entry):
                        new=False)
     
     founded = DateTime(new=False)
+
+
+class Resource(Entry):
+
+    description = String(large_textfield=True)
+    authors = ListString(render_kw={'placeholder': 'Separate by comma'})
+    published_date = DateTime()
+    last_updated = DateTime()
+    url = String()
+    doi = String()
+    arxiv = String()
+
+class Archive(Resource):
+
+    access = SingleChoice(choices={'free': 'Free',
+                                    'restricted': 'Restricted'})
+    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
+    fulltext = Boolean(description='Dataset contains fulltext')
+    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
 
 
 class Source(Entry):
@@ -210,12 +229,11 @@ class Source(Entry):
                                     required=True,
                                     radio_field=True)
 
-    published_by = ListRelationship(relationship_constraint='Organization',
-                                    reverse=True,
-                                    allow_new=True,
-                                    autoload_choices=True,
-                                    reverse_predicate='publishes',
-                                    predicate_alias=['publishes_org', 'publishes_person', '~publishes'])
+    published_by = ReverseListRelationship('publishes', 
+                                       label='Published by', 
+                                       allow_new=True)
+
+    included_in = ReverseListRelationship('sources_included', allow_new=False, label='News source included in these resources')
 
 
 # entry_countries = ListRelationship(

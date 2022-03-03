@@ -3,9 +3,9 @@
 # whatever its name is. Please forgive the heresy.
 if __name__ == "__main__" and __package__ is None:
     from sys import path
-    from os.path import dirname as dir
+    from os.path import dirname
 
-    path.append(dir(path[0]))
+    path.append(dirname(path[0]))
     __package__ = "examples"
 
 from flask_login import current_user
@@ -17,6 +17,7 @@ from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
 from flaskinventory.main.model import Entry, Organization, Source
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.flaskdgraph.dgraph_types import UID
+from flaskinventory.flaskdgraph import Schema
 import secrets
 import copy
 import unittest
@@ -269,6 +270,7 @@ class TestSanitizers(unittest.TestCase):
                 Source.country.get_choices()
                 Organization.country.get_choices()
                 Source.published_by
+                print(dir(Source.generate_new_entry_form()))
 
 
 if __name__ == "__main__":

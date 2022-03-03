@@ -1,5 +1,5 @@
 from flaskinventory.flaskdgraph import Schema
-from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
+from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, ReverseRelationship, Scalar,
                                         GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
@@ -226,31 +226,29 @@ class Sanitizer:
                     m()
 
         for key, item in self.fields.items():
+            validated = None
             if key in self.skip_keys: continue
-            if self.data.get(key) and hasattr(item, 'validate'):
-                validated = item.validate(self.data[key])
-                if type(validated) == dict:
-                    self.entry = {**self.entry, **validated}
-                elif type(validated) == list and key in self.entry.keys():
-                    self.entry[key] += validated
-                elif type(validated) == set and key in self.entry.keys():
-                    self.entry[key] = set.union(validated, self.entry[key])
-                else:
-                    self.entry[key] = validated
+            
+            if self.data.get(key) and isinstance(item, ReverseRelationship):
+                validated = item.validate(self.data[key], self.entry['uid'])
+            elif self.data.get(key) and hasattr(item, 'validate'):
+                validated = item.validate(self.data[key])  
             elif hasattr(item, 'autocode'):
                 if item.autoinput in self.data.keys():
-                    autocoded = item.autocode(self.data[item.autoinput])
-                    if type(autocoded) == dict:
-                        self.entry = {**self.entry, **autocoded}
-                    elif type(autocoded) == list and key in self.entry.keys():
-                        self.entry[key] += autocoded
-                    elif type(autocoded) == set and key in self.entry.keys():
-                        self.entry[key] = set.union(autocoded, self.entry[key])
-                    else:
-                        self.entry[key] = autocoded
-
+                    validated = item.autocode(self.data[item.autoinput])        
             elif item.default:
-                self.entry[key] = item.default
+                validated = item.default
+        
+            if validated is None: continue
+
+            if type(validated) == dict:
+                    self.entry.update(validated)
+            elif type(validated) == list and key in self.entry.keys():
+                self.entry[key] += validated
+            elif type(validated) == set and key in self.entry.keys():
+                self.entry[key] = set.union(validated, self.entry[key])
+            else:
+                self.entry[key] = validated
 
             if hasattr(item, 'allow_new'):
                 if item.allow_new:

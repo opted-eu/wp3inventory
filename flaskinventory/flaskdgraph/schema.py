@@ -5,46 +5,91 @@ from flaskinventory.users.constants import USER_ROLES
 
 class Schema:
 
-    _types = {}
+    # registry of all types and which predicates they have
+    # Key = Dgraph Type (string), val = dict of predicates
+    __types = {}
+
+    # registry of all predicates and which types use them
+    # Key = predicate (string), Val = list(Dgraph Type (string))
+    __predicates = {}
+
+    # registry of explicit reverse relationship that should generate a form field
+    # key = predicate (string), val = dict of predicates
+    __reverse_predicates = {}
+
+    def __set_name__(cls):
+        print('set name')
 
     def __init_subclass__(cls) -> None:
-        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
-        ) if hasattr(getattr(cls, key), 'predicate')}
+        from .dgraph_types import Predicate, ReverseRelationship
+        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), Predicate)}
+        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), ReverseRelationship)}
         # inherit predicates from parent classes
         for parent in cls.__bases__:
             if parent.__name__ != Schema.__name__:
                 predicates.update({k: v for k, v in Schema.get_predicates(
                     parent.__name__).items() if k not in predicates.keys()})
-        Schema._types[cls.__name__] = predicates
-        for predicate in cls.__dict__.keys():
-            if not predicate.startswith('__'):
-                setattr(getattr(cls, predicate), 'predicate', predicate)
+                reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
+                    parent.__name__).items() if k not in reverse_predicates.keys()})
+        Schema.__types[cls.__name__] = predicates
+        Schema.__reverse_predicates[cls.__name__] = reverse_predicates
+        for key in cls.__dict__.keys():
+            attribute = getattr(cls, key)
+            if isinstance(attribute, Predicate):
+                setattr(attribute, 'predicate', key)
+                if key not in cls.__predicates.keys():
+                    cls.__predicates.update({key: [cls.__name__]})
+                else:
+                    cls.__predicates[key].append(cls.__name__)
+            elif isinstance(attribute, ReverseRelationship):
+                # resolve this order!
+                setattr(attribute, 'relationship_constraint', cls.__predicates[attribute._target_predicate])
 
     @classmethod
     def get_types(cls):
-        return list(cls._types.keys())
+        return list(cls.__types.keys())
 
     @classmethod
     def get_predicates(cls, _cls):
         if isinstance(_cls, Schema):
             _cls = _cls.__name__
-        return cls._types[_cls]
+        return cls.__types[_cls]
+
+    @classmethod
+    def get_reverse_predicates(cls, _cls):
+        if isinstance(_cls, Schema):
+            _cls = _cls.__name__
+        if _cls in cls.__reverse_predicates.keys():
+            return cls.__reverse_predicates[_cls]
+        else:
+            return None
 
     @classmethod
     def predicates(cls):
-        return cls._types[cls.__name__]
+        return cls.__types[cls.__name__]
+
+    @classmethod
+    def reverse_predicates(cls):
+        if cls.__name__ in cls.__reverse_predicates:
+            return cls.__reverse_predicates[cls.__name__]
+        else:
+            return None
 
     @classmethod
     def predicate_names(cls):
-        return list(cls._types[cls.__name__].keys())
+        return list(cls.__types[cls.__name__].keys())
 
     @classmethod
     def generate_new_entry_form(cls, dgraph_type=None):
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
+            if cls.get_reverse_predicates(dgraph_type):
+                fields.update(cls.get_reverse_predicates(dgraph_type))
         else:
             fields = cls.predicates()
+            if cls.reverse_predicates():
+                fields.update(cls.reverse_predicates())
 
         class F(FlaskForm):
 
