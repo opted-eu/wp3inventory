@@ -16,7 +16,7 @@ import asyncio
 from dateutil.parser import isoparse
 from flaskinventory import dgraph
 
-def geocode(address):
+def geocode(address: str) -> dict:
     payload = {'q': address,
                'format': 'jsonv2',
                'addressdetails': 1,
@@ -33,7 +33,7 @@ def geocode(address):
         return r.json()[0]
 
 
-def reverse_geocode(lat, lon):
+def reverse_geocode(lat, lon) -> dict:
     api = "https://nominatim.openstreetmap.org/reverse"
     payload = {'lat': lat, 'lon': lon, 'format': 'json'}
     r = requests.get(api, params=payload)
@@ -431,7 +431,7 @@ def fetch_wikidata(wikidataid, query=None):
         address_geo = GeoScalar('Point', [
             float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
-        result['address'] = address
+        result['address_string'] = address
         result['address_geo'] = address_geo
     except Exception as e:
         current_app.logger.debug(
