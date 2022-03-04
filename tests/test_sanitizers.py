@@ -16,12 +16,14 @@ from flaskinventory.errors import InventoryValidationError, InventoryPermissionE
 from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
 from flaskinventory.main.model import Entry, Organization, Source
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.flaskdgraph.dgraph_types import UID
+from flaskinventory.flaskdgraph.dgraph_types import UID, Scalar
 from flaskinventory.flaskdgraph import Schema
 import secrets
 import copy
 import unittest
 from datetime import datetime
+
+from pprint import pprint
 
 class Config:
     TESTING = True
@@ -70,7 +72,12 @@ class TestSanitizers(unittest.TestCase):
             cls.derstandard_twitter = dgraph.get_uid('unique_name', 'derstandard_twitter')
             cls.austria_uid = dgraph.get_uid('unique_name', 'austria')
             cls.germany_uid = dgraph.get_uid('unique_name', 'germany')
+            cls.channel_website = dgraph.get_uid('unique_name', 'website')
+            cls.channel_print = dgraph.get_uid('unique_name', 'print')
+            cls.channel_twitter = dgraph.get_uid('unique_name', 'twitter')
+            cls.channel_facebook = dgraph.get_uid('unique_name', 'facebook')
             cls.country_choices = get_country_choices()
+            cls.archive_apa = dgraph.get_uid('unique_name', 'apa_archive')
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -148,13 +155,13 @@ class TestSanitizers(unittest.TestCase):
                 sanitizer = Sanitizer(self.mock_data1)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(list(sanitizer.entry.keys()), self.mock1_solution_keys)
-                self.assertEqual(type(sanitizer.entry['other_names']), set)
+                self.assertEqual(type(sanitizer.entry['other_names']), list)
                 self.assertGreater(len(sanitizer.entry['other_names']), 2)
             
                 sanitizer = Sanitizer(self.mock_data2)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(list(sanitizer.entry.keys()), self.mock2_solution_keys)
-                self.assertEqual(type(sanitizer.entry['other_names']), set)
+                self.assertEqual(type(sanitizer.entry['other_names']), list)
                 self.assertEqual(len(sanitizer.entry['other_names']), 2)
             
                 self.assertRaises(TypeError, Sanitizer, [1, 2, 3])
@@ -196,7 +203,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(sanitizer.is_upsert, True)
                 self.assertNotIn('dgraph.type', sanitizer.entry.keys())
                 self.assertIn('entry_edit_history', sanitizer.entry.keys())
-                self.assertCountEqual(sanitizer.overwrite[sanitizer.entry['uid']], ['other_names', 'wikidataID'])
+                self.assertCountEqual(sanitizer.overwrite[sanitizer.entry_uid], ['other_names', 'wikidataID'])
 
     def test_new_org(self):
         # print('-- test_new_org() --\n')
@@ -212,7 +219,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(sanitizer.entry['entry_review_status'], 'pending')
                 self.assertIsNotNone(sanitizer.set_nquads)
                 self.assertIsNone(sanitizer.delete_nquads)
-                self.assertEqual(sanitizer.entry['wikidataID'], 66048) # WikiDataID for Deutsche Bank
+                self.assertEqual(str(sanitizer.entry['wikidataID']), '"66048"') # WikiDataID for Deutsche Bank
                 self.assertIn('employees', sanitizer.entry.keys())
                 
                 mock_org = copy.deepcopy(self.mock_organization)
@@ -249,8 +256,8 @@ class TestSanitizers(unittest.TestCase):
 
             with self.app.app_context():
                 sanitizer = make_sanitizer(mock_org_edit, Organization, edit=True)
-                self.assertEqual(type(sanitizer.entry['founded']), datetime)
-                self.assertCountEqual(sanitizer.overwrite[sanitizer.entry['uid']], overwrite_keys)
+                self.assertEqual(type(sanitizer.entry['founded']), Scalar)
+                self.assertCountEqual(sanitizer.overwrite[sanitizer.entry_uid], overwrite_keys)
                 self.assertEqual(len(sanitizer.entry['publishes']), 5)
 
                 mock_org_edit['uid'] = self.derstandard_mbh_uid
@@ -259,18 +266,60 @@ class TestSanitizers(unittest.TestCase):
                 mock_org_edit['founded'] = '2010'
                 sanitizer = make_sanitizer(mock_org_edit, Organization, edit=True)
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
-                self.assertEqual(type(sanitizer.entry['founded']), datetime)
+                self.assertEqual(type(sanitizer.entry['founded']), Scalar)
 
     def test_new_source(self):
+
+        mock_source = {
+                # "uid": "_:newsource",
+                "channel_unique_name": "website",
+                "channel": self.channel_website,
+                "name": "https://www.tagesschau.de/",
+                "other_names": "Tagesschau,Tagesthemen",
+                "website_allows_comments": "no",
+                "founded": "2000",
+                "publication_kind": "tv show",
+                "special_interest": "yes",
+                "topical_focus": "politics",
+                "publication_cycle": "multiple times per week",
+                "publication_cycle_weekday_1": "yes",
+                "publication_cycle_weekday_2": "yes",
+                "publication_cycle_weekday_3": "yes",
+                "publication_cycle_weekday_4": "yes",
+                "publication_cycle_weekday_5": "yes",
+                "publication_cycle_weekday_6": "yes",
+                "publication_cycle_weekday_7": "yes",
+                "geographic_scope": "subnational",
+                "country": self.germany_uid,
+                "geographic_scope_subunit": "Hamburg",
+                "languages": "de",
+                "audience_size|followers": "10000",
+                "payment_model": "free",
+                "contains_ads": "no",
+                "publishes_org": [
+                    "ARD",
+                    self.derstandard_mbh_uid
+                ],
+                "publishes_person": "Caren Miosga",
+                "archive_sources_included": self.archive_apa,
+                "entry_notes": "Some notes",
+                "party_affiliated": "no",
+                "related": [
+                    "https://twitter.com/tagesschau",
+                    "https://www.facebook.com/tagesschau"
+                ],
+                "newsource_https://twitter.com/tagesschau": f"twitter,{self.channel_twitter}",
+                "newsource_https://www.facebook.com/tagesschau": f"facebook,{self.channel_facebook}"
+            }
+
         with self.client:
             response = self.client.post('/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
             self.assertEqual(current_user.user_displayname, 'Contributor')
 
             with self.app.app_context():
-                Source.country.get_choices()
-                Organization.country.get_choices()
-                Source.published_by
-                print(dir(Source.generate_new_entry_form()))
+                sanitizer = make_sanitizer(mock_source, 'Source')
+                pprint(sanitizer.entry)
+                pprint(sanitizer.related_entries)
 
 
 if __name__ == "__main__":
