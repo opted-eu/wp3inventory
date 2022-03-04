@@ -5,7 +5,9 @@ import pydgraph
 import logging
 
 class DGraph(object):
-    '''Class for dgraph database connection'''
+    """
+        Class for dgraph database connection
+    """
 
     _client = None
 
@@ -24,7 +26,9 @@ class DGraph(object):
         app.config.setdefault('DGRAPH_OPTIONS', None)
         app.teardown_appcontext(self.teardown)
 
-    ''' Connection Related Methods '''
+    """ 
+        Connection Related Methods
+    """
 
     @property
     def connection(self):
@@ -125,7 +129,7 @@ class DGraph(object):
             return ''
 
     """    
-    Generic Query Methods 
+        Generic Query Methods 
     """
 
     def query(self, query_string, variables=None):
