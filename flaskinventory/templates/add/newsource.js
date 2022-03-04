@@ -13,13 +13,17 @@ document.querySelectorAll('select').forEach(function(item) {
     }
 })
 
+var geographicScopeSingle = new Object
+var geographicScopeMultiple = new Object
+var geographicScopeSubunit = new Object
+
 
 function addFieldOptionsData(fieldOptions, key, selector, addother = false) {
     var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
     opts.forEach(function(item, i) {
         let opt = document.createElement('option')
-        opt.setAttribute('value', item.unique_name)
-        opt.setAttribute('data-value', item.uid)
+        opt.setAttribute('value', item.uid)
+        opt.setAttribute('data-value', item.unique_name)
         opt.setAttribute('data-index', i)
         opt.innerText = item.name
         document.querySelector(selector).append(opt);
@@ -93,7 +97,7 @@ function getFieldOptions(targetUrl) {
 
 // Field Visibility Logic
 function channelVisibility(fieldOptions, allNames, el) {
-    var value = el.target.value
+    var value = el.target.options[el.target.selectedIndex].getAttribute('data-value')
     var index = el.target.options[el.target.selectedIndex].getAttribute('data-index')
     if (index == null) {
         return;
@@ -343,8 +347,8 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
                 }
-                // geographicScopeSingle.clear();
-                // geographicScopeSubunit.clear();
+                geographicScopeSingle.clear();
+                geographicScopeSubunit.clear();
             } else if (item == 'national') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = false;
@@ -363,8 +367,8 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('geographic-scope-subunit').required = false;
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
-                    // geographicScopeMultiple.clear();
-                    // geographicScopeSubunit.clear();
+                    geographicScopeMultiple.clear();
+                    geographicScopeSubunit.clear();
                 }
             } else if (item == 'subnational') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
@@ -386,7 +390,7 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                     document.getElementById('geographic-scope-single-ts-control').required = true;
                 }
 
-                // geographicScopeMultiple.clear();
+                geographicScopeMultiple.clear();
             } else {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = true;
@@ -406,9 +410,9 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                     document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
 
-                // geographicScopeSingle.clear();
-                // geographicScopeMultiple.clear();
-                // geographicScopeSubunit.clear();
+                geographicScopeSingle.clear();
+                geographicScopeMultiple.clear();
+                geographicScopeSubunit.clear();
             }
         });
     });
@@ -421,8 +425,8 @@ function populateForm(jsonData) {
         document.getElementById("uid-hidden").value = jsonData["uid"]
     };
     if ('channel' in jsonData) {
-        document.getElementById("channel-select").value = jsonData["channel"].unique_name
-        document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
+        document.getElementById("channel-select").value = jsonData["channel"].uid
+        document.getElementById("channel-select-hidden").value = jsonData["channel"].unique_name
     };
     if ('name' in jsonData) {
         document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
@@ -687,10 +691,17 @@ ready(() => {
                 hiddenGeographicScopeSubunits.value = selectedSubunits.join()
             });
 
+            var inputGeographicScopeSingle = document.getElementById('geographic-scope-single')
+            inputGeographicScopeSingle.addEventListener('change', function() {
+                var hiddenGeographicScopeCountry = document.getElementById('geographic-scope-countries-hidden')
+                hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value
+            });
+
             // get url parameter to pre-fill fields
             var currentUrl = new URL(window.location.href);
             var entry_name = currentUrl.searchParams.get("entry_name");
             document.getElementById('heading-name').innerText = ': ' + entry_name
+            document.getElementById('name').value = entry_name
 
             // Populate form with draft data from embedded json
             var embeddedJSON = document.getElementById('draft') || document.getElementById('existing')
@@ -774,9 +785,9 @@ ready(() => {
                 }
             };
 
-            const geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
-            const geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
-            const geographicScopeSubunit = new TomSelect('#geographic-scope-subunit', TomSelectSubunitConfig);
+            geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
+            geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
+            geographicScopeSubunit = new TomSelect('#geographic-scope-subunit', TomSelectSubunitConfig);
 
 
             var TomSelectLanguagesConfig = {
@@ -986,14 +997,6 @@ ready(() => {
 
             function guessChannel(sourcename) {
                 sourcename = sourcename.toLowerCase()
-                let fb = ['fb', 'facebook']
-                let ig = ['ig', 'instagram']
-                let tg = ['tg', 'telegram']
-                let tw = ['tw', 'twitter']
-                let vk = ['vk', 'vkontakte']
-                let www = ['website']
-                let print = ['print']
-                let transcript = ['transcript']
 
                 if (sourcename.includes('facebook')) {
                     return 'facebook'
@@ -1186,7 +1189,9 @@ ready(() => {
             nextStep = nextbutton.parentElement.nextElementSibling;
             if (nextStep.id == 'section-audience') {
                 let audience_size_channels = ['print', 'facebook']
-                if (!audience_size_channels.includes(document.getElementById('channel-select').value)) {
+                let channelSelect = document.getElementById('channel-select')
+                let selectedChannel = channelSelect.options[channelSelect.selectedIndex].getAttribute('data-value')
+                if (!audience_size_channels.includes(selectedChannel)) {
                     nextStep = nextStep.nextElementSibling;
                 }
             }
@@ -1206,7 +1211,8 @@ ready(() => {
             currentStep = prevbutton.parentElement;
             prevStep = prevbutton.parentElement.previousElementSibling;
             if (prevStep.id == 'section-audience') {
-                if (document.getElementById('channel-select').value != 'print') {
+                let channelSelect = document.getElementById('channel-select')
+                if (channelSelect.options[channelSelect.selectedIndex].getAttribute('data-value') != 'print') {
                     prevStep = prevStep.previousElementSibling;
                 }
             }
@@ -1498,7 +1504,7 @@ function prettySummary() {
     Array.from(form.elements).forEach(function(e) {
         if (e.type == 'text' || e.type == 'number') {
             if (e.value) {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     summary_element.children[1].innerHTML = e.value
                     summary_element.hidden = false
@@ -1506,7 +1512,7 @@ function prettySummary() {
             }
         } else if (e.tagName.toLowerCase() == 'select') {
             if (e.multiple && e.selectedOptions) {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     let selected = []
                     for (opt of e.selectedOptions) { selected.push(opt.innerHTML) }
@@ -1516,7 +1522,7 @@ function prettySummary() {
                     }
                 }
             } else {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     if (e.value) {
                         summary_element.children[1].innerHTML = e.selectedOptions[0].innerHTML
@@ -1525,14 +1531,14 @@ function prettySummary() {
                 }
             }
         } else if (e.type == 'radio' && e.checked) {
-            let summary_element = document.querySelector('#summary-' + e.name)
+            let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
             if (summary_element) {
                 summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
                 summary_element.hidden = false
             }
 
         } else if (e.type == 'checkbox' && e.checked) {
-            let summary_element = document.querySelector('#summary-' + e.name)
+            let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
             if (summary_element) {
                 summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
                 summary_element.hidden = false

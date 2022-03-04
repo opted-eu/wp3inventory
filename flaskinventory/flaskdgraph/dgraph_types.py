@@ -40,14 +40,19 @@ class UID:
 
     def __init__(self, uid, facets=None):
         self.uid = uid.strip()
-        if facets:
-            self.facets = facets
+        self.facets = facets
 
     def __str__(self) -> str:
         return f'{self.uid}'
 
     def __repr__(self) -> str:
         return f'<{self.uid}>'
+
+    def update_facets(self, facets: dict) -> None:
+        if self.facets:
+            self.facets.update(facets)
+        else:
+            self.facets = facets
 
     @property
     def nquad(self) -> str:
@@ -66,14 +71,19 @@ class NewID:
         else:
             self.newid = f'_:{slugify(newid, separator="_")}'
 
-        if facets:
-            self.facets = facets
+        self.facets = facets
 
     def __str__(self) -> str:
         return self.newid
 
     def __repr__(self) -> str:
         return f'{self.newid}'
+
+    def update_facets(self, facets: dict) -> None:
+        if self.facets:
+            self.facets.update(facets)
+        else:
+            self.facets = facets
 
     @property
     def nquad(self) -> str:
@@ -157,7 +167,10 @@ class Predicate:
             self.render_kw.update(readonly=read_only)
 
         # default value applied when nothing is specified
-        self._default = default
+        if isinstance(default, (Scalar, UID, NewID, list, tuple, set)) or default is None:
+            self._default = default
+        else:
+            self._default = Scalar(default)
 
         # delete all values first before writing new ones
         self.overwrite = overwrite
@@ -174,6 +187,26 @@ class Predicate:
             return f'<DGraph Predicate "{self.predicate}">'
         else:
             return f'<Unbound DGraph Predicate>'
+
+    def validation_hook(self, data):
+        # this method is called in validation by default
+        # when custom validation is required, overwriting this hook
+        # is the preferred way.
+        return data
+
+
+    def validate(self, data, facets=None, **kwargs):
+        # Validation method that is called by data sanitizer
+        # When overwriting this method make sure to accept
+        # `facets` as keyword argument
+        # preferably this method should return a Scalar object
+        data = self.validation_hook(data)
+        if isinstance(data, (list, set, tuple)):
+            return [Scalar(item, facets=facets) if isinstance(item, (str, int, datetime.datetime, datetime.date)) else item for item in data]
+        elif isinstance(data, (str, int, datetime.datetime, datetime.date)):
+            return Scalar(data, facets=facets)
+        else:
+            return data
 
     @classmethod
     def from_key(cls, key):
@@ -229,14 +262,22 @@ class Scalar:
         self.value = str(value).strip()
         if self.value != '*':
             self.value = json.dumps(self.value)
-        if facets:
-            self.facets = facets
+        self.facets = facets
 
     def __str__(self) -> str:
         return f'{self.value}'
 
     def __repr__(self) -> str:
+        if self.facets:
+            return f'{self.value} ({self.facets})'
         return f'{self.value}'
+
+    def update_facets(self, facets: dict) -> None:
+        if self.facets:
+            self.facets.update(facets)
+        else:
+            self.facets = facets
+
 
     @property
     def nquad(self) -> str:
@@ -253,7 +294,7 @@ class GeoScalar(Scalar):
         Currently only supports Point Locations
     """
 
-    def __init__(self, geotype, coordinates):
+    def __init__(self, geotype, coordinates, facets=None):
         self.geotype = geotype
         if isinstance(coordinates, (list, tuple)):
             assert len(coordinates) == 2, 'Coordinates are not a pair!'
@@ -266,6 +307,7 @@ class GeoScalar(Scalar):
             self.lat = coordinates.get('lat')
             self.lon = coordinates.get('lon')
         self.value = {'type': geotype, 'coordinates': coordinates}
+        self.facets = facets
 
     def __str__(self) -> str:
         return str(self.value)
@@ -300,10 +342,18 @@ class Variable:
 
 class ReverseRelationship:
 
+    """
+    
+    default_predicates: dict with additional predicates that should be assigned to new entries
+    """
+
     def __init__(self, 
                  predicate_name, 
                  allow_new=False,
                  autoload_choices=True,
+                 relationship_constraint=None,
+                 overwrite=False,
+                 default_predicates=None,
                  label=None,
                  description=None,
                  render_kw=None,
@@ -311,13 +361,17 @@ class ReverseRelationship:
                  new=True,
                  edit=True) -> None:
 
-        self.predicate = f'~{predicate_name}'
+        if isinstance(relationship_constraint, str):
+            relationship_constraint = [relationship_constraint]
+        self.relationship_constraint = relationship_constraint
+        self._predicate = f'~{predicate_name}'
         self._target_predicate = predicate_name
         self.allow_new = allow_new
-        self.relationship_constraint = None
 
         self.new = new
         self.edit = edit
+        self.overwrite = overwrite
+        self.default_predicates = default_predicates
 
         # WTForms
         self._label = label
@@ -327,6 +381,7 @@ class ReverseRelationship:
         self.autoload_choices = autoload_choices
         self.choices = {}
         self.choices_tuples = []
+        self.entry_uid = None
 
         if read_only:
             self.render_kw.update(readonly=read_only)
@@ -338,23 +393,27 @@ class ReverseRelationship:
         else:
             return self.predicate.replace('_', ' ').title()
 
-    def validate(self, data, node) -> Union[UID, NewID, dict]:
+    def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         uid = validate_uid(data)
         if not uid:
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-            return {NewID(data): {self._target_predicate: node}}
+            d = {'uid': NewID(data, facets=facets), self._target_predicate: node}
+            if self.relationship_constraint:
+                d.update({'dgraph.type': self.relationship_constraint})
+            return d
+        d = {'uid': UID(uid, facets=facets), self._target_predicate: node}
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
             if entry_type not in self.relationship_constraint:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
-        
-        return {UID(uid): {self._target_predicate: node}}
+        return d
         
     def get_choices(self):
-        
+        assert self.relationship_constraint
+
         query_string = '{ '
 
         for dgraph_type in self.relationship_constraint:
@@ -385,32 +444,22 @@ class ReverseRelationship:
 
 class ReverseListRelationship(ReverseRelationship):
 
-    def validate(self, data, node) -> Union[UID, NewID, dict]:
+    def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         if isinstance(data, str):
             data = data.split(',')
 
         data = set([item.strip() for item in data])
-        uids = {}
+        uids = []
+
         for item in data:
-            uid = validate_uid(item)
-            if not uid:
-                if not self.allow_new:
-                    raise InventoryValidationError(
-                        f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-                uids.update({NewID(item): {self._target_predicate: node}})
-                continue
-            if self.relationship_constraint:
-                entry_type = dgraph.get_dgraphtype(uid)
-                if entry_type not in self.relationship_constraint:
-                    raise InventoryValidationError(
-                        f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
-            
-            uids.update({UID(uid): {self._target_predicate: node}})
+            uid = super().validate(item, node, facets=facets)
+            uids.append(uid)
         
         return uids
         
     def get_choices(self):
-        
+        assert self.relationship_constraint
+
         query_string = '{ '
 
         for dgraph_type in self.relationship_constraint:
@@ -439,6 +488,126 @@ class ReverseListRelationship(ReverseRelationship):
 
 
 
+class MutualRelationship:
+
+    def __init__(self, 
+                allow_new=False,
+                autoload_choices=True,
+                relationship_constraint=None,
+                label=None,
+                description=None,
+                render_kw=None,
+                read_only=False,
+                new=True,
+                edit=True) -> None:
+
+        if isinstance(relationship_constraint, str):
+            relationship_constraint = [relationship_constraint]
+        self.relationship_constraint = relationship_constraint
+        self.predicate = None
+        self.allow_new = allow_new
+
+        self.new = new
+        self.edit = edit
+
+        # WTForms
+        self._label = label
+        self.form_description = description
+        self.render_kw = render_kw or {}
+        # if we want the form field to show all choices automatically.
+        self.autoload_choices = autoload_choices
+        self.choices = {}
+        self.choices_tuples = []
+        self.entry_uid = None
+
+        if read_only:
+            self.render_kw.update(readonly=read_only)
+
+    @property
+    def label(self):
+        if self._label:
+            return self._label
+        else:
+            return self.predicate.replace('_', ' ').title()
+
+    def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
+        """
+            Returns two values: 
+            1) UID/NewID of target
+            2) dict for target relationship
+        """
+        uid = validate_uid(data)
+        if not uid:
+            if not self.allow_new:
+                raise InventoryValidationError(
+                    f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+            node_data = NewID(data, facets=facets)
+            data_node = {'uid': node_data, self.predicate: node}
+            if self.relationship_constraint:
+                data_node.update({'dgraph.type': self.relationship_constraint})
+            return node_data, data_node
+        node_data = UID(uid, facets=facets)
+        data_node = {'uid': node, self._target_predicate: node_data}
+        if self.relationship_constraint:
+            entry_type = dgraph.get_dgraphtype(uid)
+            if entry_type not in self.relationship_constraint:
+                raise InventoryValidationError(
+                    f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
+        return node_data, data_node
+        
+    def get_choices(self):
+        assert self.relationship_constraint
+        
+        query_string = '{ '
+
+        for dgraph_type in self.relationship_constraint:
+            query_string += f'''{dgraph_type.lower()}(func: type("{dgraph_type}"), orderasc: name) {{ uid name unique_name }} '''
+
+        query_string += '}'
+
+        choices = dgraph.query(query_string=query_string)
+
+        if len(self.relationship_constraint) == 1:
+            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+
+        else:
+            self.choices = {}
+            self.choices_tuples = {}
+            for dgraph_type in self.relationship_constraint:
+                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+
+    @property
+    def wtf_field(self) -> TomSelectField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
+        return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+
+
+class MutualListRelationship(MutualRelationship):
+
+    def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
+        if isinstance(data, (str)):
+            data = data.split(',')
+
+        node_data = []
+        data_node = []
+        for item in data:
+            n2d, d2n = super().validate(item, node, facets)
+            node_data.append(n2d)
+            data_node.append(d2n)
+        
+        return node_data, data_node
+
+
+    @property
+    def wtf_field(self) -> TomSelectField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
+        return TomSelectMutlitpleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+
+
 """
     Predicate Classes
 """
@@ -451,11 +620,6 @@ class String(Predicate):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def validate(self, data, strip=True):
-        if strip:
-            return str(data).strip()
-        else:
-            return str(data)
 
 
 class UIDPredicate(Predicate):
@@ -466,7 +630,7 @@ class UIDPredicate(Predicate):
         super().__init__(read_only=True, hidden=True, new=False,
                          default=NewID('_:newentry'), *args, **kwargs)
 
-    def validate(self, uid):
+    def validate(self, uid, **kwargs):
         if not validate_uid(uid):
             raise InventoryValidationError(f'This is not a uid: {uid}')
         else:
@@ -480,7 +644,7 @@ class Integer(Predicate):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def validate(self, data):
+    def validation_hook(self, data):
         return int(data)
 
     @property
@@ -496,15 +660,12 @@ class ListString(String):
 
     dgraph_predicate_type = '[string]'
 
-    def validate(self, data, strip=True):
+    def validation_hook(self, data):
+        if not isinstance(data, (list, tuple, set, str)):
+            raise InventoryValidationError(f'Error in <{self.predicate}> Provided data is not a list, tuple, str or set: {data}')
         if type(data) == str:
             data = data.split(',')
-
-        if strip:
-            return set([item.strip() for item in data if item.strip() != ''])
-        else:
-            return set([item for item in data if item.strip() != ''])
-
+        return [item.strip() for item in data if item.strip() != '']
 
 class UniqueName(String):
 
@@ -537,9 +698,9 @@ class SingleChoice(String):
         self.values = list(self.choices.keys())
         self.radio_field = radio_field
 
-    def validate(self, data):
+    def validation_hook(self, data):
         if str(data) in self.values:
-            return data
+            return str(data)
         else:
             raise InventoryValidationError(
                 f"Wrong value provided for {self.predicate}: {data}. Value has to be one of {', '.join(self.values)}")
@@ -570,19 +731,18 @@ class MultipleChoice(SingleChoice):
 
     dgraph_predicate_type = '[string]'
 
-    def validate(self, data):
+    def validation_hook(self, data):
         if isinstance(data, str):
             data = data.split(',')
         if not isinstance(data, list):
             raise InventoryValidationError(
                 f'Error in <{self.predicate}>! Provided data cannot be coerced to "list": {data}')
         for val in data:
-            val = val.strip()
-            if val not in self.values:
+            if val.strip() not in self.values:
                 raise InventoryValidationError(
                     f"Wrong value provided for {self.predicate}: {val}. Value has to be one of {', '.join(self.values)}")
 
-        return [val.strip() for val in data]
+        return data
 
     @property
     def wtf_field(self) -> Union[SelectMultipleField, TomSelectMutlitpleField]:
@@ -604,15 +764,19 @@ class DateTime(Predicate):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def validate(self, data):
-        if type(data) in [datetime.date, datetime.datetime]:
+    def validation_hook(self, data):
+        if isinstance(data, (datetime.date, datetime.datetime)):
             return data
-        else:
+        elif isinstance(data, int):
             try:
-                return dateparser.parse(str(data))
+                return datetime.date(year=data, month=1, day=1)
             except:
-                raise InventoryValidationError(
-                    f'Cannot parse provided value to date: {data}')
+                pass
+        try:
+            return dateparser.parse(data)
+        except:
+            raise InventoryValidationError(
+                f'Error in <{self.predicate}> Cannot parse provided value to date: {data}')
 
     @property
     def wtf_field(self) -> Union[DateField, NullableDateField]:
@@ -627,12 +791,12 @@ class DateTime(Predicate):
 
 class Year(DateTime):
 
-    def validate(self, data):
+    def validation_hook(self, data):
         if type(data) in [datetime.date, datetime.datetime]:
             return data
         else:
             try:
-                return datetime.datetime(year=int(data))
+                return datetime.datetime(year=int(data), month=1, day=1)
             except:
                 raise InventoryValidationError(
                     f'Cannot parse provided value to year: {data}')
@@ -653,7 +817,7 @@ class Boolean(Predicate):
 
     dgraph_predicate_type = 'bool'
 
-    def validate(self, data):
+    def validation_hook(self, data):
         if isinstance(data, bool):
             return bool(data)
         elif isinstance(data, str):
@@ -694,40 +858,6 @@ class Geo(Predicate):
             return None
 
 
-class GeoAutoCode(Geo):
-
-    autoinput = 'address_string'
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-    def autocode(self, data) -> Union[GeoScalar, None]:
-        return self.str2geo(data)
-
-
-class AddressAutocode(Geo):
-
-    autoinput = 'name'
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-    def validate(self, data, strip=True):
-        if strip:
-            return str(data).strip()
-        else:
-            return str(data)
-
-    def autocode(self, data: str) -> Union[dict, None]:
-        query_result = self.str2geo(data)
-        geo_result = None
-        if query_result:
-            geo_result = {'address_geo': query_result}
-            address_lookup = reverse_geocode(
-                query_result.lat, query_result.lon)
-            geo_result['address_string'] = address_lookup.get('display_name')
-        return geo_result
-
 
 class SingleRelationship(Predicate):
 
@@ -738,6 +868,7 @@ class SingleRelationship(Predicate):
                  allow_new=True, 
                  autoload_choices=False, 
                  *args, **kwargs) -> None:
+
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
         self.relationship_constraint = relationship_constraint
@@ -750,21 +881,27 @@ class SingleRelationship(Predicate):
 
         super().__init__(*args, **kwargs)
 
-    def validate(self, data, node=None) -> Union[UID, NewID, dict]:
+    def validate(self, data, facets=None) -> Union[UID, NewID, dict]:
+        if data == '':
+            return None
         uid = validate_uid(data)
         if not uid:
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-            return NewID(data)
+            d = {'uid': NewID(data, facets=facets)}
+            if self.relationship_constraint:
+                d.update({'dgraph.type': self.relationship_constraint})
+            return d
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
             if entry_type not in self.relationship_constraint:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
-        return UID(uid)
+        return {'uid': UID(uid, facets=facets)}
 
     def get_choices(self):
+        assert self.relationship_constraint
         
         query_string = '{ '
 
@@ -805,25 +942,16 @@ class ListRelationship(SingleRelationship):
         maybe __init__ needs to overwrite=True
     """
 
-    def validate(self, data, node=None) -> list:
+    def validate(self, data, facets=None) -> list:
         if isinstance(data, str):
             data = data.split(',')
-        data = set([item.strip() for item in data])
+        data = set([item.strip() for item in data if item.strip() != ''])
         uids = []
         for item in data:
-            uid = validate_uid(item)
-            if not uid:
-                if not self.allow_new:
-                    raise InventoryValidationError(
-                        f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-                uids.append(NewID(item))
-            else:
-                if self.relationship_constraint:
-                    entry_type = dgraph.get_dgraphtype(uid)
-                    if entry_type not in self.relationship_constraint:
-                        raise InventoryValidationError(
-                            f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}! uid <{uid}> <dgraph.type> <{entry_type}>')
-                uids.append(UID(uid))
+            uid = super().validate(item, facets=facets)
+            if uid:
+                uids.append(uid)
+
         return uids
 
     @property
@@ -840,36 +968,6 @@ class ListRelationship(SingleRelationship):
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
 
-
-class SourceCountrySelection(ListRelationship):
-
-    """
-        Special field with constraint to only include countries with Scope of OPTED
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-
-        super().__init__(relationship_constraint = ['Multinational', 'Country'], allow_new=False, autoload_choices=True, overwrite=True, *args, **kwargs)
-
-    def get_choices(self):
-
-        query_country = '''country(func: type("Country"), orderasc: name) @filter(eq(opted_scope, true)) { uid unique_name name  }'''
-        query_multinational = '''multinational(func: type("Multinational"), orderasc: name) { uid unique_name name other_names }'''
-
-        query_string = '{ ' + query_country + query_multinational + ' }'
-
-        choices = dgraph.query(query_string=query_string)
-
-        if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
-
-        else:
-            self.choices = {}
-            self.choices_tuples = {}
-            for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
 
 """ Functions for making nquad statements """
 
@@ -892,16 +990,17 @@ def make_nquad(s, p, o) -> str:
 
     nquad_string = f'{s.nquad} {p.nquad} {o.nquad}'
 
-    if hasattr(o, 'facets'):
-        facets = []
-        for key, val in o.facets.items():
-            if type(val) in [datetime.date, datetime.datetime]:
-                facets.append(f'{key}={val.isoformat()}')
-            elif type(val) in [int, float]:
-                facets.append(f'{key}={val}')
-            else:
-                facets.append(f'{key}={_enquote(val)}')
-        nquad_string += f' ({", ".join(facets)})'
+    if hasattr(o, "facets"):
+        if o.facets is not None:
+            facets = []
+            for key, val in o.facets.items():
+                if type(val) in [datetime.date, datetime.datetime]:
+                    facets.append(f'{key}={val.isoformat()}')
+                elif type(val) in [int, float]:
+                    facets.append(f'{key}={val}')
+                else:
+                    facets.append(f'{key}={_enquote(val)}')
+            nquad_string += f' ({", ".join(facets)})'
 
     nquad_string += ' .'
     return nquad_string

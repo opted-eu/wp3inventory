@@ -1,6 +1,6 @@
 from flaskinventory.flaskdgraph import Schema
-from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, ReverseRelationship, Scalar,
-                                        GeoScalar, Variable, make_nquad, dict_to_nquad)
+from flaskinventory.flaskdgraph.dgraph_types import (UID, MutualRelationship, NewID, Predicate, ReverseRelationship, Scalar,
+                                        SingleRelationship, GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
 from flaskinventory.auxiliary import icu_codes
@@ -52,7 +52,11 @@ class Sanitizer:
         self.newsubunits = []
 
         self.entry = {}
+        self.related_entries = []
+        self.facets = {}
+        self.entry_uid = None
         self._parse()
+        self.process_related()
 
     @staticmethod
     def _validate_inputdata(data: dict, user: User, ip: str) -> bool:
@@ -118,7 +122,7 @@ class Sanitizer:
 
     def _add_entry_meta(self, entry, newentry=False):
         # verify that dgraph.type is not added to self if the entry already exists
-        if entry == self.entry and not self.is_upsert:
+        if newentry:
             if entry.get('dgraph.type'):
                 if type(entry['dgraph.type']) != list:
                     entry['dgraph.type'] = [entry['dgraph.type']]
@@ -140,84 +144,26 @@ class Sanitizer:
 
         return entry
 
-    def _geo_query_subunit(self, query):
-        geo_result = geocode(query)
-        if geo_result:
-            dql_string = f'''{{ q(func: eq(country_code, "{geo_result['address']['country_code']}")) @filter(type("Country")) {{ uid }} }}'''
-            dql_result = dgraph.query(dql_string)
-            try:
-                country_uid = dql_result['q'][0]['uid']
-            except Exception:
-                raise InventoryValidationError(
-                    f"Country not found in inventory: {geo_result['address']['country_code']}")
-            geo_data = GeoScalar('Point', [
-                float(geo_result.get('lon')), float(geo_result.get('lat'))])
-
-            name = None
-            other_names = [query]
-            if geo_result['namedetails'].get('name'):
-                other_names.append(geo_result['namedetails'].get('name'))
-                name = geo_result['namedetails'].get('name')
-
-            if geo_result['namedetails'].get('name:en'):
-                other_names.append(geo_result['namedetails'].get('name:en'))
-                name = geo_result['namedetails'].get('name:en')
-
-            other_names = list(set(other_names))
-
-            if not name:
-                name = query
-
-            if name in other_names:
-                other_names.remove(name)
-
-            new_subunit = {'name': name,
-                           'country': UID(country_uid),
-                           'other_names': other_names,
-                           'location_point': geo_data,
-                           'country_code': geo_result['address']['country_code']}
-
-            if geo_result.get('extratags'):
-                if geo_result.get('extratags').get('wikidata'):
-                    if geo_result.get('extratags').get('wikidata').lower().startswith('q'):
-                        try:
-                            new_subunit['wikidataID'] = int(geo_result.get(
-                                'extratags').get('wikidata').lower().replace('q', ''))
-                        except Exception as e:
-                            current_app.logger.debug(
-                                f'Could not parse wikidata ID in subunit: {e}')
-
-            return new_subunit
-        else:
-            return False
-
-    def _resolve_subunit(self, subunit):
-        geo_query = self._geo_query_subunit(subunit)
-        if geo_query:
-            geo_query['dgraph.type'] = ['Subunit']
-            geo_query = self._add_entry_meta(geo_query, newentry=True)
-            geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
-            # prevent duplicates
-            duplicate_check = dgraph.get_uid(
-                'unique_name', geo_query['unique_name'])
-            if duplicate_check:
-                geo_query = {'uid': UID(duplicate_check)}
-            else:
-                geo_query['uid'] = NewID(
-                    f"_:{slugify(secrets.token_urlsafe(8))}")
-                self.newsubunits.append(geo_query)
-
-            return geo_query
-        else:
-            raise InventoryValidationError(
-                f'Invalid Data! Could not resolve geographic subunit {subunit}')
+    def _preprocess_facets(self):
+        # helper function to sieve out facets from the input data
+        # currently only supports single facets
+        for key in self.data.keys():
+            if '|' in key:
+                predicate, facet = key.split('|')
+                self.facets[predicate] = {facet: self.data[key]}
+                
 
     def _parse(self):
         if self.data.get('uid'):
             uid = self.data.pop('uid')
-            validated_uid = self.fields['uid'].validate(uid)
-            self.entry['uid'] = validated_uid
-            self.skip_keys.append(self.fields['uid'].predicate)
+            self.entry_uid = self.fields['uid'].validate(uid)
+        else:
+            self.entry_uid = self.fields['uid'].default
+        
+        self.entry['uid'] = self.entry_uid
+        self.skip_keys.append(self.fields['uid'].predicate)
+
+        self._preprocess_facets()
 
         for item in dir(self):
             if item.startswith('parse_'):
@@ -228,21 +174,57 @@ class Sanitizer:
         for key, item in self.fields.items():
             validated = None
             if key in self.skip_keys: continue
+
+            if key in self.facets.keys():
+                facets = self.facets[key]
+            else:
+                facets = None
             
             if self.data.get(key) and isinstance(item, ReverseRelationship):
-                validated = item.validate(self.data[key], self.entry['uid'])
+                validated = item.validate(self.data[key], self.entry_uid, facets=facets)
+                if isinstance(validated, list):
+                    self.related_entries += validated
+                else:
+                    self.related_entries.append(validated)
+                continue
+            elif self.data.get(key) and isinstance(item, MutualRelationship):
+                node_data, data_node = item.validate(self.data[key], self.entry_uid, facets=facets)
+                self.entry[item.predicate] = node_data
+                if isinstance(data_node, list):
+                    self.related_entries += data_node
+                else:
+                    self.related_entries.append(data_node)
+                continue
+            
+            elif self.data.get(key) and isinstance(item, SingleRelationship):
+                related_items = item.validate(self.data[key], facets=facets)
+                validated = []
+                if isinstance(related_items, list):
+                    for item in related_items:
+                        validated.append(item['uid'])
+                        if isinstance(item['uid'], NewID):
+                            self.related_entries.append(item)
+                        
+                else:
+                    validated = related_items['uid']
+                    if isinstance(related_items['uid'], NewID):
+                        self.related_entries.append(related_items)                
+
             elif self.data.get(key) and hasattr(item, 'validate'):
-                validated = item.validate(self.data[key])  
+                validated = item.validate(self.data[key], facets=facets)  
             elif hasattr(item, 'autocode'):
                 if item.autoinput in self.data.keys():
-                    validated = item.autocode(self.data[item.autoinput])        
-            elif item.default:
+                    validated = item.autocode(self.data[item.autoinput], facets=facets)        
+            elif hasattr(item, 'default'):
                 validated = item.default
+                if hasattr(validated, 'facets') and facets is not None:
+                    validated.update_facets(facets)
+
         
             if validated is None: continue
 
             if type(validated) == dict:
-                    self.entry.update(validated)
+                self.entry.update(validated)
             elif type(validated) == list and key in self.entry.keys():
                 self.entry[key] += validated
             elif type(validated) == set and key in self.entry.keys():
@@ -254,13 +236,16 @@ class Sanitizer:
                 if item.allow_new:
                     print('generate unique name for new item')
 
-        
         if self.is_upsert:
             self.entry = self._add_entry_meta(self.entry)
-            self.overwrite[self.entry['uid']] = [item.predicate for _, item in self.fields.items() if item.overwrite]
+            self.overwrite[self.entry_uid] = [item.predicate for _, item in self.fields.items() if item.overwrite]
         else:
             self.generate_unique_name()
             self.entry = self._add_entry_meta(self.entry, newentry=True)
+
+    def process_related(self):
+        for related in self.related_entries:
+            related = self._add_entry_meta(related, newentry=isinstance(related['uid'], NewID))
 
     def parse_entry_review_status(self):
         if self.data.get('accept'):
@@ -282,7 +267,7 @@ class Sanitizer:
             if self.is_upsert:
                 check = dgraph.get_uid('unique_name', unique_name)
                 if check:
-                    if check != str(self.entry['uid']):
+                    if check != str(self.entry_uid):
                         raise InventoryValidationError(
                             'Unique Name already taken!')
             self.entry['unique_name'] = unique_name
@@ -309,6 +294,7 @@ class Sanitizer:
             wikidata = get_wikidata(self.data.get('name'))
             if wikidata:
                 for key, val in wikidata.items():
+                    if val is None: continue
                     if key not in self.entry.keys():
                         self.entry[key] = val
                     elif key == 'other_names':
@@ -353,6 +339,8 @@ def make_sanitizer(data: dict, dgraph_type, edit=False):
         dgraph_type = dgraph_type.__name__
     
     fields = Schema.get_predicates(dgraph_type)
+    if Schema.get_reverse_predicates(dgraph_type):
+        fields.update(Schema.get_reverse_predicates(dgraph_type))
 
     class S(Sanitizer):
 

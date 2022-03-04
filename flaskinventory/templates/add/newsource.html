@@ -34,7 +34,7 @@
                         <option value="">Select Channel...</option>
                     </select>
             <div id="channel-select-feedback"></div>
-            <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
+            <input type="text" name="channel_unique_name" id="channel-select-hidden" hidden>
         </div>
         <div class="mb-5">
             <div id="group-name" class="form-group mb-4">
@@ -327,7 +327,7 @@
             </label>
             <small id="geographic-scope-multiple-helptext"></small>
             <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
-            <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly hidden>
+            <input id="geographic-scope-countries-hidden" name="country" type="text" class="form-control" readonly hidden>
             <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly hidden>
             <div id="geographic-scope-multiple-feedback"></div>
         </div>
@@ -466,11 +466,11 @@
         <div id="group-audience-size-followers" class="mb-5">
             <label for="audience-size-followers" class="form-label fw-bold fs-5">How many likes does the Facebook page currently have?
                 <span class="text-muted mx-1">(optional)</span>
-                {{ make_tooltip('Usually, we retrieve this information automatically. However, Facebook does not allow us to do this.') }}
+                {{ make_tooltip('Usually, we would retrieve this information automatically. However, Facebook does not allow us to do this.') }}
                 {{ make_researchtip('Just open the Facebook page and check the current count of "likes"') }}
             </label>
             <p class="my-0"><small id="audience-size-followers-helptext"></small></p>
-            <input name="audience_size_followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
+            <input name="audience_size|followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
             <div id="audience-size-followers-feedback"></div>
         </div>
 
@@ -485,7 +485,7 @@
                     Germany: https://www.ivw.eu/print/print') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext"></small></p>
-                <input name="audience_size_subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                <input name="audience_size|subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">
@@ -494,12 +494,12 @@
                     {{ make_tooltip('Use the latest information that is available') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext">(i.e., number of sold copies per issue)</small></p>
-                <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control form-control-lg" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
+                <input name="audience_size" type="number" step="1" min="1900" max="2100" class="form-control form-control-lg" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
                 <div id="audience-size-year-feedback"></div>
             </div>
             <div id="group-audience-size-datafrom" class="mb-5">
                 <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get this number (i.e., number of sold copies per issue) from? Please type the name of the data source or paste a link.<span class="text-muted mx-1">(optional)</span></label>
-                <input name="audience_size_datafrom" type="text" class="form-control form-control-lg" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
+                <input name="audience_size|datafrom" type="text" class="form-control form-control-lg" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
                 <div id="audience-size-datafrom-feedback"></div>
             </div>
             

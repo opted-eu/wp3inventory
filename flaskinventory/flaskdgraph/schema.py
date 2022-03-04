@@ -21,8 +21,8 @@ class Schema:
         print('set name')
 
     def __init_subclass__(cls) -> None:
-        from .dgraph_types import Predicate, ReverseRelationship
-        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), Predicate)}
+        from .dgraph_types import Predicate, ReverseRelationship, MutualRelationship
+        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
         reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), ReverseRelationship)}
         # inherit predicates from parent classes
         for parent in cls.__bases__:
@@ -35,15 +35,12 @@ class Schema:
         Schema.__reverse_predicates[cls.__name__] = reverse_predicates
         for key in cls.__dict__.keys():
             attribute = getattr(cls, key)
-            if isinstance(attribute, Predicate):
+            if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
                 if key not in cls.__predicates.keys():
                     cls.__predicates.update({key: [cls.__name__]})
                 else:
                     cls.__predicates[key].append(cls.__name__)
-            elif isinstance(attribute, ReverseRelationship):
-                # resolve this order!
-                setattr(attribute, 'relationship_constraint', cls.__predicates[attribute._target_predicate])
 
     @classmethod
     def get_types(cls):
