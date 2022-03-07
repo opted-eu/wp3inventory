@@ -22,6 +22,7 @@ import secrets
 import copy
 import unittest
 from datetime import datetime
+from pprint import pprint
 
 class Config:
     TESTING = True
@@ -57,7 +58,7 @@ class TestSanitizers(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.app = create_app(config_class=Config)
+        cls.app = create_app(config_json="test_config.json")
         cls.client = cls.app.test_client()
 
         with cls.app.app_context():
@@ -71,6 +72,13 @@ class TestSanitizers(unittest.TestCase):
             cls.austria_uid = dgraph.get_uid('unique_name', 'austria')
             cls.germany_uid = dgraph.get_uid('unique_name', 'germany')
             cls.country_choices = get_country_choices()
+            cls.channel_website = dgraph.get_uid('unique_name', 'website')
+            cls.channel_twitter = dgraph.get_uid('unique_name', 'twitter')
+            cls.channel_instagram = dgraph.get_uid('unique_name', 'instagram')
+            cls.channel_vkontakte = dgraph.get_uid('unique_name', 'vkontakte')
+            cls.channel_telegram = dgraph.get_uid('unique_name', 'telegram')
+            cls.channel_transcript = dgraph.get_uid('unique_name', 'transcript')
+            cls.channel_print = dgraph.get_uid('unique_name', 'print')
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -148,13 +156,13 @@ class TestSanitizers(unittest.TestCase):
                 sanitizer = Sanitizer(self.mock_data1)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(list(sanitizer.entry.keys()), self.mock1_solution_keys)
-                self.assertEqual(type(sanitizer.entry['other_names']), set)
+                self.assertEqual(type(sanitizer.entry['other_names']), list)
                 self.assertGreater(len(sanitizer.entry['other_names']), 2)
             
                 sanitizer = Sanitizer(self.mock_data2)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(list(sanitizer.entry.keys()), self.mock2_solution_keys)
-                self.assertEqual(type(sanitizer.entry['other_names']), set)
+                self.assertEqual(type(sanitizer.entry['other_names']), list)
                 self.assertEqual(len(sanitizer.entry['other_names']), 2)
             
                 self.assertRaises(TypeError, Sanitizer, [1, 2, 3])
@@ -206,18 +214,18 @@ class TestSanitizers(unittest.TestCase):
             self.assertEqual(current_user.user_displayname, 'Contributor')
 
             with self.app.app_context():
-                sanitizer = make_sanitizer(self.mock_organization, Organization)
+                sanitizer = Sanitizer(self.mock_organization, dgraph_type=Organization)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(sanitizer.entry['dgraph.type'], ['Entry', 'Organization'])
                 self.assertEqual(sanitizer.entry['entry_review_status'], 'pending')
                 self.assertIsNotNone(sanitizer.set_nquads)
                 self.assertIsNone(sanitizer.delete_nquads)
-                self.assertEqual(sanitizer.entry['wikidataID'], 66048) # WikiDataID for Deutsche Bank
+                self.assertEqual(str(sanitizer.entry['wikidataID']), '66048') # WikiDataID for Deutsche Bank
                 self.assertIn('employees', sanitizer.entry.keys())
                 
                 mock_org = copy.deepcopy(self.mock_organization)
                 mock_org.pop('address_string')
-                sanitizer = make_sanitizer(self.mock_organization, Organization)
+                sanitizer = Sanitizer(self.mock_organization, dgraph_type=Organization)
                 self.assertEqual(sanitizer.is_upsert, False)
                 self.assertCountEqual(sanitizer.entry['dgraph.type'], ['Entry', 'Organization'])
                 self.assertEqual(sanitizer.entry['entry_review_status'], 'pending')
@@ -249,7 +257,7 @@ class TestSanitizers(unittest.TestCase):
 
             with self.app.app_context():
                 sanitizer = make_sanitizer(mock_org_edit, Organization, edit=True)
-                self.assertEqual(type(sanitizer.entry['founded']), datetime)
+                # self.assertEqual(type(sanitizer.entry['founded']), datetime)
                 self.assertCountEqual(sanitizer.overwrite[sanitizer.entry['uid']], overwrite_keys)
                 self.assertEqual(len(sanitizer.entry['publishes']), 5)
 
@@ -259,9 +267,127 @@ class TestSanitizers(unittest.TestCase):
                 mock_org_edit['founded'] = '2010'
                 sanitizer = make_sanitizer(mock_org_edit, Organization, edit=True)
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
-                self.assertEqual(type(sanitizer.entry['founded']), datetime)
+                # self.assertEqual(type(sanitizer.entry['founded']), datetime)
 
     def test_new_source(self):
+
+        mock_website = {
+                            "channel_unique_name": "website",
+                            "channel": self.channel_website,
+                            "name": "https://www.tagesschau.de/",
+                            "other_names": "Tagesschau,Tagesthemen",
+                            "website_allows_comments": "no",
+                            "founded": "2000",
+                            "publication_kind": "tv show",
+                            "special_interest": "yes",
+                            "topical_focus": "politics",
+                            "publication_cycle": "multiple times per week",
+                            "publication_cycle_weekday": ["1", "2", "3", "4", "5"],
+                            "geographic_scope": "national",
+                            "country": self.germany_uid,
+                            "languages": "de",
+                            "payment_model": "free",
+                            "contains_ads": "no",
+                            "publishes_org": [
+                                "ARD",
+                                self.derstandard_mbh_uid
+                            ],
+                            "publishes_person": "Caren Miosga",
+                            "entry_notes": "Some notes",
+                            "party_affiliated": "no",
+                            "related": [
+                                "https://twitter.com/tagesschau",
+                                "https://instagram.com/tagesschau",
+                            ],
+                            "newsource_https://twitter.com/tagesschau": f"{self.channel_twitter}",
+                            "newsource_https://instagram.com/tagesschau": f"{self.channel_instagram}",
+                        }
+
+        mock_twitter = {
+                        "channel": self.channel_twitter,
+                        "name": "tagesschau",
+                        "other_names": "Tagesschau,Tagesthemen",
+                        "publication_kind": "tv show",
+                        "special_interest": "yes",
+                        "topical_focus": "politics",
+                        "publication_cycle": "continuous",
+                        "geographic_scope": "national",
+                        "country": self.germany_uid,
+                        "languages": "de",
+                        "payment_model": "free",
+                        "contains_ads": "no",
+                        "publishes_org": [
+                            "ARD",
+                            self.derstandard_mbh_uid
+                        ],
+                        "publishes_person": "Caren Miosga",
+                        "entry_notes": "Some notes",
+                        "party_affiliated": "no",
+                        }
+
+        mock_instagram = {
+                        "channel": self.channel_instagram,
+                        "name": "tagesschau",
+                        "other_names": "Tagesschau,Tagesthemen",
+                        "publication_kind": "tv show",
+                        "special_interest": "yes",
+                        "topical_focus": "politics",
+                        "publication_cycle": "continuous",
+                        "geographic_scope": "national",
+                        "country": self.germany_uid,
+                        "languages": "de",
+                        "payment_model": "free",
+                        "contains_ads": "no",
+                        "publishes_org": [
+                            "ARD",
+                            self.derstandard_mbh_uid
+                        ],
+                        "publishes_person": "Caren Miosga",
+                        "entry_notes": "Some notes",
+                        "party_affiliated": "no",
+                        "related_sources": [
+                            "https://twitter.com/tagesschau",
+                        ]
+                        }
+
+        mock_telegram = {
+                        "channel": self.channel_telegram,
+                        "name": "ARD_tagesschau_bot",
+                        "other_names": "Tagesschau,Tagesthemen",
+                        "publication_kind": "tv show",
+                        "special_interest": "yes",
+                        "topical_focus": "politics",
+                        "publication_cycle": "continuous",
+                        "geographic_scope": "national",
+                        "country": self.germany_uid,
+                        "languages": "de",
+                        "payment_model": "free",
+                        "contains_ads": "no",
+                        "publishes_org": [
+                            "ARD",
+                            self.derstandard_mbh_uid
+                        ],
+                        "publishes_person": "Caren Miosga",
+                        "entry_notes": "Some notes",
+                        "party_affiliated": "no",
+                        "related_sources": [
+                            "https://twitter.com/tagesschau",
+                        ]
+                        }
+        
+        mock_vk = {
+                        "channel": self.channel_vkontakte,
+                        "name": "anonymousnews_org",
+                        "publication_kind": "alternative media",
+                        "publication_cycle": "continuous",
+                        "geographic_scope": "multinational",
+                        "country": [self.germany_uid, self.austria_uid],
+                        "languages": "de",
+                        "payment_model": "free",
+                        "contains_ads": "no",
+                        "entry_notes": "Some notes",
+                        }
+
         with self.client:
             response = self.client.post('/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
             self.assertEqual(current_user.user_displayname, 'Contributor')
@@ -269,8 +395,16 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 Source.country.get_choices()
                 Organization.country.get_choices()
-                Source.published_by
-                print(dir(Source.generate_new_entry_form()))
+                Source.publishes_org
+                sanitizer = Sanitizer(mock_website, dgraph_type=Source)
+                pprint(sanitizer.entry)
+                pprint(sanitizer.related_entries)
+                # sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+                # sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+                # sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
+                # pprint(sanitizer.entry)
 
 
 if __name__ == "__main__":
