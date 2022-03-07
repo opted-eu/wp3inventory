@@ -48,13 +48,13 @@ class Schema:
 
     @classmethod
     def get_predicates(cls, _cls):
-        if isinstance(_cls, Schema):
+        if not isinstance(_cls, str):
             _cls = _cls.__name__
         return cls.__types[_cls]
 
     @classmethod
     def get_reverse_predicates(cls, _cls):
-        if isinstance(_cls, Schema):
+        if not isinstance(_cls, str):
             _cls = _cls.__name__
         if _cls in cls.__reverse_predicates.keys():
             return cls.__reverse_predicates[_cls]

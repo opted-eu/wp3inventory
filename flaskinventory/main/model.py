@@ -396,10 +396,30 @@ class Source(Entry):
                   required=True,
                   description='What is the name of the news source?',
                   render_kw={'placeholder': "e.g. 'The Royal Gazette'"})
+
+    channel_url = String(label='URL of Channel',
+                         description="What is the url of the website that provides tv, radio, or podcast scripts?")
     
     other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
                              render_kw={'placeholder': 'Separate by comma'}, 
                              overwrite=True)
+    
+    transcript_kind = SingleChoice(description="What kind of show is transcribed?",
+                                    choices={'tv':  "TV (broadcast, cable, satellite, etc)",
+                                             'radio': "Radio",
+                                             "podcast": "Podcast",
+                                             "NA": "Don't know / NA"})
+
+    website_allows_comments = SingleChoice(description='Does the online news source have user comments below individual news articles?',
+                                           choices={'yes': 'Yes',
+                                                    'no': 'No',
+                                                    'NA': "Don't know / NA"})
+
+    website_comments_registration_required = SingleChoice(label="Registraion required for posting comments",
+                                                          description='Is a registration or an account required to leave comments?',
+                                                          choices={'yes': 'Yes',
+                                                                    'no': 'No',
+                                                                    'NA': "Don't know / NA"})
 
     founded = Year(description="What year was the print news source founded?")
 
@@ -441,13 +461,13 @@ class Source(Entry):
                                                  required=True)
 
     publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s)",
-                                                choices={1: 'Monday', 
-                                                        2: 'Tuesday', 
-                                                        3: 'Wednesday', 
-                                                        4: 'Thursday', 
-                                                        5: 'Friday', 
-                                                        6: 'Saturday', 
-                                                        7: 'Sunday', 
+                                                choices={"1": 'Monday', 
+                                                        "2": 'Tuesday', 
+                                                        "3": 'Wednesday', 
+                                                        "4": 'Thursday', 
+                                                        "5": 'Friday', 
+                                                        "6": 'Saturday', 
+                                                        "7": 'Sunday', 
                                                         'NA': "Don't Know / NA"},
                                                 tom_select=True)
 
@@ -473,7 +493,7 @@ class Source(Entry):
                                 tom_select=True)
 
     payment_model = SingleChoice(description="Is the content produced by the news source accessible free of charge?",
-                                    choices={'free': 'Free, all content is free of charge', 
+                                    choices={'free': 'All content is free of charge', 
                                             'partly free': 'Some content is free of charge', 
                                             'not free': 'No content is free of charge', 
                                             'NA': "Don't Know / NA"},
@@ -498,10 +518,27 @@ class Source(Entry):
                                        label='Published by person',
                                        default_predicates={'is_person': True})
 
+    channel_epaper = SingleChoice(description='Does the print news source have an e-paper version?',
+                                    choices={'yes': 'Yes',
+                                            'no': 'No',
+                                            'NA': "Don't know / NA"})
+
     archive_sources_included = ReverseListRelationship('sources_included', 
                                                     allow_new=False, 
                                                     relationship_constraint='Archive',
-                                                    label='News source included in these resources')
+                                                    description="Are texts from the news source available for download in one or several of the following data archives?",
+                                                    label='News source included in these archives')
+    
+    dataset_sources_included = ReverseListRelationship('sources_included', 
+                                                    allow_new=False, 
+                                                    relationship_constraint='Dataset',
+                                                    description="Is the news source included in one or several of the following annotated media text data sets?",
+                                                    label='News source included in these datasets')
+
+    party_affiliated = SingleChoice(description='Is the news source close to a political party?',
+                                    choices={'yes': 'Yes',
+                                            'no': 'No',
+                                            'NA': "Don't know / NA"})
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
 

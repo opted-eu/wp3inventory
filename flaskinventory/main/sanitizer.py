@@ -5,14 +5,14 @@ from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.add.external import (geocode, instagram,
-                                         parse_meta, siterankdata, find_sitemaps, find_feeds,
-                                         build_url, twitter, facebook, get_wikidata)
+                                         parse_meta, reverse_geocode, siterankdata, find_sitemaps, find_feeds,
+                                         build_url, twitter, facebook, get_wikidata, telegram, vkontakte)
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User
 from flaskinventory import dgraph
 from flask import current_app
 
-from flaskinventory.main.model import Entry, Organization
+from flaskinventory.main.model import Entry, Organization, Source
 from flaskinventory.misc import get_ip
 from flask_login import current_user
 
@@ -34,12 +34,17 @@ class Sanitizer:
 
     upsert_query = None
 
-    def __init__(self, data: dict, fields: dict = None, **kwargs):
+    def __init__(self, data: dict, fields: dict = None, dgraph_type=Entry, entry_review_status=None, **kwargs):
 
         self.user = current_user
         self.user_ip = get_ip()
         self._validate_inputdata(data, self.user, self.user_ip)
-        self.fields = fields or Entry.predicates()
+        if not isinstance(dgraph_type, str):
+            dgraph_type = dgraph_type.__name__
+        self.dgraph_type = dgraph_type
+        self.fields = fields or Schema.get_predicates(dgraph_type)
+        if Schema.get_reverse_predicates(dgraph_type):
+            self.fields.update(Schema.get_reverse_predicates(dgraph_type))
 
         if self.user.user_role < USER_ROLES.Contributor:
             raise InventoryPermissionError
@@ -47,6 +52,7 @@ class Sanitizer:
         self.data = data
 
         self.is_upsert = kwargs.get('is_upsert', False)
+        self.entry_review_status = entry_review_status
         self.skip_keys = kwargs.get('skip_keys', [])
         self.overwrite = {}
         self.newsubunits = []
@@ -57,6 +63,11 @@ class Sanitizer:
         self.entry_uid = None
         self._parse()
         self.process_related()
+        if not self.is_upsert:
+            self.entry['dgraph.type'].append(self.dgraph_type)
+        if self.dgraph_type == 'Source':
+            if not self.is_upsert or self.entry_review_status == 'draft':
+                self.process_source()
 
     @staticmethod
     def _validate_inputdata(data: dict, user: User, ip: str) -> bool:
@@ -85,8 +96,10 @@ class Sanitizer:
             if check.get('entry_added').get('uid') != current_user.id:
                 raise InventoryPermissionError(
                     'You do not have the required permissions to edit this entry!')
-
-        return cls(data, is_upsert=True, **kwargs)
+        
+        entry_review_status = check.get('entry_review_status')
+            
+        return cls(data, is_upsert=True, entry_review_status=entry_review_status, **kwargs)
 
     @property
     def set_nquads(self):
@@ -319,6 +332,223 @@ class Sanitizer:
             self.entry['unique_name'] = name
         else:
             self.entry['unique_name'] = f'{name}_{secrets.token_urlsafe(4)}'
+
+    def process_source(self):
+        """
+            Special processing step for new Sources
+            We grab some additional data from various APIs
+            And also make sure that _new_ related sources inherit fields
+        """
+
+        channel = dgraph.get_unique_name(self.entry['channel'].query)
+        if channel == 'website':
+            self.resolve_website()
+            self.fetch_siterankdata()
+            self.fetch_feeds()
+        elif channel == 'instagram':
+            self.fetch_instagram()
+        elif channel == 'twitter':
+            self.fetch_twitter()
+        elif channel == 'vk':
+            self.fetch_vk()
+        elif channel == 'telegram':
+            self.fetch_telegram()
+        
+        # inherit from main source
+        for source in self.related_entries:
+            if isinstance(source['uid'], NewID):
+                if 'Source' in source['dgraph.type']:
+                    source['entry_review_status'] = 'draft'
+                    source['publication_kind'] = self.entry.get('publication_kind')
+                    source['special_interest'] = self.entry.get('special_interest')
+                    source['topical_focus'] = self.entry.get('topical_focus')
+                    source['special_interest'] = self.entry.get('special_interest')
+                    source['geographic_scope'] = self.entry.get('geographic_scope')
+                    source['country'] = self.entry.get('country')
+                    source['geographic_scope_subunit'] = self.entry.get('geographic_scope_subunit')
+                    source['languages'] = self.entry.get('languages')
+                    source['party_affiliated'] = self.entry.get('party_affiliated')
+                    if not isinstance(source['related'], list):
+                        source['related'] = [source['related']]
+                    source['related'] += self.entry['related']
+
+                    rel_channel = self.data.get('newsource_' + source['name'])
+                    if rel_channel:
+                        if dgraph.get_dgraphtype(rel_channel) == 'Channel':
+                            source['channel'] = UID(rel_channel)
+
+
+
+    def resolve_website(self):
+        # first check if website exists
+        entry_name = str(self.entry['name'])
+        try:
+            urls, names = parse_meta(entry_name)
+        except:
+            raise InventoryValidationError(
+                f"Could not resolve website! URL provided does not exist: {self.data.get('name')}")
+
+        if urls == False:
+            raise InventoryValidationError(
+                f"Could not resolve website! URL provided does not exist: {self.data.get('name')}")
+
+        # clean up the display name of the website
+        entry_name = entry_name.replace(
+            'http://', '').replace('https://', '').lower()
+        
+        if entry_name.endswith('/'):
+            entry_name = entry_name[:-1]
+
+        # append automatically retrieved names to other_names
+        if len(names) > 0:
+            if 'other_names' not in self.entry.keys():
+                self.entry['other_names'] = []
+            for name in names:
+                if name.strip() == '':
+                    continue
+                if name not in self.entry['other_names']:
+                    self.entry['other_names'].append(name.strip())
+
+        if len(urls) > 0:
+            if 'other_names' not in self.entry.keys():
+                self.entry['other_names'] = []
+            for url in urls:
+                if url.strip() == '':
+                    continue
+                if url not in self.entry['other_names']:
+                    self.entry['other_names'].append(url.strip())
+        
+        self.entry['name'] = Scalar(entry_name)
+        self.entry['channel_url'] = build_url(
+            self.data['name'])
+
+    def fetch_siterankdata(self):
+        try:
+            daily_visitors = siterankdata(self.entry['name'])
+        except Exception as e:
+            current_app.logger.warning(f'Could not fetch siterankdata for {self.entry["name"]}! Exception: {e}')
+            daily_visitors = None
+
+        if daily_visitors:
+            self.entry['audience_size'] = Scalar(datetime.date.today(), facets={
+                'daily_visitors': daily_visitors,
+                'data_from': f"https://siterankdata.com/{str(self.entry['name']).replace('www.', '')}"})
+
+    def fetch_feeds(self):
+        self.entry['channel_feeds'] = []
+        sitemaps = find_sitemaps(self.entry['name'])
+        if len(sitemaps) > 0:
+            for sitemap in sitemaps:
+                self.entry['channel_feeds'].append(
+                    Scalar(sitemap, facets={'kind': 'sitemap'}))
+
+        feeds = find_feeds(self.entry['name'])
+
+        if len(feeds) > 0:
+            for feed in feeds:
+                self.entry['channel_feeds'].append(
+                    Scalar(feed, facets={'kind': 'rss'}))
+
+    def fetch_instagram(self):
+        profile = instagram(self.data['name'].replace('@', ''))
+        if profile:
+            self.entry['name'] = self.data[
+                'name'].lower().replace('@', '')
+            self.entry['channel_url'] = self.data[
+                'name'].lower().replace('@', '')
+        else:
+            raise InventoryValidationError(
+                f"Instagram profile not found: {self.data['name']}")
+
+        if profile.get('fullname'):
+            self.entry['other_names'].append(profile['fullname'])
+        if profile.get('followers'):
+            facets = {'followers': int(
+                profile['followers'])}
+            self.entry['audience_size'] = Scalar(
+                str(datetime.date.today()), facets=facets)
+        self.entry['verified_account'] = profile['verified']
+
+    def fetch_twitter(self):
+        self.entry['channel_url'] = self.data['name'].replace('@', '')
+        try:
+            profile = twitter(self.data['name'].replace('@', ''))
+        except Exception as e:
+            raise InventoryValidationError(
+                f"Twitter profile not found: {self.data['name']}. {e}")
+
+        self.entry['name'] = self.data[
+            'name'].lower().replace('@', '')
+
+        if profile.get('fullname'):
+            self.entry['other_names'].append(profile['fullname'])
+        if profile.get('followers'):
+            facets = {'followers': int(
+                profile['followers'])}
+            self.entry['audience_size'] = Scalar(
+                str(datetime.date.today()), facets=facets)
+        if profile.get('joined'):
+            self.entry['founded'] = profile.get('joined').isoformat()
+        self.entry['verified_account'] = profile.get('verified')
+
+    def fetch_vk(self):
+        self.entry['channel_url'] = self.data[
+            'name'].replace('@', '')
+        try:
+            profile = vkontakte(self.data['name'].replace('@', ''))
+        except Exception as e:
+            raise InventoryValidationError(
+                f"VKontakte profile not found: {self.data['name']}. {e}")
+
+        self.entry['name'] = self.data[
+            'name'].lower().replace('@', '')
+
+        if profile.get('fullname'):
+            self.entry['other_names'].append(profile['fullname'])
+        if profile.get('followers'):
+            facets = {'followers': int(
+                profile['followers'])}
+            self.entry['audience_size'] = Scalar(
+                str(datetime.date.today()), facets=facets)
+        self.entry['verified_account'] = profile.get('verified')
+        if profile.get('description'):
+            self.entry['description'] = profile.get('description')
+
+    def fetch_telegram(self):
+        self.entry['channel_url'] = self.data[
+            'name'].replace('@', '')
+        try:
+            profile = telegram(self.data['name'].replace('@', ''))
+        except Exception as e:
+            current_app.logger.error(
+                f'Telegram could not be resolved. username: {self.data["name"]}. Exception: {e}')
+            raise InventoryValidationError(
+                f"""Telegram user or channel not found: {self.data['name']}. 
+                    Please check whether you typed the username correctly. 
+                    If the issue persists, please contact us and we will look into this issue.""")
+
+        if profile == False:
+            raise InventoryValidationError(
+                f"""Telegram user or channel not found: {self.data['name']}. 
+                    Please check whether you typed the username correctly. 
+                    If the issue persists, please contact us and we will look into this issue.""")
+
+        self.entry['name'] = self.data[
+            'name'].lower().replace('@', '')
+
+        if profile.get('fullname'):
+            self.entry['other_names'].append(profile['fullname'])
+        if profile.get('followers'):
+            facets = {'followers': int(
+                profile['followers'])}
+            self.entry['audience_size'] = Scalar(
+                str(datetime.date.today()), facets=facets)
+        self.entry['verified_account'] = profile.get('verified')
+        if profile.get('telegram_id'):
+            self.entry['channel_url'] = profile.get('telegram_id')
+        if profile.get('joined'):
+            self.entry['founded'] = profile.get('joined')
+
 
 
 class OrganizationSanitizer(Sanitizer):

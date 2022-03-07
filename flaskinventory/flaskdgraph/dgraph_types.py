@@ -265,7 +265,9 @@ class Scalar:
         self.facets = facets
 
     def __str__(self) -> str:
-        return f'{self.value}'
+        if self.value != '*':
+            return json.loads(self.value)
+        else: return self.value
 
     def __repr__(self) -> str:
         if self.facets:
@@ -542,7 +544,7 @@ class MutualRelationship:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
             node_data = NewID(data, facets=facets)
-            data_node = {'uid': node_data, self.predicate: node}
+            data_node = {'uid': node_data, self.predicate: node, 'name': data}
             if self.relationship_constraint:
                 data_node.update({'dgraph.type': self.relationship_constraint})
             return node_data, data_node

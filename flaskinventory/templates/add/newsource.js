@@ -276,8 +276,6 @@ if (document.querySelector('#publication-cycle')) {
                 let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
                 weekday.forEach((el) => {
                     el.setAttribute('type', 'radio')
-                    el.setAttribute('name', 'publication_cycle_weekday')
-                    el.setAttribute('value', el.id.replace('publication-cycle-weekday-', ''))
                     el.disabled = false
                     el.checked = false
                 });
@@ -287,8 +285,6 @@ if (document.querySelector('#publication-cycle')) {
                 let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
                 weekday.forEach((el) => {
                     el.setAttribute('type', 'checkbox')
-                    el.setAttribute('name', 'publication_cycle_weekday_' + el.id.replace('publication-cycle-weekday-', ''))
-                    el.setAttribute('value', 'yes')
                     el.disabled = false
                     el.checked = false
                 });
@@ -1043,14 +1039,11 @@ ready(() => {
                     if (option.getAttribute('data-value') == 'new') {
                         option.remove()
                     }
-                    // this is a lazy way of getting two bits of data into one field
-                    // we have to split this later at the comma to get the unique_name and uid
                     if (option.value) {
                         if (option.value == guessedChannel) {
                             select.value = guessedChannel
                         }
-                        option.setAttribute('data-channel-name', option.value)
-                        option.value = option.value + ',' + option.getAttribute('data-value')
+
                     }
                 }
 
