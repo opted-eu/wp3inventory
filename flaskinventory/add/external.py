@@ -187,7 +187,7 @@ def parse_meta(url):
 
     try:
         r = requests.get(site, headers=headers)
-    except requests.exceptions.SSLError:
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError):
         r = requests.get(site.replace('https', 'http'))
 
     if not r.ok:
