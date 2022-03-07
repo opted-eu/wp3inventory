@@ -42,6 +42,8 @@ def quicksearch():
             }}
         '''
     result = dgraph.query(query_string, variables={'$name': query})
+    if 'Entry' in result['type']:
+        result['type'].remove('Entry')
     result['status'] = True
     return jsonify(result)
 
