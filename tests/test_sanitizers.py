@@ -397,8 +397,10 @@ class TestSanitizers(unittest.TestCase):
                 Organization.country.get_choices()
                 Source.publishes_org
                 sanitizer = Sanitizer(mock_website, dgraph_type=Source)
-                pprint(sanitizer.entry)
-                pprint(sanitizer.related_entries)
+                # pprint(sanitizer.entry)
+                # pprint(sanitizer.related_entries)
+                print(sanitizer.set_nquads)
+                sanitizer.delete_nquads
                 # sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
                 # pprint(sanitizer.entry)
                 # sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)

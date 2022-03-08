@@ -43,8 +43,9 @@ class Sanitizer:
             dgraph_type = dgraph_type.__name__
         self.dgraph_type = dgraph_type
         self.fields = fields or Schema.get_predicates(dgraph_type)
-        if Schema.get_reverse_predicates(dgraph_type):
-            self.fields.update(Schema.get_reverse_predicates(dgraph_type))
+        if self.dgraph_type and fields is None:
+            if Schema.get_reverse_predicates(dgraph_type):
+                self.fields.update(Schema.get_reverse_predicates(dgraph_type))
 
         if self.user.user_role < USER_ROLES.Contributor:
             raise InventoryPermissionError
@@ -52,8 +53,8 @@ class Sanitizer:
         self.data = data
 
         self.is_upsert = kwargs.get('is_upsert', False)
-        self.entry_review_status = entry_review_status
         self.skip_keys = kwargs.get('skip_keys', [])
+        self.entry_review_status = entry_review_status
         self.overwrite = {}
         self.newsubunits = []
 
@@ -61,10 +62,10 @@ class Sanitizer:
         self.related_entries = []
         self.facets = {}
         self.entry_uid = None
+        if not self.is_upsert:
+            self.entry['dgraph.type'] = [self.dgraph_type]
         self._parse()
         self.process_related()
-        if not self.is_upsert:
-            self.entry['dgraph.type'].append(self.dgraph_type)
         if self.dgraph_type == 'Source':
             if not self.is_upsert or self.entry_review_status == 'draft':
                 self.process_source()
@@ -80,7 +81,7 @@ class Sanitizer:
         return True
 
     @classmethod
-    def edit(cls, data: dict, **kwargs):
+    def edit(cls, data: dict, fields=None, dgraph_type=Entry, **kwargs):
         cls._validate_inputdata(data, current_user, get_ip())
 
         if 'uid' not in data.keys():
@@ -98,12 +99,25 @@ class Sanitizer:
                     'You do not have the required permissions to edit this entry!')
         
         entry_review_status = check.get('entry_review_status')
+
+        edit_fields = fields or Schema.get_predicates(dgraph_type)
+        if dgraph_type and fields is None:
+            if Schema.get_reverse_predicates(dgraph_type):
+                edit_fields.update(Schema.get_reverse_predicates(dgraph_type))
+
+        edit_fields = {key: field for key, field in edit_fields.items() if field.edit}
             
-        return cls(data, is_upsert=True, entry_review_status=entry_review_status, **kwargs)
+        return cls(data, is_upsert=True, entry_review_status=entry_review_status, fields=edit_fields, **kwargs)
 
     @property
     def set_nquads(self):
         nquads = dict_to_nquad(self.entry)
+        # print('Entry NQuads')
+        # print(nquads)
+        # print('Related NQuads')
+        for related in self.related_entries:
+            nquads += dict_to_nquad(related)
+        # nquads += [dict_to_nquad(related) for related in self.related_entries]
         return " \n".join(nquads)
 
     @property
@@ -121,6 +135,72 @@ class Sanitizer:
             return " \n".join(nquads)
 
         return None
+
+
+    @property
+    def upsert_query(self):
+        return None
+        # # for upserts, we first have to delete all list type predicates
+        # # otherwise, the user cannot remove relationships, but just add to them
+        # del_obj = []
+        # del_obj.append({
+        #     'uid': self.entry_uid,
+        #     'geographic_scope_subunit': '*'})
+
+        # del_obj.append({
+        #     'uid': self.entry_uid,
+        #     'country': '*'})
+
+        # # delete publication_kind, languages
+        # del_obj.append({
+        #     'uid': self.newsource['uid'],
+        #     'publication_kind': '*'})
+
+        # del_obj.append({
+        #     'uid': self.newsource['uid'],
+        #     'languages': '*'})
+
+        # # delete all "Organization" <publishes> "Upserted Source"
+        # orgs = Variable('orgs', 'uid')
+        # self.upsert_query += f""" q_organizations(func: type(Organization)) 
+        #                     @filter(uid_in(publishes, {self.newsource['uid']})) 
+        #                     {{ {orgs.query()} }} """
+        # del_obj.append({
+        #     'uid': orgs,
+        #     'publishes': self.newsource['uid']})
+
+        # # delete all "Archive" <includes> "Upserted Source"
+        # archives = Variable('archives', 'uid')
+        # self.upsert_query += f""" q_archives(func: type(Archive)) 
+        #                     @filter(uid_in(sources_included, {self.newsource['uid']})) 
+        #                     {{ {archives.query()} }} """
+        # del_obj.append({
+        #     'uid': archives,
+        #     'sources_included': self.newsource['uid']})
+
+        # # delete all "Dataset" <includes> "Upserted Source"
+        # datasets = Variable('datasets', 'uid')
+        # self.upsert_query += f""" q_datasets(func: type(Dataset)) 
+        #                     @filter(uid_in(sources_included, {self.newsource['uid']})) 
+        #                     {{ {datasets.query()} }} """
+        # del_obj.append({
+        #     'uid': datasets,
+        #     'sources_included': self.newsource['uid']})
+        # # delete all related
+        # related = Variable('related', 'uid')
+        # self.upsert_query += f""" q_related(func: type(Source)) 
+        #                     @filter(uid_in(related, {self.newsource['uid']})) 
+        #                     {{ {related.query()} }} """
+        # del_obj.append({
+        #     'uid': related,
+        #     'related': self.newsource['uid']
+        # })
+        # del_obj.append({
+        #     'uid': self.newsource['uid'],
+        #     'related': '*'
+        # })
+        # nquads = [" \n ".join(dict_to_nquad(obj)) for obj in del_obj]
+        # return " \n ".join(nquads)
 
     @staticmethod
     def _check_entry(uid):
@@ -144,9 +224,12 @@ class Sanitizer:
             else:
                 entry['dgraph.type'] = ["Entry"]
 
+            entry['unique_name'] = self.generate_unique_name(entry)
+
         facets = {'timestamp': datetime.datetime.now(
             datetime.timezone.utc),
             'ip': self.user_ip}
+
         if not newentry:
             entry['entry_edit_history'] = UID(self.user.uid, facets=facets)
         else:
@@ -251,14 +334,15 @@ class Sanitizer:
 
         if self.is_upsert:
             self.entry = self._add_entry_meta(self.entry)
-            self.overwrite[self.entry_uid] = [item.predicate for _, item in self.fields.items() if item.overwrite]
+            self.overwrite[self.entry_uid] = [item.predicate for k, item in self.fields.items() if item.overwrite and k in self.data.keys()]
         else:
-            self.generate_unique_name()
             self.entry = self._add_entry_meta(self.entry, newentry=True)
+            self.entry['unique_name'] = self.generate_unique_name(self.entry)
 
     def process_related(self):
         for related in self.related_entries:
             related = self._add_entry_meta(related, newentry=isinstance(related['uid'], NewID))
+            
 
     def parse_entry_review_status(self):
         if self.data.get('accept'):
@@ -284,7 +368,7 @@ class Sanitizer:
                         raise InventoryValidationError(
                             'Unique Name already taken!')
             self.entry['unique_name'] = unique_name
-        else:
+        elif not self.is_upsert:
             name = slugify(self.data.get('name'), separator="_")
             query_string = f'''{{
                                 field1 as var(func: eq(unique_name, "{name}"))
@@ -315,23 +399,16 @@ class Sanitizer:
                             self.entry['other_names'] = []
                         self.entry[key] += val
 
-    def generate_unique_name(self):
-        name = slugify(self.data.get('name'), separator="_")
-        query_string = f'''{{
-                            field1 as var(func: eq(unique_name, "{name}"))
-                            data1(func: uid(field1)) {{
-                                    unique_name
-                                    uid
-                            }}
-                            
-                        }}'''
+    def generate_unique_name(self, entry: dict):
+        try:
+            unique_name = slugify(str(entry['name']), separator="_")
+        except KeyError:
+            current_app.logger.error(f'Error in {entry["uid"]}! No key "name" in dict')
+            unique_name = slugify(str(entry['uid']), separator="_")        
+        if dgraph.get_uid('unique_name', unique_name):
+            unique_name += f'_{secrets.token_urlsafe(4)}'
 
-        result = dgraph.query(query_string)
-
-        if len(result['data1']) == 0:
-            self.entry['unique_name'] = name
-        else:
-            self.entry['unique_name'] = f'{name}_{secrets.token_urlsafe(4)}'
+        return unique_name
 
     def process_source(self):
         """
@@ -341,6 +418,7 @@ class Sanitizer:
         """
 
         channel = dgraph.get_unique_name(self.entry['channel'].query)
+
         if channel == 'website':
             self.resolve_website()
             self.fetch_siterankdata()
@@ -353,12 +431,15 @@ class Sanitizer:
             self.fetch_vk()
         elif channel == 'telegram':
             self.fetch_telegram()
-        
+            
+        self.entry['unique_name'] = self.source_unique_name(self.entry['name'], channel=channel, country_uid=self.entry['country'][0])
+
         # inherit from main source
         for source in self.related_entries:
             if isinstance(source['uid'], NewID):
                 if 'Source' in source['dgraph.type']:
                     source['entry_review_status'] = 'draft'
+                    source['unique_name'] = secrets.token_urlsafe(8)
                     source['publication_kind'] = self.entry.get('publication_kind')
                     source['special_interest'] = self.entry.get('special_interest')
                     source['topical_focus'] = self.entry.get('topical_focus')
@@ -377,6 +458,48 @@ class Sanitizer:
                         if dgraph.get_dgraphtype(rel_channel) == 'Channel':
                             source['channel'] = UID(rel_channel)
 
+    @staticmethod
+    def source_unique_name(name, channel=None, country=None, country_uid=None):
+        name = slugify(str(name), separator="_")
+        channel = slugify(str(channel), separator="_")
+        if country_uid:
+            country = dgraph.query(
+                f'''{{ q(func: uid({country_uid.query})) {{ unique_name }} }}''')
+            country = country['q'][0]['unique_name']
+
+        country = slugify(country, separator="_")
+        query_string = f'''{{
+                            field1 as var(func: eq(unique_name, "{name}"))
+                            field2 as var(func: eq(unique_name, "{name}_{channel}"))
+                            field3 as var(func: eq(unique_name, "{name}_{country}_{channel}"))
+                        
+                            data1(func: uid(field1)) {{
+                                    unique_name
+                                    uid
+                            }}
+                        
+                            data2(func: uid(field2)) {{
+                                unique_name
+                                uid
+                            }}
+
+                            data3(func: uid(field3)) {{
+                                unique_name
+                                uid
+                            }}
+                            
+                        }}'''
+
+        result = dgraph.query(query_string)
+
+        if len(result['data1']) == 0:
+            return f'{name}'
+        elif len(result['data2']) == 0:
+            return f'{name}_{channel}'
+        elif len(result['data3']) == 0:
+            return f'{name}_{country}_{channel}'
+        else:
+            return f'{name}_{country}_{channel}_{secrets.token_urlsafe(4)}'
 
 
     def resolve_website(self):

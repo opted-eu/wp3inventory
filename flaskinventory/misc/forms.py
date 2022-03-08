@@ -36,6 +36,7 @@ def get_country_choices(opted=True, multinational=False) -> list:
     if multinational:
         c_choices += [(multi.get('uid'), multi.get('name'))
                       for multi in countries['m']]
+    c_choices.insert(0, ('', ''))                  
     return c_choices
 
 

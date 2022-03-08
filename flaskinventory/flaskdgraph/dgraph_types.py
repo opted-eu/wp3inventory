@@ -361,19 +361,23 @@ class ReverseRelationship:
                  render_kw=None,
                  read_only=False,
                  new=True,
-                 edit=True) -> None:
+                 edit=False,
+                 permission=USER_ROLES.Contributor) -> None:
 
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
         self.relationship_constraint = relationship_constraint
         self._predicate = f'~{predicate_name}'
         self._target_predicate = predicate_name
+        self.predicate = predicate_name
         self.allow_new = allow_new
 
         self.new = new
         self.edit = edit
         self.overwrite = overwrite
         self.default_predicates = default_predicates
+
+        self.permission = permission
 
         # WTForms
         self._label = label
@@ -496,12 +500,14 @@ class MutualRelationship:
                 allow_new=False,
                 autoload_choices=True,
                 relationship_constraint=None,
+                permission=USER_ROLES.Contributor,
                 label=None,
                 description=None,
                 render_kw=None,
                 read_only=False,
                 new=True,
-                edit=True) -> None:
+                edit=True,
+                overwrite=True) -> None:
 
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
@@ -511,6 +517,9 @@ class MutualRelationship:
 
         self.new = new
         self.edit = edit
+
+        self.permission = permission
+        self.overwrite = overwrite
 
         # WTForms
         self._label = label
@@ -549,7 +558,7 @@ class MutualRelationship:
                 data_node.update({'dgraph.type': self.relationship_constraint})
             return node_data, data_node
         node_data = UID(uid, facets=facets)
-        data_node = {'uid': node, self._target_predicate: node_data}
+        data_node = {'uid': node, self.predicate: node_data}
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
             if entry_type not in self.relationship_constraint:
@@ -677,7 +686,7 @@ class UniqueName(String):
 
     @property
     def default(self):
-        return slugify(secrets.token_urlsafe(8), separator="_")
+        return None
 
     # def validate(self, data, uid):
     #     data = str(data)
@@ -1008,7 +1017,7 @@ def make_nquad(s, p, o) -> str:
     return nquad_string
 
 
-def dict_to_nquad(d) -> list:
+def dict_to_nquad(d: dict) -> list:
     if d.get('uid'):
         uid = d.pop('uid')
     else:

@@ -7,18 +7,19 @@ class Schema:
 
     # registry of all types and which predicates they have
     # Key = Dgraph Type (string), val = dict of predicates
-    __types = {}
+    __types__ = {}
+
+    # Registry of permissions for each type
+    __perm_registry_new__ = {}
+    __perm_registry_edit__ = {}
 
     # registry of all predicates and which types use them
     # Key = predicate (string), Val = list(Dgraph Type (string))
-    __predicates = {}
+    __predicates__ = {}
 
     # registry of explicit reverse relationship that should generate a form field
     # key = predicate (string), val = dict of predicates
-    __reverse_predicates = {}
-
-    def __set_name__(cls):
-        print('set name')
+    __reverse_predicates__ = {}
 
     def __init_subclass__(cls) -> None:
         from .dgraph_types import Predicate, ReverseRelationship, MutualRelationship
@@ -31,53 +32,67 @@ class Schema:
                     parent.__name__).items() if k not in predicates.keys()})
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
                     parent.__name__).items() if k not in reverse_predicates.keys()})
-        Schema.__types[cls.__name__] = predicates
-        Schema.__reverse_predicates[cls.__name__] = reverse_predicates
+        Schema.__types__[cls.__name__] = predicates
+        Schema.__reverse_predicates__[cls.__name__] = reverse_predicates
+        Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
+        Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
         for key in cls.__dict__.keys():
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
-                if key not in cls.__predicates.keys():
-                    cls.__predicates.update({key: [cls.__name__]})
+                if key not in cls.__predicates__.keys():
+                    cls.__predicates__.update({key: [cls.__name__]})
                 else:
-                    cls.__predicates[key].append(cls.__name__)
+                    cls.__predicates__[key].append(cls.__name__)
 
     @classmethod
-    def get_types(cls):
-        return list(cls.__types.keys())
+    def get_types(cls) -> list:
+        return list(cls.__types__.keys())
 
     @classmethod
-    def get_predicates(cls, _cls):
+    def get_predicates(cls, _cls) -> dict:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        return cls.__types[_cls]
+        return cls.__types__[_cls]
 
     @classmethod
-    def get_reverse_predicates(cls, _cls):
+    def get_reverse_predicates(cls, _cls) -> dict:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        if _cls in cls.__reverse_predicates.keys():
-            return cls.__reverse_predicates[_cls]
+        if _cls in cls.__reverse_predicates__.keys():
+            return cls.__reverse_predicates__[_cls]
         else:
             return None
 
     @classmethod
-    def predicates(cls):
-        return cls.__types[cls.__name__]
+    def predicates(cls) -> dict:
+        return cls.__types__[cls.__name__]
 
     @classmethod
-    def reverse_predicates(cls):
-        if cls.__name__ in cls.__reverse_predicates:
-            return cls.__reverse_predicates[cls.__name__]
+    def reverse_predicates(cls) -> dict:
+        if cls.__name__ in cls.__reverse_predicates__:
+            return cls.__reverse_predicates__[cls.__name__]
         else:
             return None
 
     @classmethod
-    def predicate_names(cls):
-        return list(cls.__types[cls.__name__].keys())
+    def predicate_names(cls) -> list:
+        return list(cls.__types__[cls.__name__].keys())
 
     @classmethod
-    def generate_new_entry_form(cls, dgraph_type=None):
+    def permissions_new(cls, _cls) -> int:
+        if not isinstance(_cls, str):
+            _cls = _cls.__name__
+        return cls.__perm_registry_new__[_cls]
+
+    @classmethod
+    def permissions_edit(cls, _cls) -> int:
+        if not isinstance(_cls, str):
+            _cls = _cls.__name__
+        return cls.__perm_registry_edit__[_cls]
+
+    @classmethod
+    def generate_new_entry_form(cls, dgraph_type=None) -> FlaskForm:
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
@@ -102,16 +117,20 @@ class Schema:
         return F()
 
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, entry_review_status='pending'):
+    def generate_edit_entry_form(cls, dgraph_type=None, entry_review_status='pending') -> FlaskForm:
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
         else:
             fields = cls.predicates()
 
+        if not isinstance(dgraph_type, str):
+            dtype_label = dgraph_type.__name__
+        else: dtype_label = dgraph_type
+
         class F(FlaskForm):
 
-            submit = SubmitField(f'Edit this {cls.__name__}')
+            submit = SubmitField(f'Edit this {dtype_label}')
 
             def get_field(self, field):
                 try:

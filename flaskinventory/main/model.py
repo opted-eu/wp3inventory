@@ -97,27 +97,21 @@ class SubunitAutocode(ListRelationship):
         super().__init__(relationship_constraint = ['Subunit'], 
                             allow_new=True, autoload_choices=True, 
                             overwrite=True, *args, **kwargs)
-
+        
     def get_choices(self):
 
         query_string = '''{ subunit(func: type("Subunit"), orderasc: name) { uid unique_name name  } }'''
 
         choices = dgraph.query(query_string=query_string)
 
-        if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+        self.choices = {c['uid']: c['name'] for c in choices["subunit"]}
+        self.choices_tuples = [(c['uid'], c['name']) for c in choices["subunit"]]
 
-        else:
-            self.choices = {}
-            self.choices_tuples = {}
-            for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
 
     def _geo_query_subunit(self, query):
         geo_result = geocode(query)
         if geo_result:
+            current_app.logger.debug(f'Got a result for "{query}": {geo_result}')
             dql_string = f'''{{ q(func: eq(country_code, "{geo_result['address']['country_code']}")) @filter(type("Country")) {{ uid }} }}'''
             dql_result = dgraph.query(dql_string)
             try:
@@ -169,6 +163,7 @@ class SubunitAutocode(ListRelationship):
     def _resolve_subunit(self, subunit):
         geo_query = self._geo_query_subunit(subunit)
         if geo_query:
+            current_app.logger.debug(f'parsing result of querying {subunit}: {geo_query}')
             geo_query['dgraph.type'] = ['Subunit']
             # prevent duplicates
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
@@ -190,6 +185,7 @@ class SubunitAutocode(ListRelationship):
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+            current_app.logger.debug(f'New subunit, trying to resolve "{data}"')
             new_subunit = self._resolve_subunit(data)
             return new_subunit
         if self.relationship_constraint:
@@ -198,6 +194,18 @@ class SubunitAutocode(ListRelationship):
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
         return {'uid': UID(uid)}
+
+    def validate(self, data, facets=None) -> list:
+        if isinstance(data, str):
+            data = data.split(',')
+        data = set([item.strip() for item in data if item.strip() != ''])
+        uids = []
+        for item in data:
+            uid = self.validation_hook(item)
+            if uid:
+                uids.append(uid)
+
+        return uids
         
 
 class OrganizationAutocode(ReverseListRelationship):
@@ -280,6 +288,9 @@ class OrganizationAutocode(ReverseListRelationship):
 
 class Entry(Schema):
 
+    __permission_new__ = USER_ROLES.Contributor
+    __permission_edit__ = USER_ROLES.Contributor
+
     uid = UIDPredicate()
     
     unique_name = UniqueName()
@@ -316,7 +327,8 @@ class Organization(Entry):
                              render_kw={'placeholder': 'Separate by comma'}, 
                              overwrite=True)
     
-    is_person = Boolean(description='Is the media organisation a person?',
+    is_person = Boolean(label='Yes, is a person',
+                        description='Is the media organisation a person?',
                         default=False)
     
     ownership_kind = SingleChoice(choices={
@@ -330,7 +342,9 @@ class Organization(Entry):
     country = SingleRelationship(relationship_constraint='Country', 
                                  allow_new=False,
                                  overwrite=True, 
-                                 description='In which country is the organisation located?')
+                                 description='In which country is the organisation located?',
+                                 render_kw={'placeholder': 'Select a country...'}
+                                 )
     
     publishes = ListRelationship(allow_new=False, 
                                  relationship_constraint='Source', 
@@ -348,7 +362,8 @@ class Organization(Entry):
                                         'NA': "Don't know / NA",
                                         'yes': 'Yes',
                                         'no': 'No'
-                                    })
+                                    },
+                                    new=False)
     
     address_string = AddressAutocode(new=False,
                                      render_kw={'placeholder': 'Main address of the organization.'})
@@ -362,24 +377,6 @@ class Organization(Entry):
     
     founded = DateTime(new=False)
 
-
-class Resource(Entry):
-
-    description = String(large_textfield=True)
-    authors = ListString(render_kw={'placeholder': 'Separate by comma'})
-    published_date = DateTime()
-    last_updated = DateTime()
-    url = String()
-    doi = String()
-    arxiv = String()
-
-class Archive(Resource):
-
-    access = SingleChoice(choices={'free': 'Free',
-                                    'restricted': 'Restricted'})
-    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
-    fulltext = Boolean(description='Dataset contains fulltext')
-    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
 
 
 class Source(Entry):
@@ -508,7 +505,7 @@ class Source(Entry):
                                     required=True,
                                     radio_field=True)
 
-    audience_size = Year(default=datetime.date.today())
+    audience_size = Year(default=datetime.date.today(), edit=False)
 
     publishes_org = OrganizationAutocode('publishes', 
                                        label='Published by',
@@ -542,6 +539,32 @@ class Source(Entry):
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
 
+class Country(Entry):
+
+    __permission_new__ = USER_ROLES.Admin
+    __permission_edit__ = USER_ROLES.Admin
+
+    country_code = String(permission=USER_ROLES.Admin)
+    opted_scope = Boolean(description="Is country in the scope of OPTED?",
+                            label='Yes, in scope of OPTED')
+
+class Multinational(Entry):
+
+    __permission_new__ = USER_ROLES.Admin
+    __permission_edit__ = USER_ROLES.Admin
+
+    description = String(large_textfield=True)
+
+class Subunit(Entry):
+
+    __permission_new__ = USER_ROLES.Reviewer
+    __permission_edit__ = USER_ROLES.Reviewer
+
+    country = SingleRelationship(required=True, 
+                                tom_select=True, 
+                                relationship_constraint='Country')
+    country_code = String()
+    location_point = Geo(edit=False, new=False)
 
 
 class Resource(Entry):
@@ -561,8 +584,3 @@ class Archive(Resource):
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
     fulltext = Boolean(description='Dataset contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
-
-# entry_countries = ListRelationship(
-#     'country', relationship_constraint='Country', allow_new=False, overwrite=True)
-
-

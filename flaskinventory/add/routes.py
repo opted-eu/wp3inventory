@@ -9,7 +9,7 @@ from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.add.sanitize import NewMultinationalSanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
 from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
-from flaskinventory.main.sanitizer import OrganizationSanitizer, make_sanitizer
+from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
@@ -92,8 +92,7 @@ def new_organization(draft=None):
     if form.validate_on_submit():
         if draft:
             try:
-                sanitizer = EditOrgSanitizer(
-                    form.data, current_user, get_ip())
+                sanitizer = Sanitizer.edit(form.data, dgraph_type=Organization)
             except Exception as e:
                 if current_app.debug:
                     e_trace = traceback.format_exception(
@@ -103,7 +102,7 @@ def new_organization(draft=None):
                 return redirect(url_for('add.new_organization', draft=form.data))
         else:
             try:
-                sanitizer = make_sanitizer(form.data, Organization)
+                sanitizer = Sanitizer(form.data, dgraph_type=Organization)
             except Exception as e:
                 if current_app.debug:
                     e_trace = traceback.format_exception(
@@ -113,7 +112,7 @@ def new_organization(draft=None):
                 return redirect(url_for('add.new_organization'))
 
         try:
-            if hasattr(sanitizer, 'delete_nquads'):
+            if sanitizer.is_upsert:
                 delete = dgraph.upsert(
                     sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
