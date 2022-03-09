@@ -368,7 +368,7 @@ class Organization(Entry):
     address_string = AddressAutocode(new=False,
                                      render_kw={'placeholder': 'Main address of the organization.'})
     
-    address_geo = GeoAutoCode(read_only=True, new=False, hidden=True)
+    address_geo = GeoAutoCode(read_only=True, new=False, edit=False, hidden=True)
     
     employees = String(description='How many employees does the news organization have?',
                        render_kw={

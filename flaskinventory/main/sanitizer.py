@@ -62,6 +62,10 @@ class Sanitizer:
         self.related_entries = []
         self.facets = {}
         self.entry_uid = None
+
+        self.delete_nquads = None
+        self.upsert_query = None
+
         if not self.is_upsert:
             self.entry['dgraph.type'] = [self.dgraph_type]
         self._parse()
@@ -69,6 +73,9 @@ class Sanitizer:
         if self.dgraph_type == 'Source':
             if not self.is_upsert or self.entry_review_status == 'draft':
                 self.process_source()
+
+        
+        self._delete_nquads()
 
     @staticmethod
     def _validate_inputdata(data: dict, user: User, ip: str) -> bool:
@@ -115,92 +122,41 @@ class Sanitizer:
         # print('Entry NQuads')
         # print(nquads)
         # print('Related NQuads')
+        print(self.related_entries)
         for related in self.related_entries:
             nquads += dict_to_nquad(related)
+            print(nquads[-1])
         # nquads += [dict_to_nquad(related) for related in self.related_entries]
         return " \n".join(nquads)
 
-    @property
-    def delete_nquads(self):
+    def _delete_nquads(self):
         if self.is_upsert:
             # for upserts, we first have to delete all list type predicates
             # otherwise, the user cannot remove relationships, but just add to them
+
             del_obj = []
+
+            upsert_query = ''
 
             for key, val in self.overwrite.items():
                 for predicate in list(set(val)):
                     del_obj.append({'uid': key, predicate: '*'})
+                    if isinstance(self.fields[predicate], (MutualRelationship, ReverseRelationship)):
+                        var = Variable(predicate, 'uid')
+                        upsert_query += f""" q_{predicate}(func: has(dgraph.type)) 
+                                                @filter(uid_in({predicate}, {key.query})) {{
+                                                    {var.query}
+                                                }} """
+                        del_obj.append({'uid': var, predicate: key})
 
             nquads = [" \n".join(dict_to_nquad(obj)) for obj in del_obj]
-            return " \n".join(nquads)
-
-        return None
-
-
-    @property
-    def upsert_query(self):
-        return None
-        # # for upserts, we first have to delete all list type predicates
-        # # otherwise, the user cannot remove relationships, but just add to them
-        # del_obj = []
-        # del_obj.append({
-        #     'uid': self.entry_uid,
-        #     'geographic_scope_subunit': '*'})
-
-        # del_obj.append({
-        #     'uid': self.entry_uid,
-        #     'country': '*'})
-
-        # # delete publication_kind, languages
-        # del_obj.append({
-        #     'uid': self.newsource['uid'],
-        #     'publication_kind': '*'})
-
-        # del_obj.append({
-        #     'uid': self.newsource['uid'],
-        #     'languages': '*'})
-
-        # # delete all "Organization" <publishes> "Upserted Source"
-        # orgs = Variable('orgs', 'uid')
-        # self.upsert_query += f""" q_organizations(func: type(Organization)) 
-        #                     @filter(uid_in(publishes, {self.newsource['uid']})) 
-        #                     {{ {orgs.query()} }} """
-        # del_obj.append({
-        #     'uid': orgs,
-        #     'publishes': self.newsource['uid']})
-
-        # # delete all "Archive" <includes> "Upserted Source"
-        # archives = Variable('archives', 'uid')
-        # self.upsert_query += f""" q_archives(func: type(Archive)) 
-        #                     @filter(uid_in(sources_included, {self.newsource['uid']})) 
-        #                     {{ {archives.query()} }} """
-        # del_obj.append({
-        #     'uid': archives,
-        #     'sources_included': self.newsource['uid']})
-
-        # # delete all "Dataset" <includes> "Upserted Source"
-        # datasets = Variable('datasets', 'uid')
-        # self.upsert_query += f""" q_datasets(func: type(Dataset)) 
-        #                     @filter(uid_in(sources_included, {self.newsource['uid']})) 
-        #                     {{ {datasets.query()} }} """
-        # del_obj.append({
-        #     'uid': datasets,
-        #     'sources_included': self.newsource['uid']})
-        # # delete all related
-        # related = Variable('related', 'uid')
-        # self.upsert_query += f""" q_related(func: type(Source)) 
-        #                     @filter(uid_in(related, {self.newsource['uid']})) 
-        #                     {{ {related.query()} }} """
-        # del_obj.append({
-        #     'uid': related,
-        #     'related': self.newsource['uid']
-        # })
-        # del_obj.append({
-        #     'uid': self.newsource['uid'],
-        #     'related': '*'
-        # })
-        # nquads = [" \n ".join(dict_to_nquad(obj)) for obj in del_obj]
-        # return " \n ".join(nquads)
+            self.delete_nquads = " \n".join(nquads)
+            if upsert_query != '':
+                self.upsert_query = upsert_query
+            else:
+                self.upsert_query = None 
+        else:
+            self.delete_nquads = None
 
     @staticmethod
     def _check_entry(uid):
@@ -286,6 +242,9 @@ class Sanitizer:
             elif self.data.get(key) and isinstance(item, MutualRelationship):
                 node_data, data_node = item.validate(self.data[key], self.entry_uid, facets=facets)
                 self.entry[item.predicate] = node_data
+                print(f'<{key}>')
+                print('node_data', node_data)
+                print('data_node', data_node)
                 if isinstance(data_node, list):
                     self.related_entries += data_node
                 else:

@@ -332,12 +332,14 @@ class Variable:
     def __repr__(self) -> str:
         return f'{self.var} as {self.predicate}'
 
+    @property
     def nquad(self) -> str:
         if self.val:
             return f'val({self.var})'
         else:
             return f'uid({self.var})'
-
+    
+    @property
     def query(self) -> str:
         return f'{self.var} as {self.predicate}'
 
@@ -558,7 +560,7 @@ class MutualRelationship:
                 data_node.update({'dgraph.type': self.relationship_constraint})
             return node_data, data_node
         node_data = UID(uid, facets=facets)
-        data_node = {'uid': node, self.predicate: node_data}
+        data_node = {'uid': node_data, self.predicate: node}
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
             if entry_type not in self.relationship_constraint:
@@ -609,8 +611,13 @@ class MutualListRelationship(MutualRelationship):
             node_data.append(n2d)
             data_node.append(d2n)
         
-        return node_data, data_node
+        # permutate all relationships
+        all_uids = node_data
+        all_uids.append(node)
+        for item in data_node:
+            item[self.predicate] = all_uids
 
+        return node_data, data_node
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -990,8 +997,8 @@ def _enquote(string) -> str:
 def make_nquad(s, p, o) -> str:
     """ Strings, Ints, Floats, Bools, Date(times) are converted automatically to Scalar """
 
-    if not isinstance(s, (UID, NewID)):
-        p = NewID(p)
+    if not isinstance(s, (UID, NewID, Variable)):
+        s = NewID(s)
 
     if not isinstance(p, Predicate):
         p = Predicate.from_key(p)

@@ -117,7 +117,9 @@ class Schema:
         return F()
 
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, entry_review_status='pending') -> FlaskForm:
+    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict={}, entry_review_status='pending') -> FlaskForm:
+
+        from .dgraph_types import SingleRelationship, ReverseRelationship, MutualRelationship
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
@@ -142,9 +144,37 @@ class Schema:
 
         for k, v in fields.items():
             if v.edit and current_user.user_role >= v.permission:
+                if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)) and k in populate_obj.keys():
+                    if not v.autoload_choices:
+                        choices = [(subval['uid'], subval['name']) for subval in populate_obj[k]]
+                        v.choices_tuples = choices
                 setattr(F, k, v.wtf_field)
+                # if k in populate_obj.keys():
+                #     if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)):
+                #         print(k)
+                #         choices = [(subval['uid'], subval['name']) for subval in populate_obj[k]]
+                #         print(choices)
+                #         setattr(getattr(F, k), 'choices', choices)
 
         if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':
             setattr(F, "accept", SubmitField('Edit and Accept'))
 
-        return F()
+        form = F()
+
+        for k, value in populate_obj.items():
+            if hasattr(form, k):
+                if type(value) is dict:
+                    if 'uid' in value.keys():
+                        value = value['uid']
+                elif type(value) is list:
+                    if type(value[0]) is str:
+                        value = ",".join(value)
+                    elif type(value[0]) is int:
+                        value = [str(val) for val in value]
+                    elif 'uid' in value[0].keys():
+                        value = [subval['uid'] for subval in value]
+                        if len(value) == 1:
+                            value = value[0]
+                setattr(getattr(form, k), 'data', value)
+
+        return form

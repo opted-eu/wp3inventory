@@ -71,7 +71,18 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
     if not uid:
         uid = check.get('uid')
 
-    form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'])
+    try:
+        entry = get_entry(uid=uid)
+    except Exception as e:
+        current_app.logger.error(f'Could not populate form for <{uid}>: {e}', stack_info=True)
+        return abort(404)
+    from pprint import pprint
+
+    if request.method == 'GET':
+        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, populate_obj=entry['q'][0], entry_review_status=check['entry_review_status'])
+    else:
+        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'])
+    
     fields = Schema.get_predicates(dgraph_type)
 
     if 'country' in fields:
@@ -88,9 +99,8 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
             flash(f'{dgraph_type} could not be updated: {e}', 'danger')
             return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
         try:
-            delete = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            result = dgraph.upsert(
+                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
             if request.form.get('accept'):
                 flash(f'{dgraph_type} has been edited and accepted', 'success')
                 return redirect(url_for('review.overview', **request.args))
@@ -101,32 +111,12 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
             flash(f'{dgraph_type} could not be updated: {e}', 'danger')
             return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
 
-    result = get_entry(uid=uid)
-    if result:
-        for key, value in result['q'][0].items():
-            if not hasattr(form, key):
-                continue
-            if type(value) is list:
-                if type(value[0]) is str:
-                    value = ",".join(value)
-                elif key == 'country':
-                    value = value[0].get('uid')
-                elif key != 'country':
-                    choices = [(subval['uid'], subval['name'])
-                               for subval in value]
-                    value = [subval['uid'] for subval in value]
-                    setattr(getattr(form, key),
-                            'choices', choices)
-
-            setattr(getattr(form, key), 'data', value)
-        sidebar_items = {'meta': result['q'][0]}
-        if dgraph_type == 'Organization':
-            wikidata_form = RefreshWikidataForm()
-            wikidata_form.uid.data = uid
-            sidebar_items.update({'actions': {'wikidata': wikidata_form}})
-        return render_template('edit/editform.html', title=f'Edit {dgraph_type}', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
-    else:
-        return abort(404)   
+    sidebar_items = {'meta': entry['q'][0]}
+    if dgraph_type == 'Organization':
+        wikidata_form = RefreshWikidataForm()
+        wikidata_form.uid.data = uid
+        sidebar_items.update({'actions': {'wikidata': wikidata_form}})
+    return render_template('edit/editform.html', title=f'Edit {dgraph_type}', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
 
 # @edit.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
 # @edit.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
@@ -205,98 +195,98 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
 #         return abort(404)
 
 
-@edit.route('/edit/source/<string:unique_name>', methods=['GET', 'POST'])
-@edit.route('/edit/source/uid/<string:uid>', methods=['GET', 'POST'])
-@login_required
-def source(unique_name=None, uid=None):
+# @edit.route('/edit/source/<string:unique_name>', methods=['GET', 'POST'])
+# @edit.route('/edit/source/uid/<string:uid>', methods=['GET', 'POST'])
+# @login_required
+# def source(unique_name=None, uid=None):
 
-    check = check_entry(unique_name=unique_name, uid=uid)
-    if not check:
-        return abort(404)
+#     check = check_entry(unique_name=unique_name, uid=uid)
+#     if not check:
+#         return abort(404)
 
-    if 'Source' not in check['dgraph.type']:
-        return abort(404)
+#     if 'Source' not in check['dgraph.type']:
+#         return abort(404)
 
-    if not can_edit(check, current_user):
-        return abort(403)
+#     if not can_edit(check, current_user):
+#         return abort(403)
 
-    result = get_entry(unique_name=unique_name, uid=uid)
-    if len(result['q']) == 0:
-        return abort(404)
+#     result = get_entry(unique_name=unique_name, uid=uid)
+#     if len(result['q']) == 0:
+#         return abort(404)
 
-    form, fields = make_form(
-        result['q'][0]['channel']['unique_name'], review_status=check['entry_review_status'])
+#     form, fields = make_form(
+#         result['q'][0]['channel']['unique_name'], review_status=check['entry_review_status'])
 
-    if current_user.user_role >= USER_ROLES.Reviewer:
-        form.country.choices = get_country_choices(
-            multinational=True, opted=False)
-    else:
-        form.country.choices = get_country_choices(multinational=True)
-    form.geographic_scope_subunit.choices = get_subunit_choices()
+#     if current_user.user_role >= USER_ROLES.Reviewer:
+#         form.country.choices = get_country_choices(
+#             multinational=True, opted=False)
+#     else:
+#         form.country.choices = get_country_choices(multinational=True)
+#     form.geographic_scope_subunit.choices = get_subunit_choices()
 
-    if form.validate_on_submit():
-        try:
-            sanitizer = EditSourceSanitizer(
-                form.data, current_user, get_ip())
-            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(
-                f'Delete Nquads: {sanitizer.delete_nquads}')
-        except Exception as e:
-            # tb_str = ''.join(traceback.format_exception(
-            #     None, e, e.__traceback__))
-            current_app.logger.error(e)
-            flash(
-                f'Source could not be updated. Sanitizer raised error: {e}', 'danger')
-            return redirect(url_for('edit.source', uid=form.uid.data))
+#     if form.validate_on_submit():
+#         try:
+#             sanitizer = EditSourceSanitizer(
+#                 form.data, current_user, get_ip())
+#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+#             current_app.logger.debug(
+#                 f'Delete Nquads: {sanitizer.delete_nquads}')
+#         except Exception as e:
+#             # tb_str = ''.join(traceback.format_exception(
+#             #     None, e, e.__traceback__))
+#             current_app.logger.error(e)
+#             flash(
+#                 f'Source could not be updated. Sanitizer raised error: {e}', 'danger')
+#             return redirect(url_for('edit.source', uid=form.uid.data))
 
-        try:
-            delete = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-            current_app.logger.debug(delete)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
-            if request.form.get('accept'):
-                flash(f'Source has been edited and accepted', 'success')
-                return redirect(url_for('review.overview', **request.args))
-            else:
-                flash(f'Source has been updated', 'success')
-                return redirect(url_for('view.view_source', unique_name=form.unique_name.data))
-        except Exception as e:
-            tb_str = ''.join(traceback.format_exception(
-                None, e, e.__traceback__))
-            current_app.logger.error(e, tb_str)
-            flash(
-                f'Source could not be updated. DGraph raised error: {e.message}, {e}', 'danger')
-            return redirect(url_for('edit.source', uid=form.uid.data))
+#         try:
+#             delete = dgraph.upsert(
+#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+#             current_app.logger.debug(delete)
+#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+#             current_app.logger.debug(result)
+#             if request.form.get('accept'):
+#                 flash(f'Source has been edited and accepted', 'success')
+#                 return redirect(url_for('review.overview', **request.args))
+#             else:
+#                 flash(f'Source has been updated', 'success')
+#                 return redirect(url_for('view.view_source', unique_name=form.unique_name.data))
+#         except Exception as e:
+#             tb_str = ''.join(traceback.format_exception(
+#                 None, e, e.__traceback__))
+#             current_app.logger.error(e, tb_str)
+#             flash(
+#                 f'Source could not be updated. DGraph raised error: {e.message}, {e}', 'danger')
+#             return redirect(url_for('edit.source', uid=form.uid.data))
 
-    for key, value in result['q'][0].items():
-        if not hasattr(form, key):
-            continue
-        if type(value) is dict:
-            choices = [(value['uid'], value['name'])]
-            value = value['uid']
-            setattr(getattr(form, key),
-                    'choices', choices)
-        elif type(value) is list:
-            if type(value[0]) is str:
-                value = ",".join(value)
-            elif type(value[0]) is int:
-                value = [str(val) for val in value]
-            else:
-                choices = [(subval['uid'], subval['unique_name'])
-                           for subval in value if subval.get('unique_name')]
-                value = [subval['uid'] for subval in value]
-                if key not in ['country', 'geographic_scope_subunit']:
-                    setattr(getattr(form, key),
-                            'choices', choices)
+#     for key, value in result['q'][0].items():
+#         if not hasattr(form, key):
+#             continue
+#         if type(value) is dict:
+#             choices = [(value['uid'], value['name'])]
+#             value = value['uid']
+#             setattr(getattr(form, key),
+#                     'choices', choices)
+#         elif type(value) is list:
+#             if type(value[0]) is str:
+#                 value = ",".join(value)
+#             elif type(value[0]) is int:
+#                 value = [str(val) for val in value]
+#             else:
+#                 choices = [(subval['uid'], subval['unique_name'])
+#                            for subval in value if subval.get('unique_name')]
+#                 value = [subval['uid'] for subval in value]
+#                 if key not in ['country', 'geographic_scope_subunit']:
+#                     setattr(getattr(form, key),
+#                             'choices', choices)
 
-        setattr(getattr(form, key), 'data', value)
+#         setattr(getattr(form, key), 'data', value)
 
-    sidebar_items = {'meta': result['q'][0]}
-    if result['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
-        sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=result['q'][0]['uid'])}
+#     sidebar_items = {'meta': result['q'][0]}
+#     if result['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
+#         sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=result['q'][0]['uid'])}
 
-    return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
+#     return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
 
 
 @edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
