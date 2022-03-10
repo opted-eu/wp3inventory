@@ -33,6 +33,10 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(config_class=Config, config_json=None):
+    # assert versions
+    import wtforms
+    assert wtforms.__version__.startswith('3.'), 'WTForms Version 3.X.X is required!'
+
     app = Flask(__name__)
 
     app.logger.addHandler(create_filehandler())
