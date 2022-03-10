@@ -580,4 +580,12 @@ def doi(doi: str) -> Union[dict, bool]:
 
 
 
-    
+def arxiv(arxiv: str) -> Union[dict, bool]:
+    api = "http://export.arxiv.org/api/query"
+
+    r = requests.get(api, params={'id_list': arxiv})
+
+    if r.status_code != 200:
+        return False
+
+    soup = bs4(r.content, 'lxml')
