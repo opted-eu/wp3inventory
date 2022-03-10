@@ -619,10 +619,10 @@ class MutualListRelationship(MutualRelationship):
             data_node.append(d2n)
 
         # permutate all relationships
-        all_uids = node_data
+        all_uids = [item for item in node_data]
         all_uids.append(node)
         for item in data_node:
-            item[self.predicate] = all_uids
+            item[self.predicate] = [uid for uid in all_uids if uid != item['uid']]
 
         return node_data, data_node
 
@@ -1037,13 +1037,13 @@ def make_nquad(s, p, o) -> str:
 
 def dict_to_nquad(d: dict) -> list:
     if d.get('uid'):
-        uid = d.pop('uid')
+        uid = d['uid']
     else:
         uid = NewID('_:newentry')
     nquads = []
     for key, val in d.items():
-        if val is None:
-            continue
+        if val is None: continue
+        if key == 'uid': continue
         if not isinstance(key, Predicate):
             key = Predicate.from_key(key)
         if isinstance(val, (list, set)):

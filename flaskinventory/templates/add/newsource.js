@@ -1302,9 +1302,6 @@ submitButton.addEventListener('click', function handleFormSubmit(event) {
     submitForm('{{ url_for("endpoint.submit") }}', form, formResult);
 
 
-    // window.location.assign('{{ url_for("add.confirmation") }}')
-    // };
-
     // event.preventDefault();
 });
 

@@ -103,9 +103,14 @@ class Schema:
             if cls.reverse_predicates():
                 fields.update(cls.reverse_predicates())
 
+        if not isinstance(dgraph_type, str):
+            submit_label = dgraph_type.__name__
+        else:
+            submit_label = dgraph_type
+
         class F(FlaskForm):
 
-            submit = SubmitField(f'Add New {cls.__name__}')
+            submit = SubmitField(f'Add New {submit_label}')
 
             def get_field(self, field):
                 return getattr(self, field)

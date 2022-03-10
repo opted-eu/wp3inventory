@@ -65,6 +65,7 @@ class Sanitizer:
 
         self.delete_nquads = None
         self.upsert_query = None
+        self.set_nquads = None
 
         if not self.is_upsert:
             self.entry['dgraph.type'] = [self.dgraph_type]
@@ -74,8 +75,8 @@ class Sanitizer:
             if not self.is_upsert or self.entry_review_status == 'draft':
                 self.process_source()
 
-        
         self._delete_nquads()
+        self._set_nquads()
 
     @staticmethod
     def _validate_inputdata(data: dict, user: User, ip: str) -> bool:
@@ -116,12 +117,11 @@ class Sanitizer:
             
         return cls(data, is_upsert=True, entry_review_status=entry_review_status, fields=edit_fields, **kwargs)
 
-    @property
-    def set_nquads(self):
+    def _set_nquads(self):
         nquads = dict_to_nquad(self.entry)
         for related in self.related_entries:
             nquads += dict_to_nquad(related)
-        return " \n".join(nquads)
+        self.set_nquads = " \n".join(nquads)
 
     def _delete_nquads(self):
         if self.is_upsert:
@@ -400,11 +400,7 @@ class Sanitizer:
                     source['country'] = self.entry.get('country')
                     source['geographic_scope_subunit'] = self.entry.get('geographic_scope_subunit')
                     source['languages'] = self.entry.get('languages')
-                    source['party_affiliated'] = self.entry.get('party_affiliated')
-                    if not isinstance(source['related'], list):
-                        source['related'] = [source['related']]
-                    source['related'] += self.entry['related']
-                    
+                    source['party_affiliated'] = self.entry.get('party_affiliated')                   
                     
 
     @staticmethod

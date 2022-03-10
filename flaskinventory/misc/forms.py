@@ -2,17 +2,6 @@ from wtforms import SelectField, SelectMultipleField
 from flaskinventory import dgraph
 
 
-class TomSelectMutlitpleField(SelectMultipleField):
-
-    def pre_validate(self, form):
-        pass
-
-
-class TomSelectField(SelectField):
-
-    def pre_validate(self, form):
-        pass
-
 # cache this function
 
 

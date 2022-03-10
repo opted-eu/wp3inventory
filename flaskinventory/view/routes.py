@@ -86,21 +86,22 @@ def search():
         flash("Please enter a search query in the top search bar", "info")
         return redirect(url_for('main.home'))
 
-
 @view.route("/view")
-def view_uid():
-    if request.args.get('uid'):
-        uid = validate_uid(request.args.get('uid'))
-        if not uid:
-            return abort(404)
-        dgraphtype = dgraph.get_dgraphtype(uid)
-        if dgraphtype:
-            return redirect(url_for('view.view_' + dgraphtype.lower(), **request.args))
-        else:
-            return abort(404)
+@view.route("/view/uid/<string:uid>")
+def view_uid(uid=None):
+    request_args = request.args.to_dict()
+    if request_args.get('uid'):
+        uid = request_args.pop('uid')
+    
+    uid = validate_uid(uid)
+    if not uid:
+        return abort(404)
+    dgraphtype = dgraph.get_dgraphtype(uid)
+    if dgraphtype:
+        return redirect(url_for('view.view_' + dgraphtype.lower(), uid=uid, **request_args))
     else:
         return abort(404)
-
+    
 
 @view.route("/view/source/uid/<string:uid>")
 @view.route("/view/source/<string:unique_name>")

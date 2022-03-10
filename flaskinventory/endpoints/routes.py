@@ -10,8 +10,8 @@ from flask import (current_app, Blueprint, request, jsonify, url_for)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.utils import strip_query
-from flaskinventory.add.sanitize import SourceSanitizer
-from flaskinventory.misc import get_ip
+from flaskinventory.main.model import Source
+from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
 
 
@@ -106,11 +106,13 @@ async def fieldoptions():
 
 @endpoint.route('/endpoint/new/submit', methods=['POST'])
 def submit():
+    current_app.logger.debug(f'Received JSON: \n{request.json}')
     try:
-        current_app.logger.debug(f'Received JSON: \n{request.json}')
-        sanitizer = SourceSanitizer(
-            request.json, current_user, get_ip())
-        current_app.logger.debug(f'Processed Entry: \n{sanitizer.newsource}\n{sanitizer.newsubunits}\n{sanitizer.orgs}\n{sanitizer.related}')
+        if 'uid' in request.json.keys():
+            sanitizer = Sanitizer.edit(request.json, dgraph_type=Source)
+        else:
+            sanitizer = Sanitizer(request.json, dgraph_type=Source)
+        current_app.logger.debug(f'Processed Entry: \n{sanitizer.entry}\n{sanitizer.related_entries}')
         current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
     except Exception as e:
@@ -119,35 +121,29 @@ def submit():
         current_app.logger.error(tb_str)
         return jsonify(error)
 
-    if sanitizer.is_upsert:
-        try:
-            result = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-        except Exception as e:
-            error = {'error': f'{e}'}
-            tb_str = ''.join(traceback.format_exception(
-                None, e, e.__traceback__))
-            current_app.logger.error(tb_str)
-            current_app.logger.error(f'Set nquads: {sanitizer.set_nquads}')
-            return jsonify(error)
-
+    
     try:
-        result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+        if sanitizer.is_upsert:
+            result = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
+        else:
+            result = dgraph.upsert(None, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
     except Exception as e:
         error = {'error': f'{e}'}
-        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        tb_str = ''.join(traceback.format_exception(
+            None, e, e.__traceback__))
         current_app.logger.error(tb_str)
+        current_app.logger.error(f'Upsert Query: {sanitizer.upsert_query}')
+        current_app.logger.error(f'Delete nquads: {sanitizer.delete_nquads}')
         current_app.logger.error(f'Set nquads: {sanitizer.set_nquads}')
         return jsonify(error)
 
     if result:
         if sanitizer.is_upsert:
-            uid = str(sanitizer.uid)
+            uid = str(sanitizer.entry_uid)
         else:
             newuids = dict(result.uids)
-            uid = newuids['newsource']
-        response = {'redirect': url_for(
-            'view.view_source', uid=uid)}
+            uid = newuids[str(sanitizer.entry_uid).replace('_:', '')]
+        response = {'redirect': url_for('view.view_source', uid=uid)}
 
         return jsonify(response)
     else:

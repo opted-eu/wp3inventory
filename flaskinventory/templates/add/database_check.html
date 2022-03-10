@@ -35,7 +35,8 @@
         <td>
             {% if entry.get('entry_review_status') == 'draft' %}
             <a class="btn btn-sm btn-primary" href="{{ url_for('add.new_source', draft=entry.get('uid')) }}">Continue editing</a>
-            {% else %}
+            {% endif %}
+            {% if entity == 'Source' %}
             <a class="btn btn-sm btn-primary" href="{{ url_for('add.new_source', existing=entry.get('uid')) }}">Add related</a>
             {% endif %}
         </td>
@@ -54,12 +55,8 @@
         <a class="btn btn-outline-secondary" href="{{ url_for('add.new_entry') }}" role="button">Already listed</a>
         {% if entity == 'Source' %}
         <a class="btn btn-outline-primary" href="{{ url_for('add.new_source') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
-        {% elif entity == 'Organization' %}
-        <a class="btn btn-outline-primary" href="{{ url_for('add.new_organization') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
-        {% elif entity == 'Archive' %}
-        <a class="btn btn-outline-primary" href="{{ url_for('add.new_archive') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
-        {% elif entity == 'Dataset' %}
-        <a class="btn btn-outline-primary" href="{{ url_for('add.new_dataset') }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
+        {% else %}
+        <a class="btn btn-outline-primary" href="{{ url_for('add.new', dgraph_type=entity) }}?entry_name={{ query }}" role="button">My suggestion is new</a></div></div>
         {% endif %}
 </div>
 

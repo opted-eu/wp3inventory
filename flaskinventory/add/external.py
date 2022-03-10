@@ -1,19 +1,26 @@
+# built in modules
+
 from datetime import datetime
-from flask import current_app
+from urllib.robotparser import RobotFileParser
+import urllib.parse
+import re
+import json
+import asyncio
+
+# external utils 
 import requests
 from requests.models import PreparedRequest
 import requests.exceptions
 import feedparser
-from urllib.robotparser import RobotFileParser
-import urllib.parse
 from bs4 import BeautifulSoup as bs4
-import re
-import json
 import instaloader
 import tweepy
 from telethon import TelegramClient
-import asyncio
+
+# flask
+from flask import current_app
 from dateutil.parser import isoparse
+
 from flaskinventory import dgraph
 
 def geocode(address: str) -> dict:

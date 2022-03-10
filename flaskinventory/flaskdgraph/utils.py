@@ -17,6 +17,9 @@ def validate_uid(uid: Any) -> Union[str, bool]:
         Tries to coerce object to a str (uid)
         If fails, will return False
     """
+    if not isinstance(uid, (str, int)):
+        uid = str(uid)
+
     if type(uid) == str:
         uid = uid.lower().strip()
         if not uid.startswith('0x'):

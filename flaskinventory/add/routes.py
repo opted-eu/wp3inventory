@@ -1,19 +1,16 @@
-import asyncio
-import json
+
 from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
+from flaskinventory.flaskdgraph.schema import Schema
 from flaskinventory.main.model import Organization
-from flaskinventory.add.forms import NewEntry, NewMultinational, NewOrganization, NewArchive, NewDataset
+from flaskinventory.add.forms import NewEntry
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
-from flaskinventory.add.sanitize import NewMultinationalSanitizer, SourceSanitizer, NewOrgSanitizer, NewArchiveSanitizer, NewDatasetSanitizer
-from flaskinventory.edit.sanitize import EditDatasetSanitizer, EditOrgSanitizer, EditArchiveSanitizer
 from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
-from flaskinventory.misc import get_ip
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.flaskdgraph.utils import strip_query, validate_uid
 import traceback
@@ -45,14 +42,8 @@ def new_entry():
         else:
             if form.entity.data == 'Source':
                 return redirect(url_for('add.new_source', entry_name=form.name.data))
-            elif form.entity.data == 'Organization':
-                return redirect(url_for('add.new_organization'))
-            elif form.entity.data == 'Archive':
-                return redirect(url_for('add.new_archive'))
-            elif form.entity.data == 'Dataset':
-                return redirect(url_for('add.new_dataset'))
             else:
-                return redirect(url_for('main.under_development'))
+                return redirect(url_for('add.new', dgraph_type=form.entity.data))
 
     drafts = list_entries(current_user.id, onlydrafts=True)
     if drafts:
@@ -74,227 +65,6 @@ def new_source():
         existing = get_existing(existing)
     
     return render_template("add/newsource.html", draft=draft, existing=existing)
-
-
-@add.route("/add/organisation", methods=['GET', 'POST'])
-@add.route("/add/organization", methods=['GET', 'POST'])
-@login_required
-def new_organization(draft=None):
-    # form = NewOrganization(uid="_:neworganization", is_person='n')
-    form = Organization.generate_new_entry_form()
-    form.country.choices = get_country_choices(opted=False)
-    
-    if draft is None:
-        draft = request.args.get('draft')
-    if draft:
-        draft = check_draft(draft, form)
-
-    if form.validate_on_submit():
-        if draft:
-            try:
-                sanitizer = Sanitizer.edit(form.data, dgraph_type=Organization)
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Organization could not be updated: {e}', 'danger')
-                return redirect(url_for('add.new_organization', draft=form.data))
-        else:
-            try:
-                sanitizer = Sanitizer(form.data, dgraph_type=Organization)
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Organization could not be added: {e}', 'danger')
-                return redirect(url_for('add.new_organization'))
-
-        try:
-            if sanitizer.is_upsert:
-                delete = dgraph.upsert(
-                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            flash(f'Organization has been added!', 'success')
-            return redirect(url_for('view.view_organization', unique_name=sanitizer.entry['unique_name']))
-        except Exception as e:
-            if current_app.debug:
-                e_trace = traceback.format_exception(None, e, e.__traceback__)
-                current_app.logger.debug(e_trace)
-            flash(f'Organization could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_organization'))
-
-    fields = list(form.data.keys())
-    fields.remove('submit')
-    fields.remove('csrf_token')
-    return render_template('add/generic.html', title='Add Media Organization', form=form, fields=fields)
-
-
-@add.route("/add/archive", methods=['GET', 'POST'])
-@login_required
-def new_archive(draft=None):
-    form = NewArchive(uid="_:newarchive")
-
-    if draft is None:
-        draft = request.args.get('draft')
-    if draft:
-        draft = check_draft(draft, form)
-
-    if form.validate_on_submit():
-        if draft:
-            try:
-                sanitizer = EditArchiveSanitizer(
-                    form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-                current_app.logger.debug(
-                    f'Set Nquads: {sanitizer.delete_nquads}')
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Archive could not be updated: {e}', 'danger')
-                return redirect(url_for('add.new_archive', draft=form.data))
-        else:
-            try:
-                sanitizer = NewArchiveSanitizer(
-                    form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Archive could not be added: {e}', 'danger')
-                return redirect(url_for('add.new_archive'))
-
-        try:
-            if sanitizer.delete_nquads is not None:
-                delete = dgraph.upsert(
-                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-                current_app.logger.debug(delete)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
-            flash(f'Archive has been added!', 'success')
-            return redirect(url_for('view.view_archive', unique_name=sanitizer.new['unique_name']))
-        except Exception as e:
-            if current_app.debug:
-                e_trace = traceback.format_exception(None, e, e.__traceback__)
-                current_app.logger.debug(e_trace)
-            flash(f'Archive could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_archive'))
-
-    fields = list(form.data.keys())
-    fields.remove('submit')
-    fields.remove('csrf_token')
-    return render_template('add/generic.html', title='Add Full Text Archive', form=form, fields=fields)
-
-
-@add.route("/add/dataset", methods=['GET', 'POST'])
-@login_required
-def new_dataset(draft=None):
-    form = NewDataset(uid="_:newdataset")
-
-    if draft is None:
-        draft = request.args.get('draft')
-    if draft:
-        draft = check_draft(draft, form)
-
-    if form.validate_on_submit():
-        if draft:
-            try:
-                sanitizer = EditDatasetSanitizer(
-                    form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-                current_app.logger.debug(
-                    f'Set Nquads: {sanitizer.delete_nquads}')
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Dataset could not be updated: {e}', 'danger')
-                return redirect(url_for('add.new_dataset', draft=form.data))
-        else:
-            try:
-                sanitizer = NewDatasetSanitizer(
-                    form.data, current_user, get_ip())
-                current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            except Exception as e:
-                if current_app.debug:
-                    e_trace = traceback.format_exception(
-                        None, e, e.__traceback__)
-                    current_app.logger.debug(e_trace)
-                flash(f'Dataset could not be added: {e}', 'danger')
-                return redirect(url_for('add.new_dataset'))
-
-        try:
-            if sanitizer.delete_nquads is not None:
-                delete = dgraph.upsert(
-                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-                current_app.logger.debug(delete)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
-            flash(f'Dataset has been added!', 'success')
-            return redirect(url_for('view.view_dataset', unique_name=sanitizer.new['unique_name']))
-        except Exception as e:
-            if current_app.debug:
-                e_trace = traceback.format_exception(None, e, e.__traceback__)
-                current_app.logger.debug(e_trace)
-            flash(f'Dataset could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_dataset'))
-
-    fields = list(form.data.keys())
-    fields.remove('submit')
-    fields.remove('csrf_token')
-    return render_template('add/generic.html', title='Add Dataset', form=form, fields=fields)
-
-
-@add.route("/add/multinational", methods=['GET', 'POST'])
-@login_required
-@requires_access_level(USER_ROLES.Admin)
-def new_multinational():
-    form = NewMultinational(uid="_:newcountry")
-
-    if form.validate_on_submit():
-        try:
-            sanitizer = NewMultinationalSanitizer(
-                form.data, current_user, get_ip())
-            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-        except Exception as e:
-            if current_app.debug:
-                e_trace = traceback.format_exception(
-                    None, e, e.__traceback__)
-                current_app.logger.debug(e_trace)
-            flash(f'Multinational could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_multinational'))
-
-        try:
-            if sanitizer.delete_nquads is not None:
-                delete = dgraph.upsert(
-                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-                current_app.logger.debug(delete)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
-            flash(f'Multinational has been added!', 'success')
-            return redirect(url_for('view.view_multinational', unique_name=sanitizer.new['unique_name']))
-        except Exception as e:
-            if current_app.debug:
-                e_trace = traceback.format_exception(None, e, e.__traceback__)
-                current_app.logger.debug(e_trace)
-            flash(f'Multinational could not be added: {e}', 'danger')
-            return redirect(url_for('add.new_multinational'))
-
-    fields = list(form.data.keys())
-    fields.remove('submit')
-    fields.remove('csrf_token')
-    return render_template('add/generic.html', title='Add Multinational', form=form, fields=fields)
-
-
-@add.route("/add/confirmation")
-def confirmation():
-    return render_template("not_implemented.html")
 
 
 @login_required
@@ -321,3 +91,63 @@ def from_draft(entity=None, uid=None):
         return redirect(url_for('add.new_entry'))
 
 
+
+@add.route("/add/<string:dgraph_type>", methods=['GET', 'POST'])
+@login_required
+def new(draft=None):
+    if not dgraph_type:
+        return abort(404)
+    dgraph_type = dgraph_type.title()
+
+    form = Schema.generate_new_entry_form(dgraph_type=dgraph_type)
+    
+    if draft is None:
+        draft = request.args.get('draft')
+    if draft:
+        draft = check_draft(draft, form)
+
+    if form.validate_on_submit():
+        if draft:
+            try:
+                sanitizer = Sanitizer.edit(form.data, dgraph_type=dgraph_type)
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'{dgraph_type} could not be updated: {e}', 'danger')
+                return redirect(url_for('add.new', dgraph_type=dgraph_type, draft=form.data))
+        else:
+            try:
+                sanitizer = Sanitizer(form.data, dgraph_type=dgraph_type)
+            except Exception as e:
+                if current_app.debug:
+                    e_trace = traceback.format_exception(
+                        None, e, e.__traceback__)
+                    current_app.logger.debug(e_trace)
+                flash(f'{dgraph_type} could not be added: {e}', 'danger')
+                return redirect(url_for('add.new', dgraph_type=dgraph_type))
+
+        try:
+            if sanitizer.is_upsert:
+                result = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
+            else:
+                result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            flash(f'{dgraph_type} has been added!', 'success')
+            if sanitizer.is_upsert:
+                uid = str(sanitizer.entry_uid)
+            else:
+                newuids = dict(result.uids)
+                uid = newuids[str(sanitizer.entry_uid).replace('_:', '')]
+            return redirect(url_for('view.uid', uid=uid))
+        except Exception as e:
+            if current_app.debug:
+                e_trace = traceback.format_exception(None, e, e.__traceback__)
+                current_app.logger.debug(e_trace)
+            flash(f'{dgraph_type} could not be added: {e}', 'danger')
+            return redirect(url_for('add.new', dgraph_type=dgraph_type))
+
+    fields = list(form.data.keys())
+    fields.remove('submit')
+    fields.remove('csrf_token')
+    return render_template('add/generic.html', title=f'Add {dgraph_type}', form=form, fields=fields)

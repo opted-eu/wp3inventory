@@ -9,7 +9,7 @@ from flaskinventory.add.external import fetch_wikidata
 
 from flaskinventory.edit.forms import RefreshWikidataForm
 from flaskinventory.edit.utils import can_edit, channel_filter
-from flaskinventory.edit.sanitize import WikiDataSanitizer, EditAudienceSizeSanitizer
+from flaskinventory.edit.sanitizer import EditAudienceSizeSanitizer
 from flaskinventory.edit.dgraph import get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
 
@@ -83,8 +83,7 @@ def refresh_wikidata():
         return redirect(url_for('view.view_uid', uid=uid))
 
     try:
-        sanitizer = WikiDataSanitizer(
-            result, current_user, get_ip())
+        sanitizer = Sanitizer.edit(result, dgraph_type="Organization")
         current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
         current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
     except Exception as e:
@@ -92,10 +91,8 @@ def refresh_wikidata():
         return redirect(url_for('edit.edit_uid', uid=uid))
 
     try:
-        delete = dgraph.upsert(
-            sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-        current_app.logger.debug(delete)
-        result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+        result = dgraph.upsert(
+            sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
         current_app.logger.debug(result)
         flash(f'WikiData has been refreshed', 'success')
         return redirect(url_for('edit.edit_uid', uid=uid))
@@ -202,8 +199,7 @@ def source_audience(uid):
         current_app.logger.debug(
             f'received POST request: {request.get_json()}')
         try:
-            sanitizer = EditAudienceSizeSanitizer(
-            uid, request.get_json(), current_user, get_ip())
+            sanitizer = EditAudienceSizeSanitizer(uid, request.get_json())
         except Exception as e:
             return jsonify({'status': 'error', 'error': f'{e}'})
         
