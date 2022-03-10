@@ -6,11 +6,13 @@ import urllib.parse
 import re
 import json
 import asyncio
+from typing import Union
 
 # external utils 
 import requests
 from requests.models import PreparedRequest
 import requests.exceptions
+from dateutil import parser as dateparser
 import feedparser
 from bs4 import BeautifulSoup as bs4
 import instaloader
@@ -528,3 +530,54 @@ def telegram(username):
         fullname = profile.get('title')
 
     return {'followers': followers, 'fullname': fullname, 'joined': joined, 'verified': verified, 'telegram_id': telegram_id}
+
+
+
+def doi(doi: str) -> Union[dict, bool]:
+    from flaskinventory.flaskdgraph.dgraph_types import Scalar
+
+    api = 'https://api.crossref.org/works/'
+
+    r = requests.get(api + doi)
+
+    if r.status_code != 200:
+        return False
+
+    publication = r.json()
+
+    if publication['status'] != 'ok':
+        return False
+
+    publication = publication['message']
+
+    result = {}
+
+    result['url'] = publication.get('url')
+    result['journal'] = publication.get('container-title')
+    result['title'] = publication.get('title')
+    result['paper_kind'] = publication.get('type')
+
+    if isinstance(result['title'], list):
+        result['title'] = result['title'][0]
+
+    if publication.get('created'):
+        result['published_date'] = dateparser.parse(publication['created']['date-time'])
+
+    if publication.get('link'):
+        result['url'] = publication['link'][0]['URL']
+
+    if publication.get('author'):
+        authors = []
+        for i, author in enumerate(publication['author']):
+            author_name = f"{author.get('family', '')}, {author.get('given')}"
+            authors.append(Scalar(author_name, facets={'sequence': i}))
+
+        result['authors'] = authors
+
+    
+    return result
+
+
+
+
+    
