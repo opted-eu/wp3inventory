@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, abort, current_app
+from flask import Blueprint, render_template
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.forms import SimpleQuery

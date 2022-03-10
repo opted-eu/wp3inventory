@@ -3,8 +3,6 @@ from flaskinventory import dgraph
 
 
 # cache this function
-
-
 def get_country_choices(opted=True, multinational=False, addblank=False) -> list:
     """ Helper function to get form choices 
         Queries for all countries and returns a list of tuples

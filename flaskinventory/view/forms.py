@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flask_login import current_user
-from flaskinventory import dgraph
+from wtforms.validators import DataRequired
 
 
 class SimpleQuery(FlaskForm):

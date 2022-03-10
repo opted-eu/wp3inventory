@@ -10,7 +10,6 @@ from flaskinventory.view.utils import can_view, make_mini_table, make_results_ta
 from flaskinventory.view.forms import SimpleQuery
 from flaskinventory.misc.forms import publication_kind_dict, topical_focus_dict
 from flaskinventory.flaskdgraph.utils import validate_uid
-from flaskinventory.review.forms import ReviewActions
 from flaskinventory.review.utils import create_review_actions
 
 view = Blueprint('view', __name__)

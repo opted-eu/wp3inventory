@@ -1,10 +1,9 @@
 from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, current_app)
 from flask_login import login_required, current_user
-from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.review.forms import ReviewActions, ReviewFilter
-from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, check_entry
+from flaskinventory.review.forms import ReviewFilter
+from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 
