@@ -1,8 +1,7 @@
-from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField, RadioField
-from wtforms.fields.core import SelectMultipleField
-from wtforms.fields.html5 import IntegerField
+from wtforms import (SelectField, DateField, SelectMultipleField)
 
 import datetime
+
 
 class TomSelectMutlitpleField(SelectMultipleField):
 
@@ -31,8 +30,7 @@ class NullableDateField(DateField):
                 return
             try:
                 self.data = datetime.datetime.strptime(
-                    date_str, self.format).date()
+                    date_str, self.strptime_format[0]).date()
             except ValueError:
                 self.data = None
                 raise ValueError(self.gettext('Not a valid date value'))
-

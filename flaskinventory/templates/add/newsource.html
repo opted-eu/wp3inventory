@@ -28,7 +28,7 @@
     <fieldset id="section-general">
         <h3 class="mb-4">General Information</h3>
         <div class="mb-5 form-group">
-            <input type="text" name="uid" id="uid-hidden" value='_:newsource' readonly hidden>
+            <input type="text" name="uid" id="uid-hidden" value='' readonly hidden>
             <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed? {{ make_tooltip('If the channel you have in mind is not included as an option you may write to wp3@opted.eu and we discuss your suggestion.') }}</label>
             <select name="channel" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
                         <option value="">Select Channel...</option>
@@ -252,35 +252,35 @@
         <div id="group-publication-cycle-weekday" class="mb-5 fs-5" hidden>
                 <p class="form-label fs-6 fw-bold">Please indicate the specific day(s)</p>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-1" value="1">
                 <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-2" value="2">
                 <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-3" value="3">
                 <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-4" value="4">
                 <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-5" value="5">
                 <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-6" value="6">
                 <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-7" value="7">
                 <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-none" value="NA">
                 <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
             </div>
             <div id="publication-cycle-weekday-feedback"></div>

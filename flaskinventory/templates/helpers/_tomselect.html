@@ -191,8 +191,22 @@
             this.refreshOptions();
         }
     };
+
+    var TomSelectCountryConfig = {
+        selectOnTab: true,
+        onItemAdd:function(){ // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+        }
+    };
+
+    var countryField = document.getElementById('country')
+    if (countryField.hasAttribute('multiple')) {
+        new TomSelect('#country', TomSelectCountriesConfig);
+    } else {
+        new TomSelect('#country', TomSelectCountryConfig);
+    }
     
-    new TomSelect('#country', TomSelectCountriesConfig);
     
     {% endif %}
     

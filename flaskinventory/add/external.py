@@ -47,7 +47,9 @@ def reverse_geocode(lat, lon) -> dict:
 # Sitemaps & RSS/XML/Atom Feeds
 
 
-def build_url(site):
+def build_url(site: str):
+    if not isinstance(site, str):
+        site = str(site)
     if site.endswith('/'):
         site = site[:-1]
     if not site.startswith('http'):
@@ -247,7 +249,9 @@ def schemaorg(soup):
     return name, url
 
 
-def siterankdata(site):
+def siterankdata(site: str):
+    if not isinstance(site, str):
+        site = str(site)
     site = site.replace('http://', '').replace('https://',
                                                '').replace('www.', '')
     if site.endswith('/'):
@@ -260,7 +264,7 @@ def siterankdata(site):
         current_app.logger.debug(f'Getting siterankdata failed! Status code: {r.status_code}')
         return False
 
-    current_app.logger('Succeeded in grabbing siterankdata! Now parsing...')
+    current_app.logger.debug('Succeeded in grabbing siterankdata! Now parsing...')
 
     try:
         soup = bs4(r.content, 'lxml')
@@ -496,6 +500,8 @@ def telegram(username):
         return profile
 
     profile = asyncio.new_event_loop().run_until_complete(get_profile(username))
+    if not hasattr(profile, 'to_dict') or profile == False:
+        return False
     profile = profile.to_dict()
     telegram_id = profile.get('id')
     fullname = profile.get('first_name')

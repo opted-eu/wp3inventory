@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 flaskinventory/config.json
+flaskinventory/test_config.json
 flaskinventory/static/icons
 flaskinventory/static/labels
 flaskinventory/static/profile_pics

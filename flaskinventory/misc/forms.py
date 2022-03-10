@@ -1,5 +1,4 @@
-from wtforms import SelectField
-from wtforms.fields.core import SelectMultipleField
+from wtforms import SelectField, SelectMultipleField
 from flaskinventory import dgraph
 
 
@@ -17,7 +16,7 @@ class TomSelectField(SelectField):
 # cache this function
 
 
-def get_country_choices(opted=True, multinational=False) -> list:
+def get_country_choices(opted=True, multinational=False, addblank=False) -> list:
     """ Helper function to get form choices 
         Queries for all countries and returns a list of tuples
         [(<uid>, 'Country Name'), ...]
@@ -36,6 +35,8 @@ def get_country_choices(opted=True, multinational=False) -> list:
     if multinational:
         c_choices += [(multi.get('uid'), multi.get('name'))
                       for multi in countries['m']]
+    if addblank:
+        c_choices.insert(0, ('', ''))
     return c_choices
 
 
@@ -76,4 +77,3 @@ ownership_kind_choices = [('none', 'Missing!'),
                           ('unknown', 'Unknown Ownership')]
 
 ownership_kind_dict = {key: val for (key, val) in ownership_kind_choices}
-

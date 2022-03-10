@@ -150,6 +150,13 @@ class DGraph(object):
             return None
         return data['q'][0]['uid']
 
+    def get_unique_name(self, uid):
+        query_string = f'{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{ uid unique_name }} }}'
+        data = self.query(query_string)
+        if len(data['q']) == 0:
+            return None
+        return data['q'][0]['unique_name']
+
     def get_dgraphtype(self, uid, clean=['Entry', 'Resource']):
         query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
 

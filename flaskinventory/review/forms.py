@@ -1,7 +1,7 @@
-from wtforms.fields.simple import HiddenField, SubmitField
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms.fields import HiddenField, SubmitField, SelectField
 from wtforms.validators import DataRequired
+
 
 class ReviewFilter(FlaskForm):
     entity = SelectField('Filter by Entity Type',
@@ -13,8 +13,8 @@ class ReviewFilter(FlaskForm):
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
                              ('ResearchPaper', 'Research Paper')], validators=[DataRequired()]
-                            )
-    
+                         )
+
     country = SelectField('Filter by Country')
 
 

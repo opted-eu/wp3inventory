@@ -97,27 +97,34 @@ class SubunitAutocode(ListRelationship):
         super().__init__(relationship_constraint = ['Subunit'], 
                             allow_new=True, autoload_choices=True, 
                             overwrite=True, *args, **kwargs)
-
+        
     def get_choices(self):
 
-        query_string = '''{ subunit(func: type("Subunit"), orderasc: name) { uid unique_name name  } }'''
+        query_string = '''{
+                            q(func: type(Country)) {
+                            name
+                                subunit: ~country @filter(type(Subunit)) {
+                                        name uid
+                                }
+                            }
+                        }
+                        '''
 
         choices = dgraph.query(query_string=query_string)
 
-        if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+        self.choices = {}
+        self.choices_tuples = {}
 
-        else:
-            self.choices = {}
-            self.choices_tuples = {}
-            for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+        for country in choices["q"]:
+            if country.get('subunit'):
+                self.choices_tuples[country['name']] = [(s['uid'], s['name']) for s in country['subunit']]
+                self.choices.update({s['uid']: s['name'] for s in country['subunit']})
+
 
     def _geo_query_subunit(self, query):
         geo_result = geocode(query)
         if geo_result:
+            current_app.logger.debug(f'Got a result for "{query}": {geo_result}')
             dql_string = f'''{{ q(func: eq(country_code, "{geo_result['address']['country_code']}")) @filter(type("Country")) {{ uid }} }}'''
             dql_result = dgraph.query(dql_string)
             try:
@@ -169,6 +176,7 @@ class SubunitAutocode(ListRelationship):
     def _resolve_subunit(self, subunit):
         geo_query = self._geo_query_subunit(subunit)
         if geo_query:
+            current_app.logger.debug(f'parsing result of querying {subunit}: {geo_query}')
             geo_query['dgraph.type'] = ['Subunit']
             # prevent duplicates
             geo_query['unique_name'] = f"{slugify(subunit, separator='_')}_{geo_query['country_code']}"
@@ -190,6 +198,7 @@ class SubunitAutocode(ListRelationship):
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+            current_app.logger.debug(f'New subunit, trying to resolve "{data}"')
             new_subunit = self._resolve_subunit(data)
             return new_subunit
         if self.relationship_constraint:
@@ -198,6 +207,18 @@ class SubunitAutocode(ListRelationship):
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
         return {'uid': UID(uid)}
+
+    def validate(self, data, facets=None) -> list:
+        if isinstance(data, str):
+            data = data.split(',')
+        data = set([item.strip() for item in data if item.strip() != ''])
+        uids = []
+        for item in data:
+            uid = self.validation_hook(item)
+            if uid:
+                uids.append(uid)
+
+        return uids
         
 
 class OrganizationAutocode(ReverseListRelationship):
@@ -280,6 +301,9 @@ class OrganizationAutocode(ReverseListRelationship):
 
 class Entry(Schema):
 
+    __permission_new__ = USER_ROLES.Contributor
+    __permission_edit__ = USER_ROLES.Contributor
+
     uid = UIDPredicate()
     
     unique_name = UniqueName()
@@ -316,7 +340,8 @@ class Organization(Entry):
                              render_kw={'placeholder': 'Separate by comma'}, 
                              overwrite=True)
     
-    is_person = Boolean(description='Is the media organisation a person?',
+    is_person = Boolean(label='Yes, is a person',
+                        description='Is the media organisation a person?',
                         default=False)
     
     ownership_kind = SingleChoice(choices={
@@ -329,8 +354,11 @@ class Organization(Entry):
 
     country = SingleRelationship(relationship_constraint='Country', 
                                  allow_new=False,
-                                 overwrite=True, 
-                                 description='In which country is the organisation located?')
+                                 overwrite=True,
+                                 autoload_choices=True, 
+                                 description='In which country is the organisation located?',
+                                 render_kw={'placeholder': 'Select a country...'}
+                                 )
     
     publishes = ListRelationship(allow_new=False, 
                                  relationship_constraint='Source', 
@@ -348,12 +376,13 @@ class Organization(Entry):
                                         'NA': "Don't know / NA",
                                         'yes': 'Yes',
                                         'no': 'No'
-                                    })
+                                    },
+                                    new=False)
     
     address_string = AddressAutocode(new=False,
                                      render_kw={'placeholder': 'Main address of the organization.'})
     
-    address_geo = GeoAutoCode(read_only=True, new=False, hidden=True)
+    address_geo = GeoAutoCode(read_only=True, new=False, edit=False, hidden=True)
     
     employees = String(description='How many employees does the news organization have?',
                        render_kw={
@@ -362,24 +391,6 @@ class Organization(Entry):
     
     founded = DateTime(new=False)
 
-
-class Resource(Entry):
-
-    description = String(large_textfield=True)
-    authors = ListString(render_kw={'placeholder': 'Separate by comma'})
-    published_date = DateTime()
-    last_updated = DateTime()
-    url = String()
-    doi = String()
-    arxiv = String()
-
-class Archive(Resource):
-
-    access = SingleChoice(choices={'free': 'Free',
-                                    'restricted': 'Restricted'})
-    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
-    fulltext = Boolean(description='Dataset contains fulltext')
-    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
 
 
 class Source(Entry):
@@ -396,12 +407,32 @@ class Source(Entry):
                   required=True,
                   description='What is the name of the news source?',
                   render_kw={'placeholder': "e.g. 'The Royal Gazette'"})
+
+    channel_url = String(label='URL of Channel',
+                         description="What is the url or social media handle of the news source?")
     
     other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
                              render_kw={'placeholder': 'Separate by comma'}, 
                              overwrite=True)
+    
+    transcript_kind = SingleChoice(description="What kind of show is transcribed?",
+                                    choices={'tv':  "TV (broadcast, cable, satellite, etc)",
+                                             'radio': "Radio",
+                                             "podcast": "Podcast",
+                                             "NA": "Don't know / NA"})
 
-    founded = Year(description="What year was the print news source founded?")
+    website_allows_comments = SingleChoice(description='Does the online news source have user comments below individual news articles?',
+                                           choices={'yes': 'Yes',
+                                                    'no': 'No',
+                                                    'NA': "Don't know / NA"})
+
+    website_comments_registration_required = SingleChoice(label="Registraion required for posting comments",
+                                                          description='Is a registration or an account required to leave comments?',
+                                                          choices={'yes': 'Yes',
+                                                                    'no': 'No',
+                                                                    'NA': "Don't know / NA"})
+
+    founded = Year(description="What year was the news source founded?")
 
     publication_kind = MultipleChoice(description='What label or labels describe the main source?',
                                       choices={'newspaper': 'Newspaper / News Site', 
@@ -440,14 +471,14 @@ class Source(Entry):
                                                  'NA': "Don't Know / NA"},
                                                  required=True)
 
-    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s)",
-                                                choices={1: 'Monday', 
-                                                        2: 'Tuesday', 
-                                                        3: 'Wednesday', 
-                                                        4: 'Thursday', 
-                                                        5: 'Friday', 
-                                                        6: 'Saturday', 
-                                                        7: 'Sunday', 
+    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s) when the news source publishes.",
+                                                choices={"1": 'Monday', 
+                                                        "2": 'Tuesday', 
+                                                        "3": 'Wednesday', 
+                                                        "4": 'Thursday', 
+                                                        "5": 'Friday', 
+                                                        "6": 'Saturday', 
+                                                        "7": 'Sunday', 
                                                         'NA': "Don't Know / NA"},
                                                 tom_select=True)
 
@@ -473,7 +504,7 @@ class Source(Entry):
                                 tom_select=True)
 
     payment_model = SingleChoice(description="Is the content produced by the news source accessible free of charge?",
-                                    choices={'free': 'Free, all content is free of charge', 
+                                    choices={'free': 'All content is free of charge', 
                                             'partly free': 'Some content is free of charge', 
                                             'not free': 'No content is free of charge', 
                                             'NA': "Don't Know / NA"},
@@ -488,7 +519,7 @@ class Source(Entry):
                                     required=True,
                                     radio_field=True)
 
-    audience_size = Year(default=datetime.date.today())
+    audience_size = Year(default=datetime.date.today(), edit=False)
 
     publishes_org = OrganizationAutocode('publishes', 
                                        label='Published by',
@@ -498,13 +529,58 @@ class Source(Entry):
                                        label='Published by person',
                                        default_predicates={'is_person': True})
 
+    channel_epaper = SingleChoice(description='Does the print news source have an e-paper version?',
+                                    choices={'yes': 'Yes',
+                                            'no': 'No',
+                                            'NA': "Don't know / NA"})
+
     archive_sources_included = ReverseListRelationship('sources_included', 
                                                     allow_new=False, 
                                                     relationship_constraint='Archive',
-                                                    label='News source included in these resources')
+                                                    description="Are texts from the news source available for download in one or several of the following data archives?",
+                                                    label='News source included in these archives')
+    
+    dataset_sources_included = ReverseListRelationship('sources_included', 
+                                                    allow_new=False, 
+                                                    relationship_constraint='Dataset',
+                                                    description="Is the news source included in one or several of the following annotated media text data sets?",
+                                                    label='News source included in these datasets')
+
+    party_affiliated = SingleChoice(description='Is the news source close to a political party?',
+                                    choices={'yes': 'Yes',
+                                            'no': 'No',
+                                            'NA': "Don't know / NA"})
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
 
+class Country(Entry):
+
+    __permission_new__ = USER_ROLES.Admin
+    __permission_edit__ = USER_ROLES.Admin
+
+    country_code = String(permission=USER_ROLES.Admin)
+    opted_scope = Boolean(description="Is country in the scope of OPTED?",
+                            label='Yes, in scope of OPTED')
+
+class Multinational(Entry):
+
+    __permission_new__ = USER_ROLES.Admin
+    __permission_edit__ = USER_ROLES.Admin
+
+    description = String(large_textfield=True)
+
+class Subunit(Entry):
+
+    __permission_new__ = USER_ROLES.Reviewer
+    __permission_edit__ = USER_ROLES.Reviewer
+
+    country = SingleRelationship(required=True, 
+                                tom_select=True,
+                                autoload_choices=True, 
+                                overwrite=True,
+                                relationship_constraint='Country')
+    country_code = String()
+    location_point = Geo(edit=False, new=False)
 
 
 class Resource(Entry):
@@ -524,8 +600,3 @@ class Archive(Resource):
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
     fulltext = Boolean(description='Dataset contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
-
-# entry_countries = ListRelationship(
-#     'country', relationship_constraint='Country', allow_new=False, overwrite=True)
-
-
