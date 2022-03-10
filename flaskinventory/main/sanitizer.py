@@ -119,14 +119,8 @@ class Sanitizer:
     @property
     def set_nquads(self):
         nquads = dict_to_nquad(self.entry)
-        # print('Entry NQuads')
-        # print(nquads)
-        # print('Related NQuads')
-        print(self.related_entries)
         for related in self.related_entries:
             nquads += dict_to_nquad(related)
-            print(nquads[-1])
-        # nquads += [dict_to_nquad(related) for related in self.related_entries]
         return " \n".join(nquads)
 
     def _delete_nquads(self):
@@ -242,9 +236,6 @@ class Sanitizer:
             elif self.data.get(key) and isinstance(item, MutualRelationship):
                 node_data, data_node = item.validate(self.data[key], self.entry_uid, facets=facets)
                 self.entry[item.predicate] = node_data
-                print(f'<{key}>')
-                print('node_data', node_data)
-                print('data_node', data_node)
                 if isinstance(data_node, list):
                     self.related_entries += data_node
                 else:
@@ -286,10 +277,6 @@ class Sanitizer:
                 self.entry[key] = set.union(validated, self.entry[key])
             else:
                 self.entry[key] = validated
-
-            if hasattr(item, 'allow_new'):
-                if item.allow_new:
-                    print('generate unique name for new item')
 
         if self.is_upsert:
             self.entry = self._add_entry_meta(self.entry)
@@ -397,6 +384,12 @@ class Sanitizer:
         for source in self.related_entries:
             if isinstance(source['uid'], NewID):
                 if 'Source' in source['dgraph.type']:
+                    rel_channel = self.data.get('newsource_' + source['name'])
+                    if rel_channel:
+                        if dgraph.get_dgraphtype(rel_channel) == 'Channel':
+                            source['channel'] = UID(rel_channel)
+                    else:
+                        raise InventoryValidationError(f'No channel provided for related source {source["name"]}! Please indicate channel')
                     source['entry_review_status'] = 'draft'
                     source['unique_name'] = secrets.token_urlsafe(8)
                     source['publication_kind'] = self.entry.get('publication_kind')
@@ -411,11 +404,8 @@ class Sanitizer:
                     if not isinstance(source['related'], list):
                         source['related'] = [source['related']]
                     source['related'] += self.entry['related']
-
-                    rel_channel = self.data.get('newsource_' + source['name'])
-                    if rel_channel:
-                        if dgraph.get_dgraphtype(rel_channel) == 'Channel':
-                            source['channel'] = UID(rel_channel)
+                    
+                    
 
     @staticmethod
     def source_unique_name(name, channel=None, country=None, country_uid=None):

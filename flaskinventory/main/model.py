@@ -100,12 +100,25 @@ class SubunitAutocode(ListRelationship):
         
     def get_choices(self):
 
-        query_string = '''{ subunit(func: type("Subunit"), orderasc: name) { uid unique_name name  } }'''
+        query_string = '''{
+                            q(func: type(Country)) {
+                            name
+                                subunit: ~country @filter(type(Subunit)) {
+                                        name uid
+                                }
+                            }
+                        }
+                        '''
 
         choices = dgraph.query(query_string=query_string)
 
-        self.choices = {c['uid']: c['name'] for c in choices["subunit"]}
-        self.choices_tuples = [(c['uid'], c['name']) for c in choices["subunit"]]
+        self.choices = {}
+        self.choices_tuples = {}
+
+        for country in choices["q"]:
+            if country.get('subunit'):
+                self.choices_tuples[country['name']] = [(s['uid'], s['name']) for s in country['subunit']]
+                self.choices.update({s['uid']: s['name'] for s in country['subunit']})
 
 
     def _geo_query_subunit(self, query):
@@ -341,7 +354,8 @@ class Organization(Entry):
 
     country = SingleRelationship(relationship_constraint='Country', 
                                  allow_new=False,
-                                 overwrite=True, 
+                                 overwrite=True,
+                                 autoload_choices=True, 
                                  description='In which country is the organisation located?',
                                  render_kw={'placeholder': 'Select a country...'}
                                  )
@@ -395,7 +409,7 @@ class Source(Entry):
                   render_kw={'placeholder': "e.g. 'The Royal Gazette'"})
 
     channel_url = String(label='URL of Channel',
-                         description="What is the url of the website that provides tv, radio, or podcast scripts?")
+                         description="What is the url or social media handle of the news source?")
     
     other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
                              render_kw={'placeholder': 'Separate by comma'}, 
@@ -418,7 +432,7 @@ class Source(Entry):
                                                                     'no': 'No',
                                                                     'NA': "Don't know / NA"})
 
-    founded = Year(description="What year was the print news source founded?")
+    founded = Year(description="What year was the news source founded?")
 
     publication_kind = MultipleChoice(description='What label or labels describe the main source?',
                                       choices={'newspaper': 'Newspaper / News Site', 
@@ -457,7 +471,7 @@ class Source(Entry):
                                                  'NA': "Don't Know / NA"},
                                                  required=True)
 
-    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s)",
+    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s) when the news source publishes.",
                                                 choices={"1": 'Monday', 
                                                         "2": 'Tuesday', 
                                                         "3": 'Wednesday', 
@@ -561,7 +575,9 @@ class Subunit(Entry):
     __permission_edit__ = USER_ROLES.Reviewer
 
     country = SingleRelationship(required=True, 
-                                tom_select=True, 
+                                tom_select=True,
+                                autoload_choices=True, 
+                                overwrite=True,
                                 relationship_constraint='Country')
     country_code = String()
     location_point = Geo(edit=False, new=False)

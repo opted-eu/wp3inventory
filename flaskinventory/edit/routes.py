@@ -1,21 +1,17 @@
 from flask import (current_app, Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
-from flaskinventory.edit.forms import make_form, RefreshWikidataForm
-from flaskinventory.edit.utils import can_edit
-from flaskinventory.edit.sanitize import (EditArchiveSanitizer, EditOrgSanitizer, EditSourceSanitizer,
-                                          EditSubunitSanitizer, EditDatasetSanitizer, EditMultinationalSanitizer,
-                                          WikiDataSanitizer, EditAudienceSizeSanitizer)
+from flaskinventory import dgraph
+from flaskinventory.flaskdgraph import Schema
+from flaskinventory.main.sanitizer import Sanitizer
+from flaskinventory.misc import get_ip
+from flaskinventory.add.external import fetch_wikidata
+
+from flaskinventory.edit.forms import RefreshWikidataForm
+from flaskinventory.edit.utils import can_edit, channel_filter
+from flaskinventory.edit.sanitize import WikiDataSanitizer, EditAudienceSizeSanitizer
 from flaskinventory.edit.dgraph import get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
-from flaskinventory.misc import get_ip
-from flaskinventory.misc.forms import get_country_choices, get_subunit_choices
-from flaskinventory.add.external import fetch_wikidata
-from flaskinventory.users.constants import USER_ROLES
-from flaskinventory import dgraph
-from flaskinventory.main.model import Organization, Entry
-from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
-from flaskinventory.flaskdgraph import Schema
 
 import traceback
 
@@ -41,589 +37,10 @@ def edit_uid(uid):
     if 'Resource' in result['q'][0]['dgraph.type']:
         result['q'][0]['dgraph.type'].remove('Resource')
 
-    if result['q'][0]['dgraph.type'][0] in ['Source', 'Organization', 'Subunit', 'Archive', 'Dataset']:
+    if result['q'][0]['dgraph.type'][0] in Schema.get_types():
         return redirect(url_for('edit.entry', dgraph_type=result['q'][0]['dgraph.type'][0].title(), unique_name=result['q'][0]['unique_name'], **request.args))
     else:
         return abort(404)
-
-@edit.route('/edit/<string:dgraph_type>/<string:unique_name>', methods=['GET', 'POST'])
-@edit.route('/edit/<string:dgraph_type>/uid/<string:uid>', methods=['GET', 'POST'])
-@login_required
-def entry(dgraph_type=None, unique_name=None, uid=None):
-    if not dgraph_type:
-        return abort(404)
-    check = check_entry(unique_name=unique_name, uid=uid)
-    if not check:
-        return abort(404)
-    
-    dgraph_type = dgraph_type.title()
-    if dgraph_type not in check['dgraph.type']:
-        return abort(404)
-
-    if not can_edit(check, current_user):
-        return abort(403)
-
-    if current_user.user_role < Schema.permissions_edit(dgraph_type):
-        return abort(403)
-
-    if not unique_name:
-        unique_name = check.get('unique_name')
-    if not uid:
-        uid = check.get('uid')
-
-    try:
-        entry = get_entry(uid=uid)
-    except Exception as e:
-        current_app.logger.error(f'Could not populate form for <{uid}>: {e}', stack_info=True)
-        return abort(404)
-    from pprint import pprint
-
-    if request.method == 'GET':
-        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, populate_obj=entry['q'][0], entry_review_status=check['entry_review_status'])
-    else:
-        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'])
-    
-    fields = Schema.get_predicates(dgraph_type)
-
-    if 'country' in fields:
-        form.country.choices = get_country_choices(opted=False)
-
-    if form.validate_on_submit():
-        try:
-            sanitizer = Sanitizer.edit(form.data, dgraph_type=dgraph_type)
-        except Exception as e:
-            if current_app.debug:
-                    e_trace = "".join(traceback.format_exception(
-                        None, e, e.__traceback__))
-                    current_app.logger.error(e_trace)
-            flash(f'{dgraph_type} could not be updated: {e}', 'danger')
-            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
-        try:
-            result = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
-            if request.form.get('accept'):
-                flash(f'{dgraph_type} has been edited and accepted', 'success')
-                return redirect(url_for('review.overview', **request.args))
-            else:
-                flash(f'{dgraph_type} has been updated', 'success')
-                return redirect(url_for('view.view_uid', uid=uid))
-        except Exception as e:
-            flash(f'{dgraph_type} could not be updated: {e}', 'danger')
-            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
-
-    sidebar_items = {'meta': entry['q'][0]}
-    if dgraph_type == 'Organization':
-        wikidata_form = RefreshWikidataForm()
-        wikidata_form.uid.data = uid
-        sidebar_items.update({'actions': {'wikidata': wikidata_form}})
-    return render_template('edit/editform.html', title=f'Edit {dgraph_type}', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
-
-# @edit.route('/edit/organisation/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/organization/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/organisation/uid/<string:uid>', methods=['GET', 'POST'])
-# @edit.route('/edit/organization/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def organization(unique_name=None, uid=None):
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Organization' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     if not unique_name:
-#         unique_name = check.get('unique_name')
-#     if not uid:
-#         uid = check.get('uid')
-
-#     # form, fields = make_form('organization', review_status=check['entry_review_status'])
-#     form = Organization.generate_edit_entry_form(entry_review_status=check['entry_review_status'])
-#     fields = Organization.predicates()
-
-#     form.country.choices = get_country_choices(opted=False)
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = Sanitizer.edit(form.data, dgraph_type=Organization)
-#         except Exception as e:
-#             if current_app.debug:
-#                     e_trace = traceback.format_exception(
-#                         None, e, e.__traceback__)
-#                     current_app.logger.debug(e_trace)
-#             flash(f'Organization could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.organization', uid=uid))
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             if request.form.get('accept'):
-#                 flash(f'Organization has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Organization has been updated', 'success')
-#                 return redirect(url_for('view.view_organization', uid=uid))
-#         except Exception as e:
-#             flash(f'Organization could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.organization', uid=uid))
-
-#     result = get_entry(uid=uid)
-#     if result:
-#         for key, value in result['q'][0].items():
-#             if not hasattr(form, key):
-#                 continue
-#             if type(value) is list:
-#                 if type(value[0]) is str:
-#                     value = ",".join(value)
-#                 elif key == 'country':
-#                     value = value[0].get('uid')
-#                 elif key != 'country':
-#                     choices = [(subval['uid'], subval['name'])
-#                                for subval in value]
-#                     value = [subval['uid'] for subval in value]
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#             setattr(getattr(form, key), 'data', value)
-
-#         wikidata_form = RefreshWikidataForm()
-#         wikidata_form.uid.data = uid
-#         sidebar_items = {'actions': {'wikidata': wikidata_form}, 'meta': result['q'][0]}
-#         return render_template('edit/editform.html', title='Edit Organization', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
-#     else:
-#         return abort(404)
-
-
-# @edit.route('/edit/source/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/source/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def source(unique_name=None, uid=None):
-
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Source' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     result = get_entry(unique_name=unique_name, uid=uid)
-#     if len(result['q']) == 0:
-#         return abort(404)
-
-#     form, fields = make_form(
-#         result['q'][0]['channel']['unique_name'], review_status=check['entry_review_status'])
-
-#     if current_user.user_role >= USER_ROLES.Reviewer:
-#         form.country.choices = get_country_choices(
-#             multinational=True, opted=False)
-#     else:
-#         form.country.choices = get_country_choices(multinational=True)
-#     form.geographic_scope_subunit.choices = get_subunit_choices()
-
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = EditSourceSanitizer(
-#                 form.data, current_user, get_ip())
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-#             current_app.logger.debug(
-#                 f'Delete Nquads: {sanitizer.delete_nquads}')
-#         except Exception as e:
-#             # tb_str = ''.join(traceback.format_exception(
-#             #     None, e, e.__traceback__))
-#             current_app.logger.error(e)
-#             flash(
-#                 f'Source could not be updated. Sanitizer raised error: {e}', 'danger')
-#             return redirect(url_for('edit.source', uid=form.uid.data))
-
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             current_app.logger.debug(delete)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             current_app.logger.debug(result)
-#             if request.form.get('accept'):
-#                 flash(f'Source has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Source has been updated', 'success')
-#                 return redirect(url_for('view.view_source', unique_name=form.unique_name.data))
-#         except Exception as e:
-#             tb_str = ''.join(traceback.format_exception(
-#                 None, e, e.__traceback__))
-#             current_app.logger.error(e, tb_str)
-#             flash(
-#                 f'Source could not be updated. DGraph raised error: {e.message}, {e}', 'danger')
-#             return redirect(url_for('edit.source', uid=form.uid.data))
-
-#     for key, value in result['q'][0].items():
-#         if not hasattr(form, key):
-#             continue
-#         if type(value) is dict:
-#             choices = [(value['uid'], value['name'])]
-#             value = value['uid']
-#             setattr(getattr(form, key),
-#                     'choices', choices)
-#         elif type(value) is list:
-#             if type(value[0]) is str:
-#                 value = ",".join(value)
-#             elif type(value[0]) is int:
-#                 value = [str(val) for val in value]
-#             else:
-#                 choices = [(subval['uid'], subval['unique_name'])
-#                            for subval in value if subval.get('unique_name')]
-#                 value = [subval['uid'] for subval in value]
-#                 if key not in ['country', 'geographic_scope_subunit']:
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#         setattr(getattr(form, key), 'data', value)
-
-#     sidebar_items = {'meta': result['q'][0]}
-#     if result['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
-#         sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=result['q'][0]['uid'])}
-
-#     return render_template('edit/editform.html', title='Edit Source', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
-
-
-@edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
-@login_required
-def source_audience(uid):
-    check = check_entry(uid=uid)
-    if not check:
-        return abort(404)
-
-    if 'Source' not in check['dgraph.type']:
-        return abort(404)
-
-    if not can_edit(check, current_user):
-        return abort(403)
-
-    if check['channel']['unique_name'] not in ['print', 'facebook']:
-        flash('You can only edit the audience size for print and Facebook news sources', 'info')
-        return redirect(url_for('edit.source', uid=uid))
-
-    if request.method == 'POST':
-        current_app.logger.debug(
-            f'received POST request: {request.get_json()}')
-        try:
-            sanitizer = EditAudienceSizeSanitizer(
-            uid, request.get_json(), current_user, get_ip())
-        except Exception as e:
-            return jsonify({'status': 'error', 'error': f'{e}'})
-        
-        try:
-            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
-
-            delete = dgraph.upsert(
-                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-            current_app.logger.debug(delete)
-            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-            current_app.logger.debug(result)
-        except Exception as e:
-            return jsonify({'status': 'error', 'error': f'{e}'})
-
-        flash('Audience size updated!', 'success')
-
-        return jsonify({'status': 'success', 'redirect': url_for('view.view_source', uid=uid)})
-
-    audience_size = get_audience(uid=uid)
-    entry = get_entry(uid=uid)
-    entry = entry['q'][0]
-    sidebar_items = {'meta': entry}
-
-    return render_template('edit/audience.html', title='Edit Source', entry=entry, data=audience_size, show_sidebar=True, sidebar_items=sidebar_items)
-
-
-# @edit.route('/edit/subunit/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/subunit/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def subunit(unique_name=None, uid=None):
-
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Subunit' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     if not unique_name:
-#         unique_name = check.get('unique_name')
-
-#     form, fields = make_form('subunit', review_status=check['entry_review_status'])
-
-#     form.country.choices = get_country_choices(opted=False)
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = EditSubunitSanitizer(
-#                 form.data, current_user, get_ip())
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
-#         except Exception as e:
-#             flash(f'Subunit could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.subunit', unique_name=form.unique_name.data))
-
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             current_app.logger.debug(delete)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             current_app.logger.debug(result)
-#             if request.form.get('accept'):
-#                 flash(f'Subunit has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Subunit has been updated', 'success')
-#                 return redirect(url_for('view.view_subunit', unique_name=form.unique_name.data))
-#         except Exception as e:
-#             flash(f'Subunit could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.subunit', unique_name=form.unique_name.data))
-
-#     result = get_entry(unique_name=unique_name)
-#     if result:
-#         for key, value in result['q'][0].items():
-#             if not hasattr(form, key):
-#                 continue
-#             if type(value) is list:
-#                 if type(value[0]) is str:
-#                     value = ",".join(value)
-#                 elif key == 'country':
-#                     value = value[0].get('uid')
-#                 elif key != 'country':
-#                     choices = [(subval['uid'], subval['name'])
-#                                for subval in value]
-#                     value = [subval['uid'] for subval in value]
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#             setattr(getattr(form, key), 'data', value)
-
-#         sidebar_items = {'meta': result['q'][0]}
-
-#         return render_template('edit/editform.html', title='Edit Subunit', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
-#     else:
-#         return abort(404)
-
-
-# @edit.route('/edit/multinational/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/multinational/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def multinational(unique_name=None, uid=None):
-
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Multinational' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     if not unique_name:
-#         unique_name = check.get('unique_name')
-
-#     form, fields = make_form('multinational', review_status=check['entry_review_status'])
-
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = EditMultinationalSanitizer(
-#                 form.data, current_user, get_ip())
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
-#         except Exception as e:
-#             flash(f'Multinational Entity could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.multinational', unique_name=form.unique_name.data))
-
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             current_app.logger.debug(delete)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             current_app.logger.debug(result)
-#             if request.form.get('accept'):
-#                 flash(f'Multinational Entity has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Multinational Entity has been updated', 'success')
-#                 return redirect(url_for('view.view_multinational', unique_name=form.unique_name.data))
-#         except Exception as e:
-#             flash(f'Multinational Entity could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.multinational', unique_name=form.unique_name.data))
-
-#     result = get_entry(unique_name=unique_name)
-#     if result:
-#         for key, value in result['q'][0].items():
-#             if not hasattr(form, key):
-#                 continue
-#             if type(value) is list:
-#                 if type(value[0]) is str:
-#                     value = ",".join(value)
-#                 elif key != 'country':
-#                     choices = [(subval['uid'], subval['name'])
-#                                for subval in value]
-#                     value = [subval['uid'] for subval in value]
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#             setattr(getattr(form, key), 'data', value)
-
-#         sidebar_items = {'meta': result['q'][0]}
-
-#         return render_template('edit/editform.html', title='Edit Multinational Construct', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
-#     else:
-#         return abort(404)
-
-
-# @edit.route('/edit/dataset/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/dataset/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def dataset(unique_name=None, uid=None):
-
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Dataset' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     if not unique_name:
-#         unique_name = check.get('unique_name')
-
-#     form, fields = make_form('dataset', review_status=check['entry_review_status'])
-
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = EditDatasetSanitizer(
-#                 form.data, current_user, get_ip())
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.delete_nquads}')
-#         except Exception as e:
-#             flash(f'Dataset could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.dataset', unique_name=form.unique_name.data))
-
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             current_app.logger.debug(delete)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             current_app.logger.debug(result)
-#             if request.form.get('accept'):
-#                 flash(f'Dataset has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Dataset has been updated', 'success')
-#                 return redirect(url_for('view.view_dataset', unique_name=form.unique_name.data))
-#         except Exception as e:
-#             flash(f'Dataset could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.dataset', unique_name=form.unique_name.data))
-
-#     result = get_entry(unique_name=unique_name)
-#     if result:
-#         for key, value in result['q'][0].items():
-#             if not hasattr(form, key):
-#                 continue
-#             if type(value) is list:
-#                 if type(value[0]) is str:
-#                     value = ",".join(value)
-#                 elif key == 'country':
-#                     value = value[0].get('uid')
-#                 elif key != 'country':
-#                     choices = [(subval['uid'], subval['name'])
-#                                for subval in value]
-#                     value = [subval['uid'] for subval in value]
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#             setattr(getattr(form, key), 'data', value)
-#         sidebar_items = {'meta': result['q'][0]}
-#         return render_template('edit/editform.html', title='Edit Dataset', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
-#     else:
-#         return abort(404)
-
-
-# @edit.route('/edit/archive/<string:unique_name>', methods=['GET', 'POST'])
-# @edit.route('/edit/archive/uid/<string:uid>', methods=['GET', 'POST'])
-# @login_required
-# def archive(unique_name=None, uid=None):
-
-#     check = check_entry(unique_name=unique_name, uid=uid)
-#     if not check:
-#         return abort(404)
-
-#     if 'Archive' not in check['dgraph.type']:
-#         return abort(404)
-
-#     if not can_edit(check, current_user):
-#         return abort(403)
-
-#     if not unique_name:
-#         unique_name = check.get('unique_name')
-#     if not uid:
-#         uid = check.get('uid')
-
-#     form, fields = make_form('archive', review_status=check['entry_review_status'])
-
-#     if form.validate_on_submit():
-#         try:
-#             sanitizer = EditArchiveSanitizer(
-#                 form.data, current_user, get_ip())
-#             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-#             current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
-#         except Exception as e:
-#             flash(f'Archive could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.archive', unique_name=form.unique_name.data))
-
-#         try:
-#             delete = dgraph.upsert(
-#                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
-#             current_app.logger.debug(delete)
-#             result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
-#             current_app.logger.debug(result)
-#             if request.form.get('accept'):
-#                 flash(f'Archive has been edited and accepted', 'success')
-#                 return redirect(url_for('review.overview', **request.args))
-#             else:
-#                 flash(f'Archive has been updated', 'success')
-#                 return redirect(url_for('view.view_archive', unique_name=form.unique_name.data))
-#         except Exception as e:
-#             flash(f'Archive could not be updated: {e}', 'danger')
-#             return redirect(url_for('edit.archive', unique_name=form.unique_name.data))
-
-#     result = get_entry(unique_name=unique_name)
-#     if result:
-#         for key, value in result['q'][0].items():
-#             if not hasattr(form, key):
-#                 continue
-#             if type(value) is list:
-#                 if type(value[0]) is str:
-#                     value = ",".join(value)
-#                 elif key == 'country':
-#                     value = value[0].get('uid')
-#                 elif key != 'country':
-#                     choices = [(subval['uid'], subval['name'])
-#                                for subval in value]
-#                     value = [subval['uid'] for subval in value]
-#                     setattr(getattr(form, key),
-#                             'choices', choices)
-
-#             setattr(getattr(form, key), 'data', value)
-
-#         sidebar_items = {'meta': result['q'][0]}
-
-#         return render_template('edit/editform.html', title='Edit Archive', form=form, fields=fields.keys(), show_sidebar=True, sidebar_items=sidebar_items)
-#     else:
-#         return abort(404)
 
 
 @edit.route('/edit/wikidata', methods=['POST'])
@@ -685,3 +102,131 @@ def refresh_wikidata():
     except Exception as e:
         flash(f'Could not refresh WikiData: {e}', 'danger')
         return redirect(url_for('edit.edit_uid', uid=uid))
+
+
+@edit.route('/edit/<string:dgraph_type>/<string:unique_name>', methods=['GET', 'POST'])
+@edit.route('/edit/<string:dgraph_type>/uid/<string:uid>', methods=['GET', 'POST'])
+@login_required
+def entry(dgraph_type=None, unique_name=None, uid=None):
+    if not dgraph_type:
+        return abort(404)
+    check = check_entry(unique_name=unique_name, uid=uid)
+    if not check:
+        return abort(404)
+    
+    dgraph_type = dgraph_type.title()
+    if dgraph_type not in check['dgraph.type']:
+        return abort(404)
+
+    if not can_edit(check, current_user):
+        return abort(403)
+
+    if current_user.user_role < Schema.permissions_edit(dgraph_type):
+        return abort(403)
+
+    if not unique_name:
+        unique_name = check.get('unique_name')
+    if not uid:
+        uid = check.get('uid')
+
+    try:
+        entry = get_entry(uid=uid)
+    except Exception as e:
+        current_app.logger.error(f'Could not populate form for <{uid}>: {e}', stack_info=True)
+        return abort(404)
+
+    skip_fields = []
+    # manually filter out fields depending on channel
+    if dgraph_type == 'Source':
+        skip_fields = channel_filter(entry['q'][0]['channel']['unique_name'])
+
+    if request.method == 'GET':
+        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, populate_obj=entry['q'][0], entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
+    else:
+        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
+    
+    fields = Schema.get_predicates(dgraph_type)
+
+    if form.validate_on_submit():
+        try:
+            sanitizer = Sanitizer.edit(form.data, dgraph_type=dgraph_type)
+        except Exception as e:
+            if current_app.debug:
+                    e_trace = "".join(traceback.format_exception(
+                        None, e, e.__traceback__))
+                    current_app.logger.error(e_trace)
+            flash(f'{dgraph_type} could not be updated: {e}', 'danger')
+            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
+        try:
+            result = dgraph.upsert(
+                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
+            if request.form.get('accept'):
+                flash(f'{dgraph_type} has been edited and accepted', 'success')
+                return redirect(url_for('review.overview', **request.args))
+            else:
+                flash(f'{dgraph_type} has been updated', 'success')
+                return redirect(url_for('view.view_uid', uid=uid))
+        except Exception as e:
+            flash(f'{dgraph_type} could not be updated: {e}', 'danger')
+            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
+
+    sidebar_items = {'meta': entry['q'][0]}
+    if dgraph_type == 'Organization':
+        wikidata_form = RefreshWikidataForm()
+        wikidata_form.uid.data = uid
+        sidebar_items.update({'actions': {'wikidata': wikidata_form}})
+    if dgraph_type == 'Source':
+        if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
+            sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=entry['q'][0]['uid'])}
+
+    return render_template('edit/editform.html', title=f'Edit {dgraph_type}', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
+
+@edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
+@login_required
+def source_audience(uid):
+    check = check_entry(uid=uid)
+    if not check:
+        return abort(404)
+
+    if 'Source' not in check['dgraph.type']:
+        return abort(404)
+
+    if not can_edit(check, current_user):
+        return abort(403)
+
+    if check['channel']['unique_name'] not in ['print', 'facebook']:
+        flash('You can only edit the audience size for print and Facebook news sources', 'info')
+        return redirect(url_for('edit.source', uid=uid))
+
+    if request.method == 'POST':
+        current_app.logger.debug(
+            f'received POST request: {request.get_json()}')
+        try:
+            sanitizer = EditAudienceSizeSanitizer(
+            uid, request.get_json(), current_user, get_ip())
+        except Exception as e:
+            return jsonify({'status': 'error', 'error': f'{e}'})
+        
+        try:
+            current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
+            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
+
+            delete = dgraph.upsert(
+                sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
+            current_app.logger.debug(delete)
+            result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
+            current_app.logger.debug(result)
+        except Exception as e:
+            return jsonify({'status': 'error', 'error': f'{e}'})
+
+        flash('Audience size updated!', 'success')
+
+        return jsonify({'status': 'success', 'redirect': url_for('view.view_source', uid=uid)})
+
+    audience_size = get_audience(uid=uid)
+    entry = get_entry(uid=uid)
+    entry = entry['q'][0]
+    sidebar_items = {'meta': entry}
+
+    return render_template('edit/audience.html', title='Edit Source', entry=entry, data=audience_size, show_sidebar=True, sidebar_items=sidebar_items)
+

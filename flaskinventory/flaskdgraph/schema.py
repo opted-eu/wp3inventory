@@ -117,7 +117,7 @@ class Schema:
         return F()
 
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict={}, entry_review_status='pending') -> FlaskForm:
+    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict={}, entry_review_status='pending', skip_fields: list=None) -> FlaskForm:
 
         from .dgraph_types import SingleRelationship, ReverseRelationship, MutualRelationship
 
@@ -142,25 +142,26 @@ class Schema:
 
         from flask_login import current_user
 
+        # FlaskForm Factory
+        # Add fields depending on DGraph Type
+        skip_fields = skip_fields or []
         for k, v in fields.items():
+            # Allow to manually filter out some fields / hide them from users 
+            if k in skip_fields: continue
             if v.edit and current_user.user_role >= v.permission:
                 if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)) and k in populate_obj.keys():
                     if not v.autoload_choices:
                         choices = [(subval['uid'], subval['name']) for subval in populate_obj[k]]
                         v.choices_tuples = choices
                 setattr(F, k, v.wtf_field)
-                # if k in populate_obj.keys():
-                #     if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)):
-                #         print(k)
-                #         choices = [(subval['uid'], subval['name']) for subval in populate_obj[k]]
-                #         print(choices)
-                #         setattr(getattr(F, k), 'choices', choices)
 
         if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':
             setattr(F, "accept", SubmitField('Edit and Accept'))
 
+        # Instatiate the form from the factory
         form = F()
 
+        # Populate instance with existing values
         for k, value in populate_obj.items():
             if hasattr(form, k):
                 if type(value) is dict:
