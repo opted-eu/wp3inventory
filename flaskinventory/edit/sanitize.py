@@ -1,4 +1,3 @@
-from wtforms.validators import ValidationError
 from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
                                         GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.add.validators import InventoryValidationError

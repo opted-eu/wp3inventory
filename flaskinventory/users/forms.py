@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import (StringField, PasswordField, SubmitField,
+                     BooleanField, TextAreaField, SelectField)
+from wtforms.validators import (
+    DataRequired, Length, Email, EqualTo, ValidationError)
 from flask_login import current_user
 from flaskinventory import dgraph
 from flaskinventory.users.constants import USER_ROLES
@@ -11,7 +12,7 @@ from flaskinventory.users.dgraph import user_verify
 class RegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    
+
     password = PasswordField('Password',
                              validators=[DataRequired(), Length(min=6)])
 
@@ -33,7 +34,8 @@ class InviteUserForm(FlaskForm):
 
     def validate_email(self, email):
         if dgraph.get_uid('email', f'"{email.data}"'):
-            raise ValidationError('That email is taken. User has been invited already!')
+            raise ValidationError(
+                'That email is taken. User has been invited already!')
 
 
 class LoginForm(FlaskForm):
@@ -58,14 +60,13 @@ class UpdateProfileForm(FlaskForm):
     submit = SubmitField('Update')
 
 
-
 class UpdatePasswordForm(FlaskForm):
-    
+
     old_password = PasswordField('Old Password',
-                             validators=[DataRequired(), Length(min=6)])
+                                 validators=[DataRequired(), Length(min=6)])
 
     new_password = PasswordField('New Password',
-                                     validators=[DataRequired(), Length(min=6)])
+                                 validators=[DataRequired(), Length(min=6)])
 
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), Length(min=6), EqualTo('new_password')])
@@ -96,6 +97,7 @@ class ResetPasswordForm(FlaskForm):
 
     submit = SubmitField('Reset Password')
 
+
 class AcceptInvitationForm(FlaskForm):
     password = PasswordField('Password',
                              validators=[DataRequired(), Length(min=3)])
@@ -103,6 +105,7 @@ class AcceptInvitationForm(FlaskForm):
                                      validators=[DataRequired(), Length(min=3), EqualTo('password')])
 
     submit = SubmitField('Set Password')
+
 
 class EditUserForm(FlaskForm):
     user_displayname = StringField('Display Name',

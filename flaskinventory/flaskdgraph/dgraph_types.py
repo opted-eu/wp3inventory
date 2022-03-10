@@ -24,10 +24,8 @@ from flaskinventory.errors import InventoryPermissionError, InventoryValidationE
 from flaskinventory.add.external import geocode, reverse_geocode
 from flaskinventory.users.constants import USER_ROLES
 
-from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField, RadioField
-from wtforms.fields.core import SelectMultipleField
-from wtforms.fields.simple import TextAreaField
-from wtforms.fields.html5 import IntegerField
+from wtforms import (StringField, SelectField, SelectMultipleField,
+                     DateField, BooleanField, TextAreaField, RadioField, IntegerField)
 from wtforms.validators import DataRequired, Optional
 
 
@@ -178,7 +176,6 @@ class Predicate:
         # other references to this predicate (might delete later)
         self.predicate_alias = predicate_alias
 
-
     def __str__(self) -> str:
         return f'{self.predicate}'
 
@@ -193,7 +190,6 @@ class Predicate:
         # when custom validation is required, overwriting this hook
         # is the preferred way.
         return data
-
 
     def validate(self, data, facets=None, **kwargs):
         # Validation method that is called by data sanitizer
@@ -267,7 +263,8 @@ class Scalar:
     def __str__(self) -> str:
         if self.value != '*':
             return json.loads(self.value)
-        else: return self.value
+        else:
+            return self.value
 
     def __repr__(self) -> str:
         if self.facets:
@@ -279,7 +276,6 @@ class Scalar:
             self.facets.update(facets)
         else:
             self.facets = facets
-
 
     @property
     def nquad(self) -> str:
@@ -338,7 +334,7 @@ class Variable:
             return f'val({self.var})'
         else:
             return f'uid({self.var})'
-    
+
     @property
     def query(self) -> str:
         return f'{self.var} as {self.predicate}'
@@ -347,12 +343,12 @@ class Variable:
 class ReverseRelationship:
 
     """
-    
+
     default_predicates: dict with additional predicates that should be assigned to new entries
     """
 
-    def __init__(self, 
-                 predicate_name, 
+    def __init__(self,
+                 predicate_name,
                  allow_new=False,
                  autoload_choices=True,
                  relationship_constraint=None,
@@ -407,7 +403,8 @@ class ReverseRelationship:
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-            d = {'uid': NewID(data, facets=facets), self._target_predicate: node}
+            d = {'uid': NewID(data, facets=facets),
+                 self._target_predicate: node}
             if self.relationship_constraint:
                 d.update({'dgraph.type': self.relationship_constraint})
             return d
@@ -418,7 +415,7 @@ class ReverseRelationship:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
         return d
-        
+
     def get_choices(self):
         assert self.relationship_constraint
 
@@ -432,22 +429,25 @@ class ReverseRelationship:
         choices = dgraph.query(query_string=query_string)
 
         if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+            self.choices = {c['uid']: c['name']
+                            for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [
+                (c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
 
         else:
             self.choices = {}
             self.choices_tuples = {}
             for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+                self.choices_tuples[dgraph_type] = [
+                    (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name']
+                                    for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
-
 
 
 class ReverseListRelationship(ReverseRelationship):
@@ -462,9 +462,9 @@ class ReverseListRelationship(ReverseRelationship):
         for item in data:
             uid = super().validate(item, node, facets=facets)
             uids.append(uid)
-        
+
         return uids
-        
+
     def get_choices(self):
         assert self.relationship_constraint
 
@@ -478,15 +478,19 @@ class ReverseListRelationship(ReverseRelationship):
         choices = dgraph.query(query_string=query_string)
 
         if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+            self.choices = {c['uid']: c['name']
+                            for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [
+                (c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
 
         else:
             self.choices = {}
             self.choices_tuples = {}
             for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+                self.choices_tuples[dgraph_type] = [
+                    (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name']
+                                    for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -495,21 +499,20 @@ class ReverseListRelationship(ReverseRelationship):
         return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
-
 class MutualRelationship:
 
-    def __init__(self, 
-                allow_new=False,
-                autoload_choices=True,
-                relationship_constraint=None,
-                permission=USER_ROLES.Contributor,
-                label=None,
-                description=None,
-                render_kw=None,
-                read_only=False,
-                new=True,
-                edit=True,
-                overwrite=True) -> None:
+    def __init__(self,
+                 allow_new=False,
+                 autoload_choices=True,
+                 relationship_constraint=None,
+                 permission=USER_ROLES.Contributor,
+                 label=None,
+                 description=None,
+                 render_kw=None,
+                 read_only=False,
+                 new=True,
+                 edit=True,
+                 overwrite=True) -> None:
 
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
@@ -567,10 +570,10 @@ class MutualRelationship:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! UID specified does not match constraint, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
         return node_data, data_node
-        
+
     def get_choices(self):
         assert self.relationship_constraint
-        
+
         query_string = '{ '
 
         for dgraph_type in self.relationship_constraint:
@@ -581,15 +584,19 @@ class MutualRelationship:
         choices = dgraph.query(query_string=query_string)
 
         if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+            self.choices = {c['uid']: c['name']
+                            for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [
+                (c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
 
         else:
             self.choices = {}
             self.choices_tuples = {}
             for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+                self.choices_tuples[dgraph_type] = [
+                    (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name']
+                                    for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -610,7 +617,7 @@ class MutualListRelationship(MutualRelationship):
             n2d, d2n = super().validate(item, node, facets)
             node_data.append(n2d)
             data_node.append(d2n)
-        
+
         # permutate all relationships
         all_uids = node_data
         all_uids.append(node)
@@ -637,7 +644,6 @@ class String(Predicate):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
 
 
 class UIDPredicate(Predicate):
@@ -680,10 +686,12 @@ class ListString(String):
 
     def validation_hook(self, data):
         if not isinstance(data, (list, tuple, set, str)):
-            raise InventoryValidationError(f'Error in <{self.predicate}> Provided data is not a list, tuple, str or set: {data}')
+            raise InventoryValidationError(
+                f'Error in <{self.predicate}> Provided data is not a list, tuple, str or set: {data}')
         if type(data) == str:
             data = data.split(',')
         return [item.strip() for item in data if item.strip() != '']
+
 
 class UniqueName(String):
 
@@ -876,15 +884,14 @@ class Geo(Predicate):
             return None
 
 
-
 class SingleRelationship(Predicate):
 
     dgraph_predicate_type = 'uid'
 
-    def __init__(self, 
-                 relationship_constraint = None, 
-                 allow_new=True, 
-                 autoload_choices=False, 
+    def __init__(self,
+                 relationship_constraint=None,
+                 allow_new=True,
+                 autoload_choices=False,
                  *args, **kwargs) -> None:
 
         if isinstance(relationship_constraint, str):
@@ -915,12 +922,12 @@ class SingleRelationship(Predicate):
             entry_type = dgraph.get_dgraphtype(uid)
             if entry_type not in self.relationship_constraint:
                 raise InventoryValidationError(
-                    f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
+                    f'Error in <{self.predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')
         return {'uid': UID(uid, facets=facets)}
 
     def get_choices(self):
         assert self.relationship_constraint
-        
+
         query_string = '{ '
 
         for dgraph_type in self.relationship_constraint:
@@ -931,15 +938,19 @@ class SingleRelationship(Predicate):
         choices = dgraph.query(query_string=query_string)
 
         if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name'] for c in choices[self.relationship_constraint[0].lower()]}
-            self.choices_tuples = [(c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+            self.choices = {c['uid']: c['name']
+                            for c in choices[self.relationship_constraint[0].lower()]}
+            self.choices_tuples = [
+                (c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
 
         else:
             self.choices = {}
             self.choices_tuples = {}
             for dgraph_type in self.relationship_constraint:
-                self.choices_tuples[dgraph_type] = [(c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name'] for c in choices[dgraph_type.lower()]})
+                self.choices_tuples[dgraph_type] = [
+                    (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c['name']
+                                    for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:

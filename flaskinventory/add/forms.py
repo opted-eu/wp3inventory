@@ -8,6 +8,7 @@ from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField, o
 
 from flaskinventory.main.model import Schema
 
+
 class NewEntry(FlaskForm):
     name = StringField('Name of New Entity',
                        validators=[DataRequired()])
@@ -21,7 +22,6 @@ class NewEntry(FlaskForm):
                              #  ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
-
 
 
 class NewOrganization(FlaskForm):
@@ -125,7 +125,8 @@ class NewDataset(FlaskForm):
     access = RadioField('Is the dataset freely accessible or has some sort of restriction?', choices=[
         ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
 
-    fulltext = RadioField('Does the dataset contain fulltext data?', choices=[('no', 'No'), ('yes', 'Yes')])
+    fulltext = RadioField('Does the dataset contain fulltext data?', choices=[
+                          ('no', 'No'), ('yes', 'Yes')])
 
     url = StringField('Please specify the URL to the dataset', validators=[DataRequired()],
                       render_kw={'placeholder': 'e.g. "http://www.study.org/dataset"'})

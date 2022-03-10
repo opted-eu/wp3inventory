@@ -1,11 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField, RadioField
-from wtforms.fields.core import SelectMultipleField
-from wtforms.fields.simple import TextAreaField
-from wtforms.fields.html5 import IntegerField
+from wtforms import (StringField, SelectField, DateField, BooleanField,
+                     SubmitField, RadioField, SelectMultipleField, TextAreaField, IntegerField)
 from wtforms.validators import DataRequired, Optional
 from flask_login import current_user
-from wtforms.widgets.core import Input
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes_list_tuples
 from flaskinventory.misc.forms import publication_kind_choices, topical_focus_choices, ownership_kind_choices
