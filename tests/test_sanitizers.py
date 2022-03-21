@@ -24,8 +24,6 @@ import unittest
 from datetime import datetime
 from pprint import pprint
 
-from pprint import pprint
-
 class Config:
     TESTING = True
     WTF_CSRF_ENABLED = False

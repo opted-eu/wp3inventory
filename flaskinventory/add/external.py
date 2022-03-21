@@ -534,6 +534,11 @@ def telegram(username):
 
 
 def doi(doi: str) -> Union[dict, bool]:
+    # clean input string
+    doi = doi.replace("https://doi.org/", "")
+    doi = doi.replace("http://doi.org/", "")
+    doi = doi.replace("doi.org/", "")
+
     from flaskinventory.flaskdgraph.dgraph_types import Scalar
 
     api = 'https://api.crossref.org/works/'
@@ -550,10 +555,12 @@ def doi(doi: str) -> Union[dict, bool]:
 
     publication = publication['message']
 
-    result = {}
+    result = {'doi': doi}
 
     result['url'] = publication.get('url')
     result['journal'] = publication.get('container-title')
+    if isinstance(result['journal'], list):
+        result['journal'] = result['journal'][0]
     result['title'] = publication.get('title')
     result['paper_kind'] = publication.get('type')
 
@@ -578,9 +585,15 @@ def doi(doi: str) -> Union[dict, bool]:
     return result
 
 
-
-
 def arxiv(arxiv: str) -> Union[dict, bool]:
+    from flaskinventory.flaskdgraph.dgraph_types import Scalar
+
+    # clean input string
+    arxiv = arxiv.replace('https://arxiv.org/abs/', '')
+    arxiv = arxiv.replace('http://arxiv.org/abs/', '')
+    arxiv = arxiv.replace('arxiv.org/abs/', '')
+    arxiv = arxiv.replace('abs/', '')
+
     api = "http://export.arxiv.org/api/query"
 
     r = requests.get(api, params={'id_list': arxiv})
@@ -589,3 +602,49 @@ def arxiv(arxiv: str) -> Union[dict, bool]:
         return False
 
     soup = bs4(r.content, 'lxml')
+
+    try:
+        total_results = soup.find('opensearch:totalresults').text
+    except:
+        try:
+            total_results = soup.find('opensearch:totalResults').text
+        except:
+            return False
+    
+    if int(total_results) < 1:
+        return False
+
+    result = {'arxiv': arxiv}
+
+    try:
+        result['arxiv'] = soup.entry.id.get_text()
+    except:
+        return False
+
+    try:
+        result['title'] = soup.entry.title.get_text().replace('\n', ' ')
+    except:
+        return False
+
+    authors = []
+    try:
+        for i, author_tag in enumerate(soup.entry.find_all('author')):
+            author = author_tag.find('name').text
+            author = author.split(" ")[-1] + ', ' + " ".join(author.split(" ")[0:-1])
+            authors.append(Scalar(author, facets={'sequence': i}))
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse authors in ArXiv: {arxiv}')
+
+    result['authors'] = authors
+
+    try:
+        result['published_date'] = dateparser.parse(soup.entry.published.text)
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse publication date in ArXiv: {arxiv}')
+
+    try:
+        result['description'] = soup.entry.summary.get_text(strip=True).replace('\n', ' ')
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse abstract in ArXiv: {arxiv}')
+
+    return result
