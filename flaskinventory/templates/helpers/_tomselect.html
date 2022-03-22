@@ -268,4 +268,88 @@
     
     {% endif %}
     
+
+    {% if 'authors' in fields %}
+    
+    new TomSelect('#authors', {create: true, plugins: ['remove_button'], delimiter: ';'})
+    
+    {% endif %}
+
+
+    {% if 'platform' in fields %}
+    
+    new TomSelect('#platform', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'programming_languages' in fields %}
+    
+    new TomSelect('#programming_languages', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+
+    {% if 'used_for' in fields %}
+    
+    new TomSelect('#used_for', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'channels' in fields %}
+    
+    new TomSelect('#channels', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'input_file_format' in fields %}
+    
+    new TomSelect('#input_file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'output_file_format' in fields %}
+    
+    new TomSelect('#output_file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'input_data' in fields %}
+    
+    new TomSelect('#input_data', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'output_data' in fields %}
+    
+    new TomSelect('#output_data', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'validation_corpus' in fields %}
+    
+    new TomSelect('#validation_corpus', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'materials' in fields %}
+    
+    new TomSelect('#materials', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'related_publications' in fields %}
+    
+    new TomSelect('#related_publications', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+
     </script>
