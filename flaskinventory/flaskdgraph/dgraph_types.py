@@ -836,7 +836,7 @@ class Year(DateTime):
             validators = [DataRequired()]
         else:
             validators = None
-        return DateField(label=self.label, description=self.form_description, render_kw=render_kw, validators=validators)
+        return IntegerField(label=self.label, description=self.form_description, render_kw=render_kw, validators=validators)
 
 
 class Boolean(Predicate):
@@ -938,18 +938,18 @@ class SingleRelationship(Predicate):
         choices = dgraph.query(query_string=query_string)
 
         if len(self.relationship_constraint) == 1:
-            self.choices = {c['uid']: c['name']
+            self.choices = {c['uid']: c.get('name') or c.get('unique_name')
                             for c in choices[self.relationship_constraint[0].lower()]}
             self.choices_tuples = [
-                (c['uid'], c['name']) for c in choices[self.relationship_constraint[0].lower()]]
+                (c['uid'], c.get('name') or c.get('unique_name')) for c in choices[self.relationship_constraint[0].lower()]]
 
         else:
             self.choices = {}
             self.choices_tuples = {}
             for dgraph_type in self.relationship_constraint:
                 self.choices_tuples[dgraph_type] = [
-                    (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
-                self.choices.update({c['uid']: c['name']
+                    (c['uid'], c.get('name') or c.get('unique_name')) for c in choices[dgraph_type.lower()]]
+                self.choices.update({c['uid']: c.get('name') or c.get('unique_name')
                                     for c in choices[dgraph_type.lower()]})
 
     @property

@@ -288,6 +288,8 @@ class Sanitizer:
     def process_related(self):
         for related in self.related_entries:
             related = self._add_entry_meta(related, newentry=isinstance(related['uid'], NewID))
+            if isinstance(related['uid'], NewID) and 'name' not in related.keys():
+                related['name'] = str(related['uid']).replace('_:', '').replace('_', ' ').title()
             
 
     def parse_entry_review_status(self):
