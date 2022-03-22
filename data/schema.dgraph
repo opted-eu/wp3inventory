@@ -155,22 +155,21 @@ type Corpus {
 
 
 type Tool {
-    access
-    materials
     platform
     programming_language
-    graphical_user_interface
     used_for
+    graphical_user_interface
     channels
     language_independent
     languages
     author_validated
     validation_corpus
-    related_publications
     input_file_format
     output_file_format
     input_data
     output_data
+    materials
+    related_publications
 }
 
 
