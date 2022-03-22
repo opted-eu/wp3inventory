@@ -15,7 +15,7 @@ from flaskinventory.add.external import geocode, reverse_geocode, get_wikidata
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.flaskdgraph import Schema
 from flaskinventory.flaskdgraph.utils import validate_uid
-from flaskinventory.auxiliary import icu_codes
+from flaskinventory.auxiliary import icu_codes, programming_languages
 
 from slugify import slugify
 import secrets
@@ -586,7 +586,7 @@ class Subunit(Entry):
 class Resource(Entry):
 
     description = String(large_textfield=True)
-    authors = ListString(render_kw={'placeholder': 'Separate by comma'})
+    authors = ListString(render_kw={'placeholder': 'Separate by comma'}, tom_select=True)
     published_date = DateTime()
     last_updated = DateTime()
     url = String()
@@ -600,3 +600,82 @@ class Archive(Resource):
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
     fulltext = Boolean(description='Dataset contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
+
+class Tool(Resource):
+
+    name = String(description="What is the name of the tool?", required=True)
+
+    other_names = ListString(description="Does the tool have other names?",
+                            render_kw={'placeholder': 'Separate by comma ","'},
+                            overwrite=True)
+
+    authors = ListString(render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
+                            required=True)
+    published_date = Year(label='Year of publication', 
+                            description="Which year was the tool published?")
+    
+    last_updated = DateTime(description="When was the tool last updated?", new=False)
+    url = String(label="URL", description="Link to the tool", required=True)
+    doi = String(new=False)
+    arxiv = String(new=False)
+
+    description = String(large_textfield=True, description="Please provide a short description for the tool")
+
+    platform = MultipleChoice(description="For which kind of operating systems is the tool available?",
+                                    choices={'windows': 'Windows', 
+                                            'linux': 'Linux', 
+                                            'macos': 'macOS'},
+                                    required=True,
+                                    tom_select=True)
+
+    programming_languages = MultipleChoice(description="Which programming languages are used for the tool?",
+                                           choices=programming_languages,
+                                           required=True,
+                                            tom_select=True)
+
+    used_for = ListRelationship(description="What is the tool used for?",
+                                relationship_constraint="Operation",
+                                autoload_choices=True,
+                                required=True)
+
+    graphical_user_interface = Boolean(description="Does the tool have a graphical user interface?",
+                                        label="Yes, it does have a GUI")
+
+    channels = ListRelationship(description="Is the tool designed for specific channels?",
+                                autoload_choices=True,
+                                allow_new=False,
+                                relationship_constraint="Channel")
+
+    language_independent = Boolean(description="Is the tool language independent?",
+                                    label="Yes")
+
+    languages = MultipleChoice(description="Which languages does the tool support?",
+                                choices=icu_codes,
+                                tom_select=True)
+
+    input_file_format = ListRelationship(description="Which file formats does the tool take as input?",
+                                        autoload_choices=True,
+                                        relationship_constraint="FileFormat")
+
+    output_file_format = ListRelationship(description="Which file formats does the tool output?",
+                                        autoload_choices=True,
+                                        relationship_constraint="FileFormat")
+
+    author_validated = Boolean(description="Do the authors of the tool report any validation?",
+                                label="Yes, validation is reported")
+
+    validation_corpus = ListRelationship(description="Which corpus was used to validate the tool?",
+                                            autoload_choices=True,
+                                            relationship_constraint="Corpus")
+
+    materials = ListString(description="Are there additional materials for the tool? (e.g., FAQ, Tutorials, Website, etc)",
+                            tom_select=True)
+
+    related_publications = ReverseListRelationship('tools_used', 
+                                            description="Which research publications are using this tool?",
+                                            autoload_choices=True,
+                                            allow_new=False,
+                                            new=False,
+                                            relationship_constraint="ResearchPaper")
+
+    
