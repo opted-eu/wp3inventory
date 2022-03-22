@@ -648,3 +648,34 @@ def arxiv(arxiv: str) -> Union[dict, bool]:
         current_app.logger.warning(f'Could not parse abstract in ArXiv: {arxiv}')
 
     return result
+
+
+def cran(pkg) -> Union[dict, bool]:
+
+    api = 'https://crandb.r-pkg.org/'
+
+    r = requests.get(api + pkg)
+
+    if r.status_code != 200:
+        return False
+
+    if not 'json' in r.headers['Content-Type']:
+        return False
+
+    data = r.json()
+
+    result = {}
+
+    if 'Package' in data.keys():
+        result['name'] = data['Package']
+
+    if 'Description' in data.keys():
+        result['description'] = data['Description']
+
+    if 'Title' in data.keys():
+        result['other_names'] = data['Title']
+
+    if 'URL' in data.keys():
+        result['url'] = data['URL']
+
+    return result
