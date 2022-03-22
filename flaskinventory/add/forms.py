@@ -22,3 +22,16 @@ class NewEntry(FlaskForm):
                              #  ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
+
+
+class AutoFill(FlaskForm):
+    platform = SelectField('Autofill from',
+                            choices=[('arxiv', 'arXiv'),
+                                      ('doi', 'DOI'),
+                                     ('cran', 'CRAN')],
+                            validators=[DataRequired()])
+
+    identifier = StringField('Identifier',
+                       validators=[DataRequired()])
+
+    submit = SubmitField('Magic!')

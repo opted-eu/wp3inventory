@@ -1,0 +1,53 @@
+<div class="d-flex flex-column align-items-stretch bg-white">
+    {% if sidebar_items.get('autofill') %}
+    <div href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+        <span class="fs-5 fw-semibold">Magically fill in the form</span>
+    </div>
+    <div class="list-group list-group-flush border-bottom scrollarea">
+
+
+            <form method="POST" class="mt-4" action="" enctype="multipart/form-data">
+                {{ sidebar_items.autofill.hidden_tag() }}
+
+                <p>
+                    If you provide a DOI, arXiv, or R-Package name, the inventory tries to get some data automatically! 
+                </p>
+
+                <div class="invalid-feedback">
+                    Please select the identifier type
+                </div>
+
+                <div class="invalid-feedback">
+                    Enter the name of new the entity
+                </div>
+               
+                <div class="row g-3">
+                    <div class="col-sm">
+                    {{ sidebar_items.autofill.platform(class="form-select") }}
+                    </div>
+                    <div class="col-sm-8">
+                    {{ sidebar_items.autofill.identifier(class="form-control") }}
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-9">
+
+                    </div>
+
+                    <div class="col-sm">
+                        <div class="form-group mb-3">
+                            {{ sidebar_items.autofill.submit(class="btn btn-success my-4") }}
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+    </div>
+    {% endif %}
+
+
+</div>
+
+

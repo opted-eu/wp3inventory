@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.schema import Schema
 from flaskinventory.main.model import Organization
-from flaskinventory.add.forms import NewEntry
+from flaskinventory.add.forms import NewEntry, AutoFill
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.users.constants import USER_ROLES
@@ -93,8 +93,9 @@ def from_draft(entity=None, uid=None):
 
 
 @add.route("/add/<string:dgraph_type>", methods=['GET', 'POST'])
+@add.route("/add/<string:dgraph_type>/draft/<string:draft>", methods=['GET', 'POST'])
 @login_required
-def new(draft=None):
+def new(dgraph_type=None, draft=None):
     if not dgraph_type:
         return abort(404)
     dgraph_type = dgraph_type.title()
@@ -150,4 +151,12 @@ def new(draft=None):
     fields = list(form.data.keys())
     fields.remove('submit')
     fields.remove('csrf_token')
-    return render_template('add/generic.html', title=f'Add {dgraph_type}', form=form, fields=fields)
+
+    if dgraph_type in ['Tool', 'ResearchPaper', 'Dataset', 'Corpus']:
+        show_sidebar = True
+        sidebar_items = {'autofill': AutoFill()}
+    else:
+        show_sidebar = False
+        sidebar_items = {}
+
+    return render_template('add/generic.html', title=f'Add {dgraph_type}', form=form, fields=fields, show_sidebar=show_sidebar, sidebar_items=sidebar_items)
