@@ -6,7 +6,7 @@ Also for a potential API
 """
 
 import traceback
-from flask import (current_app, Blueprint, request, jsonify, url_for)
+from flask import (current_app, Blueprint, request, jsonify, url_for, abort)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.utils import strip_query
@@ -150,3 +150,14 @@ def submit():
         current_app.logger.error(f'DGraph Error - Could not perform mutation: {sanitizer.set_nquads}')
         return jsonify({'error': 'DGraph Error - Could not perform mutation'})
 
+
+@endpoint.route('/endpoint/cran')
+def cran():
+    package = request.args.get('package')
+    from flaskinventory.add.external import cran
+
+    result = cran(package)
+    if result:
+        return jsonify(result)
+    else:
+        return abort(404)

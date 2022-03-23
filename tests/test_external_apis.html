@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.88.1">
+    <title>Starter Template · Bootstrap v5.1</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/starter-template/">
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="../flaskinventory/static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../flaskinventory/static/css/main.css">
+
+    <link href="../flaskinventory/static/css/tom-select.min.css" rel="stylesheet">
+    <script src="../flaskinventory/static/js/tom-select.complete.min.js"></script>
+    <link href="../flaskinventory/static/css/tom-select.bootstrap5.css" rel="stylesheet">
+
+    <!-- Actual Script -->
+
+    <script src="../flaskinventory/templates/helpers/_external_apis.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row my-4">
+
+            <div class="row">
+                <div class="col-3">
+                    <select class="form-select" id="platform">
+                            <option selected>Choose identifier</option>
+                            <option value="arxiv">arXiv</option>
+                            <option value="cran">CRAN</option>
+                            <option value="doi">DOI</option>
+                          </select>
+                </div>
+                <div class="col-9">
+                    <input type="text" class="form-control" placeholder="identifier..." id="identifier">
+                </div>
+            </div>
+
+            <div class="row my-2">
+                <div class="col-sm-9">
+                </div>
+                <div class="col-sm">
+                    <div class="form-group mb-3">
+                        <button id="magic" class="btn btn-success" onclick="fetchMetaData(this)">
+                            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" hidden></span>
+                            <span class="button-loading" hidden>Loading...</span>
+                            <span class="button-text">Magic!</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <form method="POST" action="" enctype="multipart/form-data">
+                <input id="csrf_token" name="csrf_token" type="hidden" value="ImYwNmQzYWE3YTk5MTZmZTY5YTg0NTA4ZWQ0MTRmN2Q2YjA2Y2I3MDYi.YjsogQ.5CCxVDRt0BErp_yT2LZLEIyAcpI">
+                <fieldset class="form-group mb-3">
+                    <legend class="border-bottom mb-4">Add Tool</legend>
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="name" class="form-label fw-bold fs-5">
+                    
+                        What is the name of the tool?
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="name" name="name" required="" type="text" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="other_names" class="form-label fw-bold fs-5">
+                    
+                        Does the tool have other names?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="other_names" name="other_names" placeholder="Separate by comma &quot;,&quot;" type="text" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="authors" class="form-label fw-bold fs-5">
+                    
+                        Authors
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="authors" name="authors" placeholder="Separate by semicolon &quot;;&quot;" required="" type="text" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="published_date" class="form-label fw-bold fs-5">
+                    
+                        Which year was the tool published?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="published_date" max="2100" min="1500" name="published_date" step="1" type="number" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="url" class="form-label fw-bold fs-5">
+                    
+                        Link to the tool
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="url" name="url" required="" type="text" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="description" class="form-label fw-bold fs-5">
+                    
+                        Please provide a short description for the tool
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <textarea class="form-control form-control-lg" id="description" name="description"></textarea>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="platform" class="form-label fw-bold fs-5">
+                    
+                        For which kind of operating systems is the tool available?
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="platform" multiple="" name="platform" required=""><option value="windows">Windows</option><option value="linux">Linux</option><option value="macos">macOS</option></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="programming_languages" class="form-label fw-bold fs-5">
+                    
+                        Which programming languages are used for the tool?
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="programming_languages" multiple="" name="programming_languages" required=""><option value="apl">APL</option><option value="assembly">Assembly</option><option value="bash_shell">Bash/Shell</option><option value="c">C</option><option value="c_sharp">C#</option><option value="c_plusplus">C++</option><option value="cobol">COBOL</option><option value="clojure">Clojure</option><option value="crystal">Crystal</option><option value="dart">Dart</option><option value="delphi">Delphi</option><option value="elixir">Elixir</option><option value="erlang">Erlang</option><option value="f_sharp">F#</option><option value="golang">Go</option><option value="groovy">Groovy</option><option value="haskell">Haskell</option><option value="java">Java</option><option value="javascript">JavaScript</option><option value="julia">Julia</option><option value="kotlin">Kotlin</option><option value="lisp">LISP</option><option value="matlab">Matlab</option><option value="node_js">Node.js</option><option value="objective_c">Objective-C</option><option value="php">PHP</option><option value="perl">Perl</option><option value="powershell">PowerShell</option><option value="python">Python</option><option value="r">R</option><option value="ruby">Ruby</option><option value="rust">Rust</option><option value="sql">SQL</option><option value="scala">Scala</option><option value="swift">Swift</option><option value="typescript">TypeScript</option><option value="vba">VBA</option></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="used_for" class="form-label fw-bold fs-5">
+                    
+                        What is the tool used for?
+                    
+                    
+                    
+                        <span class="text-danger">*</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="used_for" multiple="" name="used_for" required=""></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <p class="fw-bold fs-5" style="padding-left: 0!;">Does the tool have a graphical user interface?</p>
+
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" id="graphical_user_interface" name="graphical_user_interface" type="checkbox" value="y">
+                        <label for="graphical_user_interface" class="form-label fs-5">
+                        Yes, it does have a GUI
+                    </label>
+                    </div>
+
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="channels" class="form-label fw-bold fs-5">
+                    
+                        Is the tool designed for specific channels?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="channels" multiple="" name="channels"><option value="0x704e5">Facebook</option><option value="0x704e9">Instagram</option><option value="0x704f5">Print</option><option value="0x704e3">Self-Hosted Website</option><option value="0x704f1">Telegram</option><option value="0x704ea">Transcript (TV/Radio/Podcast)</option><option value="0x704e4">Twitter</option><option value="0x704f6">VK (VKontakte)</option></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <p class="fw-bold fs-5" style="padding-left: 0!;">Is the tool language independent?</p>
+
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" id="language_independent" name="language_independent" type="checkbox" value="y">
+                        <label for="language_independent" class="form-label fs-5">
+                        Yes
+                    </label>
+                    </div>
+
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="languages" class="form-label fw-bold fs-5">
+                    
+                        Which languages does the tool support?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="languages" multiple="" name="languages"><option value="af">Afrikaans</option><option value="ak">Akan</option><option value="sq">Albanian</option><option value="am">Amharic</option><option value="ar">Arabic</option><option value="hy">Armenian</option><option value="as">Assamese</option><option value="az">Azerbaijani</option><option value="ay">Aymara </option><option value="bm">Bambara</option><option value="eu">Basque</option><option value="be">Belarusian</option><option value="bn">Bengali</option><option value="bs">Bosnian</option><option value="br">Breton</option><option value="bg">Bulgarian</option><option value="my">Burmese</option><option value="ca">Catalan</option><option value="zh_Hans">Chinese (Simplified)</option><option value="zh_Hant">Chinese (Traditional)</option><option value="kw">Cornish</option><option value="hr">Croatian</option><option value="cs">Czech</option><option value="da">Danish</option><option value="nl">Dutch</option><option value="dz">Dzongkha</option><option value="en">English</option><option value="eo">Esperanto</option><option value="et">Estonian</option><option value="ee">Ewe</option><option value="fo">Faroese</option><option value="fi">Finnish</option><option value="fr">French</option><option value="ff">Fulah</option><option value="gl">Galician</option><option value="lg">Ganda</option><option value="ka">Georgian</option><option value="de">German</option><option value="el">Greek</option><option value="gu">Gujarati</option><option value="ha">Hausa</option><option value="he">Hebrew</option><option value="hi">Hindi</option><option value="hu">Hungarian</option><option value="is">Icelandic</option><option value="ig">Igbo</option><option value="id">Indonesian</option><option value="ga">Irish</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="kl">Kalaallisut</option><option value="kn">Kannada</option><option value="ks">Kashmiri</option><option value="kk">Kazakh</option><option value="xnz">Kenzi (Nubian)</option><option value="km">Khmer</option><option value="ki">Kikuyu</option><option value="rw">Kinyarwanda</option><option value="ku">Kurdish</option><option value="ko">Korean</option><option value="ky">Kyrgyz</option><option value="lo">Lao</option><option value="lv">Latvian</option><option value="ln">Lingala</option><option value="lt">Lithuanian</option><option value="lu">Luba-Katanga</option><option value="lb">Luxembourgish</option><option value="mk">Macedonian</option><option value="mg">Malagasy</option><option value="ms">Malay</option><option value="ml">Malayalam</option><option value="mt">Maltese</option><option value="gv">Manx</option><option value="mr">Marathi</option><option value="mn">Mongolian</option><option value="ne">Nepali</option><option value="nd">North Ndebele</option><option value="se">Northern Sami</option><option value="no">Norwegian</option><option value="nb">Norwegian Bokmål</option><option value="nn">Norwegian Nynorsk</option><option value="or">Oriya</option><option value="om">Oromo</option><option value="os">Ossetic</option><option value="ps">Pashto</option><option value="fa">Persian</option><option value="pl">Polish</option><option value="pt">Portuguese</option><option value="pa">Punjabi</option><option value="qu">Quechua</option><option value="ro">Romanian</option><option value="rm">Romansh</option><option value="rn">Rundi</option><option value="ru">Russian</option><option value="sg">Sango</option><option value="sat">Santali</option><option value="gd">Scottish Gaelic</option><option value="sr">Serbian</option><option value="sh">Serbo-Croatian</option><option value="sn">Shona</option><option value="ii">Sichuan Yi</option><option value="si">Sinhala</option><option value="sk">Slovak</option><option value="sl">Slovenian</option><option value="so">Somali</option><option value="es">Spanish</option><option value="sw">Swahili</option><option value="sv">Swedish</option><option value="tl">Tagalog</option><option value="ta">Tamil</option><option value="te">Telugu</option><option value="tdt">Tetum</option><option value="th">Thai</option><option value="bo">Tibetan</option><option value="ti">Tigrinya</option><option value="to">Tongan</option><option value="tr">Turkish</option><option value="uk">Ukrainian</option><option value="ur">Urdu</option><option value="ug">Uyghur</option><option value="uz">Uzbek</option><option value="vi">Vietnamese</option><option value="cy">Welsh</option><option value="fy">Western Frisian</option><option value="yi">Yiddish</option><option value="yo">Yoruba</option><option value="zu">Zulu</option></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="input_file_format" class="form-label fw-bold fs-5">
+                    
+                        Which file formats does the tool take as input?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="input_file_format" multiple="" name="input_file_format"></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="output_file_format" class="form-label fw-bold fs-5">
+                    
+                        Which file formats does the tool output?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="output_file_format" multiple="" name="output_file_format"></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <p class="fw-bold fs-5" style="padding-left: 0!;">Do the authors of the tool report any validation?</p>
+
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" id="author_validated" name="author_validated" type="checkbox" value="y">
+                        <label for="author_validated" class="form-label fs-5">
+                        Yes, validation is reported
+                    </label>
+                    </div>
+
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="validation_corpus" class="form-label fw-bold fs-5">
+                    
+                        Which corpus was used to validate the tool?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <select class="form-control form-control-lg" id="validation_corpus" multiple="" name="validation_corpus"></select>
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="materials" class="form-label fw-bold fs-5">
+                    
+                        Are there additional materials for the tool? (e.g., FAQ, Tutorials, Website, etc)
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <input class="form-control form-control-lg" id="materials" name="materials" type="text" value="">
+
+
+                    </div>
+
+
+
+
+
+
+
+                    <div class="mb-5">
+
+                        <label for="entry_notes" class="form-label fw-bold fs-5">
+                    
+                        Do you have any other notes on the entry that you just coded?
+                    
+                    
+                    
+                        <span class="text-muted">(optional)</span>
+                    
+                </label>
+
+
+
+                        <textarea class="form-control form-control-lg" id="entry_notes" name="entry_notes"></textarea>
+
+
+                    </div>
+
+
+
+
+                </fieldset>
+                <div class="form-group mb-3">
+                    <input class="btn btn-success my-4" id="submit" name="submit" type="submit" value="Add New Tool">
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Tom Select -->
+    <script>
+        const authors = new TomSelect('#authors', {
+            create: true,
+            plugins: ['remove_button'],
+            delimiter: ';'
+        })
+    </script>
+
+</body>
+
+</html>

@@ -557,15 +557,15 @@ def doi(doi: str) -> Union[dict, bool]:
 
     result = {'doi': doi}
 
-    result['url'] = publication.get('url')
     result['journal'] = publication.get('container-title')
     if isinstance(result['journal'], list):
         result['journal'] = result['journal'][0]
     result['title'] = publication.get('title')
-    result['paper_kind'] = publication.get('type')
 
     if isinstance(result['title'], list):
         result['title'] = result['title'][0]
+
+    result['paper_kind'] = publication.get('type')
 
     if publication.get('created'):
         result['published_date'] = dateparser.parse(publication['created']['date-time'])
