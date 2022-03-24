@@ -339,8 +339,54 @@
 
 
     {% if 'materials' in fields %}
-    
-    new TomSelect('#materials', {create: true, plugins: ['remove_button']})
+
+    var materialsContainer = document.getElementById('materials').parentElement
+
+    function createMaterialsField(materialURL) {
+                var row = document.createElement('div')
+                row.classList.add('row', 'my-3', 'align-items-center')
+                row.id = 'container-' + materialURL
+                var label = document.createElement('label')
+                label.classList.add('col', 'form-label')
+                label.setAttribute('for', materialURL + '@kind')
+                label.innerText = materialURL;
+                row.append(label)
+                var col = document.createElement('div');
+                col.classList.add('col');
+                var description = document.createElement('p')
+                description.classList.add('fw-bold', 'fs-6', 'mb-1')
+                description.innerText = 'Please specify what kind of resource it is'
+                var input = document.createElement('input')
+                input.classList.add('form-control')
+                input.setAttribute('name', materialURL + '@kind')
+                input.setAttribute('placeholder', 'e.g. FAQ, Manual, Tutorial, Website, etc')
+
+                // append elements
+                col.append(description)
+                col.append(input);
+                row.append(col)
+
+                // append to container
+                materialsContainer.append(row)
+
+            } 
+
+    var TomSelectMaterialsConfig= {
+        plugins: ['remove_button'],
+        create: true,
+        selectOnTab: true,
+        onItemAdd: function(input) {
+            // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+            createMaterialsField(input)
+        },
+        onItemRemove: function(values) {
+            let el = document.getElementById('container-' + values)
+            el.remove()
+        }
+    };    
+    new TomSelect('#materials', TomSelectMaterialsConfig)
     
     {% endif %}
 

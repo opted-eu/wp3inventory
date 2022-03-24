@@ -1,20 +1,33 @@
+// var magicButton = document.getElementById('magic')
+
+// magicButton.addEventListener('onclick', fetchMetaData)
+
 function fetchMetaData(button) {
 
-    var platform = document.getElementById('platform').value
+    var platform = document.getElementById('magic-platform').value
 
     if (!platform) {
         return false
     }
 
-    var identifier = document.getElementById('identifier').value
+    var identifier = document.getElementById('magic-identifier').value
 
     if (!identifier) {
         return false
     }
 
+    // clear form
+    document.getElementById('form-add-new').reset()
+
     showSpinner(button)
 
     if (platform == 'doi') {
+
+        // sanitize identifier string
+
+        doi = doi.replace("https://doi.org/", "")
+        doi = doi.replace("http://doi.org/", "")
+        doi = doi.replace("doi.org/", "")
 
         let api = 'https://api.crossref.org/works/'
 
@@ -27,6 +40,12 @@ function fetchMetaData(button) {
 
     } else if (platform == 'arxiv') {
 
+        // sanitize identifier string
+        arxiv = arxiv.replace('https://arxiv.org/abs/', '')
+        arxiv = arxiv.replace('http://arxiv.org/abs/', '')
+        arxiv = arxiv.replace('arxiv.org/abs/', '')
+        arxiv = arxiv.replace('abs/', '')
+
         let api = "http://export.arxiv.org/api/query?id_list="
 
         fetch(api + identifier)
@@ -38,15 +57,25 @@ function fetchMetaData(button) {
 
     } else if (platform == 'cran') {
 
-        let api = 'https://crandb.r-pkg.org/'
+        // sanitize identifier string
 
-        fetch(api + identifier, { mode: 'no-cors' })
+        let api = $SCRIPT_ROOT + '/endpoint/cran?package='
+
+        fetch(api + identifier)
             .then(response => response.json())
-            .then(json => parseCRAN(json))
             .then(result => fillForm(result))
             .then(_ => hideSpinner(button), buttonSuccess(button))
             .catch(error => handleError(error, button))
 
+    } else if (platform == 'python') {
+        let api = "https://pypi.org/pypi/"
+
+        fetch(api + identifier + '/json')
+            .then(response => response.json())
+            .then(json => parsePyPi(json))
+            .then(result => fillForm(result))
+            .then(_ => hideSpinner(button), buttonSuccess(button))
+            .catch(error => handleError(error, button))
     }
 
 };
@@ -55,7 +84,14 @@ function fillForm(data) {
     for (let key in data) {
         let field = document.getElementById(key)
         if (field) {
-            field.value = data[key]
+            if (field.multiple) {
+                for (let v of data[key]) {
+                    console.log(v)
+                    document.querySelector(`#${field.id} option[value="${v}"]`).selected = true
+                }
+            } else {
+                field.value = data[key]
+            }
             if (field.tomselect) {
                 field.tomselect.sync()
             };
@@ -64,7 +100,7 @@ function fillForm(data) {
 };
 
 function showSpinner(button) {
-    button.classList = ['btn btn-primary']
+    button.classList = ['btn btn-primary w-100']
     button.getElementsByClassName('spinner-grow')[0].hidden = false
     button.getElementsByClassName('button-loading')[0].hidden = false
     button.getElementsByClassName('button-text')[0].hidden = true
@@ -78,7 +114,7 @@ function hideSpinner(button) {
 }
 
 function handleError(error, button) {
-    button.classList = ['btn btn-danger']
+    button.classList = ['btn btn-danger w-100']
     button.getElementsByClassName('spinner-grow')[0].hidden = true
     button.getElementsByClassName('button-loading')[0].hidden = true
     button.getElementsByClassName('button-text')[0].hidden = false
@@ -87,7 +123,7 @@ function handleError(error, button) {
 }
 
 function buttonSuccess(button) {
-    button.classList = ['btn btn-success']
+    button.classList = ['btn btn-success w-100']
     button.getElementsByClassName('button-text')[0].innerText = 'Success!'
 }
 
@@ -167,15 +203,21 @@ function parseArXiv(xml) {
     return result
 }
 
-function parseCRAN(package) {
+function parsePyPi(package) {
 
     result = new Array()
 
-    result['name'] = package['Package']
-    result['description'] = package['Description']
-    result['other_names'] = package['Title']
-    result['url'] = package['URL']
-    result['programming_languages'] = 'r'
+    result['name'] = package.info['name']
+    result['other_names'] = package.info['summary']
+    result['description'] = package.info['description']
+    result['url'] = package.info['home_page']
+    result['authors'] = package.info['author']
+    result['materials'] = []
+    for (url in package.info['project_urls']) {
+        result['materials'].push(package.info.project_urls[url])
+    }
 
+    result['programming_languages'] = ['python']
+    result['platform'] = ['windows', 'linux', 'macos']
     return result
 }

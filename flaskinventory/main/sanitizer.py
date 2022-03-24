@@ -197,6 +197,19 @@ class Sanitizer:
             if '|' in key:
                 predicate, facet = key.split('|')
                 self.facets[predicate] = {facet: self.data[key]}
+            
+            # for list predicates, we track facets via the value
+            if '@' in key:
+                val, facet = key.split('@')
+                self.facets[val] = {facet: self.data[key]}
+
+    def _postprocess_list_facets(self):
+        for _, ll in self.entry.items():
+            if isinstance(ll, list):
+                for val in ll:
+                    if isinstance(val, Scalar):
+                        if str(val) in self.facets.keys():
+                            val.update_facets(self.facets[str(val)])
                 
 
     def _parse(self):
@@ -284,6 +297,8 @@ class Sanitizer:
         else:
             self.entry = self._add_entry_meta(self.entry, newentry=True)
             self.entry['unique_name'] = self.generate_unique_name(self.entry)
+
+        self._postprocess_list_facets()
 
     def process_related(self):
         for related in self.related_entries:

@@ -411,6 +411,8 @@ class Source(Entry):
     channel_url = String(label='URL of Channel',
                          description="What is the url or social media handle of the news source?")
     
+    verified_account = Boolean(new=False, edit=False)
+
     other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
                              render_kw={'placeholder': 'Separate by comma'}, 
                              overwrite=True)
@@ -586,7 +588,7 @@ class Subunit(Entry):
 class Resource(Entry):
 
     description = String(large_textfield=True)
-    authors = ListString(render_kw={'placeholder': 'Separate by comma'}, tom_select=True)
+    authors = ListString(render_kw={'placeholder': 'Separate by semicolon'}, tom_select=True)
     published_date = DateTime()
     last_updated = DateTime()
     url = String()
@@ -609,8 +611,10 @@ class Tool(Resource):
                             render_kw={'placeholder': 'Separate by comma ","'},
                             overwrite=True)
 
-    authors = ListString(render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
+    authors = ListString(delimiter=';',
+                            render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
                             required=True)
+                            
     published_date = Year(label='Year of publication', 
                             description="Which year was the tool published?")
     
@@ -669,7 +673,7 @@ class Tool(Resource):
                                             relationship_constraint="Corpus")
 
     materials = ListString(description="Are there additional materials for the tool? (e.g., FAQ, Tutorials, Website, etc)",
-                            tom_select=True)
+                            tom_select=True, render_kw={'placeholder': 'please paste the URLs to the materials here!'})
 
     related_publications = ReverseListRelationship('tools_used', 
                                             description="Which research publications are using this tool?",

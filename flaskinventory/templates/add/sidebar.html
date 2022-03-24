@@ -5,49 +5,40 @@
     </div>
     <div class="list-group list-group-flush border-bottom scrollarea">
 
+        <p>
+            If you provide a DOI, arXiv, or R-Package name, the inventory tries to get some data automatically!
+        </p>
 
-            <form method="POST" class="mt-4" action="" enctype="multipart/form-data">
-                {{ sidebar_items.autofill.hidden_tag() }}
+        <div class="row">
+            <div class="col-3">
+                <select class="form-select" id="magic-platform">
+                                <option selected disabled>choose...</option>
+                                <option value="arxiv">arXiv</option>
+                                <option value="cran">CRAN</option>
+                                <option value="doi">DOI</option>
+                                <option value="python">Python</option>
+                              </select>
+            </div>
+            <div class="col-9">
+                <input type="text" class="form-control" placeholder="identifier or package name..." id="magic-identifier">
+            </div>
+        </div>
 
-                <p>
-                    If you provide a DOI, arXiv, or R-Package name, the inventory tries to get some data automatically! 
-                </p>
-
-                <div class="invalid-feedback">
-                    Please select the identifier type
+        <div class="row my-2 justify-content-end">
+            <div class="col-4   ">
+                <div class="form-group mb-3">
+                    <button id="magic" class="btn btn-success w-100" onclick="fetchMetaData(this)">
+                                <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" hidden></span>
+                                <span class="button-loading" hidden>Loading...</span>
+                                <span class="button-text">Magic!</span>
+                            </button>
                 </div>
+            </div>
 
-                <div class="invalid-feedback">
-                    Enter the name of new the entity
-                </div>
-               
-                <div class="row g-3">
-                    <div class="col-sm">
-                    {{ sidebar_items.autofill.platform(class="form-select") }}
-                    </div>
-                    <div class="col-sm-8">
-                    {{ sidebar_items.autofill.identifier(class="form-control") }}
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-sm-9">
-
-                    </div>
-
-                    <div class="col-sm">
-                        <div class="form-group mb-3">
-                            {{ sidebar_items.autofill.submit(class="btn btn-success my-4") }}
-                        </div>
-                    </div>
-
-                </div>
-            </form>
-
+        </div>
+        <script src="{{ url_for('static', filename='js/external_apis.js') }}"></script>
     </div>
     {% endif %}
 
 
 </div>
-
-

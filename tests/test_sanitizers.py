@@ -174,7 +174,23 @@ class TestSanitizers(unittest.TestCase):
             self.client.get('/logout')
             self.assertRaises(InventoryPermissionError, Sanitizer, self.mock_data2)
 
-        
+
+    def test_list_facets(self):
+        mock_data = {
+            'name': 'Test',
+            'other_names': 'Jay Jay,Jules,JB',
+            'Jay Jay@kind': 'first',
+            'Jules@kind': 'official',
+            'JB@kind': 'CS-GO'
+            
+        }
+        with self.client:
+            response = self.client.post('/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
+            self.assertEqual(current_user.user_displayname, 'Contributor')
+
+            with self.app.app_context():
+                sanitizer = Sanitizer(mock_data)
+                pprint(sanitizer.entry)
 
     def _test_edit_entry(self):
         # print('-- test_edit_entry() --\n')
@@ -273,7 +289,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
                 # self.assertEqual(type(sanitizer.entry['founded']), datetime)
 
-    def test_new_source(self):
+    def _test_new_source(self):
 
         mock_website = {
                             "channel_unique_name": "website",
