@@ -684,12 +684,16 @@ class ListString(String):
 
     dgraph_predicate_type = '[string]'
 
+    def __init__(self, delimiter=',', *args, **kwargs) -> None:
+        self.delimiter = delimiter
+        super().__init__(*args, **kwargs)
+
     def validation_hook(self, data):
         if not isinstance(data, (list, tuple, set, str)):
             raise InventoryValidationError(
                 f'Error in <{self.predicate}> Provided data is not a list, tuple, str or set: {data}')
         if type(data) == str:
-            data = data.split(',')
+            data = data.split(self.delimiter)
         return [item.strip() for item in data if item.strip() != '']
 
 
