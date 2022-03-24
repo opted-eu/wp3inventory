@@ -664,7 +664,8 @@ def cran(pkg) -> Union[dict, bool]:
 
     data = r.json()
 
-    result = {}
+    result = {'programming_languages': ['r'],
+                'platform': ['windows','linux','macos']}
 
     if 'Package' in data.keys():
         result['name'] = data['Package']
