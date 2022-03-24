@@ -1,0 +1,36 @@
+{% macro render_icon(entry) %}
+{% if 'Source' in entry['dgraph.type'] %}
+    <h2><i class="icon-{{ entry.channel.unique_name }} color-{{ entry.channel.unique_name }}" alt="{{ entry.channel.name }}"></i></h2>
+{% elif 'Organization' in entry['dgraph.type'] %}
+    <h2>
+    {% if entry.ownership_kind == "political party" %}
+        <i class="fas fa-flag" alt="Political Party"></i>
+        {% else %}
+        <i class="fas fa-building" alt="Organisation"></i>
+        {% endif %}
+    </h2>
+{% elif 'Archive' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-database" alt="Archive"></i></h2>
+{% elif 'Multinational' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-globe" alt="Multinational"></i></h2>
+{% elif 'Subunit' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-city" alt="Subunit"></i></h2>
+{% elif 'Country' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-globe-europe" alt="Country"></i></h2>
+{% elif 'ResearchPaper' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-graduation-cap" alt="Paper"></i></h2>
+{% elif 'Tool' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-toolbox" alt="Tool"></i></h2>
+{% elif 'Dataset' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-table" alt="Dataset"></i></h2>
+{% elif 'Corpus' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-database" alt="Corpus"></i></h2>
+{% elif 'FileFormat' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-file-alt" alt="FileFormat"></i></h2>
+{% elif 'Operation' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-screwdriver" alt="Operation"></i></h2>
+{% else %}
+    <h2><i class="fas fa-question" alt="Unknown"></i></h2>
+{% endif %}
+
+{% endmacro %}

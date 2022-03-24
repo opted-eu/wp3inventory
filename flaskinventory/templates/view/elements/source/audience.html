@@ -1,0 +1,13 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+         {% if entry.audience_size %}
+        <dt class="col-sm-3">Audience Size</dt>
+        <dd class="col-sm-9"> {{ entry.audience_size_table }}</dd> {% endif %} 
+        {% if entry.audience_residency %}
+        <dt class="col-sm-3">Audience Residency</dt>
+        <dd class="col-sm-9"> {{ entry.audience_residency_table }}</dd> {% endif %}
+    </dl>
+</div>

@@ -1,0 +1,95 @@
+{% extends "layout.html" %} 
+
+{% block content %}
+{% from "helpers/_viewhelpers.html" import render_icon %}
+
+<article>
+
+<div class="col d-flex align-items-start mb-4">
+    <div class="icon-square me-3">
+        {{ render_icon(entry) }} 
+    </div>
+    <div class="w-100">
+        <h2>
+        {% if entry.get('channel')%}
+            {% if entry.channel.unique_name in ['twitter', 'instagram'] %}
+                @
+            {% endif %}
+        {% endif %}
+        {{ entry.name }} 
+        {% if entry.verified_account %} 
+        <span class="fa-stack text-primary align-middle" style="font-size: 0.3em;">
+            <i class="fas fa-certificate fa-stack-2x" aria-hidden="true"></i>
+            <i class="fas fa-check fa-stack-1x fa-inverse" aria-hidden="true"></i>
+            </span> 
+        {% endif %}
+        <small class="fs-6 mx-4 text-muted">({{ entry.uid }})</small>
+        </h2>
+    </div>
+    <div>
+    {% include "view/elements/review_actions.html" %}
+    </div>
+</div>
+
+{% include "view/elements/general_information.html" %}
+
+{% if 'Source' in entry['dgraph.type'] %}
+
+    {% include "view/elements/source/journalistic_routines.html" %}
+    {% include "view/elements/source/audience.html" %}
+    {% include "view/elements/source/published_by.html" %}
+    {% include "view/elements/source/economic.html" %}
+    {% include "view/elements/source/channel_features.html" %}
+    {% include "view/elements/source/data_access.html" %}
+    {% include "view/elements/source/research.html" %}
+
+{% endif %}
+
+{% if 'Organization' in entry['dgraph.type'] %}
+
+    {% include "view/elements/organization/location.html" %}
+    {% include "view/elements/organization/ownership.html" %}
+
+{% endif %}
+
+
+{% if 'Multinational' in entry['dgraph.type'] %}
+
+    {% include "view/elements/multinational/summary.html" %}
+
+{% endif %}
+
+
+{% if 'Country' in entry['dgraph.type'] %}
+
+    {% include "view/elements/country/summary.html" %}
+
+{% endif %}
+
+
+{% if 'Subunit' in entry['dgraph.type'] %}
+
+    {% include "view/elements/subunit/summary.html" %}
+
+{% endif %}
+
+
+{% if 'ResearchPaper' in entry['dgraph.type'] %}
+
+    {% include "view/elements/researchpaper/sources_included.html" %}
+
+{% endif %}
+
+{% if 'Tool' in entry['dgraph.type'] %}
+
+    {% include "view/elements/tool/about.html" %}
+
+{% endif %}
+
+</article>
+
+{% endblock content %}
+
+{% block sidebar %} 
+    {% include "view/source_sidebar.html" %} 
+{% endblock sidebar %}

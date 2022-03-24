@@ -1,0 +1,40 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Owns</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.owns %} {% for org in entry.owns %}
+            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            {% endfor %} {% else %}
+            <p class="card-text text-muted">None</p>
+            {% endif %}
+        </dd>
+    </dl>
+</div>
+{% if not entry.is_person %}
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Owned by</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.owned_by %} {% for org in entry.owned_by %}
+            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            {% endfor %} {% else %}
+            <p class="card-text text-muted">None</p>
+            {% endif %}
+        </dd>
+    </dl>
+</div>
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Economic</h5></dt>
+        <dd class="col-sm-9">
+            {% if entry.ownership_kind %}
+            <dt class="col-sm-3">Type of Organization</dt>
+            <dd class="col-sm-9">{{ entry.ownership_kind }}
+            </dd>{% endif %}
+            {% if entry.employees %}
+            <dt class="col-sm-3">Employees</dt>
+            <dd class="col-sm-9">{{ entry.employees }}</dd>
+            {% endif %}
+        </dd>
+</div>
+{% endif %}

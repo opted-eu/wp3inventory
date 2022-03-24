@@ -1,0 +1,113 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
+        <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
+        {% if entry.title %}
+        <dt class="col-sm-3">Full Title</dt>
+        <dd class="col-sm-9"><h5>{{ entry.title  }}</h5></dd>
+        {% endif %} 
+        {% if entry.authors %}
+        <dt class="col-sm-3">Author(s)</dt>
+        <dd class="col-sm-9"><h6>
+            {% if entry.authors is string %}
+                {{ entry.authors }}
+            {% else %}
+                {{ ", ".join(entry.authors ) }}
+            {% endif %}
+        </h6>
+        {% endif %}
+        {% if entry.other_names %}
+        <dt class="col-sm-3">Also known as</dt>
+        <dd class="col-sm-9">{{ ", ".join(entry.other_names) }}
+        </dd>
+        {% endif %} 
+        {% if entry.published_date %}
+        <dt class="col-sm-3">Published</dt>
+        <dd class="col-sm-9">{{ entry.published_date.strftime('%Y') }}
+        </dd>
+        {% endif %}
+        {% if entry.description %}
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">{{ entry.description }}</dd>
+        {% endif %} 
+        {% if entry.is_person %}
+        <dt class="col-sm-3">Is a person</dt>
+        <dd class="col-sm-9">{{ entry.is_person }}
+        </dd>{% endif %}
+        {% if entry.channel %}
+        <dt class="col-sm-3">Channel</dt>
+        <dd class="col-sm-9"><a href="{{ url_for('view.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
+        {% endif %}
+        {% if entry.party_affiliated %}
+        <dt class="col-sm-3">Affiliated with a political party<a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Affiliated means that a political party or a party-related association or company owns at least 50% of the organization OR that persons who have a central role in the organization (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
+        <dd class="col-sm-9">{{ entry.party_affiliated }}</dd>
+        {% endif %}
+        {% if entry.channel_url %} 
+        <dt class="col-sm-3">Link to Source</dt>
+        <dd class="col-sm-9">
+                {% if entry.channel.unique_name == 'twitter' %}
+                <a class="" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
+                https://twitter.com/{{ entry.channel_url }}
+                {% elif entry.channel.unique_name == 'instagram' %}
+                <a class="" target="_blank" href="https://instagram.com/{{ entry.channel_url }}">
+                https://instagram.com/{{ entry.channel_url }}
+                    {% elif entry.channel.unique_name == 'website' %}
+                <a class="" target="_blank" href="{{ entry.channel_url }}">
+                {{ entry.channel_url }}
+                {% elif entry.channel.unique_name == 'facebook' %}
+                <a class="" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
+                    https://facebook.com/{{ entry.channel_url }}
+                {% elif entry.channel.unique_name == 'vkontakte' %}
+                <a class="" target="_blank" href="https://vk.com/{{ entry.channel_url }}">
+                    https://vk.com/{{ entry.channel_url }}
+                {% elif entry.channel.unique_name == 'telegram' %}
+                    <a class="" target="_blank" href="https://t.me/{{ entry.name }}">
+                    https://t.me/{{ entry.name }}
+                {% endif %}
+                <i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a>
+                </dd>
+        {% endif %}
+        {% if 'verified_account' in entry.keys() %}
+        <dt class="col-sm-3">Verified Account</dt>
+        <dd class="col-sm-9">{% if entry.verified_account %}Yes{% else %}No{% endif %}</dd>
+        {% endif %}
+        {% if 'Subunit' in entry['dgraph.type'] %}
+        <dt class="col-sm-3 mb-4">Subunit of</dt>
+        <dd class="col-sm-9 mb-4"><a href="{{ url_for('view.view_country', unique_name=entry.country[0].unique_name) }}">{{ entry.country[0].name }}</a></dd>
+        {% endif %}
+        {% if entry.wikidataID %}
+        <dt class="col-sm-3">Wikidata</dt>
+        <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
+        </dd>
+        {% endif %}
+        {% if entry.founded %}
+        <dt class="col-sm-3">Founded</dt>
+        <dd class="col-sm-9">{{ entry.founded.strftime('%Y') }}
+        </dd>
+        {% endif %} 
+        {% if entry.transcript_kind %}
+        <dt class="col-sm-3">Transcript</dt>
+        <dd class="col-sm-9">{{ entry.transcript_kind }}</dd>
+        {% endif %}
+        {% if entry.paper_kind %}
+        <dt class="col-sm-3">Kind</dt>
+        <dd class="col-sm-9">{{ entry.paper_kind }}</dd>
+        {% endif %} 
+        {% if entry.journal %}
+        <dt class="col-sm-3">Journal</dt>
+        <dd class="col-sm-9">{{ entry.journal }}</dd>
+        {% endif %} 
+        {% if entry.url %}
+            <dt class="col-sm-3">URL</dt>
+            <dd class="col-sm-9"><a href="{{ entry.arxiv }}" target="_blank">{{ entry.url }}</a></dd>
+        {% endif %}
+        {% if entry.doi %}
+            <dt class="col-sm-3">DOI</dt>
+            <dd class="col-sm-9"><a href="{{ entry.doi }}" target="_blank">{{ entry.doi }}</a></dd>
+        {% endif %}
+        {% if entry.arxiv %}
+            <dt class="col-sm-3">arXiv</dt>
+            <dd class="col-sm-9"><a href="{{ entry.arxiv }}" target="_blank">{{ entry.arxiv }}</a></dd>
+        {% endif %}
+    </dl>
+</div>

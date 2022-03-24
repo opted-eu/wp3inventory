@@ -1,0 +1,12 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Economic</h5>
+        </dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.payment_model %}
+        <dt class="col-sm-3">Payment Model</dt>
+        <dd class="col-sm-9">{{ entry.payment_model }}</dd>{% endif %} {% if entry.contains_ads %}
+        <dt class="col-sm-3">Contains Ads</dt>
+        <dd class="col-sm-9">{{ entry.contains_ads }}</dd>{% endif %}
+    </dl>
+</div>

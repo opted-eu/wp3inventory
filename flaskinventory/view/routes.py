@@ -339,6 +339,28 @@ def view_researchpaper(uid):
     else:
         return abort(404)
 
+@view.route("/view/generic/<uid>")
+def view_generic(uid):
+    query_func = f'{{ data(func: uid({uid})) @filter(has(dgraph.type))'
+
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name channel { name } } } }'''
+
+    query = query_func + query_fields
+
+    data = dgraph.query(query)
+
+    if len(data['data']) == 0:
+        return abort(404)
+
+    data = data['data'][0]
+
+    review_actions = create_review_actions(current_user, data['uid'], data['entry_review_status'])
+
+    return render_template('view/generic.html',
+                            title=data.get('name'),
+                            entry=data,
+                            review_actions=review_actions)
+
 @login_required
 @view.route("/view/rejected/<uid>")
 def view_rejected(uid):
