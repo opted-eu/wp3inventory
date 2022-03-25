@@ -105,13 +105,18 @@ def refresh_wikidata():
 @edit.route('/edit/<string:dgraph_type>/uid/<string:uid>', methods=['GET', 'POST'])
 @login_required
 def entry(dgraph_type=None, unique_name=None, uid=None):
+    try:
+        dgraph_type = Schema.get_type(dgraph_type)
+    except:
+        return abort(404)
+
     if not dgraph_type:
         return abort(404)
+
     check = check_entry(unique_name=unique_name, uid=uid)
     if not check:
         return abort(404)
     
-    dgraph_type = dgraph_type.title()
     if dgraph_type not in check['dgraph.type']:
         return abort(404)
 
@@ -146,7 +151,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
 
     if form.validate_on_submit():
         try:
-            sanitizer = Sanitizer.edit(form.data, dgraph_type=dgraph_type)
+            sanitizer = Sanitizer.edit(request.form.to_dict(), dgraph_type=dgraph_type)
         except Exception as e:
             if current_app.debug:
                     e_trace = "".join(traceback.format_exception(

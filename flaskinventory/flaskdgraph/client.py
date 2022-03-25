@@ -157,7 +157,7 @@ class DGraph(object):
             return None
         return data['q'][0]['unique_name']
 
-    def get_dgraphtype(self, uid, clean=['Entry', 'Resource']):
+    def get_dgraphtype(self, uid: str, clean: list =['Entry', 'Resource']):
         query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
 
         data = self.query(query_string)
@@ -168,9 +168,9 @@ class DGraph(object):
         
         if len(clean) > 0:
             for item in clean:
-                data['q'][0]['dgraph.type'].remove(item) if item in data['q'][0]['dgraph.type'] else None
+                if item in data['q'][0]['dgraph.type']:
+                    data['q'][0]['dgraph.type'].remove(item)
             return data['q'][0]['dgraph.type'][0]
-
         else:
             return data['q'][0]['dgraph.type']
 

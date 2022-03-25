@@ -11,9 +11,11 @@ from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User
 from flaskinventory import dgraph
 from flask import current_app
+from werkzeug.datastructures import ImmutableMultiDict
 
 from flaskinventory.main.model import Entry, Organization, Source
 from flaskinventory.misc import get_ip
+from flaskinventory.misc.utils import IMD2dict
 from flask_login import current_user
 
 # External Utilities
@@ -35,6 +37,9 @@ class Sanitizer:
     upsert_query = None
 
     def __init__(self, data: dict, fields: dict = None, dgraph_type=Entry, entry_review_status=None, **kwargs):
+
+        if isinstance(data, ImmutableMultiDict):
+            data = IMD2dict(data)
 
         self.user = current_user
         self.user_ip = get_ip()
@@ -68,7 +73,7 @@ class Sanitizer:
         self.set_nquads = None
 
         if not self.is_upsert:
-            self.entry['dgraph.type'] = [self.dgraph_type]
+            self.entry['dgraph.type'] = Schema.resolve_inheritance(dgraph_type)
         self._parse()
         self.process_related()
         if self.dgraph_type == 'Source':
@@ -168,9 +173,7 @@ class Sanitizer:
         if newentry:
             if entry.get('dgraph.type'):
                 if type(entry['dgraph.type']) != list:
-                    entry['dgraph.type'] = [entry['dgraph.type']]
-                entry['dgraph.type'].append(
-                    'Entry') if 'Entry' not in entry['dgraph.type'] else None
+                    entry['dgraph.type'] = Schema.resolve_inheritance(entry['dgraph.type'])
             else:
                 entry['dgraph.type'] = ["Entry"]
 

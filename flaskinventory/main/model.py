@@ -555,6 +555,12 @@ class Source(Entry):
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
 
+
+class Channel(Entry):
+
+    __permission_new__ = USER_ROLES.Admin
+    __permission_edit__ = USER_ROLES.Admin
+
 class Country(Entry):
 
     __permission_new__ = USER_ROLES.Admin
@@ -643,7 +649,8 @@ class Tool(Resource):
                                 required=True)
 
     graphical_user_interface = Boolean(description="Does the tool have a graphical user interface?",
-                                        label="Yes, it does have a GUI")
+                                        label="Yes, it does have a GUI",
+                                        default=False)
 
     channels = ListRelationship(description="Is the tool designed for specific channels?",
                                 autoload_choices=True,

@@ -9,6 +9,8 @@ class Schema:
     # Key = Dgraph Type (string), val = dict of predicates
     __types__ = {}
 
+    __inheritance__ = {}
+
     # Registry of permissions for each type
     __perm_registry_new__ = {}
     __perm_registry_edit__ = {}
@@ -32,6 +34,16 @@ class Schema:
                     parent.__name__).items() if k not in predicates.keys()})
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
                     parent.__name__).items() if k not in reverse_predicates.keys()})
+
+                # register inheritance
+                if cls.__name__ not in Schema.__inheritance__.keys():
+                    Schema.__inheritance__[cls.__name__] = [parent.__name__]
+                else:
+                    Schema.__inheritance__[cls.__name__].append(parent.__name__)
+                if parent.__name__ in Schema.__inheritance__.keys():
+                    Schema.__inheritance__[cls.__name__] += Schema.__inheritance__[parent.__name__]
+                    Schema.__inheritance__[cls.__name__] = list(set(Schema.__inheritance__[cls.__name__]))
+        
         Schema.__types__[cls.__name__] = predicates
         Schema.__reverse_predicates__[cls.__name__] = reverse_predicates
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
@@ -48,6 +60,15 @@ class Schema:
     @classmethod
     def get_types(cls) -> list:
         return list(cls.__types__.keys())
+
+    @classmethod
+    def get_type(cls, dgraph_type: str) -> str:
+        # get the correct name of a dgraph type
+        # helpful when input is all lower case
+        assert isinstance(dgraph_type, str) 
+        for t in list(cls.__types__.keys()):
+            if t.lower() == dgraph_type.lower():
+                return t
 
     @classmethod
     def get_predicates(cls, _cls) -> dict:
@@ -78,6 +99,15 @@ class Schema:
     @classmethod
     def predicate_names(cls) -> list:
         return list(cls.__types__[cls.__name__].keys())
+
+    @classmethod
+    def resolve_inheritance(cls, _cls) -> list:
+        if not isinstance(_cls, str):
+            _cls = _cls.__name__
+        dgraph_types = [_cls]
+        if _cls in cls.__inheritance__.keys():
+            dgraph_types += cls.__inheritance__[_cls]
+        return dgraph_types
 
     @classmethod
     def permissions_new(cls, _cls) -> int:
