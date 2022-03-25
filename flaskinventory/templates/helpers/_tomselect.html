@@ -383,7 +383,9 @@
         },
         onItemRemove: function(values) {
             let el = document.getElementById('container-' + values)
-            el.remove()
+            if (el) {
+                el.remove()
+            }
         }
     };    
     new TomSelect('#materials', TomSelectMaterialsConfig)
