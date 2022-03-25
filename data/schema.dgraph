@@ -124,17 +124,17 @@ type Archive {
 
 type Dataset {
     access
-    materials
-    related_publications
     languages
-    file_format
-    sources_included
     country
     start_date
     end_date
+    file_format
     initial_source
     meta_vars
     concept_vars
+    materials
+    sources_included
+    related_publications
 }
 
 type Corpus {
@@ -156,7 +156,7 @@ type Corpus {
 
 type Tool {
     platform
-    programming_language
+    programming_languages
     used_for
     graphical_user_interface
     channels
@@ -166,10 +166,7 @@ type Tool {
     validation_corpus
     input_file_format
     output_file_format
-    input_data
-    output_data
     materials
-    related_publications
 }
 
 
