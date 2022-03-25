@@ -679,4 +679,27 @@ def cran(pkg) -> Union[dict, bool]:
     if 'URL' in data.keys():
         result['url'] = data['URL']
 
+    # try extracting Author information
+
+    authors = []
+    if "Authors@R" in data.keys():
+        authors_r = data['Authors@R'].split('person')
+        for a in authors_r[1:]:
+            mtch = re.findall(r'\"(.*?)\"', a)
+            author = [mtch[1], mtch[0]] if len(mtch) > 1 else [mtch[0]]
+            authors.append(", ".join(author))
+    elif "Author" in data.keys():
+        authors_raw = data['Author']
+        authors_raw = re.sub(r"\[.*?\]", "", authors_raw)
+        authors_raw = re.sub(r"\(.*?\)", "", authors_raw)
+        authors_raw = authors_raw.replace("\n", " ")
+        if ' and ' in authors_raw:
+            authors_split = authors_raw.split("and")
+        else:
+            authors_split = authors_raw.split(',')
+        authors = [a.strip() for a in authors_split]
+
+    if len(authors) > 0:
+        result['authors'] = ";".join(authors)
+
     return result
