@@ -86,7 +86,6 @@ function fillForm(data) {
         if (field) {
             if (field.multiple) {
                 for (let v of data[key]) {
-                    console.log(v)
                     document.querySelector(`#${field.id} option[value="${v}"]`).selected = true
                 }
             } else {
