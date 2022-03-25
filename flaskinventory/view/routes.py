@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.view.dgraph import (get_archive, get_channel, get_country,
+from flaskinventory.view.dgraph import (get_entry, get_archive, get_channel, get_country,
                                         get_organization, get_paper, get_rejected, get_source, get_subunit, list_by_type, get_multinational)
 from flaskinventory.view.utils import can_view, make_mini_table, make_results_table
 from flaskinventory.view.forms import SimpleQuery
@@ -341,25 +341,27 @@ def view_researchpaper(uid):
 
 @view.route("/view/generic/<uid>")
 def view_generic(uid):
-    query_func = f'{{ data(func: uid({uid})) @filter(has(dgraph.type))'
 
-    query_fields = '''{ uid dgraph.type expand(_all_) { uid name unique_name channel { name } } } }'''
+    dgraph_type = dgraph.get_dgraphtype(uid)
+    print(dgraph_type)
 
-    query = query_func + query_fields
+    data = get_entry(uid=uid, dgraph_type=dgraph_type)
 
-    data = dgraph.query(query)
-
-    if len(data['data']) == 0:
+    if not data:
         return abort(404)
 
-    data = data['data'][0]
+    if any(x in data['dgraph.type'] for x in ['Source', 'Organization']):
+        show_sidebar = True
+    else:
+        show_sidebar = False
 
     review_actions = create_review_actions(current_user, data['uid'], data['entry_review_status'])
 
     return render_template('view/generic.html',
                             title=data.get('name'),
                             entry=data,
-                            review_actions=review_actions)
+                            review_actions=review_actions,
+                            show_sidebar=show_sidebar)
 
 @login_required
 @view.route("/view/rejected/<uid>")

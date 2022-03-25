@@ -53,6 +53,13 @@
 {% endif %}
 
 
+{% if 'Channel' in entry['dgraph.type'] %}
+
+    {% include "view/elements/channel/about.html" %}
+
+{% endif %}
+
+
 {% if 'Multinational' in entry['dgraph.type'] %}
 
     {% include "view/elements/multinational/summary.html" %}
@@ -83,6 +90,34 @@
 {% if 'Tool' in entry['dgraph.type'] %}
 
     {% include "view/elements/tool/about.html" %}
+    {% include "view/elements/tool/materials.html" %}
+    {% include "view/elements/tool/research.html" %}
+
+{% endif %}
+
+
+{% if 'Archive' in entry['dgraph.type'] %}
+
+    {% include "view/elements/archive/about.html" %}
+
+{% endif %}
+
+{% if 'Dataset' in entry['dgraph.type'] %}
+
+    {% include "view/elements/dataset/about.html" %}
+    {% include "view/elements/dataset/research.html" %}
+
+{% endif %}
+
+{% if 'Operation' in entry['dgraph.type'] %}
+
+    {% include "view/elements/operation/reverse.html" %}
+
+{% endif %}
+
+{% if 'FileFormat' in entry['dgraph.type'] %}
+
+    {% include "view/elements/fileformat/reverse.html" %}
 
 {% endif %}
 
@@ -91,5 +126,13 @@
 {% endblock content %}
 
 {% block sidebar %} 
-    {% include "view/source_sidebar.html" %} 
+
+{% if 'Source' in entry['dgraph.type'] %}
+    {% include "view/elements/source/sidebar.html" %} 
+{% endif %}
+
+{% if 'Organization' in entry['dgraph.type'] %}
+    {% include "view/elements/organization/sidebar.html" %} 
+{% endif %}
+
 {% endblock sidebar %}

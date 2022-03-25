@@ -1,0 +1,39 @@
+
+{% if entry.materials %}
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Materials</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Collection of materials that help using the tool.</small></dd>
+        {% for material in entry.materials %}
+            <dt class="col-sm-3">{{ entry.get("materials|kind").get(loop.index0|string) or 'Material' }}</dt>
+            <dd class="col-sm-9">
+                <a href="{{material}}" target="_blank">{{material}}</a>
+            </dd>
+        {% endfor %}
+    </dl>
+</div>
+{% endif %} 
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 my-4"><h5>Sources included</h5></dt>
+        <dd class="col-sm-9 my-4"><small class="text-muted">Shows how many of the sources listed in this inventory are included in the dataset.</small></dd>
+        <dt class="col-sm-3">Total</dt>
+        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
+        </dd>
+    </dl>
+</div>
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Research</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following publications are related to this dataset.</small></dd>
+        {% if entry.papers %} {% for paper in entry.papers %}
+        <dt class="col-sm-3"></dt>
+        <dd>
+            <a href="{{ url_for('view.view_researchpaper', uid=paper.uid) }}">
+                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{paper.title}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if paper.authors is string %} {{ paper.authors }}{%else%}{{
+                        paper.authors[0] }}{%endif%}</span>
+            </a> <span class="text-muted mx-3">{% if paper.get('papers|from') %} from: {{ paper.get('papers|from') }}</span>{%endif%} {% if paper.get('papers|to') %}
+            <span class="text-muted mx-1">to: {{ paper.get('papers|to') }}</span> {%endif%}{% endfor %}</dd>{% endif %}
+    </dl>
+</div>

@@ -1,0 +1,14 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Research</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following publications used this tool.</small></dd>
+        {% if entry.papers %} {% for paper in entry.papers %}
+        <dt class="col-sm-3"></dt>
+        <dd>
+            <a href="{{ url_for('view.view_researchpaper', uid=paper.uid) }}">
+                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{paper.title}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if paper.authors is string %} {{ paper.authors }}{%else%}{{
+                        paper.authors[0] }}{%endif%}</span>
+            </a>
+            {% endfor %}</dd>{% endif %}
+    </dl>
+</div>

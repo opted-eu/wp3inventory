@@ -6,15 +6,88 @@
         {% if entry.platform %}
         <dt class="col-sm-3">Platform(s)</dt>
         <dd class="col-sm-9">
-        {% for platform in entry.platform %}
-            <span class="mx-1"><i class="icon-{{platform}} me-1" alt="{{platform}}"></i>{{platform}}<span>
-        {% endfor %}
+            {% for platform in entry.platform %}
+                <span class="mx-1"><i class="icon-{{platform}} me-1" alt="{{platform}}"></i>{{platform}}<span>
+            {% endfor %}
         {% endif %}
-        <dt class="col-sm-3"></dt>
-        <dd class="col-sm-9">{% for source in entry.sources_included %}
-            <p class="card-text"><a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}">{{source.name}} ({{source.channel.name}})</a> <span class="text-muted mx-3">{% if source.get('sources_included|from') %} from: {{ source.get('sources_included|from') }}</span>{%endif%}
-                {% if source.get('sources_included|to') %}
-                <span class="text-muted mx-3">to: {{ source.get('sources_included|to') }}</span> {%endif%}{% endfor %}
+        {% if entry.programming_languages %}
+        <dt class="col-sm-3">Programming Language(s)</dt>
+        <dd class="col-sm-9">
+            {% for programming_language in entry.programming_languages %}
+                <span class="badge bg-light text-dark me-2">{{programming_language}}<span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.used_for %}
+        <dt class="col-sm-3">Used For</dt>
+        <dd class="col-sm-9">
+            {% for operation in entry.used_for %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=operation.uid) }}">{{operation.name}}</a>
+            {% endfor %}
         </dd>
+        {% endif %}
+        <dt class="col-sm-3">Graphical User Interface</dt>
+        <dd class="col-sm-9">
+            {% if entry.graphical_user_interface %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.channels %}
+        <dt class="col-sm-3">Ideal for these Channels</dt>
+        <dd class="col-sm-9">
+            {% for channel in entry.channels %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=channel.uid) }}">{{channel.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3">Tool is independent of languages</dt>
+        <dd class="col-sm-9">
+            {% if entry.language_independent %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.languages %}
+        <dt class="col-sm-3">Supported Language(s)</dt>
+        <dd class="col-sm-9">
+            {% for language in entry.languages %}
+                <span class="badge bg-light text-dark me-2">{{language}}<span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.input_file_format %}
+        <dt class="col-sm-3">Tool accepts these input file formats</dt>
+        <dd class="col-sm-9">
+            {% for file_format in entry.input_file_format %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=file_format.uid) }}">{{file_format.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.output_file_format %}
+        <dt class="col-sm-3">Tool produces these output file formats</dt>
+        <dd class="col-sm-9">
+            {% for file_format in entry.output_file_format %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=file_format.uid) }}">{{file_format.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3">Author(s) reported validation</dt>
+        <dd class="col-sm-9">
+            {% if entry.author_validated %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.validation_corpus %}
+        <dt class="col-sm-3">Corpus used for validation</dt>
+        <dd class="col-sm-9">
+            {% for corpus in entry.validation_corpus %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=corpus.uid) }}">{{corpus.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        
     </dl>
 </div>

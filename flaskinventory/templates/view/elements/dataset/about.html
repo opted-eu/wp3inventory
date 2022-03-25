@@ -1,0 +1,75 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>About</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.access %}
+        <dt class="col-sm-3">Access</dt>
+        <dd class="col-sm-9">
+            {{entry.access}}
+        {% endif %}
+        {% if entry.languages %}
+        <dt class="col-sm-3">Language(s) in dataset</dt>
+        <dd class="col-sm-9">
+            {% for language in entry.languages %}
+                <span class="badge bg-light text-dark me-2">{{language}}<span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.country %}
+        <dt class="col-sm-3">Countries covered in dataset</dt>
+        <dd class="col-sm-9">
+            {% for country in entry.country %}
+            <span><a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a></span>
+            {{ ", " if not loop.last else "" }}
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.start_date %}
+        <dt class="col-sm-3">Start Date of coverage</dt>
+        <dd class="col-sm-9">
+            {{entry.start_date}}
+        {% endif %}
+        {% if entry.end_date %}
+        <dt class="col-sm-3">End Date of coverage</dt>
+        <dd class="col-sm-9">
+            {{entry.end_date}}
+        {% endif %}
+        {% if entry.file_format %}
+        <dt class="col-sm-3">Dataset File Format</dt>
+        <dd class="col-sm-9">
+             {% for file_format in entry.file_format %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=file_format.uid) }}">{{file_format.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.initial_source %}
+        <dt class="col-sm-3">Initial Sources of Dataset</dt>
+        <dd class="col-sm-9">
+             {% for source in entry.initial_source %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=source.uid) }}">{{source.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.meta_vars %}
+        <dt class="col-sm-3">Included Meta Variables</dt>
+        <dd class="col-sm-9">
+             {% for meta_var in entry.meta_vars %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=meta_var.uid) }}">{{meta_var.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.concept_vars %}
+        <dt class="col-sm-3">Included Conceptual Variables</dt>
+        <dd class="col-sm-9">
+             {% for concept_var in entry.concept_vars %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=concept_var.uid) }}">{{concept_var.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3 my-4"><h5>Sources included</h5></dt>
+        <dd class="col-sm-9 my-4"><small class="text-muted">Shows how many of the sources listed in this inventory are available in the archive.</small></dd>
+        <dt class="col-sm-3">Total</dt>
+        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
+        </dd>
+    </dl>
+</div>

@@ -1,13 +1,67 @@
 from flask import current_app
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes
+from flaskinventory.flaskdgraph import Schema
 import json
-
+from typing import Union
 from flaskinventory.flaskdgraph.utils import author_sequence
 
 """
     Inventory Detail View Functions
 """
+
+def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None) -> Union[dict, None]:
+    if unique_name:
+        query_func = f'{{ entry(func: eq(unique_name, "{unique_name}"))'
+    elif uid:
+        query_func = f'{{ entry(func: uid({uid}))'
+    else:
+        return None
+
+    if dgraph_type:
+        assert isinstance(dgraph_type, str), "Only strings are accepted"
+        dgraph_type = Schema.get_type(dgraph_type)
+        query_func += f'@filter(type({dgraph_type}))'
+    else:
+        query_func += f'@filter(has(dgraph.type))'
+
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname channel { name unique_name } }'''
+
+    if dgraph_type == 'Source':
+        query_fields += '''published_by: ~publishes @facets @filter(type("Organization")) { name unique_name uid } 
+                            archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
+                            datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid }
+                            papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors @facets } 
+                        } }'''
+
+    elif dgraph_type == 'Organization':
+        query_fields += 'owned_by: ~owns @filter(type(Organization)) { uid name unique_name } } }'
+
+    elif dgraph_type == 'Archive':
+        query_fields += 'num_sources: count(sources_included) } }'
+
+    elif dgraph_type == 'Country':
+        query_fields += '''
+                        num_sources: count(~country @filter(type("Source")))  
+                        num_orgs: count(~country @filter(type("Organization"))) } }
+                        '''
+
+    else:
+        query_fields += '} }'
+    
+    query_string = query_func + query_fields
+
+    data = dgraph.query(query_string)
+
+    if len(data['entry']) == 0:
+        return None
+
+    data = data['entry'][0]
+
+
+    return data
+
+
 
 def get_source(unique_name=None, uid=None):
     if unique_name:

@@ -1,0 +1,17 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Tools</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">These tools can run the operation.</small></dd>
+        {% if entry.tools %} 
+            {% for tool in entry.tools %}
+            <dt class="col-sm-3"></dt>
+            <dd>
+            <a href="{{ url_for('view.view_uid', uid=tool.uid) }}">
+                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{tool.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if tool.authors is string %} {{ tool.authors }}{%else%}{{
+                        tool.authors[0] }}{%endif%}</span>
+            </a> 
+            {% endfor %}
+        </dd>
+        {% endif %}
+    </dl>
+</div>
