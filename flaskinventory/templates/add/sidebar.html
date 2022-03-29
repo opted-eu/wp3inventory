@@ -3,14 +3,14 @@
     <div href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
         <span class="fs-5 fw-semibold">Magically fill in the form</span>
     </div>
-    <div class="list-group list-group-flush border-bottom scrollarea">
+    <div class="list-group list-group-flush border-bottom scrollarea p-3">
 
         <p>
             If you provide a DOI, arXiv, or R-Package name, the inventory tries to get some data automatically!
         </p>
 
         <div class="row">
-            <div class="col-3">
+            <div class="col-4">
                 <select class="form-select" id="magic-platform">
                                 <option selected disabled>choose...</option>
                                 <option value="arxiv">arXiv</option>
@@ -19,13 +19,13 @@
                                 <option value="python">Python</option>
                               </select>
             </div>
-            <div class="col-9">
+            <div class="col-8">
                 <input type="text" class="form-control" placeholder="identifier or package name..." id="magic-identifier">
             </div>
         </div>
 
         <div class="row my-2 justify-content-end">
-            <div class="col-4   ">
+            <div class="col-5">
                 <div class="form-group mb-3">
                     <button id="magic" class="btn btn-success w-100" onclick="fetchMetaData(this)">
                                 <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" hidden></span>
@@ -36,6 +36,7 @@
             </div>
 
         </div>
+        <script src="{{ url_for('static', filename='js/bibtex-js/index.js') }}"></script>
         <script src="{{ url_for('static', filename='js/external_apis.js') }}"></script>
     </div>
     {% endif %}

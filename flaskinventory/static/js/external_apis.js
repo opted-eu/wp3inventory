@@ -1,7 +1,3 @@
-// var magicButton = document.getElementById('magic')
-
-// magicButton.addEventListener('onclick', fetchMetaData)
-
 function fetchMetaData(button) {
 
     var platform = document.getElementById('magic-platform').value
@@ -25,13 +21,13 @@ function fetchMetaData(button) {
 
         // sanitize identifier string
 
-        doi = doi.replace("https://doi.org/", "")
+        doi = identifier.replace("https://doi.org/", "")
         doi = doi.replace("http://doi.org/", "")
         doi = doi.replace("doi.org/", "")
 
-        let api = 'https://api.crossref.org/works/'
+        let api = 'http://doi.org/'
 
-        fetch(api + identifier)
+        fetch(api + doi, {headers: {'Accept': 'application/json,application/x-bibtex'}})
             .then(response => response.json())
             .then(json => parseDOI(json))
             .then(result => fillForm(result))
@@ -41,14 +37,14 @@ function fetchMetaData(button) {
     } else if (platform == 'arxiv') {
 
         // sanitize identifier string
-        arxiv = arxiv.replace('https://arxiv.org/abs/', '')
+        arxiv = identifier.replace('https://arxiv.org/abs/', '')
         arxiv = arxiv.replace('http://arxiv.org/abs/', '')
         arxiv = arxiv.replace('arxiv.org/abs/', '')
         arxiv = arxiv.replace('abs/', '')
 
         let api = "http://export.arxiv.org/api/query?id_list="
 
-        fetch(api + identifier)
+        fetch(api + arxiv)
             .then(response => response.text())
             .then(xml => parseArXiv(xml))
             .then(result => fillForm(result))
@@ -126,35 +122,65 @@ function buttonSuccess(button) {
     button.getElementsByClassName('button-text')[0].innerText = 'Success!'
 }
 
-function parseDOI(publication) {
+function resolveDOI(res) {
+
+    let text = res.text()
+
+    try {
+        let json = JSON.parse(text)
+    } catch {
+        let bib =  parseBibFile(text)
+    }
+
+    if (json) {
+        result = parseJSONDOI(json, res.url)
+    }
+    else if (bib) {
+        result = normalizeBib(bib)
+    }
+
+    return result
+
+}
+
+function parseJSONDOI(publication, framework) {
+
     result = new Array()
-    result['url'] = publication.message['url']
-    if (typeof publication.message['container-title'] === 'object') {
-        result['journal'] = publication.message['container-title'][0]
-    } else {
-        result['journal'] = publication.message['container-title']
+
+    if (framework.includes('crosscite.org')) {
+        // parse
     }
+    else if (framework.includes('crossref.org')) {
 
-    if (typeof publication.message['title'] === 'object') {
-        result['name'] = publication.message['title'][0]
-    } else {
-        result['name'] = publication.message['title']
+        result['url'] = publication.message['url']
+        result['doi'] = publication.message['DOI']
+        if (typeof publication.message['container-title'] === 'object') {
+            result['journal'] = publication.message['container-title'][0]
+        } else {
+            result['journal'] = publication.message['container-title']
+        }
+
+        if (typeof publication.message['title'] === 'object') {
+            result['name'] = publication.message['title'][0]
+        } else {
+            result['name'] = publication.message['title']
+        }
+
+        result['paper_kind'] = publication.message['type']
+
+        result['published_date'] = publication.message.created['date-time'].split('-')[0]
+
+
+        result['url'] = publication.message['link'][0]['URL']
+
+        let authors = []
+
+        for (let author of publication.message.author) {
+            authors.push(`${author['family']}, ${author['given']}`)
+        }
+
+        result['authors'] = authors.join(';')
     }
-
-    result['paper_kind'] = publication.message['type']
-
-    result['published_date'] = publication.message.created['date-time'].split('-')[0]
-
-
-    result['url'] = publication.message['link'][0]['URL']
-
-    let authors = []
-
-    for (let author of publication.message.author) {
-        authors.push(`${author['family']}, ${author['given']}`)
-    }
-
-    result['authors'] = authors.join(';')
 
     return result
 
