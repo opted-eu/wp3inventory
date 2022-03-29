@@ -183,9 +183,9 @@ type ResearchPaper {
 type Operation {}
 type FileFormat {}
 type MetaVar {}
+type ConceptVar {}
 type TextUnit {}
 type Annotation {}
-type IOData {}
 
 type Rejected {
     entry_review_status
