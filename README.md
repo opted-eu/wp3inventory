@@ -59,6 +59,7 @@ Level | Name | Permissions
 - Font Awesome
 - Tom-Select
 - jquery typeahead
+- [bibtex-js](https://github.com/digitalheir/bibtex-js)
 
 ## Backups
 
