@@ -8,7 +8,8 @@ from flaskinventory.flaskdgraph.dgraph_types import (MutualListRelationship, Str
                                                      DateTime, Year, GeoScalar,
                                                      ListString, ListRelationship,
                                                      Geo, SingleRelationship, UniqueName,
-                                                     ReverseRelationship, ReverseListRelationship, NewID, UID)
+                                                     ReverseRelationship, ReverseListRelationship, 
+                                                     NewID, UID, Scalar)
 
 
 from flaskinventory.add.external import geocode, reverse_geocode, get_wikidata
@@ -292,6 +293,35 @@ class OrganizationAutocode(ReverseListRelationship):
         return org
 
 
+class OrderedListString(ListString):
+
+    def validate(self, data, facets=None, **kwargs):
+        data = self.validation_hook(data)
+        ordered_data = []
+        if not facets:
+            facets = {"sequence": 0}
+        if isinstance(data, (list, set, tuple)):
+            for i, item in enumerate(data):
+                f = facets.copy()
+                f.update(sequence=i)
+                if isinstance(item, (str, int, datetime.datetime, datetime.date)):
+                    ordered_data.append(Scalar(item, facets=f))
+                elif hasattr(item, "facets"):
+                    ordered_data.append(item.update_facets(f))
+                else:
+                    raise InventoryValidationError(
+                        f'Error in <{self.predicate}>! Do not know how to handle {type(item)}. Value: {item}')
+            print(ordered_data)
+            return ordered_data
+        elif isinstance(data, (str, int, datetime.datetime, datetime.date)):
+            return Scalar(data, facets=facets)
+        elif hasattr(data, facets):
+            data.update_facets(facets)
+            return data
+        else:
+            raise InventoryValidationError(
+                f'Error in <{self.predicate}>! Do not know how to handle {type(data)}. Value: {data}')
+       
 
 
 """
@@ -594,7 +624,7 @@ class Subunit(Entry):
 class Resource(Entry):
 
     description = String(large_textfield=True)
-    authors = ListString(render_kw={'placeholder': 'Separate by semicolon'}, tom_select=True)
+    authors = OrderedListString(render_kw={'placeholder': 'Separate by semicolon'}, tom_select=True)
     published_date = DateTime()
     last_updated = DateTime()
     url = String()
@@ -609,6 +639,60 @@ class Archive(Resource):
     fulltext = Boolean(description='Dataset contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
 
+class Dataset(Resource):
+
+    name = String(description="What is the name of the dataset?", required=True)
+
+    other_names = ListString(description="Does the dataset have other names?",
+                            render_kw={'placeholder': 'Separate by comma ","'},
+                            overwrite=True)
+
+    authors = OrderedListString(delimiter=';',
+                            render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
+                            required=True)
+                            
+    published_date = Year(label='Year of publication', 
+                            description="Which year was the dataset published?")
+    
+    last_updated = DateTime(description="When was the dataset last updated?", new=False)
+    url = String(label="URL", description="Link to the dataset", required=True)
+    doi = String(label='DOI')
+    arxiv = String(label="arXiv")
+
+    description = String(large_textfield=True, description="Please provide a short description for the tool")
+
+
+    access = SingleChoice(choices={'free': 'Free',
+                                    'restricted': 'Restricted'})
+    
+    fulltext = Boolean(description='Dataset contains fulltext')
+
+    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
+
+    languages = MultipleChoice(description="Which languages are covered in the dataset?",
+                                choices=icu_codes,
+                                tom_select=True)
+
+    start_date = DateTime(description="Start date of the dataset")
+
+    end_date = DateTime(description="End date of the dataset")
+
+    file_format = ListRelationship(description="In which file format(s) is the dataset stored?",
+                                        autoload_choices=True,
+                                        relationship_constraint="FileFormat")
+
+    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
+
+    initial_source = ListRelationship(description="If the dataset is derived from another corpus or dataset, the original source can be linked here",
+                                        relationship_constraint=['Dataset', 'Corpus'])
+
+    meta_vars = ListRelationship(description="List of meta data included in the dataset (e.g., date, language, source, medium)",
+                                    relationship_constraint="MetaVar")
+
+    concept_vars = ListRelationship(description="List of variables based on concepts (e.g. sentiment, frames, etc)",
+                                        relationship_constraint="ConceptVar")
+
+
 class Tool(Resource):
 
     name = String(description="What is the name of the tool?", required=True)
@@ -617,7 +701,7 @@ class Tool(Resource):
                             render_kw={'placeholder': 'Separate by comma ","'},
                             overwrite=True)
 
-    authors = ListString(delimiter=';',
+    authors = OrderedListString(delimiter=';',
                             render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
                             required=True)
                             
@@ -626,8 +710,8 @@ class Tool(Resource):
     
     last_updated = DateTime(description="When was the tool last updated?", new=False)
     url = String(label="URL", description="Link to the tool", required=True)
-    doi = String(new=False)
-    arxiv = String(new=False)
+    doi = String(label='DOI')
+    arxiv = String(label='arXiv')
 
     description = String(large_textfield=True, description="Please provide a short description for the tool")
 
@@ -690,3 +774,17 @@ class Tool(Resource):
                                             relationship_constraint="ResearchPaper")
 
     
+    """ Tag Like Types """
+
+class Operation(Entry):
+    pass
+
+class FileFormat(Entry):
+    pass
+
+class ConceptVar(Entry):
+    pass
+
+class TextUnit(Entry):
+    pass
+
