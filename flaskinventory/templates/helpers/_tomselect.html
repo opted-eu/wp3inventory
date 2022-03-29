@@ -398,6 +398,28 @@
     
     {% endif %}
 
+    {% if 'initial_source' in fields %}
+    
+    new TomSelect('#initial_source', {plugins: ['remove_button']})
+    
+    {% endif %}
 
+    {% if 'meta_vars' in fields %}
+    
+    new TomSelect('#meta_vars', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'concept_vars' in fields %}
+    
+    new TomSelect('#concept_vars', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'file_format' in fields %}
+    
+    new TomSelect('#file_format', {plugins: ['remove_button']})
+    
+    {% endif %}
 
     </script>
