@@ -851,7 +851,7 @@ class Boolean(Predicate):
         if isinstance(data, bool):
             return bool(data)
         elif isinstance(data, str):
-            return data.lower() in ('yes', 'true', 't', '1')
+            return data.lower() in ('yes', 'true', 't', '1', 'y')
         elif isinstance(data, int):
             return data > 0
         else:
