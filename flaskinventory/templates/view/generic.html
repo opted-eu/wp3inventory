@@ -121,6 +121,27 @@
 
 {% endif %}
 
+
+{% if 'MetaVar' in entry['dgraph.type'] %}
+
+    {% include "view/elements/metavar/reverse.html" %}
+
+{% endif %}
+
+{% if 'ConceptVar' in entry['dgraph.type'] %}
+
+    {% include "view/elements/conceptvar/reverse.html" %}
+
+{% endif %}
+
+
+{% if 'TextUnit' in entry['dgraph.type'] %}
+
+    {% include "view/elements/textunit/reverse.html" %}
+
+{% endif %}
+
+
 </article>
 
 {% endblock content %}

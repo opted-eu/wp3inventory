@@ -40,12 +40,59 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     elif dgraph_type == 'Archive':
         query_fields += 'num_sources: count(sources_included) } }'
 
+    elif dgraph_type == 'Dataset':
+        query_fields += '''
+                        num_sources: count(sources_included) } }
+                        '''
+
     elif dgraph_type == 'Country':
         query_fields += '''
                         num_sources: count(~country @filter(type("Source")))  
                         num_orgs: count(~country @filter(type("Organization"))) } }
                         '''
+    
+    elif dgraph_type == 'Multinational':
+        query_fields += '''
+                        num_sources: count(~country @filter(type("Source"))) } }
+                        '''
 
+    elif dgraph_type == 'Subunit':
+        query_fields += '''
+                        num_sources: count(~geographic_scope_subunit @filter(type("Source"))) } }
+                        '''
+    
+    elif dgraph_type == 'Operation':
+        query_fields += '''
+                        tools: ~used_for @filter(type("Tool")) { uid name unique_name authors } } }
+                        '''
+
+    elif dgraph_type == 'FileFormat':
+        query_fields += '''
+                        tools_input: ~input_file_format @filter(type("Tool")) { uid name unique_name authors } 
+                        tools_output: ~output_file_format @filter(type("Tool")) { uid name unique_name authors }
+                        datasets: ~file_format @filter(type("Dataset"))  { uid name unique_name authors }
+                        } }
+                        '''
+
+    elif dgraph_type == 'MetaVar':
+        query_fields += '''
+                        datasets: ~meta_vars @filter(type("Dataset"))  { uid name unique_name authors }
+                        corpus: ~meta_vars @filter(type("Corpus"))  { uid name unique_name authors }
+                        } }
+                        '''
+    
+    elif dgraph_type == 'ConceptVar':
+        query_fields += '''
+                        datasets: ~concept_vars @filter(type("Dataset"))  { uid name unique_name authors }
+                        corpus: ~concept_vars @filter(type("Corpus"))  { uid name unique_name authors }
+                        } }
+                        '''
+
+    elif dgraph_type == 'TextUnit':
+        query_fields += '''
+                        corpus: ~text_units @filter(type("Corpus"))  { uid name unique_name authors }
+                        } }
+                        '''
     else:
         query_fields += '} }'
     
@@ -59,10 +106,10 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     data = data['entry'][0]
 
     # Restore ordered lists
-    for key in data.keys():
-        if '|sequence' in key:
-            data[key.replace('|sequence', '')] = restore_sequence(data, list_key=key.replace('|sequence', ''))
-
+    # for key, val in data.items():
+    #     if '|sequence' in key:
+    #         data[key.replace('|sequence', '')] = restore_sequence(data, list_key=key.replace('|sequence', ''))
+    restore_sequence(data)
 
     return data
 

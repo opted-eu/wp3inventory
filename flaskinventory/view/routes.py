@@ -2,6 +2,8 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, jsonify)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
+from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
+from flaskinventory.flaskdgraph.schema import Schema
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.view.dgraph import (get_entry, get_archive, get_channel, get_country,
@@ -343,7 +345,6 @@ def view_researchpaper(uid):
 def view_generic(uid):
 
     dgraph_type = dgraph.get_dgraphtype(uid)
-    print(dgraph_type)
 
     data = get_entry(uid=uid, dgraph_type=dgraph_type)
 
@@ -354,6 +355,19 @@ def view_generic(uid):
         show_sidebar = True
     else:
         show_sidebar = False
+    
+    # pretty printing
+    fields = Schema.get_predicates(dgraph_type)
+    for key, v in data.items():
+        if key in fields:
+            try:
+                if isinstance(fields[key], SingleChoice):
+                    if isinstance(v, list):
+                        data[key] = [fields[key].choices[subval] for subval in v]
+                    else:
+                        data[key] = fields[key].choices[v]
+            except KeyError:
+                pass
 
     review_actions = create_review_actions(current_user, data['uid'], data['entry_review_status'])
 

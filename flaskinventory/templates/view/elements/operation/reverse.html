@@ -4,14 +4,19 @@
         <dd class="col-sm-9 mb-4"><small class="text-muted">These tools can run the operation.</small></dd>
         {% if entry.tools %} 
             {% for tool in entry.tools %}
-            <dt class="col-sm-3"></dt>
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=tool.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{tool.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if tool.authors is string %} {{ tool.authors }}{%else%}{{
-                        tool.authors[0] }}{%endif%}</span>
-            </a> 
+                <dt class="col-sm-3">
+                        
+                </dt>
+                <dd class="col-sm-9 mb-4">
+                    <a href="{{ url_for('view.view_researchpaper', uid=tool.uid) }}" class="me-2">
+                        <em>{{tool.name}}</em></a> 
+                        {% if tool.authors is string %}
+                            <span>({{ tool.authors }})</span>
+                        {% else %}
+                            <span>({{ tool.authors[0] }} et al.)</span>
+                        {% endif %}
+                </dd>
             {% endfor %}
-        </dd>
         {% endif %}
     </dl>
 </div>
