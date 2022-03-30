@@ -99,6 +99,7 @@ function showSpinner(button) {
     button.getElementsByClassName('spinner-grow')[0].hidden = false
     button.getElementsByClassName('button-loading')[0].hidden = false
     button.getElementsByClassName('button-text')[0].hidden = true
+    document.getElementById('magic-wand').hidden = true
 }
 
 
@@ -106,6 +107,9 @@ function hideSpinner(button) {
     button.getElementsByClassName('spinner-grow')[0].hidden = true
     button.getElementsByClassName('button-loading')[0].hidden = true
     button.getElementsByClassName('button-text')[0].hidden = false
+    document.getElementById('magic-wand').hidden = false
+    document.getElementById('magic-error-container').hidden = true
+
 }
 
 function handleError(error, button) {
@@ -114,12 +118,14 @@ function handleError(error, button) {
     button.getElementsByClassName('button-loading')[0].hidden = true
     button.getElementsByClassName('button-text')[0].hidden = false
     button.getElementsByClassName('button-text')[0].innerText = 'Error!'
+    document.getElementById('magic-error-container').hidden = false
     console.error(error)
 }
 
 function buttonSuccess(button) {
     button.classList = ['btn btn-success w-100']
     button.getElementsByClassName('button-text')[0].innerText = 'Success!'
+    document.getElementById('magic-error-container').hidden = true
 }
 
 function resolveDOI(text) {
@@ -145,6 +151,8 @@ function resolveDOI(text) {
     } else {
         result['name'] = json['title']
     }
+
+    result['title'] = result['name']
 
     result['paper_kind'] = json['type']
 
@@ -215,6 +223,8 @@ function parseArXiv(xml) {
 
     result['name'] = publication.getElementsByTagName('title')[0].innerHTML
 
+    result['title'] = result['name']
+
     let authors = []
 
     for (author of publication.getElementsByTagName('author')) {
@@ -237,6 +247,7 @@ function parsePyPi(package) {
     result = new Array()
 
     result['name'] = package.info['name']
+    result['title'] = package.info['name']
     result['other_names'] = package.info['summary']
     result['description'] = package.info['description']
     result['url'] = package.info['home_page']
