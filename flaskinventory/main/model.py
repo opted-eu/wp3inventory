@@ -620,26 +620,25 @@ class Subunit(Entry):
     country_code = String()
     location_point = Geo(edit=False, new=False)
 
+class Archive(Entry):
 
-class Resource(Entry):
+    name = String(description="What is the name of the archive?", required=True)
+
+    other_names = ListString(description="Does the archive have other names?",
+                            render_kw={'placeholder': 'Separate by comma ","'},
+                            overwrite=True)
 
     description = String(large_textfield=True)
-    authors = OrderedListString(render_kw={'placeholder': 'Separate by semicolon'}, tom_select=True)
-    published_date = DateTime()
-    last_updated = DateTime()
-    url = String()
-    doi = String()
-    arxiv = String()
 
-class Archive(Resource):
+    url = String()
 
     access = SingleChoice(choices={'free': 'Free',
                                     'restricted': 'Restricted'})
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
-    fulltext = Boolean(description='Dataset contains fulltext')
+    fulltext = Boolean(description='Archive contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
 
-class Dataset(Resource):
+class Dataset(Entry):
 
     name = String(description="What is the name of the dataset?", required=True)
 
@@ -655,6 +654,7 @@ class Dataset(Resource):
                             description="Which year was the dataset published?")
     
     last_updated = DateTime(description="When was the dataset last updated?", new=False)
+
     url = String(label="URL", description="Link to the dataset", required=True)
     doi = String(label='DOI')
     arxiv = String(label="arXiv")
@@ -693,7 +693,7 @@ class Dataset(Resource):
                                         relationship_constraint="ConceptVar")
 
 
-class Tool(Resource):
+class Tool(Entry):
 
     name = String(description="What is the name of the tool?", required=True)
 
@@ -709,6 +709,7 @@ class Tool(Resource):
                             description="Which year was the tool published?")
     
     last_updated = DateTime(description="When was the tool last updated?", new=False)
+
     url = String(label="URL", description="Link to the tool", required=True)
     doi = String(label='DOI')
     arxiv = String(label='arXiv')
@@ -773,6 +774,48 @@ class Tool(Resource):
                                             new=False,
                                             relationship_constraint="ResearchPaper")
 
+
+class ResearchPaper(Entry):
+
+    name = String(hidden=True)
+    other_names = ListString(new=False, edit=False, hidden=True, required=False)
+
+    title = String(description="What is the title of the publication?", required=True)
+
+    authors = OrderedListString(delimiter=';',
+                            render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
+                            required=True)
+                            
+    published_date = Year(label='Year of publication', 
+                            description="Which year was the publication published?")
+
+    paper_kind = String(description="What kind of publcation is this? (e.g., Journal article, book section)")
+    
+    journal = String(description="In which journal was it published?")
+    
+    url = String(label="URL", description="Link to the publication", required=True)
+    doi = String(label='DOI')
+    arxiv = String(label='arXiv')
+
+    description = String(large_textfield=True, description="Abstract or a short description of the publication")
+
+    tools_used = ListRelationship(description="Which research tools where used in the publication?",
+                                            autoload_choices=True,
+                                            allow_new=False,
+                                            relationship_constraint="Tool")
+
+    sources_included = ListRelationship(description="Which news sources are investigated in this publication?",
+                                            autoload_choices=False,
+                                            allow_new=False,
+                                            relationship_constraint="Source")
+
+    country = ListRelationship(description="Does the publication have some sort of country that it focuses on?",
+                                                autoload_choices=True,
+                                                allow_new=False,
+                                                relationship_constraint="Country")
+
+
+
     
     """ Tag Like Types """
 
@@ -780,6 +823,9 @@ class Operation(Entry):
     pass
 
 class FileFormat(Entry):
+    pass
+
+class MetaVar(Entry):
     pass
 
 class ConceptVar(Entry):
