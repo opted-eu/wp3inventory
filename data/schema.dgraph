@@ -116,6 +116,13 @@ type Resource {
 
 
 type Archive {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     access
     sources_included
     fulltext
@@ -123,6 +130,13 @@ type Archive {
 
 
 type Dataset {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     access
     languages
     country
@@ -134,13 +148,18 @@ type Dataset {
     concept_vars
     materials
     sources_included
-    related_publications
 }
 
 type Corpus {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     access
     materials
-    related_publications
     languages
     file_format
     sources_included
@@ -150,11 +169,18 @@ type Corpus {
     meta_vars
     text_units
     country
-    annotations
+    concept_vars
 }
 
 
 type Tool {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     platform
     programming_languages
     used_for
@@ -171,11 +197,19 @@ type Tool {
 
 
 type ResearchPaper {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     title
     isbn
     paper_kind
     journal
     sources_included
+    tools_used
     country
 }
 
@@ -185,7 +219,6 @@ type FileFormat {}
 type MetaVar {}
 type ConceptVar {}
 type TextUnit {}
-type Annotation {}
 
 type Rejected {
     entry_review_status
@@ -293,7 +326,6 @@ initial_source: [uid] @reverse .
 meta_vars: [uid] @reverse .
 concept_vars: [uid] @reverse .
 text_units: [uid] @reverse .
-annotations: [uid] @reverse .
 
 # Archive Predicates
 fulltext: bool .
