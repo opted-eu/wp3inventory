@@ -27,9 +27,9 @@ function fetchMetaData(button) {
 
         let api = 'http://doi.org/'
 
-        fetch(api + doi, {headers: {'Accept': 'application/json,application/x-bibtex'}})
-            .then(response => response.json())
-            .then(json => parseDOI(json))
+        fetch(api + doi, { headers: { 'Accept': 'application/vnd.citationstyles.csl+json, application/x-bibtex' } })
+            .then(response => response.text())
+            .then(text => resolveDOI(text))
             .then(result => fillForm(result))
             .then(_ => hideSpinner(button), buttonSuccess(button))
             .catch(error => handleError(error, button))
@@ -122,69 +122,73 @@ function buttonSuccess(button) {
     button.getElementsByClassName('button-text')[0].innerText = 'Success!'
 }
 
-function resolveDOI(res) {
+function resolveDOI(text) {
 
-    let text = res.text()
+    result = new Array
 
-    try {
-        let json = JSON.parse(text)
-    } catch {
-        let bib =  parseBibFile(text)
-    }
+    // if (headers.get('Content-Type').includes('csl+json')) {
 
-    if (json) {
-        result = parseJSONDOI(json, res.url)
-    }
-    else if (bib) {
-        result = normalizeBib(bib)
-    }
-
-    return result
-
-}
-
-function parseJSONDOI(publication, framework) {
-
-    result = new Array()
-
-    if (framework.includes('crosscite.org')) {
-        // parse
-    }
-    else if (framework.includes('crossref.org')) {
-
-        result['url'] = publication.message['url']
-        result['doi'] = publication.message['DOI']
-        if (typeof publication.message['container-title'] === 'object') {
-            result['journal'] = publication.message['container-title'][0]
+    let json = JSON.parse(text)
+    console.log(json)
+    result['url'] = json['URL']
+    result['doi'] = json['DOI']
+    if (Object.keys(json).includes('container-title')) {
+        if (typeof json['container-title'] === 'object') {
+            result['journal'] = json['container-title'][0]
         } else {
-            result['journal'] = publication.message['container-title']
+            result['journal'] = json['container-title']
         }
+    }
 
-        if (typeof publication.message['title'] === 'object') {
-            result['name'] = publication.message['title'][0]
+    if (typeof json['title'] === 'object') {
+        result['name'] = json['title'][0]
+    } else {
+        result['name'] = json['title']
+    }
+
+    result['paper_kind'] = json['type']
+
+    if (Object.keys(json).includes('created')) {
+        if (Object.keys(json.created).includes('date-time')) {
+            result['published_date'] = json.created['date-time'].split('-')[0]
         } else {
-            result['name'] = publication.message['title']
+            result['published_date'] = json.created['date-parts'][0][0]
         }
+    } else if (Object.keys(json).includes('issued')) {
+        if (Object.keys(json.issued).includes('date-time')) {
+            result['published_date'] = json.issued['date-time'].split('-')[0]
+        } else {
+            result['published_date'] = json.issued['date-parts'][0][0]
+        }
+    }
 
-        result['paper_kind'] = publication.message['type']
+    if (Object.keys(json).includes('link')) {
+        result['url'] = json['link'][0]['URL']
+    }
+    let authors = []
 
-        result['published_date'] = publication.message.created['date-time'].split('-')[0]
-
-
-        result['url'] = publication.message['link'][0]['URL']
-
-        let authors = []
-
-        for (let author of publication.message.author) {
+    for (let author of json.author) {
+        if (Object.keys(author).includes('family')) {
             authors.push(`${author['family']}, ${author['given']}`)
+        } else {
+            authors.push(author.literal)
         }
-
-        result['authors'] = authors.join(';')
     }
+
+    result['authors'] = authors.join(';')
+
+    if (Object.keys(json).includes('abstract')) {
+        result['description'] = json.abstract
+    }
+
+
+    // }
+    // other parser here
 
     return result
 
 }
+
 
 function parseArXiv(xml) {
 
