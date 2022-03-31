@@ -41,7 +41,6 @@ class Sanitizer:
 
         if isinstance(data, ImmutableMultiDict):
             data = IMD2dict(data)
-
         self.user = current_user
         self.user_ip = get_ip()
         self._validate_inputdata(data, self.user, self.user_ip)
@@ -212,7 +211,10 @@ class Sanitizer:
         for key in self.data.keys():
             if '|' in key:
                 predicate, facet = key.split('|')
-                self.facets[predicate] = {facet: self.data[key]}
+                if predicate in self.facets.keys():
+                    self.facets[predicate].update({facet: self.data[key]})
+                else:
+                    self.facets[predicate] = {facet: self.data[key]}
             
             # for list predicates, we track facets via the value
             if '@' in key:
@@ -337,7 +339,9 @@ class Sanitizer:
                                             'timestamp': datetime.datetime.now(datetime.timezone.utc)})
             self.skip_keys.append('entry_review_status')
         elif self.data.get('entry_review_status'):
-            if self.user.user_role < USER_ROLES.Reviewer:
+            if self.entry_review_status == 'draft' and self.data['entry_review_status'] == 'pending':
+                self.entry['entry_review_status'] = 'pending'
+            elif self.user.user_role < USER_ROLES.Reviewer:
                 raise InventoryPermissionError(
                     'You do not have the required permissions to change the review status!')
 
@@ -595,7 +599,10 @@ class Sanitizer:
                 f"Instagram profile not found: {self.data['name']}")
 
         if profile.get('fullname'):
-            self.entry['other_names'].append(profile['fullname'])
+            try:
+                self.entry['other_names'].append(profile['fullname'])
+            except KeyError:
+                self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
             facets = {'followers': int(
                 profile['followers'])}
