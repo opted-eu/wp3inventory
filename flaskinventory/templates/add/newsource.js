@@ -338,10 +338,14 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
                 }
-                let geographicScopeSingle = document.getElementById('geographic-scope-single');
-                geographicScopeSingle.tomselect.clear();
-                let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
-                geographicScopeSubunit.tomselect.clear();
+                try {
+                    let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                    geographicScopeSingle.tomselect.clear();
+                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                    geographicScopeSubunit.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             } else if (item == 'national') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = false;
@@ -360,10 +364,14 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('geographic-scope-subunit').required = false;
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
-                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
-                    geographicScopeMultiple.tomselect.clear();
-                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
-                    geographicScopeSubunit.tomselect.clear();
+                    try {
+                        let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                        geographicScopeMultiple.tomselect.clear();
+                        let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                        geographicScopeSubunit.tomselect.clear();
+                    } catch (ex) {
+                        console.warn(ex.message);
+                    }
                 }
             } else if (item == 'subnational') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
@@ -384,8 +392,12 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = true;
                 }
-                let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
-                geographicScopeMultiple.tomselect.clear();
+                try {
+                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                    geographicScopeMultiple.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             } else {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = true;
@@ -404,12 +416,16 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
-                let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
-                geographicScopeMultiple.tomselect.clear();
-                let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
-                geographicScopeSubunit.tomselect.clear();
-                let geographicScopeSingle = document.getElementById('geographic-scope-single');
-                geographicScopeSingle.tomselect.clear();
+                try {
+                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                    geographicScopeMultiple.tomselect.clear();
+                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                    geographicScopeSubunit.tomselect.clear();
+                    let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                    geographicScopeSingle.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             }
         });
     });
