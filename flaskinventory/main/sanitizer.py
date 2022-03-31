@@ -296,7 +296,11 @@ class Sanitizer:
             if type(validated) == dict:
                 self.entry.update(validated)
             elif type(validated) == list and key in self.entry.keys():
-                self.entry[key] += validated
+                try:
+                    self.entry[key] += validated
+                except TypeError:
+                    validated.append(self.entry[key])
+                    self.entry[key] = validated
             elif type(validated) == set and key in self.entry.keys():
                 self.entry[key] = set.union(validated, self.entry[key])
             else:
