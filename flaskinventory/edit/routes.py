@@ -153,7 +153,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
 
     if form.validate_on_submit():
         try:
-            sanitizer = Sanitizer.edit(request.form.to_dict(), dgraph_type=dgraph_type)
+            sanitizer = Sanitizer.edit(request.form, dgraph_type=dgraph_type)
         except Exception as e:
             if current_app.debug:
                     e_trace = "".join(traceback.format_exception(
