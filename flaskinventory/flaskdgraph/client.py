@@ -154,16 +154,19 @@ class DGraph(object):
         return data['q'][0]['uid']
 
     def get_unique_name(self, uid):
-        query_string = f'{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{ uid unique_name }} }}'
-        data = self.query(query_string)
+
+        query_string = f''' query get_unique_name($value: string)
+                            {{ q(func: uid($value)) @filter(has(dgraph.type)) {{ uid unique_name }} }}'''
+        data = self.query(query_string, variables={'$value': uid})
         if len(data['q']) == 0:
             return None
         return data['q'][0]['unique_name']
 
     def get_dgraphtype(self, uid: str, clean: list =['Entry', 'Resource']):
-        query_string = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
+        query_string = f'''query get_dgraphtype($value: string)
+                            {{ q(func: uid($value)) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
 
-        data = self.query(query_string)
+        data = self.query(query_string, variables={'$value': uid})
         if len(data['q']) == 0:
             return False
         if 'User' in data['q'][0]['dgraph.type']:
