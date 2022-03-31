@@ -440,6 +440,7 @@ function populateForm(jsonData) {
     if ('channel' in jsonData) {
         document.getElementById("channel-select").value = jsonData["channel"].uid
         document.getElementById("channel-select-hidden").value = jsonData["channel"].unique_name
+        document.getElementById("channel-select").disabled = true
     };
     if ('name' in jsonData) {
         document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
@@ -1413,7 +1414,7 @@ function serializeForm(f) {
 
     // remove empty strings
     var obj = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != ""));
-
+    obj['entry_review_status'] = 'pending'
     return obj;
 };
 
