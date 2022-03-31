@@ -12,20 +12,29 @@ $.typeahead({
     },
     template: function(query, item) {
         if (item.channel != null) {
-            channel_label = '- {{channel}}'
+            let ch = item.channel.toLowerCase()
+            channel_label = `<i class="icon-${ch} color-${ch} me-2 fa-fw" alt="{{channel}}"></i>`
         } else { channel_label = '' }
+        if (item.doi != null) {
+            identifier = '<span class="text-muted">(DOI: {{doi}})</span>'
+        } else if (item.arxiv != null) {
+            identifier = '<span class="text-muted">(arXiv: {{arxiv}})</span>'
+        } else {
+            identifier = ''
+        }
         item.type = item.type.filter(function(e) { return e !== 'Entry' })
-        return '<span>{{name}}{{tile}} ' + channel_label + '<small"> (Type: {{type}}) <span class="text-muted">(uid: {{uid}})</span></small></span>'
+        return '<span>' + channel_label + '{{name}}<small> (Type: {{type}}) ' + identifier + '</small></span>'
     },
     emptyTemplate: "no result for {{query}}",
     source: {
         name: {
-            display: "name",
+            display: ["name", "arxiv", "doi", "title"],
             href: function(item) {
                 if (item.title != null) {
                     item.unique_name = item.uid
                 }
-                return $SCRIPT_ROOT + "/view/" + item.type.toString().toLowerCase() + '/' + item.unique_name.toString()
+                item.type = item.type.filter(function(e) { return e !== 'Entry' })
+                return $SCRIPT_ROOT + "/view/" + item.type.toString().toLowerCase() + '/uid/' + item.uid.toString()
             },
             data: [{
                 "uid": 0,
