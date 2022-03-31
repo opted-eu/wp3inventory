@@ -507,12 +507,13 @@ function populateForm(jsonData) {
     if ("geographic_scope" in jsonData) {
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).checked = true
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).dispatchEvent(new Event("input"))
+        let hiddenGeographicScopeCountry = document.getElementById('geographic-scope-countries-hidden')
         if ("country" in jsonData) {
             if (jsonData["geographic_scope"] == "multinational") {
                 for (country of jsonData["country"]) {
                     if (document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`)) {
                         document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`).selected = true
-                        document.getElementById("geographic-scope-countries-hidden").value += country["uid"] + ","
+                        hiddenGeographicScopeCountry.value += country["uid"] + ","
                     }
                 }
                 if ("geographic_scope_subunit" in jsonData) {
@@ -520,6 +521,7 @@ function populateForm(jsonData) {
                         if (document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`)) {
                             document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`).selected = true
                             document.getElementById("geographic-scope-subunits-hidden").value += country["uid"] + ","
+                            hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value += country['uid'] + ","
                         }
                     }
                 }
@@ -527,6 +529,7 @@ function populateForm(jsonData) {
                 let country = jsonData["country"][0]
                 if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                     document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                    hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value = country['uid']
                 }
 
             } else if (jsonData["geographic_scope"] == "subnational") {
@@ -539,9 +542,13 @@ function populateForm(jsonData) {
                     let country = jsonData["country"][0]
                     if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                         document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                        hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value = country['uid']
                     }
                 }
             }
+
+
+
         }
     };
     if ("languages" in jsonData) {
