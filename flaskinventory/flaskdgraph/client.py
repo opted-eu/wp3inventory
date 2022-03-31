@@ -137,6 +137,7 @@ class DGraph(object):
         if variables is None:
             res = self.connection.txn(read_only=True).query(query_string)
         else:
+            self.logger.debug(f"Got the following variables {variables}")
             res = self.connection.txn(read_only=True).query(
                 query_string, variables=variables)
         self.logger.debug(f"Received response for dgraph query.")
@@ -144,8 +145,10 @@ class DGraph(object):
         return data
 
     def get_uid(self, field, value):
-        query_string = f'{{ q(func: eq({field}, {value})) {{ uid {field} }} }}'
-        data = self.query(query_string)
+        query_string = f'''
+            query quicksearch($value: string)
+            {{ q(func: eq({field}, $value)) {{ uid {field} }} }}'''
+        data = self.query(query_string, variables={'$value': value})
         if len(data['q']) == 0:
             return None
         return data['q'][0]['uid']
