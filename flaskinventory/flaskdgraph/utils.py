@@ -38,11 +38,6 @@ def author_sequence(paper, author_key='authors', sequence_key='sequence'):
     author_sequence = {int(k): v for k, v in sorted(paper[author_key + '|' + sequence_key].items(), key=lambda item: item[1])}
     return [paper[author_key][k] for k, _ in author_sequence.items()]
 
-def restore_sequence2(data, list_key='authors', sequence_key='sequence'):
-    ordered_sequence = {int(k): v for k, v in sorted(data[list_key + '|' + sequence_key].items(), key=lambda item: item[1])}
-    return [data[list_key][k] for k, _ in ordered_sequence.items()]
-
-
 def restore_sequence(d: dict, sequence_key='sequence'):
     for predicate, val in d.items():
         if isinstance(val, dict):

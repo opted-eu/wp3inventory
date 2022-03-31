@@ -11,7 +11,6 @@ from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
-from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.flaskdgraph.utils import strip_query, validate_uid
 import traceback
 

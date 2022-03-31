@@ -1,4 +1,3 @@
-from wtforms import SelectField, SelectMultipleField
 from flaskinventory import dgraph
 
 
@@ -36,31 +35,3 @@ def get_subunit_choices():
     su_choices = [(subunit.get('uid'), f"{subunit.get('name')} [{subunit['country'][0]['name'] if subunit.get('country') else 'MISSING'}]")
                   for subunit in subunits['q']]
     return su_choices
-
-
-publication_kind_choices = [('newspaper', 'Newspaper / News Site'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
-    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
-
-
-publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
-
-
-topical_focus_choices = [("politics", "Politics"),
-                         ("society", "Society & Panorama"),
-                         ("economy", "Business, Economy, Finance & Stocks"),
-                         ("religion", "Religion"),
-                         ("science", "Science & Technology"),
-                         ("media", "Media"),
-                         ("environment", "Environment"),
-                         ("education", "Education")]
-
-topical_focus_dict = {key: val for (key, val) in topical_focus_choices}
-
-
-ownership_kind_choices = [('none', 'Missing!'),
-                          ('public ownership', 'Mainly public ownership'),
-                          ('private ownership', 'Mainly private Ownership'),
-                          ('political party', 'Political Party'),
-                          ('unknown', 'Unknown Ownership')]
-
-ownership_kind_dict = {key: val for (key, val) in ownership_kind_choices}
