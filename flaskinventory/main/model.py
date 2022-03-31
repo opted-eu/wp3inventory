@@ -227,7 +227,7 @@ class OrganizationAutocode(ReverseListRelationship):
     def __init__(self, predicate_name, *args, **kwargs) -> None:
 
         super().__init__(predicate_name,
-                            relationship_constraint = ['Organization'], 
+                            relationship_constraint = 'Organization', 
                             allow_new=True, 
                             autoload_choices=False, 
                             overwrite=True, 
@@ -246,7 +246,7 @@ class OrganizationAutocode(ReverseListRelationship):
             return new_org
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
-            if entry_type not in self.relationship_constraint:
+            if entry_type != self.relationship_constraint:
                 raise InventoryValidationError(
                     f'Error in <{self._predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
         return {'uid': UID(uid, facets=facets), self._target_predicate: node}
@@ -289,7 +289,7 @@ class OrganizationAutocode(ReverseListRelationship):
         
         if self.relationship_constraint:
             org['dgraph.type'] = self.relationship_constraint
-
+            
         return org
 
 

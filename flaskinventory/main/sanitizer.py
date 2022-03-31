@@ -182,6 +182,11 @@ class Sanitizer:
             if entry.get('dgraph.type'):
                 if type(entry['dgraph.type']) != list:
                     entry['dgraph.type'] = Schema.resolve_inheritance(entry['dgraph.type'])
+                elif isinstance(entry['dgraph.type'], list):
+                    dtypes = []
+                    for dt in  entry['dgraph.type']:
+                        dtypes += Schema.resolve_inheritance(dt)
+                    entry['dgraph.type'] = list(set(dtypes))
             else:
                 entry['dgraph.type'] = ["Entry"]
 

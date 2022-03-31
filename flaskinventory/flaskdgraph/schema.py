@@ -106,6 +106,7 @@ class Schema:
     def resolve_inheritance(cls, _cls) -> list:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
+        assert _cls in cls.__types__.keys(), f'DGraph Type "{_cls}" not found!'
         dgraph_types = [_cls]
         if _cls in cls.__inheritance__.keys():
             dgraph_types += cls.__inheritance__[_cls]
