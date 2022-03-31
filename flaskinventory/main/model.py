@@ -246,7 +246,7 @@ class OrganizationAutocode(ReverseListRelationship):
             return new_org
         if self.relationship_constraint:
             entry_type = dgraph.get_dgraphtype(uid)
-            if entry_type != self.relationship_constraint:
+            if entry_type not in self.relationship_constraint:
                 raise InventoryValidationError(
                     f'Error in <{self._predicate}>! UID specified does not match constrain, UID is not a {self.relationship_constraint}!: uid <{uid}> <dgraph.type> <{entry_type}>')        
         return {'uid': UID(uid, facets=facets), self._target_predicate: node}
@@ -311,7 +311,6 @@ class OrderedListString(ListString):
                 else:
                     raise InventoryValidationError(
                         f'Error in <{self.predicate}>! Do not know how to handle {type(item)}. Value: {item}')
-            print(ordered_data)
             return ordered_data
         elif isinstance(data, (str, int, datetime.datetime, datetime.date)):
             return Scalar(data, facets=facets)
