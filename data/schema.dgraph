@@ -321,7 +321,7 @@ fulltext: bool .
 
 # Tool Predicates
 platform: [string] @index(hash) .
-programming_language: [string] @index(hash) .
+programming_languages: [string] @index(hash) .
 graphical_user_interface: bool @index(bool) .
 used_for: [uid] @reverse .
 channels: [uid] @reverse .
