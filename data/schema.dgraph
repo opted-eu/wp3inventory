@@ -339,3 +339,4 @@ isbn: string .
 title: string @index(term) .
 paper_kind: string .
 journal: string .
+tools_used: [uid] @reverse . 
