@@ -192,7 +192,7 @@ class TestSanitizers(unittest.TestCase):
                 sanitizer = Sanitizer(mock_data)
                 pprint(sanitizer.entry)
 
-    def _test_edit_entry(self):
+    def test_edit_entry(self):
         # print('-- test_edit_entry() --\n')
         
         with self.client:
@@ -226,7 +226,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertIn('entry_edit_history', sanitizer.entry.keys())
                 self.assertCountEqual(sanitizer.overwrite[sanitizer.entry_uid], ['other_names'])
 
-    def _test_new_org(self):
+    def test_new_org(self):
         # print('-- test_new_org() --\n')
 
         with self.client:
@@ -252,7 +252,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertIsNotNone(sanitizer.set_nquads)
                 self.assertIsNone(sanitizer.delete_nquads)
 
-    def _test_edit_org(self):
+    def test_edit_org(self):
         overwrite_keys = ['country', 'publishes']
         
         mock_org_edit = {
@@ -289,7 +289,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
                 # self.assertEqual(type(sanitizer.entry['founded']), datetime)
 
-    def _test_new_source(self):
+    def test_new_source(self):
 
         mock_website = {
                             "channel_unique_name": "website",
