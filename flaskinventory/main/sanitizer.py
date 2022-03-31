@@ -426,7 +426,10 @@ class Sanitizer:
             And also make sure that _new_ related sources inherit fields
         """
 
-        channel = dgraph.get_unique_name(self.entry['channel'].query)
+        try:
+            channel = dgraph.get_unique_name(self.entry['channel'].query)
+        except KeyError:
+            channel = dgraph.get_unique_name(self.data['channel'])
 
         if channel == 'website':
             self.resolve_website()
