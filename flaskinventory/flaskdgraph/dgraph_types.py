@@ -842,7 +842,7 @@ class Year(DateTime):
         if self.required:
             validators = [DataRequired()]
         else:
-            validators = None
+            validators = [Optional(strip_whitespace=True)]
         return IntegerField(label=self.label, description=self.form_description, render_kw=render_kw, validators=validators)
 
 
