@@ -84,7 +84,7 @@
         <dt class="col-sm-3">Subunits <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Note that entities listed in 'Subunits' are not necessarily part of all the entities listed in 'Countries'."><i class="fas mx-1 fa-question-circle"></i></a></dt>
         <dd class="col-sm-9">
             {% for subunit in entry.geographic_scope_subunit %}
-            <span><a href="{{ url_for('view.view_generic', dgraph_type='Subunit' uid=subunit.uid)}}">{{ subunit.name }}</a></span>
+            <span><a href="{{ url_for('view.view_generic', dgraph_type='Subunit', uid=subunit.uid)}}">{{ subunit.name }}</a></span>
             {{ ", " if not loop.last else "" }}
             {% endfor %}
             </dd>
