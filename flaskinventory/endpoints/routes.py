@@ -25,11 +25,13 @@ def quicksearch():
     query_string = f'''
             query quicksearch($name: string)
             {{
-            field1 as var(func: anyofterms(name, $name))
-            field2 as var(func: anyofterms(other_names, $name))
-            field3 as var(func: anyofterms(title, $name))
+            field1 as a(func: anyofterms(name, $name))
+            field2 as b(func: anyofterms(other_names, $name))
+            field3 as c(func: anyofterms(title, $name))
+            field4 as d(func: eq(doi, $name))
+            field5 as e(func: eq(arxiv, $name))
             
-            data(func: uid(field1, field2, field3)) 
+            data(func: uid(field1, field2, field3, field4, field5)) 
                 @normalize @filter(eq(entry_review_status, "accepted")) {{
                     uid 
                     unique_name: unique_name 
@@ -38,6 +40,8 @@ def quicksearch():
                     type: dgraph.type 
                     title: title
                     channel {{ channel: name }}
+                    doi: doi
+                    arxiv: arxiv
                 }}
             }}
         '''
@@ -85,8 +89,8 @@ def sourcelookup():
                 uid
                 unique_name
                 name
-                channel {{ name }}
-                country {{ name }}
+                channel {{ name unique_name }}
+                country {{ name unique_name }}
                 }}
             }}
     '''
@@ -143,7 +147,7 @@ def submit():
         else:
             newuids = dict(result.uids)
             uid = newuids[str(sanitizer.entry_uid).replace('_:', '')]
-        response = {'redirect': url_for('view.view_source', uid=uid)}
+        response = {'redirect': url_for('view.view_generic', dgraph_type='Source', uid=uid)}
 
         return jsonify(response)
     else:
@@ -161,3 +165,34 @@ def cran():
         return jsonify(result)
     else:
         return abort(404)
+
+@endpoint.route('/endpoint/identifier/lookup')
+def identifier_lookup():
+    if request.args.get('doi'):
+        identifier = request.args.get('doi')
+        field = 'doi'
+    elif request.args.get('arxiv'):
+        identifier = request.args.get('arxiv')
+        field = 'arxiv'
+    else:
+        return jsonify({'status': False})
+
+    query_string = f'''
+            query quicksearch($identifier: string) {{
+                data(func: eq({field}, $identifier)) {{
+                        uid 
+                        unique_name 
+                        name 
+                        dgraph.type 
+                        title
+                        doi
+                        arxiv
+                    }}
+                }}
+        '''
+    result = dgraph.query(query_string, variables={'$identifier': identifier})
+    if len(result['data']) > 0:
+        result['status'] = True
+    else:
+        result['status'] = False
+    return jsonify(result)

@@ -16,6 +16,8 @@ function fetchMetaData(button) {
     document.getElementById('form-add-new').reset()
 
     showSpinner(button)
+    let container = document.getElementById('magic-warning-container')
+    container.hidden = true
 
     if (platform == 'doi') {
 
@@ -25,9 +27,15 @@ function fetchMetaData(button) {
         doi = doi.replace("http://doi.org/", "")
         doi = doi.replace("doi.org/", "")
 
+        // check if already in inventory
+
+        fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?doi=' + doi)
+            .then(response => response.json())
+            .then(result => checkInventory(result))
+
         let api = 'http://doi.org/'
 
-        fetch(api + doi, { headers: { 'Accept': 'application/vnd.citationstyles.csl+json, application/x-bibtex' } })
+        fetch(api + doi + '?lang=en', { headers: { 'Accept': 'application/vnd.citationstyles.csl+json, application/x-bibtex' } })
             .then(response => response.text())
             .then(text => resolveDOI(text))
             .then(result => fillForm(result))
@@ -75,6 +83,23 @@ function fetchMetaData(button) {
     }
 
 };
+
+function checkInventory(data) {
+    console.log(data)
+    let container = document.getElementById('magic-warning-container')
+    if (data.status) {
+        let identifier = data.data[0].doi
+        if (!identifier) {
+            identifier = data.data[0].arxiv
+        }
+        container.getElementsByTagName('p')[0].innerHTML = `This entry is already in the inventory! 
+            You can find it by entering the identifier "${identifier}" in the search box above`
+        container.hidden = false
+    } else {
+        container.hidden = true
+    }
+
+}
 
 function fillForm(data) {
     for (let key in data) {
@@ -215,11 +240,19 @@ function parseArXiv(xml) {
 
     publication = publication.getElementsByTagName('entry')[0]
 
+    console.log(publication)
+
     let result = new Array()
 
     result['arxiv'] = publication.getElementsByTagName('id')[0].innerHTML
 
     result['url'] = result['arxiv']
+
+    result['arxiv'] = result['arxiv'].replace('http://arxiv.org/abs/', '').replace('https://arxiv.org/abs/', '')
+
+    fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?arxiv=' + result['arxiv'])
+        .then(response => response.json())
+        .then(result => checkInventory(result))
 
     result['name'] = publication.getElementsByTagName('title')[0].innerHTML
 
