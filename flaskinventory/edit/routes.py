@@ -3,8 +3,9 @@ from flask import (current_app, Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph import Schema
+from flaskinventory.flaskdgraph.utils import restore_sequence
+
 from flaskinventory.main.sanitizer import Sanitizer
-from flaskinventory.misc import get_ip
 from flaskinventory.add.external import fetch_wikidata
 
 from flaskinventory.edit.forms import RefreshWikidataForm
@@ -133,6 +134,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
 
     try:
         entry = get_entry(uid=uid)
+        restore_sequence(entry['q'][0])
     except Exception as e:
         current_app.logger.error(f'Could not populate form for <{uid}>: {e}', stack_info=True)
         return abort(404)
@@ -222,7 +224,7 @@ def source_audience(uid):
 
         flash('Audience size updated!', 'success')
 
-        return jsonify({'status': 'success', 'redirect': url_for('view.view_source', uid=uid)})
+        return jsonify({'status': 'success', 'redirect': url_for('view.view_generic', dgraph_type='Source', uid=uid)})
 
     audience_size = get_audience(uid=uid)
     entry = get_entry(uid=uid)
