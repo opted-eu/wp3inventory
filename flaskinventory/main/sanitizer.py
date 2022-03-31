@@ -22,6 +22,7 @@ from flask_login import current_user
 
 from slugify import slugify
 import secrets
+import re
 
 import datetime
 from dateutil import parser as dateparser
@@ -79,6 +80,9 @@ class Sanitizer:
         if self.dgraph_type == 'Source':
             if not self.is_upsert or self.entry_review_status == 'draft':
                 self.process_source()
+        
+        if self.dgraph_type == 'ResearchPaper':
+            self.process_researchpaper()
 
         self._delete_nquads()
         self._set_nquads()
@@ -119,8 +123,11 @@ class Sanitizer:
                 edit_fields.update(Schema.get_reverse_predicates(dgraph_type))
 
         edit_fields = {key: field for key, field in edit_fields.items() if field.edit}
+
+        if not isinstance(dgraph_type, str):
+            dgraph_type = dgraph_type.__name__
             
-        return cls(data, is_upsert=True, entry_review_status=entry_review_status, fields=edit_fields, **kwargs)
+        return cls(data, is_upsert=True, dgraph_type=dgraph_type, entry_review_status=entry_review_status, fields=edit_fields, **kwargs)
 
     def _set_nquads(self):
         nquads = dict_to_nquad(self.entry)
@@ -159,9 +166,10 @@ class Sanitizer:
 
     @staticmethod
     def _check_entry(uid):
-        query = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type))'''
+        query = f'''query check_entry($value: string)
+                    {{ q(func: uid($value)) @filter(has(dgraph.type))'''
         query += "{ unique_name dgraph.type entry_review_status entry_added { uid } } }"
-        data = dgraph.query(query)
+        data = dgraph.query(query, variables={'$value': uid})
 
         if len(data['q']) == 0:
             return False
@@ -336,16 +344,16 @@ class Sanitizer:
             self.entry['unique_name'] = unique_name
         elif not self.is_upsert:
             name = slugify(self.data.get('name'), separator="_")
-            query_string = f'''{{
-                                field1 as var(func: eq(unique_name, "{name}"))
-                                data1(func: uid(field1)) {{
+            query_string = f''' query quicksearch($value: string)
+                                {{
+                                data1(func: eq(unique_name, $value)) {{
                                         unique_name
                                         uid
                                 }}
                                 
                             }}'''
 
-            result = dgraph.query(query_string)
+            result = dgraph.query(query_string, variables={'$value': name})
 
             if len(result['data1']) == 0:
                 self.entry['unique_name'] = name
@@ -375,6 +383,32 @@ class Sanitizer:
             unique_name += f'_{secrets.token_urlsafe(4)}'
 
         return unique_name
+
+    def process_researchpaper(self):
+        """
+            Special steps for papers
+            Generate a name based on author and title
+            assign unique name based on DOI or arXiv
+        """
+        if isinstance(self.entry['authors'], list) and len(self.entry['authors']) > 1:
+            author = f"{self.entry['authors'][0]} et al."
+        elif isinstance(self.entry['authors'], list) and len(self.entry['authors']) == 1:
+            author = f"{self.entry['authors'][0]}"
+        else:
+            author = f"{self.entry['authors']}"[:32]
+        
+        title = re.match(r".*?[\?:\.!]", str(self.entry['title']))[0]
+        title = title.replace(':', '')
+
+        year = self.entry['published_date'].year
+
+        self.entry['name'] = f'{author} ({year}): {title}'
+
+        if self.data.get('arxiv'):
+            self.entry['unique_name'] = self.data['arxiv'].strip()
+        if self.data.get('doi'):
+            self.entry['unique_name'] = self.data['doi'].strip()
+
 
     def process_source(self):
         """
