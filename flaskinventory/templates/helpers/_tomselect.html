@@ -2,18 +2,19 @@
 <script>
 
     {% if 'other_names' in fields %}
-    var TomSelectOtherNamesConfig = {
-        plugins: ['remove_button'],
-        selectOnTab: true,
-        create: true,
-        render: {
-            no_results:function(data,escape){
-                return '<div></div>';
-        }
-        }
-    };
-    
-    new TomSelect('#other_names', TomSelectOtherNamesConfig);
+    if (document.getElementById('other_names')) {
+        var TomSelectOtherNamesConfig = {
+            plugins: ['remove_button'],
+            selectOnTab: true,
+            create: true,
+            render: {
+                no_results:function(data,escape){
+                    return '<div></div>';
+            }
+            }
+        };
+        new TomSelect('#other_names', TomSelectOtherNamesConfig)
+    }
     {% endif %}
     
     {% if 'publishes' in fields %}
@@ -36,9 +37,11 @@
             render: {
                 option: function(data, escape) {
                     var channel_label = ' '
+                    var channel_icon = ''
                     if (data.channel) {
                         if (data.channel.name) {
-                        channel_label = ' (' + escape(data.channel.name) + ') '
+                            channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                            channel_label = ' (' + escape(data.channel.name) + ') '
                         }
                     };
                     var country_label = ' '
@@ -46,22 +49,24 @@
                         country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
                     return '<div>' +
-                            '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                            '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                             country_label +
                         '</div>';
                 },
                 item: function(data, escape) {
                     var channel_label = ' '
+                    var channel_icon = ''
                     if (data.channel) {
                         if (data.channel.name) {
-                            var channel_label = ' (' + escape(data.channel.name) + ') '
+                            channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                            channel_label = ' (' + escape(data.channel.name) + ') '
                         }
                     };
                     var country_label = ' '
                     if ("country" in data) {
                         country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
-                    return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
+                    return '<div>' + channel_icon + escape(data.name) + channel_label + country_label + '</div>';
                 }
             }
         };
@@ -148,17 +153,19 @@
         render: {
             option: function(data, escape) {
                 var channel_label = ' '
+                var channel_icon = ''
                 if (data.channel) {
                     if (data.channel.name) {
-                    channel_label = ' (' + escape(data.channel.name) + ') '
-                    }
+                        channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                        channel_label = ' (' + escape(data.channel.name) + ') '
+                        }
                 };
                 var country_label = ' '
                 if ("country" in data) {
                     country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                 }
                 return '<div>' +
-                        '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                        '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                         country_label +
                     '</div>';
             },
@@ -337,6 +344,12 @@
     
     {% endif %}
 
+    {% if 'tools_used' in fields %}
+    
+    new TomSelect('#tools_used', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
 
     {% if 'materials' in fields %}
 
@@ -394,7 +407,7 @@
 
     {% if 'related_publications' in fields %}
     
-    new TomSelect('#related_publications', {create: true, plugins: ['remove_button']})
+    new TomSelect('#related_publications', {plugins: ['remove_button']})
     
     {% endif %}
 
@@ -406,19 +419,19 @@
 
     {% if 'meta_vars' in fields %}
     
-    new TomSelect('#meta_vars', {plugins: ['remove_button']})
+    new TomSelect('#meta_vars', {create: true, plugins: ['remove_button']})
     
     {% endif %}
 
     {% if 'concept_vars' in fields %}
     
-    new TomSelect('#concept_vars', {plugins: ['remove_button']})
+    new TomSelect('#concept_vars', {create: true, plugins: ['remove_button']})
     
     {% endif %}
 
     {% if 'file_format' in fields %}
     
-    new TomSelect('#file_format', {plugins: ['remove_button']})
+    new TomSelect('#file_format', {create: true, plugins: ['remove_button']})
     
     {% endif %}
 

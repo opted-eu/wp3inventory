@@ -1102,8 +1102,10 @@ ready(() => {
                 render: {
                     option: function(data, escape) {
                         var channel_label = ' '
+                        var channel_icon = ''
                         if (data.channel) {
                             if (data.channel.name) {
+                                channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
                                 channel_label = ' (' + escape(data.channel.name) + ') '
                             }
                         };
@@ -1112,22 +1114,24 @@ ready(() => {
                             country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
                         return '<div>' +
-                            '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                            '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                             country_label +
                             '</div>';
                     },
                     item: function(data, escape) {
                         var channel_label = ' '
+                        var channel_icon = ''
                         if (data.channel) {
                             if (data.channel.name) {
-                                var channel_label = ' (' + escape(data.channel.name) + ') '
+                                channel_label = ' (' + escape(data.channel.name) + ') '
+                                channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
                             }
                         };
                         var country_label = ' '
                         if ("country" in data) {
                             country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
-                        return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
+                        return '<div>' + channel_icon + escape(data.name) + channel_label + country_label + '</div>';
                     }
                 }
             };
