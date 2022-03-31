@@ -12,14 +12,14 @@
         <dt class="col-sm-3">Language(s) in dataset</dt>
         <dd class="col-sm-9">
             {% for language in entry.languages %}
-                <span class="badge bg-light text-dark me-2">{{language}}<span>
+                <span class="badge bg-light text-dark me-2">{{language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.country %}
         <dt class="col-sm-3">Countries covered in dataset</dt>
         <dd class="col-sm-9">
             {% for country in entry.country %}
-            <span><a href="{{ url_for('view.view_country', unique_name=country.unique_name) }}">{{ country.name }}</a></span>
+            <span><a href="{{ url_for('view.view_generic', dgraph_type='Country', unique_name=country.unique_name) }}">{{ country.name }}</a></span>
             {{ ", " if not loop.last else "" }}
             {% endfor %}
         </dd>
@@ -27,12 +27,12 @@
         {% if entry.start_date %}
         <dt class="col-sm-3">Start Date of coverage</dt>
         <dd class="col-sm-9">
-            {{entry.start_date}}
+            {{entry.start_date.strftime('%Y-%m-%d') }}
         {% endif %}
         {% if entry.end_date %}
         <dt class="col-sm-3">End Date of coverage</dt>
         <dd class="col-sm-9">
-            {{entry.end_date}}
+            {{entry.end_date.strftime('%Y-%m-%d')}}
         {% endif %}
         {% if entry.file_format %}
         <dt class="col-sm-3">Dataset File Format</dt>
@@ -66,10 +66,6 @@
             {% endfor %}
         </dd>
         {% endif %}
-        <dt class="col-sm-3 my-4"><h5>Sources included</h5></dt>
-        <dd class="col-sm-9 my-4"><small class="text-muted">Shows how many of the sources listed in this inventory are available in the archive.</small></dd>
-        <dt class="col-sm-3">Total</dt>
-        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
         </dd>
     </dl>
 </div>

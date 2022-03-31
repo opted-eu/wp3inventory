@@ -16,7 +16,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-    
+
     <!-- JQUERY -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -64,7 +64,7 @@
     </a>
     <div class="list-group list-group-flush border-bottom scrollarea">
         {% if sidebar_items %} {% for item in sidebar_items %}
-        <a href="{{ url_for('view.view_source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+        <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">{{ item.name }} ({{item.channel.name}})</strong>
                 <small></small>
@@ -133,11 +133,11 @@
 
         <!-- Typeahead script searchbar -->
         <script src="{{ url_for('static',  filename='js/search_everything.js') }}"></script>
-        
+
         <!-- Enable Bootstrap Tooltips Globally -->
         <script>
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         </script>

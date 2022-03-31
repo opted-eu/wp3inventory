@@ -4,7 +4,7 @@
         <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
         {% if entry.published_by %} {% for publisher in entry.published_by %}
         <dt class="col-sm-3"></dt>
-        <dd class="col-sm-9"><a href="{{ url_for('view.view_organization', unique_name=publisher.unique_name) }}">{{ publisher.name }}</a></dd>
+        <dd class="col-sm-9"><a href="{{ url_for('view.view_generic', dgraph_type='Organization', unique_name=publisher.unique_name) }}">{{ publisher.name }}</a></dd>
         {% endfor %} {% else %}
         <dt class="col-sm-3"></dt>
         <dd class="col-sm-9 text-danger">Missing!</dd>

@@ -12,7 +12,13 @@
         {% endif %} 
         {% if entry.channel_feeds %}
         <dt class="col-sm-3">Feeds</dt>
-        <dd class="col-sm-9">{% for feed in entry.channel_feeds %}<a href="{{feed.url}}" target="_blank">{{ feed.kind }}</a>{{ ", " if not loop.last else "" }} {% endfor %}</dd> {% endif %} 
+        <dd class="col-sm-9">
+            {% for feed in entry.channel_feeds %}
+                <a href="{{feed}}" target="_blank">{{ entry.get('channel_feeds|kind')[loop.index0|string] }}</a>
+                {{ ", " if not loop.last else "" }}
+            {% endfor %}
+            </dd> 
+        {% endif %} 
         {% if entry.channel_epaper %}
         <dt class="col-sm-3">E-Paper available</dt>
         <dd class="col-sm-9">{{ entry.channel_epaper }}</dd>

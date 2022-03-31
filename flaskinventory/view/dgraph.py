@@ -2,6 +2,7 @@ from flask import current_app
 from flaskinventory import dgraph
 from flaskinventory.auxiliary import icu_codes
 from flaskinventory.flaskdgraph import Schema
+
 import json
 from typing import Union
 from flaskinventory.flaskdgraph.utils import author_sequence, restore_sequence
@@ -36,6 +37,9 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
 
     elif dgraph_type == 'Organization':
         query_fields += 'owned_by: ~owns @filter(type(Organization)) { uid name unique_name } } }'
+
+    elif dgraph_type == 'Channel':
+        query_fields += 'num_sources: count(~channel) } }'
 
     elif dgraph_type == 'Archive':
         query_fields += 'num_sources: count(sources_included) } }'
@@ -105,10 +109,6 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
 
     data = data['entry'][0]
 
-    # Restore ordered lists
-    # for key, val in data.items():
-    #     if '|sequence' in key:
-    #         data[key.replace('|sequence', '')] = restore_sequence(data, list_key=key.replace('|sequence', ''))
     restore_sequence(data)
 
     return data

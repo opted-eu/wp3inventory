@@ -55,17 +55,17 @@ producing sources. Please carefully read the following definition.
 -   Social media accounts providing news, self-created textual content
 -   Messaging apps providing news, self-created textual content
 -   Sources for multinational audiences (e.g.,
-    [www.euronews.com]({{ url_for('view.view_source', unique_name='https_www_euronews_com_website')}})), national audiences (e.g.,
-    [www.derstandard.at]({{ url_for('view.view_source', unique_name='www.derstandard.at')}})), and subnational audiences (i.e., for
-    a region or city, e.g., [www.standard.co.uk]({{ url_for('view.view_source', unique_name='https_www_standard_co_uk_website')}}))
+    [www.euronews.com]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='https_www_euronews_com_website')}})), national audiences (e.g.,
+    [www.derstandard.at]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='www.derstandard.at')}})), and subnational audiences (i.e., for
+    a region or city, e.g., [www.standard.co.uk]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='https_www_standard_co_uk_website')}}))
 -   News blogs that are published by a group of people (i.e. different
     authors, appears to be created with editorial support, see for
     example
-    [www.nachdenkseiten.de]({{ url_for('view.view_source', unique_name='https_www_nachdenkseiten_de_website')}}),
-    [globalvoices.org]({{ url_for('view.view_source', unique_name='https_globalvoices_org_website')}}))
+    [www.nachdenkseiten.de]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='https_www_nachdenkseiten_de_website')}}),
+    [globalvoices.org]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='https_globalvoices_org_website')}}))
 -   Alternative news media sources (i.e., propagate that they provide an
     alternative view in contrast to mainstream media, e.g.,
-    [order-order.com]({{ url_for('view.view_source', unique_name='https_order_order_com_website')}}) )
+    [order-order.com]({{ url_for('view.view_generic', dgraph_type='Source', unique_name='https_order_order_com_website')}}) )
 
 **Please note, the inventory does not include:**
 

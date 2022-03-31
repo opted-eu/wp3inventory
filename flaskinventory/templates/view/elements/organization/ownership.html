@@ -3,7 +3,7 @@
         <dt class="col-sm-3 mb-2"><h5>Owns</h5></dt>
         <dd class="col-sm-9">
             {% if entry.owns %} {% for org in entry.owns %}
-            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            <p class="card-text"><a href="{{ url_for('view.view_generic', dgraph_type='Organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
             {% endfor %} {% else %}
             <p class="card-text text-muted">None</p>
             {% endif %}
@@ -16,7 +16,7 @@
         <dt class="col-sm-3 mb-2"><h5>Owned by</h5></dt>
         <dd class="col-sm-9">
             {% if entry.owned_by %} {% for org in entry.owned_by %}
-            <p class="card-text"><a href="{{ url_for('view.view_organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
+            <p class="card-text"><a href="{{ url_for('view.view_generic', dgraph_type='Organization', unique_name=org.unique_name) }}">{{ org.name }}</a></p>
             {% endfor %} {% else %}
             <p class="card-text text-muted">None</p>
             {% endif %}
@@ -27,16 +27,13 @@
     <dl class="row">
         <dt class="col-sm-3 mb-2"><h5>Economic</h5></dt>
         <dd class="col-sm-9"></dd>
-            {% if entry.ownership_kind %}
-            <dt class="col-sm-3">Type of Organization</dt>
-            <dd class="col-sm-9">{{ entry.ownership_kind }}
-            </dd>{% endif %}
-            {% if entry.employees %}
-            <dt class="col-sm-3">Employees</dt>
-            <dd class="col-sm-9">{{ entry.employees }}</dd>
-            {% endif %}
-        
-        {% if entry.party_affiliated %}
+        {% if entry.ownership_kind %}
+        <dt class="col-sm-3">Type of Organization</dt>
+        <dd class="col-sm-9">{{ entry.ownership_kind }}
+        </dd>{% endif %} {% if entry.employees %}
+        <dt class="col-sm-3">Employees</dt>
+        <dd class="col-sm-9">{{ entry.employees }}</dd>
+        {% endif %} {% if entry.party_affiliated %}
         <dt class="col-sm-3">Affiliated with a political party<a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Affiliated means that a political party or a party-related association or company owns at least 50% of the organization OR that persons who have a central role in the organization (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
         <dd class="col-sm-9">{{ entry.party_affiliated }}</dd>
         {% endif %}

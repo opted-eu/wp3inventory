@@ -27,8 +27,14 @@
         </dd>
         {% endif %}
         {% if entry.description %}
-        <dt class="col-sm-3">Description</dt>
-        <dd class="col-sm-9">{{ entry.description }}</dd>
+        <dt class="col-sm-3">Description
+            {% if entry.description|length > 160 %}
+                <a href="#" class="link-secondary fw-normal mx-2" data-bs-toggle="button" onclick="document.getElementById('description-trunc').classList.toggle('text-truncate')">show more</a>
+            {% endif %}
+        </dt>
+        <dd class="col-sm-9">
+            <div class="{% if entry.description|length > 160 %}text-truncate{% endif %}" id='description-trunc'>{{ entry.description }}</div>
+        </dd>
         {% endif %} 
         {% if entry.is_person %}
         <dt class="col-sm-3">Is a person</dt>
@@ -36,7 +42,7 @@
         </dd>{% endif %}
         {% if entry.channel %}
         <dt class="col-sm-3">Channel</dt>
-        <dd class="col-sm-9"><a href="{{ url_for('view.view_channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
+        <dd class="col-sm-9"><a href="{{ url_for('view.view_generic', dgraph_type='Channel', unique_name=entry.channel.unique_name) }}">{{entry.channel.name}}</a> </dd>
         {% endif %}
         {% if entry.channel_url %} 
         <dt class="col-sm-3">Link to Source</dt>
@@ -69,7 +75,7 @@
         {% endif %}
         {% if 'Subunit' in entry['dgraph.type'] %}
         <dt class="col-sm-3 mb-4">Subunit of</dt>
-        <dd class="col-sm-9 mb-4"><a href="{{ url_for('view.view_country', unique_name=entry.country[0].unique_name) }}">{{ entry.country[0].name }}</a></dd>
+        <dd class="col-sm-9 mb-4"><a href="{{ url_for('view.view_generic', dgraph_type='Country', unique_name=entry.country[0].unique_name) }}">{{ entry.country[0].name }}</a></dd>
         {% endif %}
         {% if entry.wikidataID %}
         <dt class="col-sm-3">Wikidata</dt>
@@ -99,7 +105,18 @@
         {% endif %}
         {% if entry.doi %}
             <dt class="col-sm-3">DOI</dt>
-            <dd class="col-sm-9"><a href="{{ entry.doi }}" target="_blank">{{ entry.doi }}</a></dd>
+            <dd class="col-sm-9">
+                <a href="{{ entry.doi }}" target="_blank">{{ entry.doi }}</a>
+                <div class="row mt-3">
+                <div class="col-1">
+                    <span class="__dimensions_badge_embed__" data-doi="{{ entry.doi }}" data-hide-zero-citations="true" data-style="small_circle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
+                </div>
+                <div class="col-1">
+                    <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+                    <div data-badge-popover="right" data-badge-type="donut" data-doi="{{ entry.doi }}" data-hide-no-mentions="true" class="altmetric-embed"></div>
+                </div>
+                </div>
+            </dd>
         {% endif %}
         {% if entry.arxiv %}
             <dt class="col-sm-3">arXiv</dt>

@@ -8,7 +8,7 @@
                         
                 </dt>
                 <dd class="col-sm-9 mb-4">
-                    <a href="{{ url_for('view.view_researchpaper', uid=tool.uid) }}" class="me-2">
+                    <a href="{{ url_for('view.view_generic', dgraph_type='ResearchPaper', uid=tool.uid) }}" class="me-2">
                         <em>{{tool.name}}</em></a> 
                         {% if tool.authors is string %}
                             <span>({{ tool.authors }})</span>
