@@ -104,17 +104,6 @@ type Subunit {
     location_point
 }
 
-type Resource {
-    description
-    authors
-    doi
-    arxiv
-    url
-    published_date
-    last_updated
-}
-
-
 type Archive {
     description
     authors
@@ -310,9 +299,9 @@ opted_scope: bool .
 authors: [string] @index(term) .
 published_date: dateTime @index(day) .
 last_updated: dateTime @index(day) .
-url: string .
-doi: string .
-arxiv: string .
+url: string @index(exact) .
+doi: string @index(exact) .
+arxiv: string @index(exact) .
 
 # Shared Predicates (dataset, corpus, tool, archive)
 sources_included: [uid] @reverse .
