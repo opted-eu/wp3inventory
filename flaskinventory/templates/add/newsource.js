@@ -521,15 +521,16 @@ function populateForm(jsonData) {
                         if (document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`)) {
                             document.querySelector(`#geographic-scope-multiple option[value='${subunit.unique_name}']`).selected = true
                             document.getElementById("geographic-scope-subunits-hidden").value += country["uid"] + ","
-                            hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value += country['uid'] + ","
                         }
                     }
+                    hiddenGeographicScopeCountry.value = jsonData["country"][0]["uid"]
+                    document.querySelector(`#geographic-scope-single option[value='${jsonData['country'][0]["uid"]}']`).selected = true
                 }
             } else if (jsonData["geographic_scope"] == "national") {
                 let country = jsonData["country"][0]
                 if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                     document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
-                    hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value = country['uid']
+                    hiddenGeographicScopeCountry.value = country['uid']
                 }
 
             } else if (jsonData["geographic_scope"] == "subnational") {
@@ -542,13 +543,10 @@ function populateForm(jsonData) {
                     let country = jsonData["country"][0]
                     if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                         document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
-                        hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value = country['uid']
+                        hiddenGeographicScopeCountry.value = country['uid']
                     }
                 }
             }
-
-
-
         }
     };
     if ("languages" in jsonData) {
