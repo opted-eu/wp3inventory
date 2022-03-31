@@ -10,7 +10,7 @@
             <thead>
                 <tr>
                     <th>Date</th>
-                    {% if entry.get('audience_size|data_from') %}
+                    {% if entry.get('audience_size|data_from') or entry.get('audience_size|datafrom') %}
                         <th>Data from</th>
                     {% endif %}
                     {% if entry.get('audience_size|daily_visitors') %}
