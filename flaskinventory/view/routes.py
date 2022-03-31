@@ -125,7 +125,7 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
                         data[key] = fields[key].choices[v]
             except KeyError:
                 pass
-
+    
     review_actions = create_review_actions(current_user, data['uid'], data['entry_review_status'])
     return render_template('view/generic.html',
                             title=data.get('name'),
