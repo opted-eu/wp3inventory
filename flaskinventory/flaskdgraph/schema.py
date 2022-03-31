@@ -1,5 +1,7 @@
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
+from wtforms import IntegerField
 
 from flaskinventory.users.constants import USER_ROLES
 
@@ -204,13 +206,17 @@ class Schema:
                         value = value['uid']
                 elif type(value) is list:
                     if type(value[0]) is str:
-                        value = ",".join(value)
+                        delimiter = getattr(fields[k], 'delimiter', ',')
+                        value = delimiter.join(value)
                     elif type(value[0]) is int:
                         value = [str(val) for val in value]
                     elif 'uid' in value[0].keys():
                         value = [subval['uid'] for subval in value]
                         if len(value) == 1:
                             value = value[0]
+                if isinstance(getattr(form, k), IntegerField) and isinstance(value, datetime):
+                    # cast datetime as year if field does not need to be too specific
+                    value = value.year
                 setattr(getattr(form, k), 'data', value)
 
         return form

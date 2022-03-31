@@ -251,6 +251,9 @@ class Scalar:
 
     def __init__(self, value, facets=None):
         if type(value) in [datetime.date, datetime.datetime]:
+            self.year = value.year
+            self.month = value.month
+            self.day = value.day
             value = value.isoformat()
         elif type(value) is bool:
             value = str(value).lower()
@@ -684,9 +687,9 @@ class ListString(String):
 
     dgraph_predicate_type = '[string]'
 
-    def __init__(self, delimiter=',', *args, **kwargs) -> None:
+    def __init__(self, delimiter=',', overwrite=True, *args, **kwargs) -> None:
         self.delimiter = delimiter
-        super().__init__(*args, **kwargs)
+        super().__init__(overwrite=overwrite, *args, **kwargs)
 
     def validation_hook(self, data):
         if not isinstance(data, (list, tuple, set, str)):
@@ -748,13 +751,13 @@ class SingleChoice(String):
             validators = [Optional()]
         if self.tom_select:
             return TomSelectField(label=self.label, validators=validators, description=self.form_description,
-                                  choices=self.choices_tuples)
+                                  choices=self.choices_tuples, render_kw=self.render_kw)
         elif self.radio_field:
             return RadioField(label=self.label, validators=validators, description=self.form_description,
-                              choices=self.choices_tuples)
+                              choices=self.choices_tuples, render_kw=self.render_kw)
         else:
             return SelectField(label=self.label, validators=validators, description=self.form_description,
-                               choices=self.choices_tuples)
+                               choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class MultipleChoice(SingleChoice):
@@ -782,9 +785,9 @@ class MultipleChoice(SingleChoice):
             validators = [Optional()]
         if self.tom_select:
             return TomSelectMutlitpleField(label=self.label, validators=validators, description=self.form_description,
-                                           choices=self.choices_tuples)
+                                           choices=self.choices_tuples, render_kw=self.render_kw)
         return SelectMultipleField(label=self.label, validators=validators, description=self.form_description,
-                                   choices=self.choices_tuples)
+                                   choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class DateTime(Predicate):
@@ -946,6 +949,7 @@ class SingleRelationship(Predicate):
                             for c in choices[self.relationship_constraint[0].lower()]}
             self.choices_tuples = [
                 (c['uid'], c.get('name') or c.get('unique_name')) for c in choices[self.relationship_constraint[0].lower()]]
+            self.choices_tuples.insert(0, ('',''))
 
         else:
             self.choices = {}

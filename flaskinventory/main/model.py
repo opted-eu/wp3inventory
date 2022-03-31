@@ -340,7 +340,7 @@ class Entry(Schema):
     
     name = String(required=True)
     
-    other_names = ListString(overwrite=True)
+    other_names = ListString()
     
     entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
                          large_textfield=True)
@@ -367,8 +367,7 @@ class Organization(Entry):
                   render_kw={'placeholder': 'e.g. The Big Media Corp.'})
     
     other_names = ListString(description='Does the organisation have any other names or common abbreviations?',
-                             render_kw={'placeholder': 'Separate by comma'}, 
-                             overwrite=True)
+                             render_kw={'placeholder': 'Separate bySingleRe comma'})
     
     is_person = Boolean(label='Yes, is a person',
                         description='Is the media organisation a person?',
@@ -665,13 +664,15 @@ class Dataset(Entry):
     access = SingleChoice(choices={'free': 'Free',
                                     'restricted': 'Restricted'})
     
-    fulltext = Boolean(description='Dataset contains fulltext')
-
-    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
+    country = ListRelationship(description="Does the dataset have a specific geographic coverage?",
+                                relationship_constraint=['Country', 'Multinational'], 
+                                autoload_choices=True,
+                                render_kw={'placeholder': 'Select multiple countries...'})
 
     languages = MultipleChoice(description="Which languages are covered in the dataset?",
                                 choices=icu_codes,
-                                tom_select=True)
+                                tom_select=True,
+                                render_kw={'placeholder': 'Select multiple...'})
 
     start_date = DateTime(description="Start date of the dataset")
 
@@ -679,18 +680,23 @@ class Dataset(Entry):
 
     file_format = ListRelationship(description="In which file format(s) is the dataset stored?",
                                         autoload_choices=True,
-                                        relationship_constraint="FileFormat")
+                                        relationship_constraint="FileFormat",
+                                        render_kw={'placeholder': 'Select multiple...'})
 
-    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
+    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False,
+                                            render_kw={'placeholder': 'Select multiple...'})
 
     initial_source = ListRelationship(description="If the dataset is derived from another corpus or dataset, the original source can be linked here",
-                                        relationship_constraint=['Dataset', 'Corpus'])
+                                        relationship_constraint=['Dataset', 'Corpus'],
+                                        render_kw={'placeholder': 'Select multiple...'})
 
     meta_vars = ListRelationship(description="List of meta data included in the dataset (e.g., date, language, source, medium)",
-                                    relationship_constraint="MetaVar")
+                                    relationship_constraint="MetaVar",
+                                    render_kw={'placeholder': 'Select multiple...'})
 
     concept_vars = ListRelationship(description="List of variables based on concepts (e.g. sentiment, frames, etc)",
-                                        relationship_constraint="ConceptVar")
+                                        relationship_constraint="ConceptVar",
+                                        render_kw={'placeholder': 'Select multiple...'})
 
 
 class Tool(Entry):
@@ -777,7 +783,7 @@ class Tool(Entry):
 
 class ResearchPaper(Entry):
 
-    name = String(hidden=True)
+    name = String(new=False, edit=False, hidden=True)
     other_names = ListString(new=False, edit=False, hidden=True, required=False)
 
     title = String(description="What is the title of the publication?", required=True)
@@ -787,7 +793,8 @@ class ResearchPaper(Entry):
                             required=True)
                             
     published_date = Year(label='Year of publication', 
-                            description="Which year was the publication published?")
+                            description="Which year was the publication published?",
+                            required=True)
 
     paper_kind = String(description="What kind of publcation is this? (e.g., Journal article, book section)")
     
@@ -817,7 +824,7 @@ class ResearchPaper(Entry):
 
 
     
-    """ Tag Like Types """
+""" Tag Like Types """
 
 class Operation(Entry):
     pass
