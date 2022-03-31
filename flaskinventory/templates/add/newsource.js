@@ -13,11 +13,6 @@ document.querySelectorAll('select').forEach(function(item) {
     }
 })
 
-var geographicScopeSingle = new Object
-var geographicScopeMultiple = new Object
-var geographicScopeSubunit = new Object
-
-
 function addFieldOptionsData(fieldOptions, key, selector, addother = false) {
     var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
     opts.forEach(function(item, i) {
@@ -343,8 +338,10 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
                 }
-                geographicScopeSingle.clear();
-                geographicScopeSubunit.clear();
+                let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                geographicScopeSingle.tomselect.clear();
+                let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                geographicScopeSubunit.tomselect.clear();
             } else if (item == 'national') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = false;
@@ -363,8 +360,10 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('geographic-scope-subunit').required = false;
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
-                    geographicScopeMultiple.clear();
-                    geographicScopeSubunit.clear();
+                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                    geographicScopeMultiple.tomselect.clear();
+                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                    geographicScopeSubunit.tomselect.clear();
                 }
             } else if (item == 'subnational') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
@@ -385,8 +384,8 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = true;
                 }
-
-                geographicScopeMultiple.clear();
+                let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                geographicScopeMultiple.tomselect.clear();
             } else {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = true;
@@ -405,10 +404,12 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
-
-                geographicScopeSingle.clear();
-                geographicScopeMultiple.clear();
-                geographicScopeSubunit.clear();
+                let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                geographicScopeMultiple.tomselect.clear();
+                let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                geographicScopeSubunit.tomselect.clear();
+                let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                geographicScopeSingle.tomselect.clear();
             }
         });
     });
