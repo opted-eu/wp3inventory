@@ -200,6 +200,8 @@ type ResearchPaper {
     journal
     sources_included
     tools_used
+    datasets_used
+    corpus_used
     country
 }
 
@@ -341,3 +343,6 @@ title: string @index(term) .
 paper_kind: string .
 journal: string .
 tools_used: [uid] @reverse . 
+datasets_used: [uid] @reverse . 
+corpus_used: [uid] @reverse . 
+
