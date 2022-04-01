@@ -6,8 +6,7 @@ from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
 from flaskinventory.flaskdgraph.schema import Schema
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.view.dgraph import (get_entry, get_archive, get_channel, get_country,
-                                        get_organization, get_paper, get_rejected, get_source, get_subunit, list_by_type, get_multinational)
+from flaskinventory.view.dgraph import (get_entry, get_rejected, list_by_type)
 from flaskinventory.view.utils import can_view
 from flaskinventory.view.forms import SimpleQuery
 from flaskinventory.flaskdgraph.utils import validate_uid
