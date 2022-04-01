@@ -36,6 +36,7 @@ type Entry {
     entry_notes
     reviewed_by
     wikidataID
+    description
 }
 
 type Source {
