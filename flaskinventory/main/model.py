@@ -687,6 +687,9 @@ class Dataset(Entry):
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False,
                                             render_kw={'placeholder': 'Select multiple...'})
 
+    materials = ListString(description="Are there additional materials for the dataset? (e.g., codebook, documentation, etc)",
+                            tom_select=True, render_kw={'placeholder': 'please paste the URLs to the materials here!'})
+
     initial_source = ListRelationship(description="If the dataset is derived from another corpus or dataset, the original source can be linked here",
                                         relationship_constraint=['Dataset', 'Corpus'],
                                         render_kw={'placeholder': 'Select multiple...'})
@@ -700,6 +703,78 @@ class Dataset(Entry):
                                         relationship_constraint="ConceptVar",
                                         render_kw={'placeholder': 'Select multiple...'},
                                         autoload_choices=True)
+
+
+class Corpus(Entry):
+
+    name = String(description="What is the name of the corpus?", required=True)
+
+    other_names = ListString(description="Does the corpus have other names?",
+                            render_kw={'placeholder': 'Separate by comma ","'},
+                            overwrite=True)
+
+    authors = OrderedListString(delimiter=';',
+                            render_kw={'placeholder': 'Separate by semicolon ";"'}, tom_select=True,
+                            required=True)
+                            
+    published_date = Year(label='Year of publication', 
+                            description="Which year was the corpus published?")
+    
+    last_updated = DateTime(description="When was the corpus last updated?", new=False)
+
+    url = String(label="URL", description="Link to the corpus", required=True)
+    doi = String(label='DOI')
+    arxiv = String(label="arXiv")
+
+    description = String(large_textfield=True, description="Please provide a short description for the corpus")
+
+    access = SingleChoice(choices={'free': 'Free',
+                                    'restricted': 'Restricted'})
+    
+    country = ListRelationship(description="Does the corpus have a specific geographic coverage?",
+                                relationship_constraint=['Country', 'Multinational'], 
+                                autoload_choices=True,
+                                render_kw={'placeholder': 'Select multiple countries...'})
+
+    languages = MultipleChoice(description="Which languages are covered in the corpus?",
+                                choices=icu_codes,
+                                tom_select=True,
+                                render_kw={'placeholder': 'Select multiple...'})
+
+    start_date = DateTime(description="Start date of the corpus")
+
+    end_date = DateTime(description="End date of the corpus")
+
+    file_format = ListRelationship(description="In which file format(s) is the corpus stored?",
+                                        autoload_choices=True,
+                                        relationship_constraint="FileFormat",
+                                        render_kw={'placeholder': 'Select multiple...'})
+
+    materials = ListString(description="Are there additional materials for the corpus? (e.g., codebook, documentation, etc)",
+                            tom_select=True, render_kw={'placeholder': 'please paste the URLs to the materials here!'})
+
+    sources_included = ListRelationship(relationship_constraint='Source', allow_new=False,
+                                            render_kw={'placeholder': 'Select multiple...'})
+
+    text_units = ListRelationship(description="List of text units included in the corpus (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
+                                    relationship_constraint="TextUnit",
+                                    render_kw={'placeholder': 'Select multiple...'},
+                                    autoload_choices=True)
+
+    meta_vars = ListRelationship(description="List of meta data included in the corpus (e.g., date, language, source, medium)",
+                                    relationship_constraint="MetaVar",
+                                    render_kw={'placeholder': 'Select multiple...'},
+                                    autoload_choices=True)
+
+    concept_vars = ListRelationship(description="List of annotations included in the corpus (e.g., sentiment, topic, named entities)",
+                                        relationship_constraint="ConceptVar",
+                                        render_kw={'placeholder': 'Select multiple...'},
+                                        autoload_choices=True)
+
+    initial_source = ListRelationship(description="If the corpus is derived from another corpus or dataset, the original source can be linked here",
+                                        relationship_constraint=['Dataset', 'Corpus'],
+                                        render_kw={'placeholder': 'Select multiple...'})
+
 
 
 class Tool(Entry):
@@ -809,7 +884,7 @@ class ResearchPaper(Entry):
 
     description = String(large_textfield=True, description="Abstract or a short description of the publication")
 
-    tools_used = ListRelationship(description="Which research tools where used in the publication?",
+    tools_used = ListRelationship(description="Which research tool(s) where used in the publication?",
                                             autoload_choices=True,
                                             allow_new=False,
                                             relationship_constraint="Tool")
@@ -818,6 +893,16 @@ class ResearchPaper(Entry):
                                             autoload_choices=False,
                                             allow_new=False,
                                             relationship_constraint="Source")
+    
+    datasets_used = ListRelationship(description="Which dataset(s) where used in the publication?",
+                                            autoload_choices=True,
+                                            allow_new=False,
+                                            relationship_constraint="Dataset")
+
+    corpus_used = ListRelationship(description="Which corpora where used in the publication?",
+                                            autoload_choices=True,
+                                            allow_new=False,
+                                            relationship_constraint="Corpus")
 
     country = ListRelationship(description="Does the publication have some sort of country that it focuses on?",
                                                 autoload_choices=True,
