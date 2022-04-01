@@ -340,13 +340,7 @@
 
     {% if 'validation_corpus' in fields %}
     
-    new TomSelect('#validation_corpus', {create: true, plugins: ['remove_button']})
-    
-    {% endif %}
-
-    {% if 'tools_used' in fields %}
-    
-    new TomSelect('#tools_used', {create: true, plugins: ['remove_button']})
+    new TomSelect('#validation_corpus', {plugins: ['remove_button']})
     
     {% endif %}
 
@@ -411,6 +405,24 @@
     
     {% endif %}
 
+    {% if 'tools_used' in fields %}
+    
+    new TomSelect('#tools_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'corpus_used' in fields %}
+    
+    new TomSelect('#corpus_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'datasets_used' in fields %}
+    
+    new TomSelect('#datasets_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
     {% if 'initial_source' in fields %}
     
     new TomSelect('#initial_source', {plugins: ['remove_button']})
@@ -432,6 +444,12 @@
     {% if 'file_format' in fields %}
     
     new TomSelect('#file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'text_units' in fields %}
+    
+    new TomSelect('#text_units', {create: true, plugins: ['remove_button']})
     
     {% endif %}
 
