@@ -265,6 +265,7 @@
 
         _:paper1 <dgraph.type> "ResearchPaper" .
         _:paper1 <doi> "10.1080/1461670X.2020.1745667" .
+        _:paper1 <name> "Egelhofer et al. (2020): From Novelty to Normalization?" .
         _:paper1 <title> "From Novelty to Normalization? How Journalists Use the Term “Fake News” in their Reporting" .
         _:paper1 <unique_name> "10.1080/1461670X.2020.1745667" .
         _:paper1 <authors> "Jana Laura Egelhofer" (sequence=1) .
