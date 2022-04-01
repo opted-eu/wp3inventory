@@ -9,14 +9,14 @@
             {{entry.access}}
         {% endif %}
         {% if entry.languages %}
-        <dt class="col-sm-3">Language(s) in dataset</dt>
+        <dt class="col-sm-3">Language(s) in corpus</dt>
         <dd class="col-sm-9">
             {% for language in entry.languages %}
                 <span class="badge bg-primary me-2">{{language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.country %}
-        <dt class="col-sm-3">Countries covered in dataset</dt>
+        <dt class="col-sm-3">Countries covered in corpus</dt>
         <dd class="col-sm-9">
             {% for country in entry.country %}
             <span><a href="{{ url_for('view.view_uid', uid=country.uid) }}">{{ country.name }}</a></span>
@@ -35,29 +35,35 @@
             {{entry.end_date.strftime('%Y-%m-%d')}}
         {% endif %}
         {% if entry.file_format %}
-        <dt class="col-sm-3">Dataset File Format</dt>
+        <dt class="col-sm-3">Corpus File Format</dt>
         <dd class="col-sm-9">
-            {{ render_tags(entry.file_format) }}
+             {{ render_tags(entry.file_format) }}
         </dd>
         {% endif %}
         {% if entry.initial_source %}
-        <dt class="col-sm-3">Initial Sources of Dataset</dt>
+        <dt class="col-sm-3">Initial Sources of Corpus</dt>
         <dd class="col-sm-9">
-            {% for source in entry.initial_source %}
-                {{ render_publication(source) }}
+             {% for source in entry.initial_source %}
+                <p>{{render_publication(source)}}</a>
             {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.text_units %}
+        <dt class="col-sm-3">Text Units</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.text_units) }}
         </dd>
         {% endif %}
         {% if entry.meta_vars %}
         <dt class="col-sm-3">Included Meta Variables</dt>
         <dd class="col-sm-9">
-            {{ render_tags(entry.meta_vars ) }}
+            {{ render_tags(entry.meta_vars) }}
         </dd>
         {% endif %}
         {% if entry.concept_vars %}
-        <dt class="col-sm-3">Included Conceptual Variables</dt>
+        <dt class="col-sm-3">Included Annotations</dt>
         <dd class="col-sm-9">
-            {{ render_tags(entry.concept_vars ) }}
+            {{ render_tags(entry.concept_vars) }}
         </dd>
         {% endif %}
         </dd>

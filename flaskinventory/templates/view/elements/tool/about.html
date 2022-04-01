@@ -1,4 +1,4 @@
-
+{% from "helpers/_viewhelpers.html" import render_tags, render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>About</h5></dt>
@@ -14,15 +14,13 @@
         <dt class="col-sm-3">Programming Language(s)</dt>
         <dd class="col-sm-9">
             {% for programming_language in entry.programming_languages %}
-                <span class="badge bg-light text-dark me-2">{{programming_language}}</span>
+                <span class="badge bg-indigo me-2">{{programming_language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.used_for %}
         <dt class="col-sm-3">Used For</dt>
         <dd class="col-sm-9">
-            {% for operation in entry.used_for %}
-                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=operation.uid) }}">{{operation.name}}</a>
-            {% endfor %}
+            {{ render_tags(entry.used_for) }}
         </dd>
         {% endif %}
         <dt class="col-sm-3">Graphical User Interface</dt>
@@ -36,9 +34,7 @@
         {% if entry.channels %}
         <dt class="col-sm-3">Ideal for these Channels</dt>
         <dd class="col-sm-9">
-            {% for channel in entry.channels %}
-                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=channel.uid) }}">{{channel.name}}</a>
-            {% endfor %}
+            {{ render_tags(entry.channels) }}
         </dd>
         {% endif %}
         <dt class="col-sm-3">Tool is independent of languages</dt>
@@ -53,23 +49,19 @@
         <dt class="col-sm-3">Supported Language(s)</dt>
         <dd class="col-sm-9">
             {% for language in entry.languages %}
-                <span class="badge bg-light text-dark me-2">{{language}}</span>
+                <span class="badge bg-primary me-2">{{language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.input_file_format %}
         <dt class="col-sm-3">Tool accepts these input file formats</dt>
         <dd class="col-sm-9">
-            {% for file_format in entry.input_file_format %}
-                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=file_format.uid) }}">{{file_format.name}}</a>
-            {% endfor %}
+            {{ render_tags(entry.input_file_format) }}
         </dd>
         {% endif %}
         {% if entry.output_file_format %}
         <dt class="col-sm-3">Tool produces these output file formats</dt>
         <dd class="col-sm-9">
-            {% for file_format in entry.output_file_format %}
-                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=file_format.uid) }}">{{file_format.name}}</a>
-            {% endfor %}
+            {{ render_tags(entry.output_file_format) }}
         </dd>
         {% endif %}
         <dt class="col-sm-3">Author(s) reported validation</dt>

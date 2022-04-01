@@ -5,7 +5,7 @@
 
 <article>
 
-<div class="col d-flex align-items-start mb-4">
+<div class="d-flex align-items-start">
     <div class="icon-square me-3">
         {{ render_icon(entry) }} 
     </div>
@@ -23,15 +23,19 @@
             <i class="fas fa-check fa-stack-1x fa-inverse" aria-hidden="true"></i>
             </span> 
         {% endif %}
-        <small class="fs-6 fw-normal mx-4 text-dark">Type: {{ dgraph_type }}</small>
-        <small class="fs-6 fw-normal mx-4 text-muted">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
         </h2>
     </div>
     <div>
     {% include "view/elements/review_actions.html" %}
     </div>
 </div>
-
+<div class="mb-2">
+    <small class="fs-6 fw-normal pe-2 text-dark">Type: {{ dgraph_type }}</small>
+    {% if entry.creation_date %}
+    <small class="fs-6 fw-normal px-2 text-muted border-start">Created: <span class="font-monospace">{{ entry.creation_date.strftime('%Y-%m-%d') }}</span></small>
+    {% endif %}
+    <small class="fs-6 fw-normal px-2 text-muted border-start">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
+</div>
 {% include "view/elements/general_information.html" %}
 
 {% if 'Source' in entry['dgraph.type'] %}
@@ -107,6 +111,14 @@
 
     {% include "view/elements/dataset/about.html" %}
     {% include "view/elements/dataset/research.html" %}
+
+{% endif %}
+
+
+{% if 'Corpus' in entry['dgraph.type'] %}
+
+    {% include "view/elements/corpus/about.html" %}
+    {% include "view/elements/corpus/research.html" %}
 
 {% endif %}
 

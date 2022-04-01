@@ -46,7 +46,7 @@
 {% macro render_publication(publication) %}
 
 <a href="{{ url_for('view.view_uid', uid=publication.uid) }}" class="me-2">
-    {{ publication.name }}
+    {{ publication.title if publication.title else publication.name }}
 </a>
 <span>
 {% if publication.authors is string %} 
@@ -59,4 +59,12 @@
 {% endif %}
 </span>
 
+{% endmacro %}
+
+{% macro render_tags(tags) %}
+<ul class="list-inline">
+{% for tag in tags %}
+    <li class="list-inline-item"><a href="{{ url_for('view.view_uid', uid=tag.uid) }}">{{tag.name}}</a></li>
+{% endfor %}
+</ul>
 {% endmacro %}
