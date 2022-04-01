@@ -356,7 +356,13 @@ class Sanitizer:
                             'Unique Name already taken!')
             self.entry['unique_name'] = unique_name
         elif not self.is_upsert:
-            name = slugify(self.data.get('name'), separator="_")
+            if self.dgraph_type is 'ResearchPaper':
+                name = self.data.get('doi') or self.data.get('arxiv')
+                if name is None:
+                    name = slugify(self.data.get('title'), separator="_")
+            else:
+                name = slugify(self.data.get('name'), separator="_")
+
             query_string = f''' query quicksearch($value: string)
                                 {{
                                 data1(func: eq(unique_name, $value)) {{
