@@ -26,7 +26,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     else:
         query_func += f'@filter(has(dgraph.type))'
 
-    query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname channel { name unique_name } }'''
+    query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname authors @facets title channel { name unique_name } }'''
 
     if dgraph_type == 'Source':
         query_fields += '''published_by: ~publishes @facets @filter(type("Organization")) { name unique_name uid } 
@@ -47,6 +47,13 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     elif dgraph_type == 'Dataset':
         query_fields += '''
                         num_sources: count(sources_included) } }
+                        '''
+
+    elif dgraph_type == 'Corpus':
+        query_fields += '''
+                        num_sources: count(sources_included) 
+                        papers: ~corpus_used @facets @filter(type("ResearchPaper")) { uid title published_date name authors @facets } 
+                        } }
                         '''
 
     elif dgraph_type == 'Country':
