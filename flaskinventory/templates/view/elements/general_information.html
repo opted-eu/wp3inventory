@@ -33,7 +33,9 @@
             {% endif %}
         </dt>
         <dd class="col-sm-9">
-            <div class="{% if entry.description|length > 160 %}text-truncate{% endif %}" id='description-trunc'>{{ entry.description }}</div>
+            <div class="{% if entry.description|length > 160 %}text-truncate{% endif %}" id='description-trunc'>
+                {{ entry.description }}
+            </div>
         </dd>
         {% endif %} 
         {% if entry.is_person %}

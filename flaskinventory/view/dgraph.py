@@ -67,34 +67,34 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     
     elif dgraph_type == 'Operation':
         query_fields += '''
-                        tools: ~used_for @filter(type("Tool")) { uid name unique_name authors } } }
+                        tools: ~used_for @filter(type("Tool")) { uid name unique_name authors @facets published_date programming_languages platform } } }
                         '''
 
     elif dgraph_type == 'FileFormat':
         query_fields += '''
-                        tools_input: ~input_file_format @filter(type("Tool")) { uid name unique_name authors } 
-                        tools_output: ~output_file_format @filter(type("Tool")) { uid name unique_name authors }
-                        datasets: ~file_format @filter(type("Dataset"))  { uid name unique_name authors }
+                        tools_input: ~input_file_format @filter(type("Tool")) { uid name unique_name authors @facets published_date programming_languages platform } 
+                        tools_output: ~output_file_format @filter(type("Tool")) { uid name unique_name authors @facets published_date programming_languages platform }
+                        datasets: ~file_format @filter(type("Dataset"))  { uid name unique_name authors @facets published_date }
                         } }
                         '''
 
     elif dgraph_type == 'MetaVar':
         query_fields += '''
-                        datasets: ~meta_vars @filter(type("Dataset"))  { uid name unique_name authors }
-                        corpus: ~meta_vars @filter(type("Corpus"))  { uid name unique_name authors }
+                        datasets: ~meta_vars @filter(type("Dataset"))  { uid name unique_name authors @facets published_date }
+                        corpus: ~meta_vars @filter(type("Corpus"))  { uid name unique_name authors @facets published_date }
                         } }
                         '''
     
     elif dgraph_type == 'ConceptVar':
         query_fields += '''
-                        datasets: ~concept_vars @filter(type("Dataset"))  { uid name unique_name authors }
-                        corpus: ~concept_vars @filter(type("Corpus"))  { uid name unique_name authors }
+                        datasets: ~concept_vars @filter(type("Dataset"))  { uid name unique_name authors @facets published_date }
+                        corpus: ~concept_vars @filter(type("Corpus"))  { uid name unique_name authors @facets published_date }
                         } }
                         '''
 
     elif dgraph_type == 'TextUnit':
         query_fields += '''
-                        corpus: ~text_units @filter(type("Corpus"))  { uid name unique_name authors }
+                        corpus: ~text_units @filter(type("Corpus"))  { uid name unique_name authors @facets published_date }
                         } }
                         '''
     else:
@@ -362,6 +362,7 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
     if filt:
         query_head += dgraph.build_filt_string(filt)
 
+    query_fields = ''
     if fields == 'all':
         query_fields = " expand(_all_) "
     elif fields:

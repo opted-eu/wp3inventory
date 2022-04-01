@@ -12,7 +12,7 @@
                         {% if paper.authors is string %}
                             {{ paper.authors }}
                         {% else %}
-                            {{ paper.authors[0] }} et al.
+                            {{ paper.authors[0] }} {{ 'et al.' if paper.authors|length > 1 else '' }}
                         {% endif %}
                     </a> 
                     {% if paper.get('papers|from') %} 

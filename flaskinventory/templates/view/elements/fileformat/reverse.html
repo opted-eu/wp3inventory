@@ -1,27 +1,22 @@
+{% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>Tools</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">These tools can handle this file format.</small></dd>
         {% if entry.tools_input %} 
             <dt class="col-sm-3">Input</dt>
-            {% for tool in entry.tools %}
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=tool.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{tool.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if tool.authors is string %} {{ tool.authors }}{%else%}{{
-                        tool.authors[0] }}{%endif%}</span>
-            </a> 
+            <dd class="col-sm-9 mb-4">
+            {% for tool in entry.tools_input %}
+                <p>{{ render_publication(tool) }}</p>
             {% endfor %}
-        </dd>
+            </dd>
         {% endif %}
 
         {% if entry.tools_output %} 
             <dt class="col-sm-3">Output</dt>
-            {% for tool in entry.tools %}
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=tool.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{tool.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if tool.authors is string %} {{ tool.authors }}{%else%}{{
-                        tool.authors[0] }}{%endif%}</span>
-            </a> 
+            <dd class="col-sm-9 mb-4">
+            {% for tool in entry.tools_output %}
+                <p>{{ render_publication(tool) }}</p>
             {% endfor %}
         </dd>
         {% endif %}
@@ -30,18 +25,16 @@
 
 <div class="border rounded p-3">
     <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Dataset</h5></dt>
+        <dt class="col-sm-3 mb-4"><h5>Datasets</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">These datasets are using this file format.</small></dd>
+        <dt class="col-sm-3 mb-4"></dt>
+        <dd class="col-sm-9 mb-4">
         {% if entry.datasets %} 
             {% for dataset in entry.datasets %}
-            <dt class="col-sm-3"></dt>
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=dataset.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{dataset.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if dataset.authors is string %} {{ dataset.authors }}{%else%}{{
-                        dataset.authors[0] }}{%endif%}</span>
-            </a> 
+            <p>{{ render_publication(dataset) }}</p>
             {% endfor %}
-        </dd>
+
         {% endif %}
+        </dd>
     </dl>
 </div>

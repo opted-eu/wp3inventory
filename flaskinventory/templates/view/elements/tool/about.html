@@ -7,14 +7,14 @@
         <dt class="col-sm-3">Platform(s)</dt>
         <dd class="col-sm-9">
             {% for platform in entry.platform %}
-                <span class="mx-1"><i class="icon-{{platform}} me-1" alt="{{platform}}"></i>{{platform}}<span>
+                <span class="mx-1"><i class="icon-{{platform}} me-1" alt="{{platform}}"></i>{{platform}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.programming_languages %}
         <dt class="col-sm-3">Programming Language(s)</dt>
         <dd class="col-sm-9">
             {% for programming_language in entry.programming_languages %}
-                <span class="badge bg-light text-dark me-2">{{programming_language}}<span>
+                <span class="badge bg-light text-dark me-2">{{programming_language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.used_for %}
@@ -53,7 +53,7 @@
         <dt class="col-sm-3">Supported Language(s)</dt>
         <dd class="col-sm-9">
             {% for language in entry.languages %}
-                <span class="badge bg-light text-dark me-2">{{language}}<span>
+                <span class="badge bg-light text-dark me-2">{{language}}</span>
             {% endfor %}
         {% endif %}
         {% if entry.input_file_format %}

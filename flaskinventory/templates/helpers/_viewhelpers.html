@@ -31,8 +31,32 @@
     <h2><i class="fas fa-file-alt" alt="FileFormat"></i></h2>
 {% elif 'Operation' in entry['dgraph.type'] %}
     <h2><i class="fas fa-screwdriver" alt="Operation"></i></h2>
+{% elif 'MetaVar' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-cubes" alt="MetaVar"></i></h2>
+{% elif 'ConceptVar' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-layer-group" alt="ConceptVar"></i></h2>
+{% elif 'TextUnit' in entry['dgraph.type'] %}
+    <h2><i class="fas fa-paragraph" alt="TextUnit"></i></h2>
 {% else %}
     <h2><i class="fas fa-question" alt="Unknown"></i></h2>
 {% endif %}
+
+{% endmacro %}
+
+{% macro render_publication(publication) %}
+
+<a href="{{ url_for('view.view_uid', uid=publication.uid) }}" class="me-2">
+    {{ publication.name }}
+</a>
+<span>
+{% if publication.authors is string %} 
+    {{ publication.authors }}
+{% else %}
+    {{ publication.authors[0] }} {{ 'et al.' if publication.authors|length > 1 else '' }}
+{% endif %}
+{% if publication.published_date %}
+    <span>({{ publication.published_date.strftime('%Y') }})</span>
+{% endif %}
+</span>
 
 {% endmacro %}

@@ -1,32 +1,27 @@
+{% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>Dataset</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">These datasets have this conceptual variable.</small></dd>
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9 mb-4">
         {% if entry.datasets %} 
             {% for dataset in entry.datasets %}
-            <dt class="col-sm-3"></dt>
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=dataset.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{dataset.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if dataset.authors is string %} {{ dataset.authors }}{%else%}{{
-                        dataset.authors[0] }}{%endif%}</span>
-            </a> 
+                <p>{{ render_publication(dataset) }}</p>
             {% endfor %}
-        </dd>
         {% endif %}
+        </dd>
     </dl>
 </div>
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>Corpus</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">These corpora this conceptual variable as annotation.</small></dd>
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9 mb-4">
         {% if entry.corpus %} 
             {% for corp in entry.corpus %}
-            <dt class="col-sm-3"></dt>
-            <dd>
-            <a href="{{ url_for('view.view_uid', uid=corp.uid) }}">
-                <span class="d-inline-block text-truncate" style="max-width: 140px;"><em>{{corp.name}}</em></span> <span class="d-inline-block text-truncate" style="max-width: 140px;">{% if corp.authors is string %} {{ corp.authors }}{%else%}{{
-                        corp.authors[0] }}{%endif%}</span>
-            </a> 
+                <p>{{ render_publication(corp) }}</p>
             {% endfor %}
         </dd>
         {% endif %}
