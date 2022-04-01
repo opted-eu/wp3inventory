@@ -158,6 +158,10 @@ dt {
     background-image: none!important;
 }
 
+.bg-indigo {
+    background-color: #6610f2;
+}
+
 
 /* Markdown styling */
 
