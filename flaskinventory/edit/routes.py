@@ -39,7 +39,7 @@ def edit_uid(uid):
         result['q'][0]['dgraph.type'].remove('Resource')
 
     if result['q'][0]['dgraph.type'][0] in Schema.get_types():
-        return redirect(url_for('edit.entry', dgraph_type=result['q'][0]['dgraph.type'][0].title(), unique_name=result['q'][0]['unique_name'], **request.args))
+        return redirect(url_for('edit.entry', dgraph_type=result['q'][0]['dgraph.type'][0].title(), uid=result['q'][0]['uid'], **request.args))
     else:
         return abort(404)
 
