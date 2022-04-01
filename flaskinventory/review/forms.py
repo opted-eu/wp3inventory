@@ -12,7 +12,14 @@ class ReviewFilter(FlaskForm):
                              ('Subunit', 'Subunit'),
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
-                             ('ResearchPaper', 'Research Paper')], validators=[DataRequired()]
+                             ('Tool', 'Tool'),
+                             ('Corpus', 'Corpus'),
+                             ('ResearchPaper', 'Research Paper'),
+                             ('Operation', 'Operation'),
+                             ('FileFormat', 'File Format'),
+                             ('MetaVar', 'Meta Variable'),
+                             ('ConceptVar', 'Concept Variables'),
+                             ('TextUnit', 'Text Unit')], validators=[DataRequired()]
                          )
 
     country = SelectField('Filter by Country')

@@ -23,18 +23,24 @@ def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
         query = strip_query(form.name.data)
-        query_string = f'''{{
-                field1 as var(func: regexp(name, /{query.ljust(3)}/i)) @filter(type("{form.entity.data}"))
-                field2 as var(func: allofterms(name, "{query}")) @filter(type("{form.entity.data}"))
-                field3 as var(func: allofterms(other_names, "{query}")) @filter(type("{form.entity.data}"))
-    
-                data(func: uid(field1, field2, field3)) {{
-                    uid
-                    expand(_all_) {{ name }}
-                    }}
+        query_string = f'''
+                query database_check($query: string)
+                {{
+                    field1 as a(func: regexp(name, /$query/i)) @filter(type("{form.entity.data}"))
+                    field2 as b(func: allofterms(name, $query)) @filter(type("{form.entity.data}"))
+                    field3 as c(func: allofterms(other_names, $query)) @filter(type("{form.entity.data}"))
+                    field4 as d(func: match(name, $query, 3)) @filter(type("{form.entity.data}"))
+                    field5 as e(func: allofterms(title, $query)) @filter(type("{form.entity.data}"))
+                    doi as f(func: eq(doi, $query))
+                    arxiv as g(func: eq(arxiv, $query))
+
+                    data(func: uid(field1, field2, field3, field4, field5, doi, arxiv)) {{
+                        uid
+                        expand(_all_) {{ name }}
+                        }}
                 }}
         '''
-        result = dgraph.query(query_string)
+        result = dgraph.query(query_string, variables={'$query': query})
         if len(result['data']) > 0:
             return render_template('add/database_check.html', query=form.name.data, result=result['data'], entity=form.entity.data)
             # return redirect(url_for('add.database_check', result=result['data']))
@@ -146,7 +152,7 @@ def new(dgraph_type=None, draft=None):
             else:
                 newuids = dict(result.uids)
                 uid = newuids[str(sanitizer.entry_uid).replace('_:', '')]
-            return redirect(url_for('view.uid', uid=uid))
+            return redirect(url_for('view.view_uid', uid=uid))
         except Exception as e:
             if current_app.debug:
                 e_trace = traceback.format_exception(None, e, e.__traceback__)

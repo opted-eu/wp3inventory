@@ -341,12 +341,14 @@ class Entry(Schema):
     
     other_names = ListString()
     
-    entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
-                         large_textfield=True)
-    
     wikidataID = Integer(label='WikiData ID',
                          overwrite=True,
                          new=False)
+
+    description = String(large_textfield=True)
+
+    entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
+                         large_textfield=True)
     
     entry_review_status = SingleChoice(choices={'draft': 'Draft',
                                                 'pending': 'Pending',
@@ -691,11 +693,13 @@ class Dataset(Entry):
 
     meta_vars = ListRelationship(description="List of meta data included in the dataset (e.g., date, language, source, medium)",
                                     relationship_constraint="MetaVar",
-                                    render_kw={'placeholder': 'Select multiple...'})
+                                    render_kw={'placeholder': 'Select multiple...'},
+                                    autoload_choices=True)
 
     concept_vars = ListRelationship(description="List of variables based on concepts (e.g. sentiment, frames, etc)",
                                         relationship_constraint="ConceptVar",
-                                        render_kw={'placeholder': 'Select multiple...'})
+                                        render_kw={'placeholder': 'Select multiple...'},
+                                        autoload_choices=True)
 
 
 class Tool(Entry):
@@ -826,17 +830,22 @@ class ResearchPaper(Entry):
 """ Tag Like Types """
 
 class Operation(Entry):
+
     pass
 
 class FileFormat(Entry):
+
     pass
 
 class MetaVar(Entry):
+    
     pass
 
 class ConceptVar(Entry):
+    
     pass
 
 class TextUnit(Entry):
+    
     pass
 

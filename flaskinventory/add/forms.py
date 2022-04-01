@@ -13,7 +13,9 @@ class NewEntry(FlaskForm):
                              ('Organization', 'Media Organization'),
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
-                             #  ('ResearchPaper', 'Research Paper')
+                             ('Tool', 'Tool'),
+                             ('Corpus', 'Corpus'),
+                              ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
 
