@@ -26,7 +26,7 @@ def get_audience(uid):
     if 'audience_size' not in data.keys():
         cols = ['date']
         if data['channel']['unique_name'] == 'print':
-            cols += ['copied_sold', 'data_from']
+            cols += ['copies_sold', 'data_from']
         elif data['channel']['unique_name'] == 'facebook':
             cols.append('likes')
         else:
