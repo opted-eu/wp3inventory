@@ -173,12 +173,12 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
                                 publishes: count(publishes)
                                 owns: count(owns)
                                 '''
-        if typename in ['Archive', 'Dataset']:
+        if typename in ['Archive', 'Dataset', 'Corpus']:
             query_fields = ''' uid unique_name name access other_names
                                 sources_included: count(sources_included)
-                                '''
+                                ''' 
         if typename == 'ResearchPaper':
-            normalize = False
+            normalize = False   
             query_fields = ''' uid title authors @facets published_date journal
                                 sources_included: count(sources_included)
                                 '''
