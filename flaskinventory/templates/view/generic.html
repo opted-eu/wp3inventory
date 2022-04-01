@@ -11,11 +11,6 @@
     </div>
     <div class="w-100">
         <h2>
-        {% if entry.get('channel')%}
-            {% if entry.channel.unique_name in ['twitter', 'instagram'] %}
-                @
-            {% endif %}
-        {% endif %}
         {{ entry.name }} 
         {% if entry.verified_account %} 
         <span class="fa-stack text-primary align-middle" style="font-size: 0.3em;">
@@ -30,11 +25,11 @@
     </div>
 </div>
 <div class="mb-2">
-    <small class="fs-6 fw-normal pe-2 text-dark">Type: {{ dgraph_type }}</small>
+    <span class="pe-2 text-dark">Type: {{ dgraph_type }}</span>
     {% if entry.creation_date %}
-    <small class="fs-6 fw-normal px-2 text-muted border-start">Created: <span class="font-monospace">{{ entry.creation_date.strftime('%Y-%m-%d') }}</span></small>
+    <small class="px-2 text-muted border-start">Created: <span class="font-monospace">{{ entry.creation_date.strftime('%Y-%m-%d') }}</span></small>
     {% endif %}
-    <small class="fs-6 fw-normal px-2 text-muted border-start">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
+    <small class="px-2 text-muted border-start">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
 </div>
 {% include "view/elements/general_information.html" %}
 
