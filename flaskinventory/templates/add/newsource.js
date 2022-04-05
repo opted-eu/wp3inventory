@@ -1,5 +1,3 @@
-// rewrite everything without jquery https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/#selecting-elements
-
 // ********************
 // Function declaration
 // ********************
@@ -11,7 +9,11 @@ document.querySelectorAll('select').forEach(function(item) {
             document.getElementById(this.id + '-hidden').value = this.options[this.selectedIndex].getAttribute('data-value')
         })
     }
-})
+});
+
+document.getElementById('channel-select').addEventListener('change', function() {
+            document.getElementById('channel-select-uid').value = this.value
+        });
 
 function addFieldOptionsData(fieldOptions, key, selector, addother = false) {
     var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
@@ -249,14 +251,18 @@ if (document.querySelector('input[name="special_interest"]')) {
             var item = event.target.value;
             if (item == 'no') {
                 document.getElementById('group-topical-focus').hidden = true;
-                document.getElementById('topical-focus-ts-control').required = false;
                 document.getElementById('topical-focus').required = false;
+                if (document.getElementById('topical-focus-ts-control')) {
+                    document.getElementById('topical-focus-ts-control').required = false;
+                }
 
             }
             if (item == 'yes') {
                 document.getElementById('group-topical-focus').hidden = false;
-                document.getElementById('topical-focus-ts-control').required = true;
                 document.getElementById('topical-focus').required = true;
+                if (document.getElementById('topical-focus-ts-control')) {
+                    document.getElementById('topical-focus-ts-control').required = false;
+                }
             }
         });
     });
@@ -438,12 +444,13 @@ function populateForm(jsonData) {
         document.getElementById("uid-hidden").value = jsonData["uid"]
     };
     if ('channel' in jsonData) {
-        document.getElementById("channel-select").value = jsonData["channel"].uid
+        document.querySelector(`#channel-select option[value='${jsonData["channel"].uid}']`).selected = true
         document.getElementById("channel-select-hidden").value = jsonData["channel"].unique_name
         document.getElementById("channel-select").disabled = true
     };
     if ('name' in jsonData) {
         document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
+        document.getElementById("name").value = jsonData['name']
     };
     if ("other_names" in jsonData) {
         document.getElementById("other-names").value = jsonData["other_names"].join(",");
@@ -835,7 +842,6 @@ ready(() => {
             var TomSelectDatasetConfig = {
                 selectOnTab: true,
                 plugins: ['remove_button'],
-                create: true,
                 onItemAdd: function() { // clear input after item was selected
                     this.setTextboxValue();
                     this.refreshOptions();

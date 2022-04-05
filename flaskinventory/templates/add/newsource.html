@@ -30,11 +30,12 @@
         <div class="mb-5 form-group">
             <input type="text" name="uid" id="uid-hidden" value='' readonly hidden>
             <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed? {{ make_tooltip('If the channel you have in mind is not included as an option you may write to wp3@opted.eu and we discuss your suggestion.') }}</label>
-            <select name="channel" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
+            <select name="channel_public" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
                         <option value="">Select Channel...</option>
                     </select>
             <div id="channel-select-feedback"></div>
             <input type="text" name="channel_unique_name" id="channel-select-hidden" hidden>
+            <input type="text" name="channel" id="channel-select-uid" readonly hidden>
         </div>
         <div class="mb-5">
             <div id="group-name" class="form-group mb-4">
@@ -544,7 +545,7 @@
                 <span class="text-muted mx-1">(optional)</span>
                 {{ make_tooltip('For news sources that run their own archives, please add the name via the option “Other please specify” e.g. The Guardian Open Platform”.') }}
             </label>
-            <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
+            <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple ..." aria-describedby="archive-sources-included-feedback" multiple></select>
             <small id="archive-sources-included-helptext"></small>
             <div id="archive-sources-included-feedback"></div>
         </div>
@@ -552,7 +553,7 @@
         <!-- Optional Field -->
         <div id="group-dataset-sources-included" class="mb-5 form-group">
             <label for="dataset-sources-included" class="form-label fw-bold fs-5">Is the news source included in one or several of the following annotated media text data sets?<span class="text-muted mx-1">(optional)</span></label>
-            <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
+            <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple ..." aria-describedby="dataset-sources-included-feedback" multiple></select>
             <small id="dataset-sources-included-helptext"></small>
             <div id="dataset-sources-included-feedback"></div>
         </div>
