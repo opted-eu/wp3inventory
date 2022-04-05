@@ -405,7 +405,7 @@ class ReverseRelationship:
         if not uid:
             if not self.allow_new:
                 raise InventoryValidationError(
-                    f'Error in <{self.predicate}>! provided value is not a UID: {data}')
+                    f'Error in <{self.predicate}>! Adding new items is not allowed, the provided value is not a UID: {data}')
             d = {'uid': NewID(data, facets=facets),
                  self._target_predicate: node}
             if self.relationship_constraint:
