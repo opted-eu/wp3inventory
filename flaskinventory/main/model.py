@@ -321,7 +321,24 @@ class OrderedListString(ListString):
             raise InventoryValidationError(
                 f'Error in <{self.predicate}>! Do not know how to handle {type(data)}. Value: {data}')
        
+class MultipleChoiceInt(MultipleChoice):
 
+    dgraph_predicate_type = '[int]'
+
+    def validation_hook(self, data):
+        if isinstance(data, str):
+            data = data.split(',')
+        if not isinstance(data, list):
+            raise InventoryValidationError(
+                f'Error in <{self.predicate}>! Provided data cannot be coerced to "list": {data}')
+        for val in data:
+            if val.strip() not in self.values:
+                raise InventoryValidationError(
+                    f"Wrong value provided for {self.predicate}: {val}. Value has to be one of {', '.join(self.values)}")
+            if val.strip().lower() == 'na':
+                data = None
+
+        return data
 
 """
     Entry
@@ -368,7 +385,7 @@ class Organization(Entry):
                   render_kw={'placeholder': 'e.g. The Big Media Corp.'})
     
     other_names = ListString(description='Does the organisation have any other names or common abbreviations?',
-                             render_kw={'placeholder': 'Separate bySingleRe comma'})
+                             render_kw={'placeholder': 'Separate by comma'})
     
     is_person = Boolean(label='Yes, is a person',
                         description='Is the media organisation a person?',
@@ -503,7 +520,7 @@ class Source(Entry):
                                                  'NA': "Don't Know / NA"},
                                                  required=True)
 
-    publication_cycle_weekday = MultipleChoice(description="Please indicate the specific day(s) when the news source publishes.",
+    publication_cycle_weekday = MultipleChoiceInt(description="Please indicate the specific day(s) when the news source publishes.",
                                                 choices={"1": 'Monday', 
                                                         "2": 'Tuesday', 
                                                         "3": 'Wednesday', 
