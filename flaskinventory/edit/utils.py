@@ -23,6 +23,23 @@ def can_edit(entry, user) -> bool:
     else:
         return True
 
+
+def can_delete(entry) -> bool:
+    from flask_login import current_user
+    if "entry_review_status" in entry.keys():
+        if entry['entry_review_status'] == 'draft':
+            if current_user.is_authenticated:
+                if current_user.user_role > USER_ROLES.Reviewer or entry['entry_added']['uid'] == current_user.id:
+                    return True
+                else: 
+                    return False
+            else: 
+                return False
+        else:
+            return False
+    else:
+        return True
+
 def channel_filter(channel: str) -> list:
     if channel == 'print':
         return ['channel_url', 

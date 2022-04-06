@@ -1,6 +1,6 @@
 {% extends "layout.html" %} {% block content %}
 <div class="border rounded p-3">
-    <h3 class="mb-4">My Entries</h3>
+    <h3 class="mb-4">{{title}}</h3>
 
     <ul class="nav nav-tabs" id="entryTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -46,6 +46,7 @@
                         <td>{% if entry.get("draft|timestamp") %}{{ entry.get("draft|timestamp").strftime('%d-%m-%Y') }}{% endif %}</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group"><a class="btn btn-primary" href="{{ url_for('add.from_draft', entity=entry.get('dgraph.type'), uid=entry.get('uid'))}}">Continue this entry</a></div>
+                            <div class="btn-group btn-group-sm" role="group"><a class="btn btn-danger" href="{{ url_for('edit.delete_draft', uid=entry.get('uid'))}}">Delete Draft</a></div>
                         </td>
                     </tr>
                     {% endfor %} {% endif %}
@@ -155,4 +156,7 @@
     </div>
 
 </div>
-{% endblock content %} {% block sidebar %} {% include "users/profile_sidebar.html" %} {% endblock sidebar %}
+{% endblock content %} 
+
+{% block sidebar %}  
+{% endblock sidebar %}
