@@ -28,7 +28,8 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     if dgraph_type == 'Source':
         query_fields += '''published_by: ~publishes @facets @filter(type("Organization")) { name unique_name uid } 
                             archives: ~sources_included @facets @filter(type("Archive")) { name unique_name uid } 
-                            datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid }
+                            datasets: ~sources_included @facets @filter(type("Dataset")) { name unique_name uid authors @facets }
+                            corpora: ~sources_included @facets @filter(type("Corpus")) { name unique_name uid authors @facets }
                             papers: ~sources_included @facets @filter(type("ResearchPaper")) { uid title published_date authors @facets } 
                         } }'''
 
