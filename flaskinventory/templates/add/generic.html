@@ -17,6 +17,14 @@
 
 {% include "helpers/_tomselect.html" %} 
 
+<script>
+function submitFunction(e) {
+    if(document.activeElement!=document.getElementById('submit')) e.preventDefault();
+}
+document.getElementById('form-add-new').addEventListener('submit', submitFunction);
+
+</script>
+
 {% endblock content %} 
 
 {% block sidebar %} 
