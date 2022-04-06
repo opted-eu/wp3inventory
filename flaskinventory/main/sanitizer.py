@@ -356,7 +356,7 @@ class Sanitizer:
                             'Unique Name already taken!')
             self.entry['unique_name'] = unique_name
         elif not self.is_upsert:
-            if self.dgraph_type is 'ResearchPaper':
+            if self.dgraph_type == 'ResearchPaper':
                 name = self.data.get('doi') or self.data.get('arxiv')
                 if name is None:
                     name = slugify(self.data.get('title'), separator="_")
@@ -453,8 +453,15 @@ class Sanitizer:
             self.fetch_vk()
         elif channel == 'telegram':
             self.fetch_telegram()
+        elif channel == 'facebook':
+            self.entry['channel_url'] = self.entry['name']
+        
+        try: 
+            country_uid = self.entry['country'][0]
+        except TypeError:
+            country_uid = self.entry['country']
             
-        self.entry['unique_name'] = self.source_unique_name(self.entry['name'], channel=channel, country_uid=self.entry['country'][0])
+        self.entry['unique_name'] = self.source_unique_name(self.entry['name'], channel=channel, country_uid=country_uid)
 
         # inherit from main source
         for source in self.related_entries:
