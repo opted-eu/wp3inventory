@@ -80,12 +80,17 @@ def reject_entry(uid, user):
     related = Variable('v', 'uid')
     publishes = Variable('p', 'uid')
     owns = Variable('o', 'uid')
+    source_included = Variable('i', 'uid') 
+
     query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query})) {{
 			            {related.query} }} 
                     publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query})) {{
                         {publishes.query} }}
                     owns(func: type(Organization)) @filter(uid_in(owns, {uid.query})) {{
                         {owns.query} }}
+                    included(func: has(dgraph.type)) @filter(uid_in(sources_inclued, {uid.query})) {{
+                        {source_included.query}
+                    }}
                 }}'''
 
     delete_predicates = ['dgraph.type', 'unique_name', 'publishes',
@@ -96,6 +101,7 @@ def reject_entry(uid, user):
     del_nquads += [make_nquad(related, 'related', uid)]
     del_nquads += [make_nquad(publishes, 'publishes', uid)]
     del_nquads += [make_nquad(owns, 'owns', uid)]
+    del_nquads += [make_nquad(source_included, 'sources_included', uid)]
 
     del_nquads = " \n ".join(del_nquads)
 
