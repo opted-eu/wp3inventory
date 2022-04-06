@@ -4,10 +4,11 @@ from flask import (Blueprint, render_template, url_for,
                    flash, redirect, request, abort, Markup)
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskinventory import dgraph
+from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm, UpdatePasswordForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
-from flaskinventory.users.utils import send_reset_email, send_invite_email, send_verification_email, requires_access_level, make_users_table, make_sources_table
+from flaskinventory.users.utils import send_reset_email, send_invite_email, send_verification_email, requires_access_level, make_users_table
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User, get_user_data, user_login, create_user, list_users, list_entries
 from secrets import token_hex
@@ -234,23 +235,33 @@ def edit_user(uid):
     return render_template('users/update_user.html', title='Manage Users', user=editable_user, form=form)
 
 
-@users.route('/users/entries')
+@users.route('/users/<string:uid>/entries')
 @login_required
-def my_entries():
-    sources = list_entries(current_user.id)
-    if sources:
-        return render_template('users/entries.html', 
-                                title='My Entries', 
-                                show_sidebar=True, 
-                                drafts=sources[0].get('drafts'),
-                                pending=sources[0].get('pending'),
-                                accepted=sources[0].get('accepted'),
-                                rejected=sources[0].get('rejected'))
+def my_entries(uid):
+    uid = validate_uid(uid)
+    if not uid:
+        return abort(404)
+    if current_user.user_role > USER_ROLES.Contributor or current_user.id == uid:
+        sources = list_entries(uid)
+        if current_user.id == uid:
+            title = 'My Entries'
+        else:
+            title = f'Entries of user <{uid}>' 
+        if sources:
+            return render_template('users/entries.html', 
+                                    title=title, 
+                                    show_sidebar=False, 
+                                    drafts=sources[0].get('drafts'),
+                                    pending=sources[0].get('pending'),
+                                    accepted=sources[0].get('accepted'),
+                                    rejected=sources[0].get('rejected'))
+        else:
+            return render_template('users/entries.html', 
+                                    title=title, 
+                                    show_sidebar=False, 
+                                    drafts=None,
+                                    pending=None,
+                                    accepted=None)
     else:
-        return render_template('users/entries.html', 
-                                title='My Entries', 
-                                show_sidebar=True, 
-                                drafts=None,
-                                pending=None,
-                                accepted=None)
-    
+        return abort(403)
+        

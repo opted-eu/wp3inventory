@@ -1,0 +1,85 @@
+{% from "helpers/_viewhelpers.html" import render_tags, render_publication %}
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>About</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.platform %}
+        <dt class="col-sm-3">Platform(s)</dt>
+        <dd class="col-sm-9">
+            {% for platform in entry.platform %}
+                <span class="mx-1"><i class="icon-{{platform}} me-1" alt="{{platform}}"></i>{{platform}}</span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.programming_languages %}
+        <dt class="col-sm-3">Programming Language(s)</dt>
+        <dd class="col-sm-9">
+            {% for programming_language in entry.programming_languages %}
+                <span class="badge bg-indigo me-2">{{programming_language}}</span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.used_for %}
+        <dt class="col-sm-3">Used For</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.used_for) }}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3">Graphical User Interface</dt>
+        <dd class="col-sm-9">
+            {% if entry.graphical_user_interface %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.channels %}
+        <dt class="col-sm-3">Ideal for these Channels</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.channels) }}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3">Tool is independent of languages</dt>
+        <dd class="col-sm-9">
+            {% if entry.language_independent %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.languages %}
+        <dt class="col-sm-3">Supported Language(s)</dt>
+        <dd class="col-sm-9">
+            {% for language in entry.languages %}
+                <span class="badge bg-primary me-2">{{language}}</span>
+            {% endfor %}
+        {% endif %}
+        {% if entry.input_file_format %}
+        <dt class="col-sm-3">Tool accepts these input file formats</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.input_file_format) }}
+        </dd>
+        {% endif %}
+        {% if entry.output_file_format %}
+        <dt class="col-sm-3">Tool produces these output file formats</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.output_file_format) }}
+        </dd>
+        {% endif %}
+        <dt class="col-sm-3">Author(s) reported validation</dt>
+        <dd class="col-sm-9">
+            {% if entry.author_validated %}
+                <span>Yes</span>
+            {% else %}
+                <span>No</span>
+            {% endif %}
+        </dd>
+        {% if entry.validation_corpus %}
+        <dt class="col-sm-3">Corpus used for validation</dt>
+        <dd class="col-sm-9">
+            {% for corpus in entry.validation_corpus %}
+                <p class="card-text"><a href="{{ url_for('view.view_uid', uid=corpus.uid) }}">{{corpus.name}}</a>
+            {% endfor %}
+        </dd>
+        {% endif %}
+        
+    </dl>
+</div>

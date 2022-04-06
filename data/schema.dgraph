@@ -36,6 +36,7 @@ type Entry {
     entry_notes
     reviewed_by
     wikidataID
+    description
 }
 
 type Source {
@@ -104,18 +105,14 @@ type Subunit {
     location_point
 }
 
-type Resource {
+type Archive {
     description
     authors
-    published_date
-    last_updated
-    url
     doi
     arxiv
-}
-
-
-type Archive {
+    url
+    published_date
+    last_updated
     access
     sources_included
     fulltext
@@ -123,24 +120,36 @@ type Archive {
 
 
 type Dataset {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     access
-    materials
-    related_publications
     languages
-    file_format
-    sources_included
     country
     start_date
     end_date
+    file_format
     initial_source
     meta_vars
     concept_vars
+    materials
+    sources_included
 }
 
 type Corpus {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     access
     materials
-    related_publications
     languages
     file_format
     sources_included
@@ -150,34 +159,49 @@ type Corpus {
     meta_vars
     text_units
     country
-    annotations
+    concept_vars
 }
 
 
 type Tool {
-    access
-    materials
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     platform
-    programming_language
+    programming_languages
     used_for
+    graphical_user_interface
+    channels
     language_independent
     languages
-    validation
+    author_validated
     validation_corpus
-    related_publications
     input_file_format
     output_file_format
-    input_data
-    output_data
+    materials
 }
 
 
 type ResearchPaper {
+    description
+    authors
+    doi
+    arxiv
+    url
+    published_date
+    last_updated
     title
     isbn
     paper_kind
     journal
     sources_included
+    tools_used
+    datasets_used
+    corpus_used
     country
 }
 
@@ -185,9 +209,8 @@ type ResearchPaper {
 type Operation {}
 type FileFormat {}
 type MetaVar {}
+type ConceptVar {}
 type TextUnit {}
-type Annotation {}
-type IOData {}
 
 type Rejected {
     entry_review_status
@@ -279,9 +302,9 @@ opted_scope: bool .
 authors: [string] @index(term) .
 published_date: dateTime @index(day) .
 last_updated: dateTime @index(day) .
-url: string .
-doi: string .
-arxiv: string .
+url: string @index(exact) .
+doi: string @index(exact) .
+arxiv: string @index(exact) .
 
 # Shared Predicates (dataset, corpus, tool, archive)
 sources_included: [uid] @reverse .
@@ -295,17 +318,18 @@ initial_source: [uid] @reverse .
 meta_vars: [uid] @reverse .
 concept_vars: [uid] @reverse .
 text_units: [uid] @reverse .
-annotations: [uid] @reverse .
 
 # Archive Predicates
 fulltext: bool .
 
 # Tool Predicates
 platform: [string] @index(hash) .
-programming_language: [string] @index(hash) .
+programming_languages: [string] @index(hash) .
+graphical_user_interface: bool @index(bool) .
 used_for: [uid] @reverse .
+channels: [uid] @reverse .
 language_independent: bool @index(bool) .
-validation: string @index(hash) .
+author_validated: string @index(hash) .
 validation_corpus: [uid] @reverse .
 input_file_format: [uid] @reverse .
 output_file_format: [uid] @reverse .
@@ -318,3 +342,7 @@ isbn: string .
 title: string @index(term) .
 paper_kind: string .
 journal: string .
+tools_used: [uid] @reverse . 
+datasets_used: [uid] @reverse . 
+corpus_used: [uid] @reverse . 
+

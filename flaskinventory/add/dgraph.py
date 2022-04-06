@@ -1,7 +1,7 @@
 from flaskinventory import dgraph
 from flask_login import current_user
 from flaskinventory.users.constants import USER_ROLES
-from flask import url_for, current_app, flash
+from flask import flash
 from flaskinventory.auxiliary import icu_codes_list
 from pydgraph import Txn
 import json
@@ -31,26 +31,6 @@ async def generate_fieldoptions():
     data['language'] = icu_codes_list
 
     return data
-
-
-def get_subunit_country(uid=None, country_code=None):
-    if uid:
-        query_string = f''' {{ q(func: uid({uid})) {{ country {{ uid }} }} }}'''
-    if country_code:
-        query_string = f''' {{ q(func: eq(country_code, "{country_code}")) 
-                                @filter(type("Country")) {{
-		                            uid }} }}'''
-
-    result = dgraph.query(query_string)
-
-    if len(result['q']) == 0:
-        return False
-
-    if uid:
-        return result['q'][0]['country'][0]['uid']
-
-    if country_code:
-        return result['q'][0]['uid']
 
 
 def check_draft(draft, form):

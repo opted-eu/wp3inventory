@@ -10,3 +10,6 @@ instagram-square
 github
 github-square
 researchgate
+windows
+linux
+apple

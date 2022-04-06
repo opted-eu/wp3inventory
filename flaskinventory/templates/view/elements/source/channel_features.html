@@ -1,0 +1,27 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Channel Features</h5></dt>
+        <dd></dd>
+        {% if entry.website_allows_comments %}
+        <dt class="col-sm-3">News Source allows users to leave comments</dt>
+        <dd class="col-sm-9">{{ entry.website_allows_comments }}</dd>
+        {% endif %} 
+        {% if entry.website_comments_registration_required %}
+        <dt class="col-sm-3">User registration required to leave comments</dt>
+        <dd class="col-sm-9">{{ entry.website_comments_registration_required }}</dd>
+        {% endif %} 
+        {% if entry.channel_feeds %}
+        <dt class="col-sm-3">Feeds</dt>
+        <dd class="col-sm-9">
+            {% for feed in entry.channel_feeds %}
+                <a href="{{feed}}" target="_blank">{{ entry.get('channel_feeds|kind')[loop.index0|string] }}</a>
+                {{ ", " if not loop.last else "" }}
+            {% endfor %}
+            </dd> 
+        {% endif %} 
+        {% if entry.channel_epaper %}
+        <dt class="col-sm-3">E-Paper available</dt>
+        <dd class="col-sm-9">{{ entry.channel_epaper }}</dd>
+        {% endif %}
+    </dl>
+</div>

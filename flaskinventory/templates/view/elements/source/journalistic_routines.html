@@ -1,0 +1,107 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Routines</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.publication_kind %}
+        <dt class="col-sm-3">Publication Kind</dt>
+        <dd class="col-sm-9"><span class="">{{ ", ".join(entry.publication_kind) }}</span></dd>
+        {% endif %}
+        {% if 'special_interest' in entry.keys() %}
+        <dt class="col-sm-3">Special Interest Publication</dt>
+        <dd class="col-sm-9">{% if entry.special_interest %}Yes{% else %}No{% endif %}</dd>
+        {% endif %}
+        {% if entry.topical_focus %}
+        <dt class="col-sm-3">Topical Focus</dt>
+        <dd class="col-sm-9">{{ ", ".join(entry.topical_focus) }}</dd>{% endif %} {% if entry.publication_cycle %}
+        <dt class="col-sm-3">Publication Cycle</dt>
+        <dd class="col-sm-9">{{ entry.publication_cycle }}</dd>{% endif %}
+        {% if entry.publication_cycle_weekday %}
+        <dt class="col-sm-3">Publication weekdays</dt>
+        <dd class="col-sm-9">
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item 
+                {% if 1 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Mon</li>
+                <li class="list-group-item 
+                {% if 2 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Tue</li>
+                <li class="list-group-item 
+                {% if 3 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Wed</li>
+                <li class="list-group-item 
+                {% if 4 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Thu</li>
+                <li class="list-group-item 
+                {% if 5 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Fri</li>
+                <li class="list-group-item 
+                {% if 6 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Sat</li>
+                <li class="list-group-item 
+                {% if 7 in entry.publication_cycle_weekday %}
+                list-group-item-success
+                {% else %}
+                list-group-item-secondary
+                {% endif %}
+                ">Sun</li>
+              </ul>
+        </dd>{% endif %}
+        <dt class="col-sm-3">Geographic Scope</dt>
+        <dd class="col-sm-9">{{ entry.geographic_scope }}
+        <dt class="col-sm-3">Countries</dt>
+        <dd class="col-sm-9">
+            {% for country in entry.country %}
+            <span><a href="{{ url_for('view.view_uid', uid=country.uid) }}">{{ country.name }}</a></span>
+            {{ ", " if not loop.last else "" }}
+            {% endfor %}
+        </dd>
+        {% if entry.geographic_scope_subunit %}
+        <dt class="col-sm-3">Subunits <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Note that entities listed in 'Subunits' are not necessarily part of all the entities listed in 'Countries'."><i class="fas mx-1 fa-question-circle"></i></a></dt>
+        <dd class="col-sm-9">
+            {% for subunit in entry.geographic_scope_subunit %}
+            <span><a href="{{ url_for('view.view_generic', dgraph_type='Subunit', uid=subunit.uid)}}">{{ subunit.name }}</a></span>
+            {{ ", " if not loop.last else "" }}
+            {% endfor %}
+            </dd>
+            
+        {% endif %} 
+        
+        {% if entry.languages %}
+        <dt class="col-sm-3">Languages</dt>
+        <dd class="col-sm-9">
+            {% for language in entry.languages %}
+             <span class="badge bg-primary me-2">{{ language }}</span>
+             {% endfor %}
+            </dd>
+        {% endif %}
+        {% if entry.party_affiliated %}
+        <dt class="col-sm-3">News Source close to a political party <a data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="Close means that a political party or a party-related association or company owns at least 50% of the news source OR that persons who have a central role in the news source (or the affiliated associations) have or had also a central role in a political party."><i class="fas mx-1 fa-question-circle"></i></a></dt>
+        <dd class="col-sm-9">{{ entry.party_affiliated }}</dd>
+        {% endif %}
+    </dl>
+</div>

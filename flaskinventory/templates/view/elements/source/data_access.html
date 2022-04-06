@@ -1,0 +1,22 @@
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Data Access</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following data bases include full text data.</small></dd>
+        {% if entry.archives %} 
+        {% for archive in entry.archives %}
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9">
+            <a href="{{ url_for('view.view_generic', dgraph_type='Archive', unique_name=archive.unique_name) }}">
+                {{archive.name}}
+            </a>
+                {% if archive.get('archives|from') %}
+                    <span class="text-muted mx-3"> from: {{ archive.get('archives|from') }}</span>
+                {%endif%} 
+                {% if archive.get('archives|to') %}
+                    <span class="text-muted mx-3">to: {{ archive.get('archives|to') }}</span> 
+                {%endif%}
+            {% endfor %}
+        </dd>
+        {% endif %}
+    </dl>
+</div>

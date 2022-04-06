@@ -1,12 +1,37 @@
 {% macro render_field(field) %}
+{% if field %}
 {% if field.name == 'uid' %}
 {{ field(class="form-control form-control-lg", hidden="true") }} 
+{% elif field.type == 'BooleanField' %}
+    {% if field.description %}
+        <p class="fw-bold fs-5" style='padding-left: 0!;'>{{ field.description }}</p>
+    {% endif %}
+    <div class="mb-3 form-check">
+            {{ field(class="form-check-input") }} 
+        <label for="{{ field.id}}" class="form-label fs-5">
+            {{ field.label.text }}
+        </label>
+    </div>
+
 {% else %}
 
 <div class="mb-5">
-    <label for="{{ field.id}}" class="form-label fw-bold fs-5">{{ field.label.text }}
-    {% if field.flags.required %}<span class="text-danger">*</span>{% else %}<span class="text-muted">(optional)</span>{% endif %}
+    {% if field.render_kw.hidden %}
+    {% else %}
+    <label for="{{ field.id}}" class="form-label fw-bold fs-5">
+        {% if field.description %}
+            {{ field.description }}
+        {% else %}
+            {{ field.label.text }}
+        {% endif %}
+        
+        {% if field.flags.required %}
+            <span class="text-danger">*</span>
+        {% else %}
+            <span class="text-muted">(optional)</span>
+        {% endif %}
     </label>
+    {% endif %}
     {% if field.errors %} 
         {{ field(class="form-control form-control-lg is-invalid") }}
         <div class="invalid-feedback">
@@ -15,9 +40,7 @@
             {% endfor %}
         </div>
     {% else %} 
-        {% if field.type == 'BooleanField' %}
-            {{ field(class="form-check") }} 
-        {% elif field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+        {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
             {{ field(class="form-select form-select-lg") }} 
         {% elif field.type == 'RadioField' %}
             {% for subfield in field %}
@@ -33,4 +56,5 @@
 </div>
 {% endif %}
 
+{% endif %}
 {% endmacro %}

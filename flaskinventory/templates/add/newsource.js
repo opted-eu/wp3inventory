@@ -1,5 +1,3 @@
-// rewrite everything without jquery https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/#selecting-elements
-
 // ********************
 // Function declaration
 // ********************
@@ -11,15 +9,18 @@ document.querySelectorAll('select').forEach(function(item) {
             document.getElementById(this.id + '-hidden').value = this.options[this.selectedIndex].getAttribute('data-value')
         })
     }
-})
+});
 
+document.getElementById('channel-select').addEventListener('change', function() {
+            document.getElementById('channel-select-uid').value = this.value
+        });
 
 function addFieldOptionsData(fieldOptions, key, selector, addother = false) {
     var opts = fieldOptions[key] // .sort((a, b) => a.name > b.name ? 1 : -1);
     opts.forEach(function(item, i) {
         let opt = document.createElement('option')
-        opt.setAttribute('value', item.unique_name)
-        opt.setAttribute('data-value', item.uid)
+        opt.setAttribute('value', item.uid)
+        opt.setAttribute('data-value', item.unique_name)
         opt.setAttribute('data-index', i)
         opt.innerText = item.name
         document.querySelector(selector).append(opt);
@@ -93,7 +94,7 @@ function getFieldOptions(targetUrl) {
 
 // Field Visibility Logic
 function channelVisibility(fieldOptions, allNames, el) {
-    var value = el.target.value
+    var value = el.target.options[el.target.selectedIndex].getAttribute('data-value')
     var index = el.target.options[el.target.selectedIndex].getAttribute('data-index')
     if (index == null) {
         return;
@@ -250,14 +251,18 @@ if (document.querySelector('input[name="special_interest"]')) {
             var item = event.target.value;
             if (item == 'no') {
                 document.getElementById('group-topical-focus').hidden = true;
-                document.getElementById('topical-focus-ts-control').required = false;
                 document.getElementById('topical-focus').required = false;
+                if (document.getElementById('topical-focus-ts-control')) {
+                    document.getElementById('topical-focus-ts-control').required = false;
+                }
 
             }
             if (item == 'yes') {
                 document.getElementById('group-topical-focus').hidden = false;
-                document.getElementById('topical-focus-ts-control').required = true;
                 document.getElementById('topical-focus').required = true;
+                if (document.getElementById('topical-focus-ts-control')) {
+                    document.getElementById('topical-focus-ts-control').required = false;
+                }
             }
         });
     });
@@ -272,8 +277,6 @@ if (document.querySelector('#publication-cycle')) {
                 let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
                 weekday.forEach((el) => {
                     el.setAttribute('type', 'radio')
-                    el.setAttribute('name', 'publication_cycle_weekday')
-                    el.setAttribute('value', el.id.replace('publication-cycle-weekday-', ''))
                     el.disabled = false
                     el.checked = false
                 });
@@ -283,8 +286,6 @@ if (document.querySelector('#publication-cycle')) {
                 let weekday = document.querySelectorAll('input[id^="publication-cycle-weekday-"]')
                 weekday.forEach((el) => {
                     el.setAttribute('type', 'checkbox')
-                    el.setAttribute('name', 'publication_cycle_weekday_' + el.id.replace('publication-cycle-weekday-', ''))
-                    el.setAttribute('value', 'yes')
                     el.disabled = false
                     el.checked = false
                 });
@@ -343,8 +344,14 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
                 }
-                // geographicScopeSingle.clear();
-                // geographicScopeSubunit.clear();
+                try {
+                    let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                    geographicScopeSingle.tomselect.clear();
+                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                    geographicScopeSubunit.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             } else if (item == 'national') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = false;
@@ -363,8 +370,14 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 document.getElementById('geographic-scope-subunit').required = false;
                 if (document.getElementById('geographic-scope-subunit-ts-control')) {
                     document.getElementById('geographic-scope-subunit-ts-control').required = false;
-                    // geographicScopeMultiple.clear();
-                    // geographicScopeSubunit.clear();
+                    try {
+                        let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                        geographicScopeMultiple.tomselect.clear();
+                        let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                        geographicScopeSubunit.tomselect.clear();
+                    } catch (ex) {
+                        console.warn(ex.message);
+                    }
                 }
             } else if (item == 'subnational') {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
@@ -385,8 +398,12 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = true;
                 }
-
-                // geographicScopeMultiple.clear();
+                try {
+                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                    geographicScopeMultiple.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             } else {
                 document.getElementById('group-geographic-scope-multiple').hidden = true;
                 document.getElementById('group-geographic-scope-single').hidden = true;
@@ -405,10 +422,16 @@ if (document.querySelector('input[name="geographic_scope"]')) {
                 if (document.getElementById('geographic-scope-single-ts-control')) {
                     document.getElementById('geographic-scope-single-ts-control').required = false;
                 }
-
-                // geographicScopeSingle.clear();
-                // geographicScopeMultiple.clear();
-                // geographicScopeSubunit.clear();
+                try {
+                    let geographicScopeMultiple = document.getElementById('geographic-scope-multiple');
+                    geographicScopeMultiple.tomselect.clear();
+                    let geographicScopeSubunit = document.getElementById('geographic-scope-subunit');
+                    geographicScopeSubunit.tomselect.clear();
+                    let geographicScopeSingle = document.getElementById('geographic-scope-single');
+                    geographicScopeSingle.tomselect.clear();
+                } catch (ex) {
+                    console.warn(ex.message);
+                }
             }
         });
     });
@@ -421,11 +444,13 @@ function populateForm(jsonData) {
         document.getElementById("uid-hidden").value = jsonData["uid"]
     };
     if ('channel' in jsonData) {
-        document.getElementById("channel-select").value = jsonData["channel"].unique_name
-        document.getElementById("channel-select-hidden").value = jsonData["channel"].uid
+        document.querySelector(`#channel-select option[value='${jsonData["channel"].uid}']`).selected = true
+        document.getElementById("channel-select-hidden").value = jsonData["channel"].unique_name
+        document.getElementById("channel-select").disabled = true
     };
     if ('name' in jsonData) {
         document.getElementById("heading-name").innerText = ': ' + jsonData["name"]
+        document.getElementById("name").value = jsonData['name']
     };
     if ("other_names" in jsonData) {
         document.getElementById("other-names").value = jsonData["other_names"].join(",");
@@ -507,12 +532,13 @@ function populateForm(jsonData) {
     if ("geographic_scope" in jsonData) {
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).checked = true
         document.querySelector(`input[name=geographic_scope][value='${jsonData["geographic_scope"]}']`).dispatchEvent(new Event("input"))
+        let hiddenGeographicScopeCountry = document.getElementById('geographic-scope-countries-hidden')
         if ("country" in jsonData) {
             if (jsonData["geographic_scope"] == "multinational") {
                 for (country of jsonData["country"]) {
                     if (document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`)) {
                         document.querySelector(`#geographic-scope-multiple option[value='${country.unique_name}']`).selected = true
-                        document.getElementById("geographic-scope-countries-hidden").value += country["uid"] + ","
+                        hiddenGeographicScopeCountry.value += country["uid"] + ","
                     }
                 }
                 if ("geographic_scope_subunit" in jsonData) {
@@ -522,11 +548,14 @@ function populateForm(jsonData) {
                             document.getElementById("geographic-scope-subunits-hidden").value += country["uid"] + ","
                         }
                     }
+                    hiddenGeographicScopeCountry.value = jsonData["country"][0]["uid"]
+                    document.querySelector(`#geographic-scope-single option[value='${jsonData['country'][0]["uid"]}']`).selected = true
                 }
             } else if (jsonData["geographic_scope"] == "national") {
                 let country = jsonData["country"][0]
                 if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                     document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                    hiddenGeographicScopeCountry.value = country['uid']
                 }
 
             } else if (jsonData["geographic_scope"] == "subnational") {
@@ -539,6 +568,7 @@ function populateForm(jsonData) {
                     let country = jsonData["country"][0]
                     if (document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`)) {
                         document.querySelector(`#geographic-scope-single option[value='${country["uid"]}']`).selected = true
+                        hiddenGeographicScopeCountry.value = country['uid']
                     }
                 }
             }
@@ -687,10 +717,17 @@ ready(() => {
                 hiddenGeographicScopeSubunits.value = selectedSubunits.join()
             });
 
+            var inputGeographicScopeSingle = document.getElementById('geographic-scope-single')
+            inputGeographicScopeSingle.addEventListener('change', function() {
+                var hiddenGeographicScopeCountry = document.getElementById('geographic-scope-countries-hidden')
+                hiddenGeographicScopeCountry.value = inputGeographicScopeSingle.value
+            });
+
             // get url parameter to pre-fill fields
             var currentUrl = new URL(window.location.href);
             var entry_name = currentUrl.searchParams.get("entry_name");
             document.getElementById('heading-name').innerText = ': ' + entry_name
+            document.getElementById('name').value = entry_name
 
             // Populate form with draft data from embedded json
             var embeddedJSON = document.getElementById('draft') || document.getElementById('existing')
@@ -774,9 +811,9 @@ ready(() => {
                 }
             };
 
-            const geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
-            const geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
-            const geographicScopeSubunit = new TomSelect('#geographic-scope-subunit', TomSelectSubunitConfig);
+            geographicScopeSingle = new TomSelect('#geographic-scope-single', TomSelectCountryConfig);
+            geographicScopeMultiple = new TomSelect('#geographic-scope-multiple', TomSelectCountriesConfig);
+            geographicScopeSubunit = new TomSelect('#geographic-scope-subunit', TomSelectSubunitConfig);
 
 
             var TomSelectLanguagesConfig = {
@@ -805,7 +842,6 @@ ready(() => {
             var TomSelectDatasetConfig = {
                 selectOnTab: true,
                 plugins: ['remove_button'],
-                create: true,
                 onItemAdd: function() { // clear input after item was selected
                     this.setTextboxValue();
                     this.refreshOptions();
@@ -986,14 +1022,6 @@ ready(() => {
 
             function guessChannel(sourcename) {
                 sourcename = sourcename.toLowerCase()
-                let fb = ['fb', 'facebook']
-                let ig = ['ig', 'instagram']
-                let tg = ['tg', 'telegram']
-                let tw = ['tw', 'twitter']
-                let vk = ['vk', 'vkontakte']
-                let www = ['website']
-                let print = ['print']
-                let transcript = ['transcript']
 
                 if (sourcename.includes('facebook')) {
                     return 'facebook'
@@ -1040,14 +1068,11 @@ ready(() => {
                     if (option.getAttribute('data-value') == 'new') {
                         option.remove()
                     }
-                    // this is a lazy way of getting two bits of data into one field
-                    // we have to split this later at the comma to get the unique_name and uid
                     if (option.value) {
                         if (option.value == guessedChannel) {
                             select.value = guessedChannel
                         }
-                        option.setAttribute('data-channel-name', option.value)
-                        option.value = option.value + ',' + option.getAttribute('data-value')
+
                     }
                 }
 
@@ -1106,8 +1131,10 @@ ready(() => {
                 render: {
                     option: function(data, escape) {
                         var channel_label = ' '
+                        var channel_icon = ''
                         if (data.channel) {
                             if (data.channel.name) {
+                                channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
                                 channel_label = ' (' + escape(data.channel.name) + ') '
                             }
                         };
@@ -1116,22 +1143,24 @@ ready(() => {
                             country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
                         return '<div>' +
-                            '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                            '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                             country_label +
                             '</div>';
                     },
                     item: function(data, escape) {
                         var channel_label = ' '
+                        var channel_icon = ''
                         if (data.channel) {
                             if (data.channel.name) {
-                                var channel_label = ' (' + escape(data.channel.name) + ') '
+                                channel_label = ' (' + escape(data.channel.name) + ') '
+                                channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
                             }
                         };
                         var country_label = ' '
                         if ("country" in data) {
                             country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                         }
-                        return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
+                        return '<div>' + channel_icon + escape(data.name) + channel_label + country_label + '</div>';
                     }
                 }
             };
@@ -1186,7 +1215,9 @@ ready(() => {
             nextStep = nextbutton.parentElement.nextElementSibling;
             if (nextStep.id == 'section-audience') {
                 let audience_size_channels = ['print', 'facebook']
-                if (!audience_size_channels.includes(document.getElementById('channel-select').value)) {
+                let channelSelect = document.getElementById('channel-select')
+                let selectedChannel = channelSelect.options[channelSelect.selectedIndex].getAttribute('data-value')
+                if (!audience_size_channels.includes(selectedChannel)) {
                     nextStep = nextStep.nextElementSibling;
                 }
             }
@@ -1206,7 +1237,8 @@ ready(() => {
             currentStep = prevbutton.parentElement;
             prevStep = prevbutton.parentElement.previousElementSibling;
             if (prevStep.id == 'section-audience') {
-                if (document.getElementById('channel-select').value != 'print') {
+                let channelSelect = document.getElementById('channel-select')
+                if (channelSelect.options[channelSelect.selectedIndex].getAttribute('data-value') != 'print') {
                     prevStep = prevStep.previousElementSibling;
                 }
             }
@@ -1303,9 +1335,6 @@ submitButton.addEventListener('click', function handleFormSubmit(event) {
     submitForm('{{ url_for("endpoint.submit") }}', form, formResult);
 
 
-    // window.location.assign('{{ url_for("add.confirmation") }}')
-    // };
-
     // event.preventDefault();
 });
 
@@ -1391,7 +1420,7 @@ function serializeForm(f) {
 
     // remove empty strings
     var obj = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != ""));
-
+    obj['entry_review_status'] = 'pending'
     return obj;
 };
 
@@ -1498,7 +1527,7 @@ function prettySummary() {
     Array.from(form.elements).forEach(function(e) {
         if (e.type == 'text' || e.type == 'number') {
             if (e.value) {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     summary_element.children[1].innerHTML = e.value
                     summary_element.hidden = false
@@ -1506,7 +1535,7 @@ function prettySummary() {
             }
         } else if (e.tagName.toLowerCase() == 'select') {
             if (e.multiple && e.selectedOptions) {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     let selected = []
                     for (opt of e.selectedOptions) { selected.push(opt.innerHTML) }
@@ -1516,7 +1545,7 @@ function prettySummary() {
                     }
                 }
             } else {
-                let summary_element = document.querySelector('#summary-' + e.name)
+                let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
                 if (summary_element) {
                     if (e.value) {
                         summary_element.children[1].innerHTML = e.selectedOptions[0].innerHTML
@@ -1525,14 +1554,14 @@ function prettySummary() {
                 }
             }
         } else if (e.type == 'radio' && e.checked) {
-            let summary_element = document.querySelector('#summary-' + e.name)
+            let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
             if (summary_element) {
                 summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
                 summary_element.hidden = false
             }
 
         } else if (e.type == 'checkbox' && e.checked) {
-            let summary_element = document.querySelector('#summary-' + e.name)
+            let summary_element = document.querySelector('#summary-' + e.name.replace('|', '_'))
             if (summary_element) {
                 summary_element.children[1].innerHTML = document.querySelector('[for="' + e.id + '"]').innerHTML
                 summary_element.hidden = false

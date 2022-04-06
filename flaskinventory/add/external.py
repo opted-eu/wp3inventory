@@ -1,24 +1,31 @@
+# built in modules
+
 from datetime import datetime
-from flask import current_app
+from urllib.robotparser import RobotFileParser
+import urllib.parse
+import re
+import json
+import asyncio
+from typing import Union
+
+# external utils 
 import requests
 from requests.models import PreparedRequest
 import requests.exceptions
+from dateutil import parser as dateparser
 import feedparser
-from urllib.robotparser import RobotFileParser
-import urllib.parse
 from bs4 import BeautifulSoup as bs4
-import re
-import json
 import instaloader
 import tweepy
 from telethon import TelegramClient
-import asyncio
+
+# flask
+from flask import current_app
 from dateutil.parser import isoparse
+
 from flaskinventory import dgraph
-from flaskinventory.flaskdgraph.dgraph_types import UID, Geolocation
 
-
-def geocode(address):
+def geocode(address: str) -> dict:
     payload = {'q': address,
                'format': 'jsonv2',
                'addressdetails': 1,
@@ -35,7 +42,7 @@ def geocode(address):
         return r.json()[0]
 
 
-def reverse_geocode(lat, lon):
+def reverse_geocode(lat, lon) -> dict:
     api = "https://nominatim.openstreetmap.org/reverse"
     payload = {'lat': lat, 'lon': lon, 'format': 'json'}
     r = requests.get(api, params=payload)
@@ -49,7 +56,9 @@ def reverse_geocode(lat, lon):
 # Sitemaps & RSS/XML/Atom Feeds
 
 
-def build_url(site):
+def build_url(site: str):
+    if not isinstance(site, str):
+        site = str(site)
     if site.endswith('/'):
         site = site[:-1]
     if not site.startswith('http'):
@@ -249,20 +258,25 @@ def schemaorg(soup):
     return name, url
 
 
-def siterankdata(site):
+def siterankdata(site: str):
+    if not isinstance(site, str):
+        site = str(site)
     site = site.replace('http://', '').replace('https://',
                                                '').replace('www.', '')
     if site.endswith('/'):
         site = site[:-1]
 
-    r = requests.get("https://siterankdata.com/" + site)
+    current_app.logger.debug(f'requesting: {"https://siterankdata.com/" + site}')
+    r = requests.get("https://siterankdata.com/" + site, timeout=30)
 
     if r.status_code != 200:
+        current_app.logger.debug(f'Getting siterankdata failed! Status code: {r.status_code}')
         return False
 
-    soup = bs4(r.content, 'lxml')
+    current_app.logger.debug('Succeeded in grabbing siterankdata! Now parsing...')
 
     try:
+        soup = bs4(r.content, 'lxml')
         visitor_string = soup.find(text=re.compile('Daily Unique Visitors'))
         visitors = visitor_string.parent.parent.h3.getText(strip=True)
         visitors = int(visitors.replace(',', ''))
@@ -366,8 +380,9 @@ def lookup_wikidata_id(query):
 
 
 def fetch_wikidata(wikidataid, query=None):
+    from flaskinventory.flaskdgraph.dgraph_types import UID, GeoScalar
     api = 'https://www.wikidata.org/w/api.php'
-    result = {'wikidataID': wikidataid.replace('Q', '')}
+    result = {'wikidataID': int(wikidataid.replace('Q', ''))}
     try:
         params = {'action': 'wbgetentities', 'languages': 'en',
                   'ids': wikidataid, 'format': 'json'}
@@ -426,10 +441,10 @@ def fetch_wikidata(wikidataid, query=None):
         wikidata = r.json()
         address = wikidata['entities'][headquarters]['labels']['en']['value']
         geo_result = geocode(address)
-        address_geo = Geolocation('Point', [
+        address_geo = GeoScalar('Point', [
             float(geo_result.get('lon')), float(geo_result.get('lat'))])
 
-        result['address'] = address
+        result['address_string'] = address
         result['address_geo'] = address_geo
     except Exception as e:
         current_app.logger.debug(
@@ -494,6 +509,8 @@ def telegram(username):
         return profile
 
     profile = asyncio.new_event_loop().run_until_complete(get_profile(username))
+    if not hasattr(profile, 'to_dict') or profile == False:
+        return False
     profile = profile.to_dict()
     telegram_id = profile.get('id')
     fullname = profile.get('first_name')
@@ -513,3 +530,176 @@ def telegram(username):
         fullname = profile.get('title')
 
     return {'followers': followers, 'fullname': fullname, 'joined': joined, 'verified': verified, 'telegram_id': telegram_id}
+
+
+
+def doi(doi: str) -> Union[dict, bool]:
+    # clean input string
+    doi = doi.replace("https://doi.org/", "")
+    doi = doi.replace("http://doi.org/", "")
+    doi = doi.replace("doi.org/", "")
+
+    from flaskinventory.flaskdgraph.dgraph_types import Scalar
+
+    api = 'https://api.crossref.org/works/'
+
+    r = requests.get(api + doi)
+
+    if r.status_code != 200:
+        return False
+
+    publication = r.json()
+
+    if publication['status'] != 'ok':
+        return False
+
+    publication = publication['message']
+
+    result = {'doi': doi}
+
+    result['journal'] = publication.get('container-title')
+    if isinstance(result['journal'], list):
+        result['journal'] = result['journal'][0]
+    result['title'] = publication.get('title')
+
+    if isinstance(result['title'], list):
+        result['title'] = result['title'][0]
+
+    result['paper_kind'] = publication.get('type')
+
+    if publication.get('created'):
+        result['published_date'] = dateparser.parse(publication['created']['date-time'])
+
+    if publication.get('link'):
+        result['url'] = publication['link'][0]['URL']
+
+    if publication.get('author'):
+        authors = []
+        for i, author in enumerate(publication['author']):
+            author_name = f"{author.get('family', '')}, {author.get('given')}"
+            authors.append(Scalar(author_name, facets={'sequence': i}))
+
+        result['authors'] = authors
+
+    
+    return result
+
+
+def arxiv(arxiv: str) -> Union[dict, bool]:
+    from flaskinventory.flaskdgraph.dgraph_types import Scalar
+
+    # clean input string
+    arxiv = arxiv.replace('https://arxiv.org/abs/', '')
+    arxiv = arxiv.replace('http://arxiv.org/abs/', '')
+    arxiv = arxiv.replace('arxiv.org/abs/', '')
+    arxiv = arxiv.replace('abs/', '')
+
+    api = "http://export.arxiv.org/api/query"
+
+    r = requests.get(api, params={'id_list': arxiv})
+
+    if r.status_code != 200:
+        return False
+
+    soup = bs4(r.content, 'lxml')
+
+    try:
+        total_results = soup.find('opensearch:totalresults').text
+    except:
+        try:
+            total_results = soup.find('opensearch:totalResults').text
+        except:
+            return False
+    
+    if int(total_results) < 1:
+        return False
+
+    result = {'arxiv': arxiv}
+
+    try:
+        result['arxiv'] = soup.entry.id.get_text()
+    except:
+        return False
+
+    try:
+        result['title'] = soup.entry.title.get_text().replace('\n', ' ')
+    except:
+        return False
+
+    authors = []
+    try:
+        for i, author_tag in enumerate(soup.entry.find_all('author')):
+            author = author_tag.find('name').text
+            author = author.split(" ")[-1] + ', ' + " ".join(author.split(" ")[0:-1])
+            authors.append(Scalar(author, facets={'sequence': i}))
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse authors in ArXiv: {arxiv}')
+
+    result['authors'] = authors
+
+    try:
+        result['published_date'] = dateparser.parse(soup.entry.published.text)
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse publication date in ArXiv: {arxiv}')
+
+    try:
+        result['description'] = soup.entry.summary.get_text(strip=True).replace('\n', ' ')
+    except Exception as e:
+        current_app.logger.warning(f'Could not parse abstract in ArXiv: {arxiv}')
+
+    return result
+
+
+def cran(pkg) -> Union[dict, bool]:
+
+    api = 'https://crandb.r-pkg.org/'
+
+    r = requests.get(api + pkg)
+
+    if r.status_code != 200:
+        return False
+
+    if not 'json' in r.headers['Content-Type']:
+        return False
+
+    data = r.json()
+
+    result = {'programming_languages': ['r'],
+                'platform': ['windows','linux','macos']}
+
+    if 'Package' in data.keys():
+        result['name'] = data['Package']
+
+    if 'Description' in data.keys():
+        result['description'] = data['Description']
+
+    if 'Title' in data.keys():
+        result['other_names'] = data['Title']
+
+    if 'URL' in data.keys():
+        result['url'] = data['URL']
+
+    # try extracting Author information
+
+    authors = []
+    if "Authors@R" in data.keys():
+        authors_r = data['Authors@R'].split('person')
+        for a in authors_r[1:]:
+            mtch = re.findall(r'\"(.*?)\"', a)
+            author = [mtch[1], mtch[0]] if len(mtch) > 1 else [mtch[0]]
+            authors.append(", ".join(author))
+    elif "Author" in data.keys():
+        authors_raw = data['Author']
+        authors_raw = re.sub(r"\[.*?\]", "", authors_raw)
+        authors_raw = re.sub(r"\(.*?\)", "", authors_raw)
+        authors_raw = authors_raw.replace("\n", " ")
+        if ' and ' in authors_raw:
+            authors_split = authors_raw.split("and")
+        else:
+            authors_split = authors_raw.split(',')
+        authors = [a.strip() for a in authors_split]
+
+    if len(authors) > 0:
+        result['authors'] = ";".join(authors)
+
+    return result

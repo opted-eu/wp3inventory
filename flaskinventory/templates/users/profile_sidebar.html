@@ -3,7 +3,7 @@
         <span class="fs-5 fw-semibold">Tasks</span>
     </a>
     <div class="list-group">
-        <a href="{{ url_for('users.my_entries') }}" type="button" class="list-group-item list-group-item-action">
+        <a href="{{ url_for('users.my_entries', uid=current_user.id) }}" type="button" class="list-group-item list-group-item-action">
             <i class="fas fa-tasks me-3 fa-fw"></i>My Entries
         </a>
         <a href="{{ url_for('add.new_entry') }}" type="button" class="list-group-item list-group-item-action">

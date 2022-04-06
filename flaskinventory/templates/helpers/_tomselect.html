@@ -2,18 +2,19 @@
 <script>
 
     {% if 'other_names' in fields %}
-    var TomSelectOtherNamesConfig = {
-        plugins: ['remove_button'],
-        selectOnTab: true,
-        create: true,
-        render: {
-            no_results:function(data,escape){
-                return '<div></div>';
-        }
-        }
-    };
-    
-    new TomSelect('#other_names', TomSelectOtherNamesConfig);
+    if (document.getElementById('other_names')) {
+        var TomSelectOtherNamesConfig = {
+            plugins: ['remove_button'],
+            selectOnTab: true,
+            create: true,
+            render: {
+                no_results:function(data,escape){
+                    return '<div></div>';
+            }
+            }
+        };
+        new TomSelect('#other_names', TomSelectOtherNamesConfig)
+    }
     {% endif %}
     
     {% if 'publishes' in fields %}
@@ -36,9 +37,11 @@
             render: {
                 option: function(data, escape) {
                     var channel_label = ' '
+                    var channel_icon = ''
                     if (data.channel) {
                         if (data.channel.name) {
-                        channel_label = ' (' + escape(data.channel.name) + ') '
+                            channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                            channel_label = ' (' + escape(data.channel.name) + ') '
                         }
                     };
                     var country_label = ' '
@@ -46,22 +49,24 @@
                         country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
                     return '<div>' +
-                            '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                            '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                             country_label +
                         '</div>';
                 },
                 item: function(data, escape) {
                     var channel_label = ' '
+                    var channel_icon = ''
                     if (data.channel) {
                         if (data.channel.name) {
-                            var channel_label = ' (' + escape(data.channel.name) + ') '
+                            channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                            channel_label = ' (' + escape(data.channel.name) + ') '
                         }
                     };
                     var country_label = ' '
                     if ("country" in data) {
                         country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                     }
-                    return '<div>' + escape(data.name) + channel_label + country_label + '</div>';
+                    return '<div>' + channel_icon + escape(data.name) + channel_label + country_label + '</div>';
                 }
             }
         };
@@ -148,17 +153,19 @@
         render: {
             option: function(data, escape) {
                 var channel_label = ' '
+                var channel_icon = ''
                 if (data.channel) {
                     if (data.channel.name) {
-                    channel_label = ' (' + escape(data.channel.name) + ') '
-                    }
+                        channel_icon = `<i class="icon-${data.channel.unique_name} color-${data.channel.unique_name} me-2 fa-fw" alt="${data.channel.name}"></i>`
+                        channel_label = ' (' + escape(data.channel.name) + ') '
+                        }
                 };
                 var country_label = ' '
                 if ("country" in data) {
                     country_label = '<small class="text-muted mx-1"> (' + escape(data.country[0].name) + ')</small>'
                 }
                 return '<div>' +
-                        '<span class="title">' + escape(data.name) + channel_label + '</span> ' +
+                        '<span class="title">' + channel_icon + escape(data.name) + channel_label + '</span> ' +
                         country_label +
                     '</div>';
             },
@@ -191,8 +198,22 @@
             this.refreshOptions();
         }
     };
+
+    var TomSelectCountryConfig = {
+        selectOnTab: true,
+        onItemAdd:function(){ // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+        }
+    };
+
+    var countryField = document.getElementById('country')
+    if (countryField.hasAttribute('multiple')) {
+        new TomSelect('#country', TomSelectCountriesConfig);
+    } else {
+        new TomSelect('#country', TomSelectCountryConfig);
+    }
     
-    new TomSelect('#country', TomSelectCountriesConfig);
     
     {% endif %}
     
@@ -254,4 +275,182 @@
     
     {% endif %}
     
+
+    {% if 'authors' in fields %}
+    
+    new TomSelect('#authors', {create: true, plugins: ['remove_button'], delimiter: ';'})
+    
+    {% endif %}
+
+
+    {% if 'platform' in fields %}
+    
+    new TomSelect('#platform', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'programming_languages' in fields %}
+    
+    new TomSelect('#programming_languages', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+
+    {% if 'used_for' in fields %}
+    
+    new TomSelect('#used_for', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'channels' in fields %}
+    
+    new TomSelect('#channels', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'input_file_format' in fields %}
+    
+    new TomSelect('#input_file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'output_file_format' in fields %}
+    
+    new TomSelect('#output_file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'input_data' in fields %}
+    
+    new TomSelect('#input_data', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'output_data' in fields %}
+    
+    new TomSelect('#output_data', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'validation_corpus' in fields %}
+    
+    new TomSelect('#validation_corpus', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+
+    {% if 'materials' in fields %}
+
+    var materialsContainer = document.getElementById('materials').parentElement
+
+    function createMaterialsField(materialURL) {
+                var row = document.createElement('div')
+                row.classList.add('row', 'my-3', 'align-items-center')
+                row.id = 'container-' + materialURL
+                var label = document.createElement('label')
+                label.classList.add('col', 'form-label')
+                label.setAttribute('for', materialURL + '@kind')
+                label.innerText = materialURL;
+                row.append(label)
+                var col = document.createElement('div');
+                col.classList.add('col');
+                var description = document.createElement('p')
+                description.classList.add('fw-bold', 'fs-6', 'mb-1')
+                description.innerText = 'Please specify what kind of resource it is'
+                var input = document.createElement('input')
+                input.classList.add('form-control')
+                input.setAttribute('name', materialURL + '@kind')
+                input.setAttribute('placeholder', 'e.g. FAQ, Manual, Tutorial, Website, etc')
+
+                // append elements
+                col.append(description)
+                col.append(input);
+                row.append(col)
+
+                // append to container
+                materialsContainer.append(row)
+
+            } 
+
+    var TomSelectMaterialsConfig= {
+        plugins: ['remove_button'],
+        create: true,
+        selectOnTab: true,
+        onItemAdd: function(input) {
+            // clear input after item was selected
+            this.setTextboxValue();
+            this.refreshOptions();
+            createMaterialsField(input)
+        },
+        onItemRemove: function(values) {
+            let el = document.getElementById('container-' + values)
+            if (el) {
+                el.remove()
+            }
+        }
+    };    
+    new TomSelect('#materials', TomSelectMaterialsConfig)
+    
+    {% endif %}
+
+    {% if 'related_publications' in fields %}
+    
+    new TomSelect('#related_publications', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'tools_used' in fields %}
+    
+    new TomSelect('#tools_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'corpus_used' in fields %}
+    
+    new TomSelect('#corpus_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'datasets_used' in fields %}
+    
+    new TomSelect('#datasets_used', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'initial_source' in fields %}
+    
+    new TomSelect('#initial_source', {plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'meta_vars' in fields %}
+    
+    new TomSelect('#meta_vars', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'concept_vars' in fields %}
+    
+    new TomSelect('#concept_vars', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'file_format' in fields %}
+    
+    new TomSelect('#file_format', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
+    {% if 'text_units' in fields %}
+    
+    new TomSelect('#text_units', {create: true, plugins: ['remove_button']})
+    
+    {% endif %}
+
     </script>

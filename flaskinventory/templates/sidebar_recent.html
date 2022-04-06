@@ -14,7 +14,7 @@
                 </small>
             </div>
             <div class="col-10 mb-1 small">
-                {{ item.get('type')[0] }}{% if item.get('country') %}, {{ item.country }}{% endif %}
+                <span class="badge rounded-pill bg-primary">{{ item.get('dgraph.type')[0] }}</span>{% if item.get('country') %}{% for country in item.country %} {{country.name}} {{- ', ' if not loop.last else '' -}} {% endfor %}{% endif %}
             </div>
         </a>
         {% endfor %} 

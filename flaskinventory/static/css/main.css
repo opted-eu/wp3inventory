@@ -57,6 +57,30 @@
     font-style: normal;
 }
 
+.icon-windows::before,
+.icon-Windows::before {
+    content: "\f17a";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+.icon-macos::before,
+.icon-macOS::before {
+    content: "\f179";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+.icon-linux::before,
+.icon-Linux::before {
+    content: "\f17c";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
 
 /* social colors */
 
@@ -132,6 +156,10 @@ dt {
 
 .ts-no-arrow {
     background-image: none!important;
+}
+
+.bg-indigo {
+    background-color: #6610f2;
 }
 
 

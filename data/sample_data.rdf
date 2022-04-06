@@ -25,7 +25,7 @@
         _:print <unique_name> "print" .
         _:print <name> "Print" .
         _:print <form_name_question> "What is the name of the print news source?" .
-        _:print <form_name_placeholder> "e.g. 'The Royal Gazette" .
+        _:print <form_name_placeholder> "e.g. 'The Royal Gazette'" .
 
         _:twitter <dgraph.type> "Channel" .
         _:twitter <unique_name> "twitter" .
@@ -77,7 +77,6 @@
         _:derstandardat <founded> "1995-02-02" .
         _:derstandardat <channel> _:website .
         _:derstandardat <channel_url> "https://www.derstandard.at/" .
-        _:derstandardat <channel_comments> "registration required" .
         _:derstandardat <website_allows_comments> "yes" .
         _:derstandardat <website_comments_registration_required> "yes" .
         _:derstandardat <channel_feeds> "https://www.derstandard.at/sitemaps/news.xml" (kind="sitemap") .
@@ -243,7 +242,7 @@
 
         _:stverlag <dgraph.type> "Organization" .
         _:stverlag <unique_name> "st_verlagmbh" .
-        _:stverlag <name> "ST Verlagsbeteiligungs­gesellschaft m.b.H." .
+        _:stverlag <name> "ST Verlagsbeteiligungsgesellschaft m.b.H." .
         _:stverlag <founded> "1999-11-30" .
         _:stverlag <is_person> "false" .
         _:stverlag <ownership_kind> "private ownership" .
@@ -266,6 +265,7 @@
 
         _:paper1 <dgraph.type> "ResearchPaper" .
         _:paper1 <doi> "10.1080/1461670X.2020.1745667" .
+        _:paper1 <name> "Egelhofer et al. (2020): From Novelty to Normalization?" .
         _:paper1 <title> "From Novelty to Normalization? How Journalists Use the Term “Fake News” in their Reporting" .
         _:paper1 <unique_name> "10.1080/1461670X.2020.1745667" .
         _:paper1 <authors> "Jana Laura Egelhofer" (sequence=1) .
@@ -285,9 +285,25 @@
         _:admin <email> "wp3@opted.eu" .
         _:admin <pw> "admin123" .
         _:admin <user_displayname> "Admin" .
-        _:admin <date_joined> "2020-05-20" .
+        _:admin <date_joined> "2021-05-20" .
         _:admin <user_role> "10" .
         _:admin <account_status> "active" .
+
+        _:contributor <dgraph.type> "User" .
+        _:contributor <email> "contributor@opted.eu" .
+        _:contributor <pw> "contributor123" .
+        _:contributor <user_displayname> "Contributor" .
+        _:contributor <date_joined> "2022-03-02" .
+        _:contributor <user_role> "1" .
+        _:contributor <account_status> "active" .
+
+        _:reviewer <dgraph.type> "User" .
+        _:reviewer <email> "reviewer@opted.eu" .
+        _:reviewer <pw> "reviewer123" .
+        _:reviewer <user_displayname> "Reviewer" .
+        _:reviewer <date_joined> "2022-03-02" .
+        _:reviewer <user_role> "2" .
+        _:reviewer <account_status> "active" .
 
     }
 }

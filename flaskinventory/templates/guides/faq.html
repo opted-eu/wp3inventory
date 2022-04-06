@@ -56,7 +56,7 @@ stage.
 
 *How to do that?*
 
-1. Go to Tasks \> **[My Entries]({{ url_for('users.my_entries')}})**
+1. Go to Tasks \> **[My Entries]({{ url_for('users.my_entries', uid=current_user.id)}})**
 
 2. Find the organization you want to edit (in one of the tabs) and click
 on "Edit". 

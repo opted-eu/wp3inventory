@@ -3,12 +3,11 @@ from dateutil.parser import isoparse
 from flask import current_app, _app_ctx_stack
 import pydgraph
 import logging
-from .dgraph_types import (UID, NewID, Predicate, Scalar,
-                                        Geolocation, Variable, make_nquad, dict_to_nquad)
-
 
 class DGraph(object):
-    '''Class for dgraph database connection'''
+    """
+        Class for dgraph database connection
+    """
 
     _client = None
 
@@ -27,7 +26,9 @@ class DGraph(object):
         app.config.setdefault('DGRAPH_OPTIONS', None)
         app.teardown_appcontext(self.teardown)
 
-    ''' Connection Related Methods '''
+    """ 
+        Connection Related Methods
+    """
 
     @property
     def connection(self):
@@ -128,7 +129,7 @@ class DGraph(object):
             return ''
 
     """    
-    Generic Query Methods 
+        Generic Query Methods 
     """
 
     def query(self, query_string, variables=None):
@@ -136,6 +137,7 @@ class DGraph(object):
         if variables is None:
             res = self.connection.txn(read_only=True).query(query_string)
         else:
+            self.logger.debug(f"Got the following variables {variables}")
             res = self.connection.txn(read_only=True).query(
                 query_string, variables=variables)
         self.logger.debug(f"Received response for dgraph query.")
@@ -143,11 +145,40 @@ class DGraph(object):
         return data
 
     def get_uid(self, field, value):
-        query_string = f'{{ q(func: eq({field}, {value})) {{ uid {field} }} }}'
-        data = self.query(query_string)
+        query_string = f'''
+            query quicksearch($value: string)
+            {{ q(func: eq({field}, $value)) {{ uid {field} }} }}'''
+        data = self.query(query_string, variables={'$value': value})
         if len(data['q']) == 0:
             return None
         return data['q'][0]['uid']
+
+    def get_unique_name(self, uid):
+
+        query_string = f''' query get_unique_name($value: string)
+                            {{ q(func: uid($value)) @filter(has(dgraph.type)) {{ uid unique_name }} }}'''
+        data = self.query(query_string, variables={'$value': uid})
+        if len(data['q']) == 0:
+            return None
+        return data['q'][0]['unique_name']
+
+    def get_dgraphtype(self, uid: str, clean: list =['Entry', 'Resource']):
+        query_string = f'''query get_dgraphtype($value: string)
+                            {{ q(func: uid($value)) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
+
+        data = self.query(query_string, variables={'$value': uid})
+        if len(data['q']) == 0:
+            return False
+        if 'User' in data['q'][0]['dgraph.type']:
+            return False
+        
+        if len(clean) > 0:
+            for item in clean:
+                if item in data['q'][0]['dgraph.type']:
+                    data['q'][0]['dgraph.type'].remove(item)
+            return data['q'][0]['dgraph.type'][0]
+        else:
+            return data['q'][0]['dgraph.type']
 
     """
         New Entries
@@ -207,9 +238,9 @@ class DGraph(object):
             if not query.startswith('{'):
                 query = '{' + query + '}'
         self.logger.debug("Performing upsert:")
-        self.logger.debug(f'Query: {query}')
-        self.logger.debug(f'set nquads: {set_nquads}')
-        self.logger.debug(f'delete nquads: {del_nquads}')
+        self.logger.debug(f'Query:\n{query}')
+        self.logger.debug(f'set nquads:\n{set_nquads}')
+        self.logger.debug(f'delete nquads:\n{del_nquads}')
         txn = self.connection.txn()
         mutation = txn.create_mutation(set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
         request = txn.create_request(query=query, mutations=[

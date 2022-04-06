@@ -1,0 +1,19 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-2"><h5>Location</h5></dt>
+        <dd class="col-sm-9 mb-4"></dd>
+        {% if entry.country %}
+        <dt class="col-sm-3">Country</dt>
+        <dd class="col-sm-9">
+            {% for country in entry.country %}
+                <a href="{{ url_for('view.view_generic', dgraph_type='Country', unique_name=country.unique_name) }}">{{ country.name }}</a> 
+            {% endfor %}
+        </dd>
+        {% endif %}
+        {% if entry.address_string %}
+        <dt class="col-sm-3">Primary Address</dt>
+        <dd class="col-sm-9"><a href="https://www.openstreetmap.org/search?query={{ entry.address_string }}" target="_blank">{{ entry.address_string }}</a>
+        </dd>{% endif %}
+    </dl>
+</div>

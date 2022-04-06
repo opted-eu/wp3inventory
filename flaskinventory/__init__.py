@@ -33,6 +33,10 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(config_class=Config, config_json=None):
+    # assert versions
+    import wtforms
+    assert wtforms.__version__.startswith('3.'), 'WTForms Version 3.X.X is required!'
+
     app = Flask(__name__)
 
     app.logger.addHandler(create_filehandler())
@@ -56,7 +60,7 @@ def create_app(config_class=Config, config_json=None):
         except Exception as e:
             app.logger.error(f'Slack Logging not working: {e}')
 
-    app.config['APP_VERSION'] = "0.9"
+    app.config['APP_VERSION'] = "1.0"
 
     from flaskinventory.users.routes import users
     from flaskinventory.view.routes import view

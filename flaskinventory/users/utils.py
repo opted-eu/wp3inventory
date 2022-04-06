@@ -94,15 +94,3 @@ def save_picture(form_picture):
 
     return picture_fn
 
-# list all sources by user
-def make_sources_table(table_data):
-    TableCls = create_table('Table')
-    TableCls.allow_empty = True
-    TableCls.classes = ['table']
-
-    TableCls.add_column('name', Col('Name'))
-    TableCls.add_column('unique_name', Col('Unique Name'))
-    TableCls.add_column('uid', LinkCol('UID', 'view.view_source', url_kwargs=dict(uid='uid'), attr_list='uid'))
-    TableCls.add_column('entry_review_status', Col('Status'))
-    TableCls.add_column('entry_added|timestamp', DateCol('Date added'))
-    return TableCls(table_data)

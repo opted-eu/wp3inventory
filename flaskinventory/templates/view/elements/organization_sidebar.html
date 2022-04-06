@@ -3,30 +3,26 @@
         <span class="fs-5 fw-semibold">Publishes</span>
     </a>
     <div class="list-group list-group-flush border-bottom scrollarea">
-        {% if entry.publishes %} 
-                {% for source in entry.publishes %}
-                    {% if 'Rejected' not in source.get('dgraph.type') %}
-                    <a href="{{ url_for('view.view_source', unique_name=source.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
-                        <strong class="mb-1"><i class="icon-{{ source.channel.unique_name }} color-{{ source.channel.unique_name }} fa-fw mx-1" alt="{{ source.channel.name }}"></i>
+        {% if entry.publishes %} {% for source in entry.publishes %} {% if 'Rejected' not in source.get('dgraph.type') %}
+        <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=source.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1"><i class="icon-{{ source.channel.unique_name }} color-{{ source.channel.unique_name }} fa-fw mx-1" alt="{{ source.channel.name }}"></i>
                             {{ source.name }} ({{source.channel.name}})</strong>
-                        <small></small>
-                    </div>
-                    <div class="col-10 mb-1 small"></div>
-                    </a>
-                    {% else %}
-                    <a href="#" class="list-group-item list-group-item-action py-3 lh-tight" title="UID: <{{ source.uid }}>">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                        <strong class="mb-1 text-muted"><i class="icon-{{ source.channel.unique_name }} color-{{ source.channel.unique_name }} fa-fw mx-1" alt="{{ source.channel.name }}"></i>
+                <small></small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+        {% else %}
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-tight" title="UID: <{{ source.uid }}>">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1 text-muted"><i class="icon-{{ source.channel.unique_name }} color-{{ source.channel.unique_name }} fa-fw mx-1" alt="{{ source.channel.name }}"></i>
                             {{ source.name }} ({{source.channel.name}})</strong>
-                        <small class="text-muted">rejected</small>
-                    </div>
-                    <div class="col-10 mb-1 small"></div>
-                </a>
-                    {% endif %}
-                {% endfor %} 
-            {% else %}
-            <a href="#" class="list-group-item list-group-item-action py-3 lh-tight disabled">
+                <small class="text-muted">rejected</small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+        {% endif %} {% endfor %} {% else %}
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-tight disabled">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">None</strong>
                 <small></small>

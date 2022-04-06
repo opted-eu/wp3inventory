@@ -1,0 +1,68 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Audience</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.audience_size %}
+        <dt class="col-sm-3">Audience Size</dt>
+        <dd class="col-sm-9">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    {% if entry.get('audience_size|data_from') or entry.get('audience_size|datafrom') %}
+                        <th>Data from</th>
+                    {% endif %}
+                    {% if entry.get('audience_size|daily_visitors') %}
+                        <th>Daily Visitors</th>
+                    {% endif %}
+                    {% if entry.get('audience_size|likes') %}
+                        <th>Likes</th>
+                    {% endif %}
+                    {% if entry.get('audience_size|subscribers') %}
+                        <th>Subscribers</th>
+                    {% endif %}
+                    {% if entry.get('audience_size|copies_sold') %}
+                        <th>Copies Sold</th>
+                    {% endif %}
+                    {% if entry.get('audience_size|followers') %}
+                        <th>Followers</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in entry.audience_size %}
+                    <tr>
+                        <td>{{data.strftime('%Y-%m-%d')}}</td>
+                        {% if entry.get('audience_size|data_from')[loop.index0|string] %}
+                        <td>
+                            <a href="{{ entry.get('audience_size|data_from')[loop.index0|string] }}" target="_blank">source</a>
+                        </td>
+                        {% endif %}
+                        {% if entry.get('audience_size|daily_visitors') %}
+                        <td>{{ entry.get('audience_size|daily_visitors')[loop.index0|string] }}</td>
+                        {% endif %}
+                        {% if entry.get('audience_size|likes') %}
+                            <td>{{ entry.get('audience_size|likes')[loop.index0|string] }}</td>
+                        {% endif %}
+                        {% if entry.get('audience_size|subscribers') %}
+                            <td>{{ entry.get('audience_size|subscribers')[loop.index0|string] }}</td>
+                        {% endif %}
+                        {% if entry.get('audience_size|copies_sold') %}
+                            <td>{{ entry.get('audience_size|copies_sold')[loop.index0|string] }}</td>
+                        {% endif %}
+                        {% if entry.get('audience_size|followers') %}
+                            <td>{{ entry.get('audience_size|followers')[loop.index0|string] }}</td>
+                        {% endif %}
+                    </tr>
+                    
+                {% endfor %}
+            </tbody>
+        </table>
+        </dd>
+        {% endif %} 
+        {% if entry.audience_residency %}
+        <dt class="col-sm-3">Audience Residency</dt>
+        <dd class="col-sm-9"> {{ entry.audience_residency_table }}</dd> {% endif %}
+    </dl>
+</div>

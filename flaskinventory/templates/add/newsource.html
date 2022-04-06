@@ -28,13 +28,14 @@
     <fieldset id="section-general">
         <h3 class="mb-4">General Information</h3>
         <div class="mb-5 form-group">
-            <input type="text" name="uid" id="uid-hidden" value='_:newsource' readonly hidden>
+            <input type="text" name="uid" id="uid-hidden" value='' readonly hidden>
             <label for="channel-select" class="form-label fw-bold fs-5">Through which channel is the news source distributed? {{ make_tooltip('If the channel you have in mind is not included as an option you may write to wp3@opted.eu and we discuss your suggestion.') }}</label>
-            <select name="channel" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
+            <select name="channel_public" id="channel-select" class="form-select form-select-lg" aria-describedby="channel-select-feedback" required>
                         <option value="">Select Channel...</option>
                     </select>
             <div id="channel-select-feedback"></div>
-            <input type="text" name="channel_uid" id="channel-select-hidden" hidden>
+            <input type="text" name="channel_unique_name" id="channel-select-hidden" hidden>
+            <input type="text" name="channel" id="channel-select-uid" readonly hidden>
         </div>
         <div class="mb-5">
             <div id="group-name" class="form-group mb-4">
@@ -252,35 +253,35 @@
         <div id="group-publication-cycle-weekday" class="mb-5 fs-5" hidden>
                 <p class="form-label fs-6 fw-bold">Please indicate the specific day(s)</p>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_1" id="publication-cycle-weekday-1" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-1" value="1">
                 <label class="form-check-label" for="publication-cycle-weekday-1">Monday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_2" id="publication-cycle-weekday-2" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-2" value="2">
                 <label class="form-check-label" for="publication-cycle-weekday-2">Tuesday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_3" id="publication-cycle-weekday-3" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-3" value="3">
                 <label class="form-check-label" for="publication-cycle-weekday-3">Wednesday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_4" id="publication-cycle-weekday-4" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-4" value="4">
                 <label class="form-check-label" for="publication-cycle-weekday-4">Thursday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_5" id="publication-cycle-weekday-5" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-5" value="5">
                 <label class="form-check-label" for="publication-cycle-weekday-5">Friday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_6" id="publication-cycle-weekday-6" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-6" value="6">
                 <label class="form-check-label" for="publication-cycle-weekday-6">Saturday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_7" id="publication-cycle-weekday-7" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-7" value="7">
                 <label class="form-check-label" for="publication-cycle-weekday-7">Sunday</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday_none" id="publication-cycle-weekday-none" value="yes">
+                <input class="form-check-input" aria-describedby="publication-cycle-weekday-feedback" type="checkbox" name="publication_cycle_weekday" id="publication-cycle-weekday-none" value="NA">
                 <label class="form-check-label" for="publication-cycle-weekday-none">Don't know</label>
             </div>
             <div id="publication-cycle-weekday-feedback"></div>
@@ -327,7 +328,7 @@
             </label>
             <small id="geographic-scope-multiple-helptext"></small>
             <select name="geographic_scope_multiple" id="geographic-scope-multiple" class="form-select form-select-lg" aria-describedby="geographic-scope-multiple-feedback" placeholder="Select multiple or create new entries..." autocomplete="off" required multiple></select>
-            <input id="geographic-scope-countries-hidden" name="geographic_scope_countries" type="text" class="form-control" readonly hidden>
+            <input id="geographic-scope-countries-hidden" name="country" type="text" class="form-control" readonly hidden>
             <input id="geographic-scope-subunits-hidden" name="geographic_scope_subunits" type="text" class="form-control" readonly hidden>
             <div id="geographic-scope-multiple-feedback"></div>
         </div>
@@ -466,11 +467,11 @@
         <div id="group-audience-size-followers" class="mb-5">
             <label for="audience-size-followers" class="form-label fw-bold fs-5">How many likes does the Facebook page currently have?
                 <span class="text-muted mx-1">(optional)</span>
-                {{ make_tooltip('Usually, we retrieve this information automatically. However, Facebook does not allow us to do this.') }}
+                {{ make_tooltip('Usually, we would retrieve this information automatically. However, Facebook does not allow us to do this.') }}
                 {{ make_researchtip('Just open the Facebook page and check the current count of "likes"') }}
             </label>
             <p class="my-0"><small id="audience-size-followers-helptext"></small></p>
-            <input name="audience_size_followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
+            <input name="audience_size|followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
             <div id="audience-size-followers-feedback"></div>
         </div>
 
@@ -485,7 +486,7 @@
                     Germany: https://www.ivw.eu/print/print') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext"></small></p>
-                <input name="audience_size_subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                <input name="audience_size|subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">
@@ -494,12 +495,12 @@
                     {{ make_tooltip('Use the latest information that is available') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext">(i.e., number of sold copies per issue)</small></p>
-                <input name="audience_size_year" type="number" step="1" min="1900" max="2100" class="form-control form-control-lg" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
+                <input name="audience_size" type="number" step="1" min="1900" max="2100" class="form-control form-control-lg" id="audience-size-year" aria-describedby="audience-size-year-feedback" placeholder="YYYY">
                 <div id="audience-size-year-feedback"></div>
             </div>
             <div id="group-audience-size-datafrom" class="mb-5">
                 <label for="audience-size-datafrom" class="form-label fw-bold fs-5">Where did you get this number (i.e., number of sold copies per issue) from? Please type the name of the data source or paste a link.<span class="text-muted mx-1">(optional)</span></label>
-                <input name="audience_size_datafrom" type="text" class="form-control form-control-lg" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
+                <input name="audience_size|datafrom" type="text" class="form-control form-control-lg" id="audience-size-datafrom" aria-describedby="audience-size-datafrom-feedback" placeholder="Please specify name or a link">
                 <div id="audience-size-datafrom-feedback"></div>
             </div>
             
@@ -544,7 +545,7 @@
                 <span class="text-muted mx-1">(optional)</span>
                 {{ make_tooltip('For news sources that run their own archives, please add the name via the option “Other please specify” e.g. The Guardian Open Platform”.') }}
             </label>
-            <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="archive-sources-included-feedback" multiple></select>
+            <select name="archive_sources_included" id="archive-sources-included" class="form-select form-select-lg" placeholder="Select multiple ..." aria-describedby="archive-sources-included-feedback" multiple></select>
             <small id="archive-sources-included-helptext"></small>
             <div id="archive-sources-included-feedback"></div>
         </div>
@@ -552,7 +553,7 @@
         <!-- Optional Field -->
         <div id="group-dataset-sources-included" class="mb-5 form-group">
             <label for="dataset-sources-included" class="form-label fw-bold fs-5">Is the news source included in one or several of the following annotated media text data sets?<span class="text-muted mx-1">(optional)</span></label>
-            <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple or create new ones..." aria-describedby="dataset-sources-included-feedback" multiple></select>
+            <select name="dataset_sources_included" id="dataset-sources-included" class="form-select form-select-lg" placeholder="Select multiple ..." aria-describedby="dataset-sources-included-feedback" multiple></select>
             <small id="dataset-sources-included-helptext"></small>
             <div id="dataset-sources-included-feedback"></div>
         </div>
@@ -604,7 +605,7 @@
         <!-- Optional Field -->
         <div id="group-related-sources" class="mb-5 form-group">
             <label for="related-sources" class="form-label fw-bold fs-5">For the source that you just coded, does it have other closely related sources? Please type their names below and start a new entry<span class="text-muted mx-1">(optional)</span></label>
-            <select name="related_sources" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
+            <select name="related" id="related-sources" class="form-select form-select-lg" aria-describedby="related-sources-feedback" placeholder="Select multiple or add new ones..." multiple></select>
             <small id="related-sources-helptext"></small>
             <div id="related-sources-feedback"></div>
 
@@ -623,7 +624,7 @@
         <h3 class="mb-5">Summary</h3>
 
         <div id='summary-container'>
-            <div id='summary-channel' hidden>
+            <div id='summary-channel_public' hidden>
                 <h6 class="text-muted mb-1">
                     Through which channel is the news source distributed?
                 </h6>

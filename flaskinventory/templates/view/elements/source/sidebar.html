@@ -1,0 +1,44 @@
+<div class="d-flex flex-column align-items-stretch bg-white" style="width: 380px;">
+    <a href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+        <span class="fs-5 fw-semibold">Related Sources by Brand</span>
+    </a>
+    <div class="list-group list-group-flush border-bottom scrollarea">
+        {% if entry.related %} {% for item in entry.related %} {% if item.entry_review_status == "accepted" %}
+        <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
+                            {{ item.name }} ({{item.channel.name}})</strong>
+                <small></small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+        {% elif item.entry_review_status == "pending" %}
+        <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1 text-muted"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
+                            {{ item.name }} ({{item.channel.name}})</strong>
+                <small class="text-muted">pending</small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+        {% endif %} {% endfor %} {% else %}
+
+        <a href="#" class="list-group-item list-group-item-action py-3 lh-tight disabled">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">None</strong>
+                <small></small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+
+        {% endif %}
+        <a href="{{ url_for('add.new_source', existing=entry.get('uid')) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1"><i class="fas fa-plus-circle fa-fw mx-1" alt="Add related"></i>
+                    Add new related</strong>
+                <small></small>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+    </div>
+</div>

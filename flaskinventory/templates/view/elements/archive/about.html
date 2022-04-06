@@ -1,0 +1,17 @@
+
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>About</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.access %}
+        <dt class="col-sm-3">Access</dt>
+        <dd class="col-sm-9">
+            {{entry.access}}
+        {% endif %}
+        <dt class="col-sm-3 my-4"><h5>Sources included</h5></dt>
+        <dd class="col-sm-9 my-4"><small class="text-muted">Shows how many of the sources listed in this inventory are available in the archive.</small></dd>
+        <dt class="col-sm-3">Total</dt>
+        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
+        </dd>
+    </dl>
+</div>

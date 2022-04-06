@@ -1,10 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField, SelectField, DateField, BooleanField,
-                     IntegerField, SubmitField, TextAreaField, RadioField)
-from wtforms.validators import DataRequired, Optional
-from flask_login import current_user
-from flaskinventory import dgraph
-from flaskinventory.misc.forms import TomSelectMutlitpleField, TomSelectField, ownership_kind_choices
+from wtforms import (StringField, SelectField, SubmitField)
+from wtforms.validators import DataRequired
 
 
 class NewEntry(FlaskForm):
@@ -17,129 +13,21 @@ class NewEntry(FlaskForm):
                              ('Organization', 'Media Organization'),
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
-                             #  ('ResearchPaper', 'Research Paper')
+                             ('Tool', 'Tool'),
+                             ('Corpus', 'Corpus'),
+                              ('ResearchPaper', 'Research Paper')
                          ],
                          validators=[DataRequired()])
 
 
-class NewOrganization(FlaskForm):
-    uid = StringField('uid', render_kw={'readonly': True})
-    name = StringField(
-        'What is the legal or official name of the media organisation?', validators=[DataRequired()],
-        render_kw={'placeholder': 'e.g. "The Big Media Corp."'})
-    other_names = StringField(
-        'Does the organisation have any other names or common abbreviations?',
-        render_kw={'placeholder': 'Separate by comma'})
+class AutoFill(FlaskForm):
+    platform = SelectField('Autofill from',
+                            choices=[('arxiv', 'arXiv'),
+                                      ('doi', 'DOI'),
+                                     ('cran', 'CRAN')],
+                            validators=[DataRequired()])
 
-    is_person = RadioField('Is the media organisation a person?', choices=[
-                           ('n', 'No'), ('y', 'Yes')], validators=[DataRequired()])
+    identifier = StringField('Identifier',
+                       validators=[DataRequired()])
 
-    ownership_kind_choices = ownership_kind_choices[1:]
-
-    ownership_kind = SelectField(
-        'Is the media organization mainly privately owned or publicly owned?', choices=ownership_kind_choices, validators=[DataRequired()])
-
-    country = SelectField(
-        'In which country is the organisation located?', choices=[])
-
-    employees = IntegerField(
-        'How many employees does the news organization have?',
-        render_kw={'placeholder': 'Most recent figure as plain number'}, validators=[Optional()])
-
-    publishes = TomSelectMutlitpleField(
-        'Which news sources publishes the organisation (or person)?', choices=[],
-        render_kw={'placeholder': 'Type to search existing news sources and add multiple...'})
-
-    owns = TomSelectMutlitpleField(
-        'Which other media organisations are owned by this new organisation (or person)?', choices=[],
-        render_kw={'placeholder': 'Type to search existing organisations and add multiple...'})
-
-    entry_notes = TextAreaField(
-        'Do you have any other notes on the entry that you just coded?')
-
-    submit = SubmitField('Add New Media Organisation')
-
-    def get_field(self, field):
-        return getattr(self, field)
-
-
-class NewArchive(FlaskForm):
-    uid = StringField('uid', render_kw={'readonly': True})
-    name = StringField(
-        'What is the name of the full text archive?', validators=[DataRequired()],
-        render_kw={'placeholder': 'e.g. "The Web Archive"'})
-    other_names = StringField(
-        'Does the archive have any other names or common abbreviations?',
-        render_kw={'placeholder': 'Separate by comma'})
-
-    access = RadioField('Is the archive freely accessible or has some sort of restriction?', choices=[
-        ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
-
-    url = StringField('Please specify the URL to the full text archive', validators=[DataRequired()],
-                      render_kw={'placeholder': 'e.g. "http://www.archive.org"'})
-
-    sources_included = TomSelectMutlitpleField(
-        'Which news sources are included in the full text archive?', choices=[],
-        render_kw={'placeholder': 'Type to search existing entries and add multiple...'})
-
-    description = TextAreaField(
-        'Can you briefly describe the archive?',
-        render_kw={'placeholder': 'You can also paste their official self-description'})
-
-    entry_notes = TextAreaField(
-        'Do you have any other notes on the entry that you just coded?')
-
-    submit = SubmitField('Add New Full Text Archive')
-
-    def get_field(self, field):
-        return getattr(self, field)
-
-
-class NewMultinational(FlaskForm):
-    uid = StringField('uid', render_kw={'readonly': True})
-    name = StringField('Name', validators=[DataRequired()])
-    other_names = StringField('Other Names',
-                              render_kw={'placeholder': 'Separate by comma'})
-
-    description = TextAreaField(
-        'Can you briefly describe the Multinational Construct??',
-        render_kw={'placeholder': 'Explain what you mean by this construct'})
-
-    submit = SubmitField('Add New Multinational')
-
-    def get_field(self, field):
-        return getattr(self, field)
-
-
-class NewDataset(FlaskForm):
-    uid = StringField('uid', render_kw={'readonly': True})
-    name = StringField(
-        'What is the name of the dataset?', validators=[DataRequired()],
-        render_kw={'placeholder': 'e.g. "Media Study 2012"'})
-    other_names = StringField(
-        'Does the dataset have any other names or common abbreviations?',
-        render_kw={'placeholder': 'Separate by comma'})
-
-    access = RadioField('Is the dataset freely accessible or has some sort of restriction?', choices=[
-        ('free', 'Free'), ('restricted', 'Restricted')], validators=[DataRequired()])
-
-    fulltext = RadioField('Does the dataset contain fulltext data?', choices=[('no', 'No'), ('yes', 'Yes')])
-
-    url = StringField('Please specify the URL to the dataset', validators=[DataRequired()],
-                      render_kw={'placeholder': 'e.g. "http://www.study.org/dataset"'})
-
-    sources_included = TomSelectMutlitpleField(
-        'Which news sources are included in the dataset?', choices=[],
-        render_kw={'placeholder': 'Type to search existing entries and add multiple...'})
-
-    description = TextAreaField(
-        'Can you briefly describe the dataset?',
-        render_kw={'placeholder': 'You can also paste their official self-description'})
-
-    entry_notes = TextAreaField(
-        'Do you have any other notes on the entry that you just coded?')
-
-    submit = SubmitField('Add New Dataset')
-
-    def get_field(self, field):
-        return getattr(self, field)
+    submit = SubmitField('Magic!')

@@ -1,0 +1,167 @@
+{% extends "layout.html" %} 
+
+{% block content %}
+{% from "helpers/_viewhelpers.html" import render_icon %}
+
+<article>
+
+<div class="d-flex align-items-start">
+    <div class="icon-square me-3">
+        {{ render_icon(entry) }} 
+    </div>
+    <div class="w-100">
+        <h2>
+        {{ entry.name }} 
+        {% if entry.verified_account %} 
+        <span class="fa-stack text-primary align-middle" style="font-size: 0.3em;">
+            <i class="fas fa-certificate fa-stack-2x" aria-hidden="true"></i>
+            <i class="fas fa-check fa-stack-1x fa-inverse" aria-hidden="true"></i>
+            </span> 
+        {% endif %}
+        </h2>
+    </div>
+    <div>
+    {% include "view/elements/review_actions.html" %}
+    </div>
+</div>
+<div class="mb-2">
+    <span class="pe-2 text-dark">Type: {{ dgraph_type }}</span>
+    {% if entry.creation_date %}
+    <small class="px-2 text-muted border-start">Created: <span class="font-monospace">{{ entry.creation_date.strftime('%Y-%m-%d') }}</span></small>
+    {% endif %}
+    <small class="px-2 text-muted border-start">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
+</div>
+{% include "view/elements/general_information.html" %}
+
+{% if 'Source' in entry['dgraph.type'] %}
+
+    {% include "view/elements/source/journalistic_routines.html" %}
+    {% include "view/elements/source/audience.html" %}
+    {% include "view/elements/source/published_by.html" %}
+    {% include "view/elements/source/economic.html" %}
+    {% include "view/elements/source/channel_features.html" %}
+    {% include "view/elements/source/data_access.html" %}
+    {% include "view/elements/source/research.html" %}
+
+{% endif %}
+
+{% if 'Organization' in entry['dgraph.type'] %}
+
+    {% include "view/elements/organization/location.html" %}
+    {% include "view/elements/organization/ownership.html" %}
+
+{% endif %}
+
+
+{% if 'Channel' in entry['dgraph.type'] %}
+
+    {% include "view/elements/channel/about.html" %}
+
+{% endif %}
+
+
+{% if 'Multinational' in entry['dgraph.type'] %}
+
+    {% include "view/elements/multinational/summary.html" %}
+
+{% endif %}
+
+
+{% if 'Country' in entry['dgraph.type'] %}
+
+    {% include "view/elements/country/summary.html" %}
+
+{% endif %}
+
+
+{% if 'Subunit' in entry['dgraph.type'] %}
+
+    {% include "view/elements/subunit/summary.html" %}
+
+{% endif %}
+
+
+{% if 'ResearchPaper' in entry['dgraph.type'] %}
+
+    {% include "view/elements/researchpaper/sources_included.html" %}
+
+{% endif %}
+
+{% if 'Tool' in entry['dgraph.type'] %}
+
+    {% include "view/elements/tool/about.html" %}
+    {% include "view/elements/tool/materials.html" %}
+    {% include "view/elements/tool/research.html" %}
+
+{% endif %}
+
+
+{% if 'Archive' in entry['dgraph.type'] %}
+
+    {% include "view/elements/archive/about.html" %}
+
+{% endif %}
+
+{% if 'Dataset' in entry['dgraph.type'] %}
+
+    {% include "view/elements/dataset/about.html" %}
+    {% include "view/elements/dataset/research.html" %}
+
+{% endif %}
+
+
+{% if 'Corpus' in entry['dgraph.type'] %}
+
+    {% include "view/elements/corpus/about.html" %}
+    {% include "view/elements/corpus/research.html" %}
+
+{% endif %}
+
+{% if 'Operation' in entry['dgraph.type'] %}
+
+    {% include "view/elements/operation/reverse.html" %}
+
+{% endif %}
+
+{% if 'FileFormat' in entry['dgraph.type'] %}
+
+    {% include "view/elements/fileformat/reverse.html" %}
+
+{% endif %}
+
+
+{% if 'MetaVar' in entry['dgraph.type'] %}
+
+    {% include "view/elements/metavar/reverse.html" %}
+
+{% endif %}
+
+{% if 'ConceptVar' in entry['dgraph.type'] %}
+
+    {% include "view/elements/conceptvar/reverse.html" %}
+
+{% endif %}
+
+
+{% if 'TextUnit' in entry['dgraph.type'] %}
+
+    {% include "view/elements/textunit/reverse.html" %}
+
+{% endif %}
+
+
+</article>
+
+{% endblock content %}
+
+{% block sidebar %} 
+
+{% if 'Source' in entry['dgraph.type'] %}
+    {% include "view/elements/source/sidebar.html" %} 
+{% endif %}
+
+{% if 'Organization' in entry['dgraph.type'] %}
+    {% include "view/elements/organization/sidebar.html" %} 
+{% endif %}
+
+{% endblock sidebar %}

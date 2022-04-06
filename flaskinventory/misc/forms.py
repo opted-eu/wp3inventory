@@ -1,25 +1,11 @@
-from wtforms import SelectField
-from wtforms.fields.core import SelectMultipleField
 from flaskinventory import dgraph
 
 
-class TomSelectMutlitpleField(SelectMultipleField):
-
-    def pre_validate(self, form):
-        pass
-
-
-class TomSelectField(SelectField):
-
-    def pre_validate(self, form):
-        pass
-
 # cache this function
-
-
-def get_country_choices(opted=True, multinational=False):
+def get_country_choices(opted=True, multinational=False, addblank=False) -> list:
     """ Helper function to get form choices 
         Queries for all countries and returns a list of tuples
+        [(<uid>, 'Country Name'), ...]
         Filters countries by default according to OPTED scope
     """
     query_string = '''{ q(func: type("Country"), orderasc: name)'''
@@ -35,6 +21,8 @@ def get_country_choices(opted=True, multinational=False):
     if multinational:
         c_choices += [(multi.get('uid'), multi.get('name'))
                       for multi in countries['m']]
+    if addblank:
+        c_choices.insert(0, ('', ''))
     return c_choices
 
 
@@ -47,32 +35,3 @@ def get_subunit_choices():
     su_choices = [(subunit.get('uid'), f"{subunit.get('name')} [{subunit['country'][0]['name'] if subunit.get('country') else 'MISSING'}]")
                   for subunit in subunits['q']]
     return su_choices
-
-
-publication_kind_choices = [('newspaper', 'Newspaper / News Site'), ('news agency', 'News Agency'), ('magazine', 'Magazine'), ('tv show', 'TV Show / TV Channel'), (
-    'radio show', 'Radio Show / Radio Channel'), ('podcast', 'Podcast'), ('news blog', 'News Blog'), ('alternative media', 'Alternative Media')]
-
-
-publication_kind_dict = {key: val for (key, val) in publication_kind_choices}
-
-
-topical_focus_choices = [("politics", "Politics"),
-                         ("society", "Society & Panorama"),
-                         ("economy", "Business, Economy, Finance & Stocks"),
-                         ("religion", "Religion"),
-                         ("science", "Science & Technology"),
-                         ("media", "Media"),
-                         ("environment", "Environment"),
-                         ("education", "Education")]
-
-topical_focus_dict = {key: val for (key, val) in topical_focus_choices}
-
-
-ownership_kind_choices = [('none', 'Missing!'),
-                          ('public ownership', 'Mainly public ownership'),
-                          ('private ownership', 'Mainly private Ownership'),
-                          ('political party', 'Political Party'),
-                          ('unknown', 'Unknown Ownership')]
-
-ownership_kind_dict = {key: val for (key, val) in ownership_kind_choices}
-

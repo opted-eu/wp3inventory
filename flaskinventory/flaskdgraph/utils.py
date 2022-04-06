@@ -17,6 +17,9 @@ def validate_uid(uid: Any) -> Union[str, bool]:
         Tries to coerce object to a str (uid)
         If fails, will return False
     """
+    if not isinstance(uid, (str, int)):
+        uid = str(uid)
+
     if type(uid) == str:
         uid = uid.lower().strip()
         if not uid.startswith('0x'):
@@ -31,6 +34,14 @@ def validate_uid(uid: Any) -> Union[str, bool]:
     else:
         return False
 
-def author_sequence(paper, author_key='authors', sequence_key='sequence'):
-    author_sequence = {int(k): v for k, v in sorted(paper[author_key + '|' + sequence_key].items(), key=lambda item: item[1])}
-    return [paper[author_key][k] for k, _ in author_sequence.items()]
+def restore_sequence(d: dict, sequence_key='sequence'):
+    for predicate, val in d.items():
+        if isinstance(val, dict):
+            restore_sequence(val, sequence_key=sequence_key)
+        if isinstance(val, list):
+            for subval in val:
+                if isinstance(subval, dict):
+                    restore_sequence(subval, sequence_key=sequence_key)
+        if predicate + "|" + sequence_key in d.keys():
+            ordered_sequence = {int(k): v for k, v in sorted(d[predicate + "|" + sequence_key].items(), key=lambda item: item[1])}
+            d[predicate] = [d[predicate][k] for k, _ in ordered_sequence.items()]

@@ -1,0 +1,15 @@
+
+{% if entry.materials %}
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Materials</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Collection of materials that help using the tool.</small></dd>
+        {% for material in entry.materials %}
+            <dt class="col-sm-3">{{ entry.get("materials|kind").get(loop.index0|string) or 'Material' }}</dt>
+            <dd class="col-sm-9">
+                <a href="{{material}}" target="_blank">{{material}}</a>
+            </dd>
+        {% endfor %}
+    </dl>
+</div>
+{% endif %} 

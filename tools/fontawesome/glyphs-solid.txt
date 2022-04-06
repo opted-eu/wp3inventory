@@ -42,3 +42,5 @@ file-alt
 table
 layer-group
 cubes
+magic
+paragraph
