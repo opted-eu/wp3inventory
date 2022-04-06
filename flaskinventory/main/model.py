@@ -393,8 +393,8 @@ class Organization(Entry):
     
     ownership_kind = SingleChoice(choices={
                                     'NA': "Don't know / NA",
-                                    'public ownership': 'Mainly public ownership',
                                     'private ownership': 'Mainly private Ownership',
+                                    'public ownership': 'Mainly public ownership',
                                     'political party': 'Political Party',
                                     'unknown': 'Unknown Ownership'},
                                   description='Is the media organization mainly privately owned or publicly owned?')
@@ -595,12 +595,22 @@ class Source(Entry):
                                                     description="Is the news source included in one or several of the following annotated media text data sets?",
                                                     label='News source included in these datasets')
 
+    corpus_sources_included = ReverseListRelationship('sources_included', 
+                                                    allow_new=False, 
+                                                    relationship_constraint='Corpus',
+                                                    description="Is the news source included in one or several of the following corpora?",
+                                                    label='News source included in these corpora')
+
+
     party_affiliated = SingleChoice(description='Is the news source close to a political party?',
                                     choices={'yes': 'Yes',
                                             'no': 'No',
                                             'NA': "Don't know / NA"})
+    
+    defunct = Boolean(description="Is the news source defunct or out of business?") 
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
+
 
 
 class Channel(Entry):
