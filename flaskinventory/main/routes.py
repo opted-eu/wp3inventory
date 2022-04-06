@@ -17,24 +17,24 @@ def home():
 
     query_string = f'''{{
                         data(func: has(dgraph.type), orderdesc: creation_date, first: 5) 
-                            @normalize @filter(eq(entry_review_status, "accepted") AND has(creation_date)) {{
+                            @filter(eq(entry_review_status, "accepted") AND has(creation_date)) {{
                                 uid
-                                unique_name: unique_name 
-                                name: name 
-                                type: dgraph.type 
-                                title: title
-                                creation_date: creation_date
-                                channel {{ channel: name }}
-                                country {{ country: name }}
+                                unique_name 
+                                name 
+                                dgraph.type 
+                                title
+                                creation_date
+                                channel {{ name }}
+                                country {{ name }}
                             }}
                         }}'''
     
     result = dgraph.query(query_string)
     for entry in result['data']:
-        if 'Entry' in entry['type']:
-            entry['type'].remove('Entry')
-        if 'Resource' in entry['type']:
-            entry['type'].remove('Resource')
+        if 'Entry' in entry['dgraph.type']:
+            entry['dgraph.type'].remove('Entry')
+        if 'Resource' in entry['dgraph.type']:
+            entry['dgraph.type'].remove('Resource')
 
     return render_template('home.html', form=form, recent=result['data'], show_sidebar=True)
 
