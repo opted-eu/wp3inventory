@@ -74,7 +74,7 @@
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <li><a class="dropdown-item" href="{{ url_for('users.profile') }}" tabindex="-1"><i class="fas fa-id-badge me-2 fa-fw"></i>Profile</a></li>
                     <li>
-                        <a href="{{ url_for('users.my_entries') }}" class="dropdown-item" tabindex="-1">
+                        <a href="{{ url_for('users.my_entries', uid=current_user.id) }}" class="dropdown-item" tabindex="-1">
                             <i class="fas fa-tasks me-2 fa-fw"></i>My Entries
                         </a>
                     </li>
