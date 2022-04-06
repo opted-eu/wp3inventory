@@ -3,15 +3,15 @@ from flask import (current_app, Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph import Schema
-from flaskinventory.flaskdgraph.utils import restore_sequence
+from flaskinventory.flaskdgraph.utils import restore_sequence, validate_uid
 
 from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.add.external import fetch_wikidata
 
 from flaskinventory.edit.forms import RefreshWikidataForm
-from flaskinventory.edit.utils import can_edit, channel_filter
+from flaskinventory.edit.utils import can_delete, can_edit, channel_filter
 from flaskinventory.edit.sanitizer import EditAudienceSizeSanitizer
-from flaskinventory.edit.dgraph import get_entry, get_audience
+from flaskinventory.edit.dgraph import draft_delete, get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
 
 import traceback
@@ -51,12 +51,12 @@ def refresh_wikidata():
     uid = request.form.get('uid')
     if not uid:
         flash('Need to specify a UID', 'danger')
-        return redirect(url_for('users.my_entries'))
+        return redirect(url_for('users.my_entries', uid=current_user.id))
 
     check = check_entry(uid=uid)
     if not check:
         flash('UID not found!', 'danger')
-        return redirect(url_for('users.my_entries'))
+        return redirect(url_for('users.my_entries', uid=current_user.id))
 
     if "Organization" not in check.get('dgraph.type'):
         flash('Only works with organizations!', 'danger')
@@ -233,3 +233,18 @@ def source_audience(uid):
 
     return render_template('edit/audience.html', title='Edit Source', entry=entry, data=audience_size, show_sidebar=True, sidebar_items=sidebar_items)
 
+
+@edit.route('/draft/delete/<string:uid>')
+@login_required
+def delete_draft(uid):
+    check = check_entry(uid=uid)
+    if not check:
+        return abort(404)
+    if not can_delete(check):
+        return abort(403)
+    
+    draft_delete(check['uid'])
+
+    flash('Draft deleted!', 'success')
+
+    return redirect(url_for('users.my_entries', uid=current_user.id))
