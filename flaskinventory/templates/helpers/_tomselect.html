@@ -1,10 +1,12 @@
 
 <script>
 
+var jsonData = new Array
 
 let embeddedJSON = document.getElementById('json-data')
-const jsonData = JSON.parse(embeddedJSON.innerHTML)
-
+if (embeddedJSON) {
+    jsonData = JSON.parse(embeddedJSON.innerHTML)
+} 
 
     {% if 'other_names' in fields %}
     if (document.getElementById('other_names')) {
@@ -405,9 +407,11 @@ const jsonData = JSON.parse(embeddedJSON.innerHTML)
     };    
     new TomSelect('#materials', TomSelectMaterialsConfig)
 
-    if (jsonData['materials|kind']) {
-        for (val in jsonData['materials']) { 
-            createMaterialsField(jsonData['materials'][val], content=jsonData['materials|kind'][val])
+    if (jsonData) {
+        if (jsonData['materials|kind']) {
+            for (val in jsonData['materials']) { 
+                createMaterialsField(jsonData['materials'][val], content=jsonData['materials|kind'][val])
+            }
         }
     }
     
