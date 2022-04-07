@@ -71,6 +71,7 @@ class Schema:
         for t in list(cls.__types__.keys()):
             if t.lower() == dgraph_type.lower():
                 return t
+        return None
 
     @classmethod
     def get_predicates(cls, _cls) -> dict:

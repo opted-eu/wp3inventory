@@ -102,6 +102,12 @@ def view_rejected(uid):
 @view.route("/view/<string:dgraph_type>/<string:unique_name>")
 def view_generic(dgraph_type=None, uid=None, unique_name=None):
     dgraph_type = Schema.get_type(dgraph_type)
+    if not dgraph_type:
+        if uid:
+            return redirect(url_for('view.view_uid', uid=uid))
+        else:
+            return abort(404)
+
     data = get_entry(uid=uid, unique_name=unique_name, dgraph_type=dgraph_type)
 
     if not data:
