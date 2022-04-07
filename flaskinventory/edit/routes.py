@@ -15,6 +15,7 @@ from flaskinventory.edit.dgraph import draft_delete, get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
 
 import traceback
+import json
 
 edit = Blueprint('edit', __name__)
 
@@ -183,7 +184,11 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
             sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=entry['q'][0]['uid'])}
 
-    return render_template('edit/editform.html', title=f'Edit {dgraph_type}', form=form, fields=fields.keys(), sidebar_items=sidebar_items, show_sidebar=True)
+    return render_template('edit/editform.html', 
+                            title=f'Edit {dgraph_type}', 
+                            form=form, fields=fields.keys(), 
+                            sidebar_items=sidebar_items, show_sidebar=True,
+                            entry=json.dumps(entry['q'][0], default=str))
 
 @edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
 @login_required

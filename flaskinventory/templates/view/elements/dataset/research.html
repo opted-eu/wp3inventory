@@ -4,7 +4,7 @@
         <dt class="col-sm-3 mb-4"><h5>Materials</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">Collection of materials that help using the dataset or document it.</small></dd>
         {% for material in entry.materials %}
-        <dt class="col-sm-3">{{ entry.get("materials|kind").get(loop.index0|string) or 'Material' }}</dt>
+        <dt class="col-sm-3">{% if entry.get('materials|kind') %}{{ entry.get("materials|kind").get(loop.index0|string) or 'Material' }}{% else %}Material{% endif %}</dt>
         <dd class="col-sm-9">
             <a href="{{material}}" target="_blank">{{material}}</a>
         </dd>

@@ -1,6 +1,11 @@
 
 <script>
 
+
+let embeddedJSON = document.getElementById('json-data')
+const jsonData = JSON.parse(embeddedJSON.innerHTML)
+
+
     {% if 'other_names' in fields %}
     if (document.getElementById('other_names')) {
         var TomSelectOtherNamesConfig = {
@@ -349,7 +354,7 @@
 
     var materialsContainer = document.getElementById('materials').parentElement
 
-    function createMaterialsField(materialURL) {
+    function createMaterialsField(materialURL, content=null) {
                 var row = document.createElement('div')
                 row.classList.add('row', 'my-3', 'align-items-center')
                 row.id = 'container-' + materialURL
@@ -367,6 +372,9 @@
                 input.classList.add('form-control')
                 input.setAttribute('name', materialURL + '@kind')
                 input.setAttribute('placeholder', 'e.g. FAQ, Manual, Tutorial, Website, etc')
+                if (content) {
+                    input.value = content
+                }
 
                 // append elements
                 col.append(description)
@@ -396,6 +404,12 @@
         }
     };    
     new TomSelect('#materials', TomSelectMaterialsConfig)
+
+    if (jsonData['materials|kind']) {
+        for (val in jsonData['materials']) { 
+            createMaterialsField(jsonData['materials'][val], content=jsonData['materials|kind'][val])
+        }
+    }
     
     {% endif %}
 
