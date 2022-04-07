@@ -33,7 +33,7 @@ function fetchMetaData(button) {
             .then(response => response.json())
             .then(result => checkInventory(result))
 
-        let api = 'http://doi.org/'
+        let api = 'https://doi.org/'
 
         fetch(api + doi + '?lang=en', { headers: { 'Accept': 'application/vnd.citationstyles.csl+json, application/x-bibtex' } })
             .then(response => response.text())
@@ -50,7 +50,7 @@ function fetchMetaData(button) {
         arxiv = arxiv.replace('arxiv.org/abs/', '')
         arxiv = arxiv.replace('abs/', '')
 
-        let api = "http://export.arxiv.org/api/query?id_list="
+        let api = "https://export.arxiv.org/api/query?id_list="
 
         fetch(api + arxiv)
             .then(response => response.text())
