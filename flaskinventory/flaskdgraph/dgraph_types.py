@@ -444,7 +444,7 @@ class ReverseRelationship:
                 self.choices_tuples[dgraph_type] = [
                     (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
                 self.choices.update({c['uid']: c['name']
-                                    for c in choices[dgraph_type.lower()]})
+                                     for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -493,7 +493,7 @@ class ReverseListRelationship(ReverseRelationship):
                 self.choices_tuples[dgraph_type] = [
                     (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
                 self.choices.update({c['uid']: c['name']
-                                    for c in choices[dgraph_type.lower()]})
+                                     for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -599,7 +599,7 @@ class MutualRelationship:
                 self.choices_tuples[dgraph_type] = [
                     (c['uid'], c['name']) for c in choices[dgraph_type.lower()]]
                 self.choices.update({c['uid']: c['name']
-                                    for c in choices[dgraph_type.lower()]})
+                                     for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -625,7 +625,8 @@ class MutualListRelationship(MutualRelationship):
         all_uids = [item for item in node_data]
         all_uids.append(node)
         for item in data_node:
-            item[self.predicate] = [uid for uid in all_uids if uid != item['uid']]
+            item[self.predicate] = [
+                uid for uid in all_uids if uid != item['uid']]
 
         return node_data, data_node
 
@@ -949,7 +950,7 @@ class SingleRelationship(Predicate):
                             for c in choices[self.relationship_constraint[0].lower()]}
             self.choices_tuples = [
                 (c['uid'], c.get('name') or c.get('unique_name')) for c in choices[self.relationship_constraint[0].lower()]]
-            self.choices_tuples.insert(0, ('',''))
+            self.choices_tuples.insert(0, ('', ''))
 
         else:
             self.choices = {}
@@ -958,7 +959,7 @@ class SingleRelationship(Predicate):
                 self.choices_tuples[dgraph_type] = [
                     (c['uid'], c.get('name') or c.get('unique_name')) for c in choices[dgraph_type.lower()]]
                 self.choices.update({c['uid']: c.get('name') or c.get('unique_name')
-                                    for c in choices[dgraph_type.lower()]})
+                                     for c in choices[dgraph_type.lower()]})
 
     @property
     def wtf_field(self) -> TomSelectField:
@@ -975,9 +976,9 @@ class ListRelationship(SingleRelationship):
 
     dgraph_predicate_type = '[uid]'
 
-    """
-        maybe __init__ needs to overwrite=True
-    """
+    def __init__(self, overwrite=True, relationship_constraint=None, allow_new=True, autoload_choices=False, *args, **kwargs) -> None:
+        super().__init__(relationship_constraint=relationship_constraint, allow_new=allow_new,
+                         autoload_choices=autoload_choices, overwrite=overwrite, *args, **kwargs)
 
     def validate(self, data, facets=None) -> list:
         if isinstance(data, str):
@@ -1050,8 +1051,10 @@ def dict_to_nquad(d: dict) -> list:
         uid = NewID('_:newentry')
     nquads = []
     for key, val in d.items():
-        if val is None: continue
-        if key == 'uid': continue
+        if val is None:
+            continue
+        if key == 'uid':
+            continue
         if not isinstance(key, Predicate):
             key = Predicate.from_key(key)
         if isinstance(val, (list, set)):
