@@ -182,7 +182,10 @@ def identifier_lookup():
 
     query_string = f'''
             query quicksearch($identifier: string) {{
-                data(func: eq({field}, $identifier)) {{
+                data(func: eq({field}, $identifier)) 
+                    @filter(eq(entry_review_status, "draft") or 
+                            eq(entry_review_status, "accepted") or 
+                            eq(entry_review_status, "pending")) {{
                         uid 
                         unique_name 
                         name 
