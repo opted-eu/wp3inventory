@@ -96,7 +96,6 @@ type Country {
 
 
 type Multinational {
-    description
 }
 
 type Subunit {
@@ -106,7 +105,6 @@ type Subunit {
 }
 
 type Archive {
-    description
     authors
     doi
     arxiv
@@ -120,7 +118,6 @@ type Archive {
 
 
 type Dataset {
-    description
     authors
     doi
     arxiv
@@ -141,7 +138,6 @@ type Dataset {
 }
 
 type Corpus {
-    description
     authors
     doi
     arxiv
@@ -164,7 +160,6 @@ type Corpus {
 
 
 type Tool {
-    description
     authors
     doi
     arxiv
@@ -187,7 +182,6 @@ type Tool {
 
 
 type ResearchPaper {
-    description
     authors
     doi
     arxiv
@@ -308,7 +302,7 @@ arxiv: string @index(exact) .
 
 # Shared Predicates (dataset, corpus, tool, archive)
 sources_included: [uid] @reverse .
-access: string .
+access: string @index(hash).
 materials: [string] .
 related_publications: [uid] @reverse .
 file_format: [uid] @reverse .
@@ -320,7 +314,7 @@ concept_vars: [uid] @reverse .
 text_units: [uid] @reverse .
 
 # Archive Predicates
-fulltext: bool .
+fulltext: bool @index(bool).
 
 # Tool Predicates
 platform: [string] @index(hash) .
@@ -338,7 +332,7 @@ output_data: [uid] @reverse .
 
 
 # ResearchPaper Predicates
-isbn: string .
+isbn: string @index(exact).
 title: string @index(term) .
 paper_kind: string .
 journal: string .
