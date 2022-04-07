@@ -396,8 +396,10 @@ class Sanitizer:
         try:
             unique_name = slugify(str(entry['name']), separator="_")
         except KeyError:
-            current_app.logger.error(f'Error in {entry["uid"]}! No key "name" in dict')
-            unique_name = slugify(str(entry['uid']), separator="_")        
+            current_app.logger.debug(f'<{entry["uid"]}> No key "name" in dict. Autoassigning')
+            unique_name = slugify(str(entry['uid']), separator="_")
+            if hasattr(entry['uid'], 'original_value'):
+                entry['name'] = entry['uid'].original_value        
         if dgraph.get_uid('unique_name', unique_name):
             unique_name += f'_{secrets.token_urlsafe(4)}'
 

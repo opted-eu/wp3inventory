@@ -71,6 +71,8 @@ class NewID:
 
         self.facets = facets
 
+        self.original_value = newid.strip()
+
     def __str__(self) -> str:
         return self.newid
 
