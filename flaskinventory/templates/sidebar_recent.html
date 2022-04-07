@@ -7,7 +7,7 @@
         <a href="{{ url_for('view.view_uid', uid=item.get('uid'))}}" class="list-group-item list-group-item-action py-1 lh-tight">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1 text-truncate">
-                    {{ item.name }} {{ item.title }} {% if item.get('channel') %}({{item.get('channel')}}){% endif %}
+                    {{ item.name }} {{ item.title }} {% if item.get('channel') %}({{item.channel.name}}){% endif %}
                 </strong>
                 <small class="text-muted">
                     {{ item.creation_date.strftime('%d&nbsp;%b')|safe }}
