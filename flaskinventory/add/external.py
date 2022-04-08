@@ -685,7 +685,7 @@ def cran(pkg) -> Union[dict, bool]:
     if "Authors@R" in data.keys():
         authors_r = data['Authors@R'].split('person')
         for a in authors_r[1:]:
-            mtch = re.findall(r'\"(.*?)\"', a)
+            mtch = re.findall(r'[\"\'](.*?)[\"\']', a)
             author = [mtch[1], mtch[0]] if len(mtch) > 1 else [mtch[0]]
             authors.append(", ".join(author))
     elif "Author" in data.keys():
