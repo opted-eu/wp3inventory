@@ -7,7 +7,7 @@
 
 
     {% from "helpers/_formhelpers.html" import render_field %}
-    <form method="POST" action="" enctype="multipart/form-data">
+    <form method="POST" action="" enctype="application/x-www-form-urlencoded">
         {{ form.hidden_tag() }}
         <fieldset class="form-group mb-3">
             <legend class="border-bottom mb-4">{{ title }}</legend>

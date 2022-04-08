@@ -13,7 +13,7 @@ from flaskinventory.edit.utils import can_delete, can_edit, channel_filter
 from flaskinventory.edit.sanitizer import EditAudienceSizeSanitizer
 from flaskinventory.edit.dgraph import draft_delete, get_entry, get_audience
 from flaskinventory.review.dgraph import check_entry
-
+from flaskinventory.misc.utils import IMD2dict
 import traceback
 import json
 
@@ -153,8 +153,13 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
     fields = Schema.get_predicates(dgraph_type)
 
     if form.validate_on_submit():
+        data = form.data.copy()
+        additional_fields = IMD2dict(request.form)
+        for k, v in additional_fields.items():
+            if k not in data.keys():
+                data[k] = v
         try:
-            sanitizer = Sanitizer.edit(request.form, dgraph_type=dgraph_type)
+            sanitizer = Sanitizer.edit(data, dgraph_type=dgraph_type)
         except Exception as e:
             if current_app.debug:
                     e_trace = "".join(traceback.format_exception(
