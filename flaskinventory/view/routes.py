@@ -72,6 +72,8 @@ def view_uid(uid=None):
         return abort(404)
     dgraphtype = dgraph.get_dgraphtype(uid)
     if dgraphtype:
+        if dgraphtype.lower() == 'rejected':
+            return redirect(url_for('view.view_rejected', uid=uid))
         return redirect(url_for('view.view_generic', dgraph_type=dgraphtype, uid=uid, **request_args))
     else:
         return abort(404)
