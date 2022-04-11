@@ -451,7 +451,7 @@ class Sanitizer:
             self.fetch_instagram()
         elif channel == 'twitter':
             self.fetch_twitter()
-        elif channel == 'vk':
+        elif channel == 'vkontakte':
             self.fetch_vk()
         elif channel == 'telegram':
             self.fetch_telegram()
