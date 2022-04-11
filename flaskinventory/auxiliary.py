@@ -291,5 +291,6 @@ programming_languages = {'apl': 'APL',
                         'sql': 'SQL', 
                         'scala': 'Scala', 
                         'swift': 'Swift', 
+                        'stata': 'Stata Script (Ado)',
                         'typescript': 'TypeScript', 
                         'vba': 'VBA'}
