@@ -6,7 +6,7 @@ import urllib.parse
 import re
 import json
 import asyncio
-from typing import Union
+from typing import Union, Tuple
 
 # external utils 
 import requests
@@ -89,7 +89,7 @@ def test_url(site):
     return False
 
 
-def find_sitemaps(site):
+def find_sitemaps(site: str) -> list:
     site = build_url(site)
     if not site:
         return []
@@ -121,7 +121,7 @@ def find_sitemaps(site):
         return []
 
 
-def find_feeds(site):
+def find_feeds(site: str) -> list:
     site = build_url(site)
     if not site:
         return []
@@ -182,7 +182,7 @@ def find_feeds(site):
     return result
 
 
-def parse_meta(url):
+def parse_meta(url: str) -> Tuple[list, list]:
 
     urls = []
     names = []
@@ -222,7 +222,7 @@ def parse_meta(url):
     return list(set(names)), list(set(urls))
 
 
-def opengraph(soup):
+def opengraph(soup: str) -> Tuple[str, str]:
     if soup.find('meta', property='og:title'):
         title = soup.find('meta', property='og:title')['content']
     else:
@@ -236,7 +236,7 @@ def opengraph(soup):
     return title, url
 
 
-def schemaorg(soup):
+def schemaorg(soup: str) -> Tuple[str, str]:
     schemas = soup.find_all('script', type=re.compile(r'json'))
     if len(schemas) == 0:
         return False, False
@@ -258,7 +258,7 @@ def schemaorg(soup):
     return name, url
 
 
-def siterankdata(site: str):
+def siterankdata(site: str) -> Union[int, bool]:
     if not isinstance(site, str):
         site = str(site)
     site = site.replace('http://', '').replace('https://',
