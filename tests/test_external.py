@@ -80,20 +80,40 @@ class TestSanitizers(unittest.TestCase):
     def tearDown(self):
         pass
         
-    def test_doi(self):
+    def _test_doi(self):
         doi = "10.1080/1461670X.2020.1745667"
         with self.app.app_context():
             publication = external.doi(doi)
             self.assertNotEqual(publication, False)
-            pprint(publication)
+            # pprint(publication)
 
-    def test_arxiv(self):
+    def _test_arxiv(self):
         arxiv = "http://arxiv.org/abs/2004.02566v3"
         with self.app.app_context():
             publication = external.arxiv(arxiv)
             self.assertNotEqual(publication, False)
-            pprint(publication)
+            # pprint(publication)
 
+    def test_website(self):
+        # website = "http://www.faktum-magazin.de/"
+        website = "https://freie-medien.tv/"
+        with self.app.app_context():
+            names, urls = external.parse_meta(website)
+            pprint(names)
+            self.assertGreaterEqual(len(names), 1)
+            pprint(urls)
+            self.assertGreaterEqual(len(urls), 1)
+            daily_visitors = external.siterankdata(website)
+            pprint(daily_visitors)
+            self.assertGreaterEqual(daily_visitors, 1000)
+            sitemaps = external.find_sitemaps(website)
+            self.assertEqual(type(sitemaps), list)
+            pprint(sitemaps)
+            self.assertGreaterEqual(len(sitemaps), 0)
+
+            feeds = external.find_feeds(website)
+            pprint(feeds)
+            self.assertGreaterEqual(len(feeds), 1)
 
 if __name__ == "__main__":
     unittest.main()

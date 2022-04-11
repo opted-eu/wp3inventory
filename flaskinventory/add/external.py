@@ -24,6 +24,7 @@ from flask import current_app
 from dateutil.parser import isoparse
 
 from flaskinventory import dgraph
+from flaskinventory.errors import InventoryValidationError
 
 def geocode(address: str) -> dict:
     payload = {'q': address,
@@ -70,17 +71,38 @@ def build_url(site: str):
     except Exception as e:
         return False
 
+def perform_request(site: str) -> requests.Response:
+
+    headers = {'user-agent':
+               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
+
+    try:
+        r = requests.get(site, headers=headers)
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError):
+        try:
+            r = requests.get(site, verify=False, headers=headers)
+        except (requests.exceptions.SSLError, requests.exceptions.ConnectionError):
+            try:
+                r = requests.get(site.replace('https', 'http'), verify=False, headers=headers)
+            except Exception as e:
+                current_app.logger.error(f'Error when requesting {site}: {e}')
+                raise InventoryValidationError(
+                    f'''Could not verify this address exists: {site}.\n
+                        Please make sure the entered address is correct (e.g. starts with "https://") 
+                        and also make sure the website exists.\n
+                        If the issue persists please contact us.\n
+                        Error message: {e}
+                        '''
+                    )
+    return r or False
 
 def test_url(site):
     site = build_url(site)
     if not site:
         return False
-    try:
-        r = requests.head(site, timeout=5)
-    except requests.exceptions.SSLError:
-        site = site.replace('https', 'http')
-        r = requests.get(site)
-    except Exception as e:
+    r = perform_request(site)
+
+    if not r:
         return False
 
     if r.ok:
@@ -97,13 +119,9 @@ def find_sitemaps(site: str) -> list:
     if site.endswith('/'):
         site = site[:-1]
 
-    headers = {"user-agent":
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
-    try:
-        r = requests.get(site, headers=headers)
-    except requests.exceptions.SSLError:
-        site = site.replace('https', 'http')
-        r = requests.get(site)
+    r = perform_request(site)
+    if not r:
+        return False
 
     if r.status_code != 200:
         raise requests.RequestException(
@@ -134,16 +152,19 @@ def find_feeds(site: str) -> list:
 
     # first: naive approach
     try:
-        r = requests.get(site + '/rss', headers=headers)
+        r = requests.get(site + '/rss', headers=headers, verify=False)
         if 'xml' in r.headers['Content-Type'] or 'rss' in r.headers['Content-Type']:
             return [site + '/rss']
     except requests.exceptions.SSLError:
         site = site.replace('https', 'http')
-        r = requests.get(site)
+        r = requests.get(site, verify=False)
     except Exception:
         pass
 
-    r = requests.get(site, headers=headers)
+    r = perform_request(site)
+    if not r:
+        return []
+
     result = []
     possible_feeds = []
     html = bs4(r.content, 'lxml')
@@ -191,13 +212,10 @@ def parse_meta(url: str) -> Tuple[list, list]:
     if not site:
         return False, False
 
-    headers = {'user-agent':
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
+    r = perform_request(site)
 
-    try:
-        r = requests.get(site, headers=headers)
-    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError):
-        r = requests.get(site.replace('https', 'http'))
+    if not r:
+        return False, False
 
     if not r.ok:
         return False, False
