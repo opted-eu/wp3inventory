@@ -2,17 +2,23 @@ from flaskinventory import dgraph
 from flaskinventory.flaskdgraph import Schema
 
 from typing import Union
-from flaskinventory.flaskdgraph.utils import restore_sequence
+from flaskinventory.flaskdgraph.utils import restore_sequence, validate_uid
 
 """
     Inventory Detail View Functions
 """
 
 def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None) -> Union[dict, None]:
+    query_var = 'query get_entry($value: string) '
     if unique_name:
-        query_func = f'{{ entry(func: eq(unique_name, "{unique_name}"))'
+        query_func = f'{{ entry(func: eq(unique_name, $value))'
+        var = unique_name
     elif uid:
-        query_func = f'{{ entry(func: uid({uid}))'
+        uid = validate_uid(uid)
+        if not uid:
+            return None
+        query_func = f'{{ entry(func: uid($value))'
+        var = uid
     else:
         return None
 
@@ -105,9 +111,9 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     else:
         query_fields += '} }'
     
-    query_string = query_func + query_fields
+    query_string = query_var + query_func + query_fields
 
-    data = dgraph.query(query_string)
+    data = dgraph.query(query_string, variables={'$value': var})
 
     if len(data['entry']) == 0:
         return None
