@@ -94,7 +94,13 @@ class TestSanitizers(unittest.TestCase):
             self.assertNotEqual(publication, False)
             # pprint(publication)
 
-    def test_website(self):
+    def test_vkontakte(self):
+        handle = "dieunbestechlichen"
+        with self.app.app_context():
+            profile = external.vkontakte(handle)
+            pprint(profile)
+
+    def _test_website(self):
         # website = "http://www.faktum-magazin.de/"
         website = "https://freie-medien.tv/"
         with self.app.app_context():
