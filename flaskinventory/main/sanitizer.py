@@ -536,7 +536,7 @@ class Sanitizer:
         # first check if website exists
         entry_name = str(self.entry['name'])
         try:
-            urls, names = parse_meta(entry_name)
+            names, urls = parse_meta(entry_name)
         except:
             raise InventoryValidationError(
                 f"Could not resolve website! URL provided does not exist: {self.data.get('name')}")
