@@ -696,13 +696,16 @@ class Sanitizer:
             'name'].lower().replace('@', '')
 
         if profile.get('fullname'):
-            self.entry['other_names'].append(profile['fullname'])
+            try:
+                self.entry['other_names'].append(profile['fullname'])
+            except KeyError:
+                self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
             facets = {'followers': int(
                 profile['followers'])}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
-        self.entry['verified_account'] = profile.get('verified')
+        self.entry['verified_account'] = profile.get('verified', False)
         if profile.get('telegram_id'):
             self.entry['channel_url'] = profile.get('telegram_id')
         if profile.get('joined'):
