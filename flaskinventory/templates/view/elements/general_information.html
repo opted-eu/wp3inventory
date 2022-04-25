@@ -1,7 +1,11 @@
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
-        <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}</dd>
+        <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}
+            {% if entry.defunct %}
+                <span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="This news source is no longer actively publishing">Defunct</span>
+            {% endif %}
+        </dd>
         {% if entry.title %}
         <dt class="col-sm-3">Full Title</dt>
         <dd class="col-sm-9"><h5>{{ entry.title  }}</h5></dd>
