@@ -66,6 +66,7 @@ type Source {
     languages
     verified_account
     party_affiliated
+    defunct
 }
 
 type Channel {
@@ -279,6 +280,7 @@ audience_size: [dateTime] .
 audience_residency: [dateTime] .
 verified_account: bool @index(bool) .
 party_affiliated: string @index(hash) .
+defunct: bool @index(bool) .
 
 # Organization Predicates
 is_person: bool .
