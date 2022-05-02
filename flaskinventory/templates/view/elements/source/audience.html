@@ -40,19 +40,19 @@
                         </td>
                         {% endif %}
                         {% if entry.get('audience_size|daily_visitors') %}
-                        <td>{{ "{0:,}"|format(entry.get('audience_size|daily_visitors')[loop.index0|string]) }}</td>
+                        <td>{{ "{0:,}".format(entry.get('audience_size|daily_visitors')[loop.index0|string]) }}</td>
                         {% endif %}
                         {% if entry.get('audience_size|likes') %}
-                            <td>{{ "{0:,}"|format(entry.get('audience_size|likes')[loop.index0|string]) }}</td>
+                            <td>{{ "{0:,}".format(entry.get('audience_size|likes')[loop.index0|string]) }}</td>
                         {% endif %}
                         {% if entry.get('audience_size|subscribers') %}
-                            <td>{{ "{0:,}"|format(entry.get('audience_size|subscribers')[loop.index0|string]) }}</td>
+                            <td>{{ "{0:,}".format(entry.get('audience_size|subscribers')[loop.index0|string]) }}</td>
                         {% endif %}
                         {% if entry.get('audience_size|copies_sold') %}
-                            <td>{{ "{0:,}"|format(entry.get('audience_size|copies_sold')[loop.index0|string]) }}</td>
+                            <td>{{ "{0:,}".format(entry.get('audience_size|copies_sold')[loop.index0|string]) }}</td>
                         {% endif %}
                         {% if entry.get('audience_size|followers') %}
-                            <td>{{ "{0:,}"|format(entry.get('audience_size|followers')[loop.index0|string]) }}</td>
+                            <td>{{ "{0:,}".format(entry.get('audience_size|followers')[loop.index0|string]) }}</td>
                         {% endif %}
                     </tr>
                     
