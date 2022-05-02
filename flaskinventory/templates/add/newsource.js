@@ -1434,6 +1434,7 @@ function serializeForm(f) {
 
     // remove empty strings
     var obj = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != ""));
+    obj['entry_review_status'] = 'pending'
     return obj;
 };
 
