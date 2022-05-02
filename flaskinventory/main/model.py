@@ -436,7 +436,7 @@ class Organization(Entry):
                            'placeholder': 'Most recent figure as plain number'},
                        new=False)
     
-    founded = DateTime(new=False)
+    founded = DateTime(new=False, overwrite=True)
 
 
 
@@ -481,7 +481,7 @@ class Source(Entry):
                                                                     'no': 'No',
                                                                     'NA': "Don't know / NA"})
 
-    founded = Year(description="What year was the news source founded?")
+    founded = Year(description="What year was the news source founded?", overwrite=True)
 
     publication_kind = MultipleChoice(description='What label or labels describe the main source?',
                                       choices={'newspaper': 'Newspaper / News Site', 
@@ -664,7 +664,7 @@ class Archive(Entry):
                                     'restricted': 'Restricted'})
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
     fulltext = Boolean(description='Archive contains fulltext')
-    country = ListRelationship(relationship_constraint=['Country', 'Multinational'])
+    country = ListRelationship(relationship_constraint=['Country', 'Multinational'], autoload_choices=True)
 
 class Dataset(Entry):
 
