@@ -603,9 +603,10 @@ class Source(Entry):
 
 
     party_affiliated = SingleChoice(description='Is the news source close to a political party?',
-                                    choices={'yes': 'Yes',
+                                    choices={'NA': "Don't know / NA",
+                                            'yes': 'Yes',
                                             'no': 'No',
-                                            'NA': "Don't know / NA"})
+                                            })
     
     defunct = Boolean(description="Is the news source defunct or out of business?") 
 
