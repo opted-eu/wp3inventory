@@ -341,7 +341,13 @@ class Sanitizer:
         elif self.data.get('entry_review_status'):
             if self.entry_review_status == 'draft' and self.data['entry_review_status'] == 'pending':
                 self.entry['entry_review_status'] = 'pending'
-            elif self.user.user_role < USER_ROLES.Reviewer:
+            elif self.data['entry_review_status'] == 'pending':
+                self.entry_review_status == 'pending'
+                self.entry['entry_review_status'] = 'pending'
+            elif self.user.user_role >= USER_ROLES.Reviewer:
+                validated = self.fields.get('entry_review_status').validate(self.data.get('entry_review_status'))
+                self.entry['entry_review_status'] = validated
+            else:
                 raise InventoryPermissionError(
                     'You do not have the required permissions to change the review status!')
 
