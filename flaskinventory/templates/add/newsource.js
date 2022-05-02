@@ -1366,17 +1366,28 @@ function errorContainer(field) {
     if (field.id.includes("ts-control")) {
         field = document.getElementById(field.id.replace("-ts-control", ""))
     }
-    const errorContainerId = field
+    var errorContainerId = ""
+    try {
+        errorContainerId = field
         .getAttribute("aria-describedby")
         .split(" ")
         .find((id) => id.includes("feedback"));
+    } catch (error) {
+        // console.warn(error);
+    }
+    
     return document.getElementById(errorContainerId);
 }
 
 function setFieldValidity(field) {
     if (!field.validity.valid) {
-        errorContainer(field).textContent = field.validationMessage;
-        errorContainer(field).classList.add('invalid-feedback');
+        try {
+            errorContainer(field).textContent = field.validationMessage;
+            errorContainer(field).classList.add('invalid-feedback');
+        } catch (error) {
+            // console.debug(error)
+        }
+        
         field.setAttribute("aria-invalid", "true");
         field.classList.add('is-invalid');
         if (field.classList.contains('tomselected')) {
@@ -1384,8 +1395,13 @@ function setFieldValidity(field) {
             ts.parentElement.parentElement.classList.add('is-invalid');
         }
     } else {
-        errorContainer(field).textContent = "";
-        errorContainer(field).classList.remove('invalid-feedback');
+        try {
+            errorContainer(field).textContent = "";
+            errorContainer(field).classList.remove('invalid-feedback');  
+        } catch (error) {
+            // console.debug(error)
+        }
+
         field.removeAttribute("aria-invalid");
         field.classList.remove('is-invalid');
         if (field.classList.contains('tomselected')) {
