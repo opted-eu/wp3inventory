@@ -1197,10 +1197,8 @@ ready(() => {
                     visited.push(field);
                 }
                 if (!field.id.includes("ts-control")) {
-                    if (field.required) {
                         field.reportValidity();
                         setFieldValidity(field)
-                    }
                 }
 
             };
