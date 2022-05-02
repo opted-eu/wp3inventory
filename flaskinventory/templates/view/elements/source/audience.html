@@ -36,7 +36,7 @@
                         <td>{{data.strftime('%Y-%m-%d')}}</td>
                         {% if entry.get('audience_size|data_from' or entry.get('audience_size|datafrom')[loop.index0|string] %}
                         <td>
-                            <a href="{{ entry.get('audience_size|data_from' or entry.get('audience_size|datafrom')[loop.index0|string] }}" target="_blank">source</a>
+                            <a href="{{ entry.get('audience_size|data_from')[loop.index0|string] or entry.get('audience_size|datafrom')[loop.index0|string] }}" target="_blank">source</a>
                         </td>
                         {% endif %}
                         {% if entry.get('audience_size|daily_visitors') %}
