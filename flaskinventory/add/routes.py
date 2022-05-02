@@ -70,6 +70,10 @@ def new_source():
         draft = get_draft(draft)
     elif existing:
         existing = get_existing(existing)
+        existing.pop('publication_cycle', None)
+        existing.pop('publication_cycle_weekday', None)
+        existing.pop('founded', None)
+        existing.pop('channel_epaper', None)
     
     return render_template("add/newsource.html", draft=draft, existing=existing)
 

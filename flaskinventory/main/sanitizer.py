@@ -486,7 +486,6 @@ class Sanitizer:
                     source['publication_kind'] = self.entry.get('publication_kind')
                     source['special_interest'] = self.entry.get('special_interest')
                     source['topical_focus'] = self.entry.get('topical_focus')
-                    source['special_interest'] = self.entry.get('special_interest')
                     source['geographic_scope'] = self.entry.get('geographic_scope')
                     source['country'] = self.entry.get('country')
                     source['geographic_scope_subunit'] = self.entry.get('geographic_scope_subunit')
