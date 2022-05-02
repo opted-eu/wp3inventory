@@ -61,7 +61,7 @@
             <td>{% if entry.get('founded') %} {{ entry.founded.strftime('%Y')}} {% endif %}</td>
         {% endif %}
         {% if 'country' in cols %}
-        <td>{% if entry.get('country') %} {{ entry.country[0].get('country') }}{% endif %}</td>
+        <td>{% if entry.get('country') %} {% for c in entry.get('country') %} {{c.get('name')}} {{ ', ' if not loop.last else '' }} {% endfor %}{% endif %}</td>
         {% endif %}
         {% if 'access' in cols %}
             <td>{{ entry.get('access')}}</td>

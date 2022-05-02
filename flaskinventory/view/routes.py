@@ -144,16 +144,13 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
 @view.route("/query", methods=['GET', 'POST'])
 def query():
     if request.args:
-        if request.args.get('country') == 'all':
-            relation_filt = None
-        else:
+        filt = {'eq': {'entry_review_status': 'accepted'}}
+        if not request.args.get('country', 'all') == 'all':
             uid = validate_uid(request.args.get('country'))
             if uid:
-                relation_filt = {'country': {'uid': request.args.get('country')}}
-            else:
-                relation_filt = None
+                filt.update({'uid_in': {'country': request.args.get('country')}})
         data = list_by_type(
-            request.args['entity'], relation_filt=relation_filt, filt={'eq': {'entry_review_status': 'accepted'}})
+            request.args['entity'], filt=filt)
 
         cols = []
         if data:

@@ -159,7 +159,7 @@ def get_orphan(query):
 # List all entries of specified type, allows to pass in filters
 
 
-def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize=False):
+def list_by_type(typename, filt=None, fields=None, normalize=False):
     query_head = f'{{ q(func: type("{typename}"), orderasc: name) '
     if filt:
         query_head += dgraph.build_filt_string(filt)
@@ -198,27 +198,13 @@ def list_by_type(typename, filt=None, relation_filt=None, fields=None, normalize
             query_fields = ''' uid name authors @facets published_date journal
                                 '''
 
-    query_relation = ''
-    if relation_filt:
-        query_head += ' @cascade('
-    
-        for key, val in relation_filt.items():
-            query_head += key
-            query_relation += f'{key} {dgraph.build_filt_string(val)}'
-            if fields == None:
-                query_relation += f'{{ {key}: '
-            else:
-                query_relation += ' { '
-            query_relation += ''' name }'''
-        query_head += ')'
-    else:
-        query_fields += ''' country { country: name } '''
+    query_fields += ''' country { name } '''
 
     if normalize:
         query_head += ''
 
     query_string = query_head + \
-        ' { ' + query_fields + ' ' + query_relation + ' } }'
+        ' { ' + query_fields + ' ' + ' } }'
 
     data = dgraph.query(query_string)
 
