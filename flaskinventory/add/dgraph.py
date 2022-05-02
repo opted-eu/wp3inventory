@@ -120,6 +120,10 @@ def get_existing(uid):
             existing['related'] = [related]
         else:
             existing['related'].append(related)
+        existing.pop('publication_cycle', None)
+        existing.pop('publication_cycle_weekday', None)
+        existing.pop('founded', None)
+        existing.pop('channel_epaper', None)
         existing = json.dumps(existing, default=str)
     else:
         existing = None
