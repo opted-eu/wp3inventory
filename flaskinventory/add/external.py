@@ -121,7 +121,7 @@ def find_sitemaps(site: str) -> list:
 
     r = perform_request(site)
     if not r:
-        return False
+        return []
 
     if r.status_code != 200:
         raise requests.RequestException(
