@@ -1,10 +1,10 @@
 # Introduction
 
-This is the code repository for the WP3 Inventory, which will contain an interlinked knowledge graph of news sources, media organizations, and data archives in Europe (for details see the [OPTED main page](https://opted.eu/)). Currently, this is a prototype / work in progress.
+This is the code repository for *Meteor* (the WP3 Inventory), which will contain an interlinked knowledge graph of news sources, media organizations, and data archives in Europe (for details see the [OPTED main page](https://opted.eu/)). Currently, this is a prototype / work in progress.
 
-The WP3 Inventory is a web based application that allows users to
+*Meteor* is a web based application that allows users to
 
-- browse & query the WP3 database
+- browse & query the *Meteor* database
 - Add new entries to the database
 - edit and update existing entries
 

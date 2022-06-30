@@ -27,7 +27,7 @@ def send_reset_email(user):
 def send_verification_email(user):
     if not current_app.debug:
         token = user.get_invite_token()
-        subject = 'OPTED WP3 Inventory: Please verify your email address'
+        subject = 'OPTED Meteor: Please verify your email address'
         msg = Message(subject,
                     sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
 
@@ -37,7 +37,7 @@ def send_verification_email(user):
 
 def send_invite_email(user):
     token = user.get_invite_token()
-    subject = 'OPTED: Invitation to join WP3 Inventory'
+    subject = 'OPTED: Invitation to join Meteor'
     msg = Message(subject=subject,
                   sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
 

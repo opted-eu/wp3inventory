@@ -1,8 +1,8 @@
 {% extends "layout.html" %} {% block content %}
 
 <main>
-    <h1>Welcome to the OPTED inventory for media</h1>
-    <p class="fs-5 col-md-8">Quickly and easily query our database of news sources and organisations. Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
+    <h1>Welcome to the OPTED inventory for media texts!</h1>
+    <p class="fs-5 col-md-8">Quickly and easily query our database of news sources, organisations, datasets, corpora, tools and more! Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
         already exists!</p>
     <div class="mb-5">
         <form method="GET" action="{{ url_for('view.query') }}">
