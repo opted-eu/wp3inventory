@@ -162,6 +162,19 @@ dt {
     background-color: #6610f2;
 }
 
+.header-branding-serif {
+    font-family: serif;
+    font-weight: 900;
+    letter-spacing: .05rem;
+    line-height: 0.5em;
+}
+
+.header-branding-small {
+        font-weight: normal;
+        letter-spacing: normal;
+        font-size: small;
+        font-family: var(--bs-body-font-family);
+}
 
 /* Markdown styling */
 
