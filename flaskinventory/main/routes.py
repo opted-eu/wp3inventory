@@ -67,3 +67,7 @@ def guides_resources():
 @main.route('/guides/faq')
 def guides_faq():
     return render_template('guides/faq.html', show_sidebar=True)
+
+@main.route('/guides/teaching-materials')
+def guides_teaching():
+    return render_template('guides/teaching.html', show_sidebar=True)
