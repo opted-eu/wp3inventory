@@ -179,6 +179,10 @@ type Tool {
     input_file_format
     output_file_format
     materials
+    user_access
+license
+defunct
+    open_source
 }
 
 
@@ -331,7 +335,9 @@ input_file_format: [uid] @reverse .
 output_file_format: [uid] @reverse .
 input_data: [uid] @reverse .
 output_data: [uid] @reverse .
-
+user_access: string @index(hash) .
+license: string @index(term, trigram) .
+open_source: string @index(hash) .
 
 # ResearchPaper Predicates
 isbn: string @index(exact).
