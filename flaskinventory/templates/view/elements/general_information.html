@@ -3,7 +3,16 @@
         <dt class="col-sm-3 mb-4"><h5>General Information</h5></dt>
         <dd class="col-sm-9 mb-4">{% include "view/elements/entry_status.html" %}
             {% if entry.defunct %}
-                <span class="badge bg-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="This news source is no longer actively publishing">Defunct</span>
+                <span class="badge bg-warning text-dark" data-bs-toggle="tooltip" data-bs-placement="top" 
+                {% if 'Source' in entry['dgraph.type'] %}
+                title="This news source is no longer actively publishing">
+                {% elif 'Tool' in entry['dgraph.type'] %}
+                title="This tool is no longer available or ended its lifecycle">
+                {% else %}
+                title="This resource is no longer active or available"
+                {% endif %}
+                Defunct
+                </span>
             {% endif %}
         </dd>
         {% if entry.title %}

@@ -340,6 +340,7 @@ class MultipleChoiceInt(MultipleChoice):
 
         return data
 
+
 """
     Entry
 """
@@ -840,6 +841,20 @@ class Tool(Entry):
                                            required=True,
                                             tom_select=True)
 
+    open_source = SingleChoice(description="Is this tool open source?",
+                                choices={'na': 'NA / Unknown',
+                                        'yes': 'Yes',
+                                        'no': 'No, proprietary'})
+
+    license = String(description="What kind of license attached to the tool?")
+
+    user_access = SingleChoice(description="How can the user access the tool?",
+                                choices={'na': 'NA / Unknown',
+                                        'free': 'Free',
+                                        'registration': 'Registration',
+                                        'request': 'Upon Request',
+                                        'purchase': 'Purchase'})
+
     used_for = ListRelationship(description="What is the tool used for?",
                                 relationship_constraint="Operation",
                                 autoload_choices=True,
@@ -885,6 +900,8 @@ class Tool(Entry):
                                             allow_new=False,
                                             new=False,
                                             relationship_constraint="ResearchPaper")
+
+    defunct = Boolean(description="Is the tool defunct?") 
 
 
 class ResearchPaper(Entry):

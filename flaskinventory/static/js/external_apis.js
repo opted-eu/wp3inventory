@@ -285,6 +285,7 @@ function parsePyPi(package) {
     result['description'] = package.info['description']
     result['url'] = package.info['home_page']
     result['authors'] = package.info['author']
+    result['license'] = package.info['license']
     result['materials'] = []
     for (url in package.info['project_urls']) {
         result['materials'].push(package.info.project_urls[url])
@@ -292,5 +293,7 @@ function parsePyPi(package) {
 
     result['programming_languages'] = ['python']
     result['platform'] = ['windows', 'linux', 'macos']
+    result['open_source'] = ['yes']
+    result['user_access'] = ['free']
     return result
 }

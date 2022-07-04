@@ -683,7 +683,9 @@ def cran(pkg) -> Union[dict, bool]:
     data = r.json()
 
     result = {'programming_languages': ['r'],
-                'platform': ['windows','linux','macos']}
+                'platform': ['windows','linux','macos'],
+                'user_access': 'free',
+                'open_source': 'yes'}
 
     if 'Package' in data.keys():
         result['name'] = data['Package']
@@ -696,6 +698,9 @@ def cran(pkg) -> Union[dict, bool]:
 
     if 'URL' in data.keys():
         result['url'] = data['URL']
+
+    if 'License' in data.keys():
+        result['license'] = data['License']
 
     # try extracting Author information
 

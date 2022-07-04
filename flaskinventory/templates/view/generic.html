@@ -6,11 +6,11 @@
 <article>
 
 <div class="d-flex align-items-start">
-    <div class="icon-square me-3">
+    <div class="icon-square me-3 {{ 'text-muted' if entry.defunct else '' }}">
         {{ render_icon(entry) }} 
     </div>
     <div class="w-100">
-        <h2>
+        <h2 class="{{ 'text-muted' if entry.defunct else '' }}">
         {{ entry.name }} 
         {% if entry.verified_account %} 
         <span class="fa-stack text-primary align-middle" style="font-size: 0.3em;">
