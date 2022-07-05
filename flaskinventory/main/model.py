@@ -838,7 +838,7 @@ class Tool(Entry):
 
     programming_languages = MultipleChoice(description="Which programming languages are used for the tool?",
                                            choices=programming_languages,
-                                           required=True,
+                                           required=False,
                                             tom_select=True)
 
     open_source = SingleChoice(description="Is this tool open source?",
