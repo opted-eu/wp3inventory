@@ -836,7 +836,9 @@ class Tool(Entry):
                                     required=True,
                                     tom_select=True)
 
-    programming_languages = MultipleChoice(description="Which programming languages are used for the tool?",
+    programming_languages = MultipleChoice(label="Programming Languages",
+                                            description="Which programming languages are used for the tool? \
+                                            Please also include language that can directly interface with this tool.",
                                            choices=programming_languages,
                                            required=False,
                                             tom_select=True)
