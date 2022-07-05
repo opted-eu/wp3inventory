@@ -40,17 +40,19 @@
             <p>You want to help us and add entries to the database? You can contribute through various means:</p>
             <ul class="icon-list">
                 <li>Add media organisations and news sources to our inventory.</li>
-                <li>Make <strong>your</strong> research paper more visible by adding it to the inventory and linking it to news sources.</li>
+                <li>Make <strong>your text analysis tool</strong> more visible by adding it to the inventory.</li>
                 <li>You know a data base or corpus that contains full-text data? Share it with the community by adding it here!</li>
+                <li>Share your dataset with the researcher community by adding it to Meteor.</li>
             </ul>
             <a href="{{ url_for('add.new_entry') }}" class="btn btn-primary px-4">Add entry</a>
         </div>
 
         <div class="col-md-6">
-            <h2>Guides</h2>
+            <h2>Guides & Materials</h2>
             <p>Read more detailed instructions and documentation on using or contributing to the inventory.</p>
             <ul class="icon-list">
-                <li><a class="fw-bold" href="{{ url_for('main.guides_newssource') }}" target="_blank">detailed guide for adding news sources to the inventory.</a></li>
+                <li><a class="fw-bold" href="{{ url_for('main.guides_newssource') }}">detailed guide for adding news sources to the inventory.</a></li>
+                <li><a class="fw-bold" href="{{ url_for('main.guides_teaching') }}">teaching materials (e.g., slides, syllabi) for using the inventory in the classroom.</a></li>
             </ul>
         </div>
     </div>
