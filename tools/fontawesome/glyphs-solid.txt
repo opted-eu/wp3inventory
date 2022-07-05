@@ -45,3 +45,4 @@ cubes
 magic
 paragraph
 chalkboard
+user-plus
