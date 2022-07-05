@@ -46,3 +46,4 @@ magic
 paragraph
 chalkboard
 user-plus
+sign-in-alt
