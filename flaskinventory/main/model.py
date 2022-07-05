@@ -886,8 +886,10 @@ class Tool(Entry):
                                         autoload_choices=True,
                                         relationship_constraint="FileFormat")
 
-    author_validated = Boolean(description="Do the authors of the tool report any validation?",
-                                label="Yes, validation is reported")
+    author_validated = SingleChoice(description="Do the authors of the tool report any validation?",
+                                choices={'na': 'NA / Unknown',
+                                        'yes': 'Yes',
+                                        'no': 'No, not reported'})
 
     validation_corpus = ListRelationship(description="Which corpus was used to validate the tool?",
                                             autoload_choices=True,

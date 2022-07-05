@@ -72,14 +72,12 @@
             {{ render_tags(entry.output_file_format) }}
         </dd>
         {% endif %}
+        {% if entry.author_validated %}
         <dt class="col-sm-3">Author(s) reported validation</dt>
         <dd class="col-sm-9">
-            {% if entry.author_validated %}
-                <span>Yes</span>
-            {% else %}
-                <span>No</span>
-            {% endif %}
+            <span>{{  entry.author_validated }}</span>
         </dd>
+        {% endif %}
         {% if entry.validation_corpus %}
         <dt class="col-sm-3">Corpus used for validation</dt>
         <dd class="col-sm-9">
