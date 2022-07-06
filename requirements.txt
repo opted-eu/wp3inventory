@@ -15,11 +15,11 @@ Flask-Limiter
 Flask-Markdown
 grpcio
 idna
-itsdangerous
+itsdangerous==2.0.1
 Jinja2
 MarkupSafe
 Pillow
-protobuf
+protobuf==3.20.0
 pycparser
 pydgraph
 python-dateutil
