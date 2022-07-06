@@ -341,6 +341,20 @@ class MultipleChoiceInt(MultipleChoice):
         return data
 
 
+class GitHubAuto(String):
+
+    def validation_hook(self, data):
+        if "github" in data:
+            data = data.replace('https://www.', '')
+            data = data.replace('http://www.', '')
+            data = data.replace('https://', '')
+            data = data.replace('http://', '')
+            data = data.replace('github.com/', '')
+            if data.startswith('/'):
+                data = data[1:]
+        
+        return data
+
 """
     Entry
 """
@@ -826,6 +840,14 @@ class Tool(Entry):
     url = String(label="URL", description="Link to the tool", required=True)
     doi = String(label='DOI')
     arxiv = String(label='arXiv')
+    cran = String(label="CRAN", description="CRAN Package name",
+                    render_kw={'placeholder': 'usually this is filled in automatically...'})
+    
+    pypi = String(label="PyPi", description="PyPi Project name",
+                    render_kw={'placeholder': 'usually this is filled in automatically...'})
+
+    github = GitHubAuto(label="Github", description="Github repository",
+                        render_kw={'placeholder': 'If the tool has a repository on Github you can add this here.'})
 
     description = String(large_textfield=True, description="Please provide a short description for the tool")
 

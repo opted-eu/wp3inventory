@@ -180,9 +180,12 @@ type Tool {
     output_file_format
     materials
     user_access
-license
-defunct
+    license
+    defunct
     open_source
+    cran
+    pypi
+    github
 }
 
 
@@ -338,6 +341,9 @@ output_data: [uid] @reverse .
 user_access: string @index(hash) .
 license: string @index(term, trigram) .
 open_source: string @index(hash) .
+pypi: string @index(term, trigram) .
+cran: string @index(term, trigram) .
+github: string @index(term, trigram) .
 
 # ResearchPaper Predicates
 isbn: string @index(exact).

@@ -689,6 +689,7 @@ def cran(pkg) -> Union[dict, bool]:
 
     if 'Package' in data.keys():
         result['name'] = data['Package']
+        result['cran'] = data['Package']
 
     if 'Description' in data.keys():
         result['description'] = data['Description']

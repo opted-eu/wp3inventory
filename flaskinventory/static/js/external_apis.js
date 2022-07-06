@@ -80,6 +80,24 @@ function fetchMetaData(button) {
             .then(result => fillForm(result))
             .then(_ => hideSpinner(button), buttonSuccess(button))
             .catch(error => handleError(error, button))
+    
+    } else if (platform == 'github') {
+        let api = "https://api.github.com/repos/"
+
+        // sanitize identifier string
+        github = identifier.replace('https://www.github.com/', '')
+        github = github.replace('http://www.github.com/', '')
+        github = github.replace('www.github.com/', '')
+        github = github.replace('https://github.com/', '')
+        github = github.replace('http://github.com/', '')
+        github = github.replace('github.com/', '')
+
+        fetch(api + github)
+            .then(response => response.json())
+            .then(json => parseGithub(json))
+            .then(result => fillForm(result))
+            .then(_ => hideSpinner(button), buttonSuccess(button))
+            .catch(error => handleError(error, button))
     }
 
 };
@@ -280,6 +298,7 @@ function parsePyPi(package) {
     result = new Array()
 
     result['name'] = package.info['name']
+    result['pypi'] = package.info['name']
     result['title'] = package.info['name']
     result['other_names'] = package.info['summary']
     result['description'] = package.info['description']
@@ -293,6 +312,37 @@ function parsePyPi(package) {
 
     result['programming_languages'] = ['python']
     result['platform'] = ['windows', 'linux', 'macos']
+    result['open_source'] = ['yes']
+    result['user_access'] = ['free']
+    return result
+}
+
+
+function parseGithub(package) {
+
+    result = new Array()
+
+    result['name'] = package['name']
+    result['github'] = package['full_name']
+    result['title'] = package['name']
+    if ('home_page' in package) {
+        result['url'] = package['home_page']
+    } else {
+        result['url'] = 'https://github.com/' + package['full_name']
+    }
+    if (package.license != null) {
+        result['license'] = package.license['name']
+    }
+    if ('created_at' in package) {
+        let year = package.created_at.split('-')[0]
+        if (parseInt(year)) {
+            result['published_date'] = year
+        }
+    }
+
+    if ('language' in package) {
+        result['programming_languages'] = [package.language.toLowerCase()]
+    }
     result['open_source'] = ['yes']
     result['user_access'] = ['free']
     return result
