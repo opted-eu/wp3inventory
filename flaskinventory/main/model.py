@@ -838,18 +838,24 @@ class Tool(Entry):
     last_updated = DateTime(description="When was the tool last updated?", new=False)
 
     url = String(label="URL", description="Link to the tool", required=True)
-    doi = String(label='DOI')
-    arxiv = String(label='arXiv')
+    doi = String(label='DOI',
+                    overwrite=True)
+    arxiv = String(label='arXiv',
+                    overwrite=True)
     cran = String(label="CRAN", description="CRAN Package name",
-                    render_kw={'placeholder': 'usually this is filled in automatically...'})
+                    render_kw={'placeholder': 'usually this is filled in automatically...'},
+                    overwrite=True)
     
     pypi = String(label="PyPi", description="PyPi Project name",
-                    render_kw={'placeholder': 'usually this is filled in automatically...'})
+                    render_kw={'placeholder': 'usually this is filled in automatically...'},
+                    overwrite=True)
 
     github = GitHubAuto(label="Github", description="Github repository",
-                        render_kw={'placeholder': 'If the tool has a repository on Github you can add this here.'})
+                        render_kw={'placeholder': 'If the tool has a repository on Github you can add this here.'},
+                    overwrite=True)
 
-    description = String(large_textfield=True, description="Please provide a short description for the tool")
+    description = String(large_textfield=True, description="Please provide a short description for the tool",
+                    overwrite=True)
 
     platform = MultipleChoice(description="For which kind of operating systems is the tool available?",
                                     choices={'windows': 'Windows', 
