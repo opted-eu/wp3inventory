@@ -141,5 +141,17 @@
             <dt class="col-sm-3">arXiv</dt>
             <dd class="col-sm-9"><a href="https://arxiv.org/abs/{{ entry.arxiv }}" target="_blank">{{ entry.arxiv }}</a></dd>
         {% endif %}
+        {% if entry.cran %}
+            <dt class="col-sm-3">CRAN</dt>
+            <dd class="col-sm-9"><a href="https://cran.r-project.org/package={{ entry.cran }}" target="_blank"><i class="icon-cran me-1" alt="cran"></i>{{ entry.cran }}</a></dd>
+        {% endif %}
+        {% if entry.pypi %}
+            <dt class="col-sm-3">PyPi</dt>
+            <dd class="col-sm-9"><a href="https://pypi.org/project/{{ entry.pypi }}" target="_blank"><i class="icon-python me-1" alt="python"></i>{{ entry.pypi }}</a></dd>
+        {% endif %}
+        {% if entry.github %}
+            <dt class="col-sm-3">GitHub</dt>
+            <dd class="col-sm-9"><a href="https://github.com/{{ entry.github }}" target="_blank"><i class="icon-github me-1" alt="github"></i>{{ entry.github }}</a></dd>
+        {% endif %}
     </dl>
 </div>

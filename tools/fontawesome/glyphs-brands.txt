@@ -13,3 +13,5 @@ researchgate
 windows
 linux
 apple
+r-project
+python

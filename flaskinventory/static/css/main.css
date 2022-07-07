@@ -82,6 +82,34 @@
 }
 
 
+.icon-python::before,
+.icon-Python::before {
+    content: "\f3e2";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+.icon-cran::before,
+.icon-CRAN::before,
+.icon-rproject::before,
+.icon-R-Project::before {
+    content: "\f4f7";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+
+.icon-github::before,
+.icon-GitHub::before {
+    content: "\f09b";
+    font-weight: 400;
+    font-family: "Font Awesome 5 Brands";
+    font-style: normal;
+}
+
+
 /* social colors */
 
 .color-facebook {

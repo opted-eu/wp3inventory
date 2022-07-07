@@ -7,5 +7,5 @@ pyftsubset\
 pyftsubset\
  webfonts/fa-brands-400.ttf \
  --output-file="fa-brands-subset-400.woff2" \
- --glyphs-file="glyphs-brands.txt"
+ --glyphs-file="glyphs-brands.txt" \
  --flavor="woff2"
