@@ -109,15 +109,24 @@ sudo service flaskinventory start
 ```
 server {
         listen 80;
-        server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
-        return 301 https://wp3.opted.eu$request_uri;
+        server_name meteor.opted.eu wp3.opted.eu a493-server1.pub.univie.ac.at;
+        return 301 https://meteor.opted.eu$request_uri;
         }
+
+server {
+        listen 443 ssl;
+        ssl_certificate/etc/ssl/certificate.cer;
+        ssl_certificate_key/etc/ssl/private/key.key;
+        server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
+        return 301 https://meteor.opted.eu$request_uri;
+        }
+
 
 server {
         listen 443 ssl;
         ssl_certificate /etc/ssl/certificate.cer;
         ssl_certificate_key /etc/ssl/private/key.key;
-        server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
+        server_name meteor.opted.eu wp3.opted.eu a493-server1.pub.univie.ac.at;
 
         location / {
                 include proxy_params;
