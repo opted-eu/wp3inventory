@@ -186,6 +186,7 @@ type Tool {
     cran
     pypi
     github
+    concept_vars
 }
 
 
