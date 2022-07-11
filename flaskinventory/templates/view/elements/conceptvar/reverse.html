@@ -27,3 +27,17 @@
         {% endif %}
     </dl>
 </div>
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Tools</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">These tools can measure this concept.</small></dd>
+        {% if entry.tools %} 
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9 mb-4">
+            {% for tool in entry.tools %}
+                <p>{{ render_publication(tool) }}</p>
+            {% endfor %}
+        </dd>
+        {% endif %}
+    </dl>
+</div>
