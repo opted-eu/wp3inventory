@@ -31,6 +31,12 @@
             {{ render_tags(entry.used_for) }}
         </dd>
         {% endif %}
+        {% if entry.concept_vars %}
+        <dt class="col-sm-3">Concepts measured</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.concept_vars) }}
+        </dd>
+        {% endif %}
         <dt class="col-sm-3">Graphical User Interface</dt>
         <dd class="col-sm-9">
             {% if entry.graphical_user_interface %}
