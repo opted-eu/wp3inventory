@@ -100,7 +100,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
         query_fields += '''
                         datasets: ~concept_vars @filter(type("Dataset"))  { uid name unique_name authors @facets published_date }
                         corpus: ~concept_vars @filter(type("Corpus"))  { uid name unique_name authors @facets published_date }
-                        tools: ~used_for @filter(type("Tool")) { uid name unique_name authors @facets published_date programming_languages platform } } }
+                        tools: ~used_for @filter(type("Tool")) { uid name unique_name authors @facets published_date programming_languages platform }
                         } }
                         '''
 
