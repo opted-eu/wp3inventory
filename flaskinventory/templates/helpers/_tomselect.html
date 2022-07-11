@@ -426,9 +426,9 @@ if (embeddedJSON) {
     {% endif %}
 
     {% if 'related_publications' in fields %}
-    
-    new TomSelect('#related_publications', {plugins: ['remove_button']})
-    
+    if (document.querySelector('#related_publications')) {
+        new TomSelect('#related_publications', {plugins: ['remove_button']})
+    }
     {% endif %}
 
     {% if 'tools_used' in fields %}
