@@ -285,13 +285,15 @@ if (embeddedJSON) {
 
     {% if 'authors' in fields %}
     
-    new TomSelect('#authors', {create: true, 
+    new TomSelect('#authors', {
+        create: true, 
         plugins: ['remove_button'], 
         delimiter: ';',
         render: {
                 no_results:function(data,escape){
                     return '<div></div>';
-            }};
+            }}
+        })
 
     {% endif %}
 
