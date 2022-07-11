@@ -885,10 +885,15 @@ class Tool(Entry):
                                         'request': 'Upon Request',
                                         'purchase': 'Purchase'})
 
-    used_for = ListRelationship(description="What is the tool used for?",
+    used_for = ListRelationship(description="Which operations can the tool perform?",
                                 relationship_constraint="Operation",
                                 autoload_choices=True,
                                 required=True)
+
+    concept_vars = ListRelationship(description="Which concepts can the tool measuere (e.g. sentiment, frames, etc)",
+                                        relationship_constraint="ConceptVar",
+                                        render_kw={'placeholder': 'Select multiple...'},
+                                        autoload_choices=True)
 
     graphical_user_interface = Boolean(description="Does the tool have a graphical user interface?",
                                         label="Yes, it does have a GUI",
