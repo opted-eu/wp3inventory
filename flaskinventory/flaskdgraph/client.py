@@ -144,7 +144,8 @@ class DGraph(object):
         data = json.loads(res.json, object_hook=self.datetime_hook)
         return data
 
-    def get_uid(self, field, value):
+    def get_uid(self, field: str, value: str) -> str:
+        value = str(value).strip()
         query_string = f'''
             query quicksearch($value: string)
             {{ q(func: eq({field}, $value)) {{ uid {field} }} }}'''
