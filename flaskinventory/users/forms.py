@@ -22,7 +22,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Create Account')
 
     def validate_email(self, email):
-        if dgraph.get_uid('email', f'"{email.data}"'):
+        if dgraph.get_uid('email', f'{email.data}'):
             raise ValidationError('That email is taken. Try to login!')
 
 
@@ -33,7 +33,7 @@ class InviteUserForm(FlaskForm):
     submit = SubmitField('Invite User')
 
     def validate_email(self, email):
-        if dgraph.get_uid('email', f'"{email.data}"'):
+        if dgraph.get_uid('email', f'{email.data}'):
             raise ValidationError(
                 'That email is taken. User has been invited already!')
 
