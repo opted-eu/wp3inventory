@@ -84,7 +84,7 @@ class RequestResetForm(FlaskForm):
     submit = SubmitField('Request Password Reset')
 
     def validate_email(self, email):
-        if dgraph.get_uid('email', f'"{email.data}"') is None:
+        if dgraph.get_uid('email', f'{email.data}') is None:
             raise ValidationError(
                 'There is no account with that email. Please register first.')
 
