@@ -9,7 +9,7 @@ from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.view.dgraph import (get_entry, get_rejected, list_by_type)
 from flaskinventory.view.utils import can_view
 from flaskinventory.view.forms import SimpleQuery
-from flaskinventory.flaskdgraph.utils import validate_uid
+from flaskinventory.flaskdgraph.utils import validate_uid, restore_sequence
 from flaskinventory.review.utils import create_review_actions
 
 view = Blueprint('view', __name__)
@@ -56,6 +56,8 @@ def search():
         for item in result:
             if 'Entry' in item['type']:
                 item['type'].remove('Entry')
+            if any(t in item['type'] for t in ['ResearchPaper', 'Tool', 'Corpus', 'Dataset']):
+                restore_sequence(item)
 
         # CACHE THIS
         c_choices = get_country_choices()
