@@ -53,9 +53,9 @@ def search():
         else:
             result = None
 
-        for item in result['type']:
-            if 'Entry' in item:
-                item.remove('Entry')
+        for item in result:
+            if 'Entry' in item['type']:
+                item['type'].remove('Entry')
 
         # CACHE THIS
         c_choices = get_country_choices()
