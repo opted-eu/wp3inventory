@@ -41,7 +41,7 @@ def search():
                         country {{ country: name }}
                         doi: doi
                         arxiv: arxiv
-                        authors: authors
+                        authors: authors @facets
                         published_date: published_date
                     }}
                 }}
