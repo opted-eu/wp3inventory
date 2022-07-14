@@ -27,8 +27,9 @@ def search():
                 field3 as c(func: anyofterms(title, $name))
                 field4 as d(func: eq(doi, $name))
                 field5 as e(func: eq(arxiv, $name))
+                field6 as f(func: anyofterms(authors, $name))
                 
-                data(func: uid(field1, field2, field3, field4, field5)) 
+                data(func: uid(field1, field2, field3, field4, field5, field6)) 
                     @normalize @filter(eq(entry_review_status, "accepted")) {{
                         uid 
                         unique_name: unique_name 
@@ -40,6 +41,8 @@ def search():
                         country {{ country: name }}
                         doi: doi
                         arxiv: arxiv
+                        authors: authors
+                        published_date: published_date
                     }}
                 }}
         '''
@@ -49,6 +52,10 @@ def search():
             result = result['data']
         else:
             result = None
+
+        for item in result['type']:
+            if 'Entry' in item:
+                item.remove('Entry')
 
         # CACHE THIS
         c_choices = get_country_choices()

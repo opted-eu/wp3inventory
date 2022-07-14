@@ -3,6 +3,7 @@
 <h1 class="mb-4">Search Result</h1>
 
 <p class="text-muted">You searched for "{{ request.args.query }}"</p>
+{% from "helpers/_viewhelpers.html" import render_publication %}
 
 {% if result %}
 
@@ -19,7 +20,11 @@
     
       {% for entry in result %}
       <tr>
+        {% if entry.type[0] in ["Tool", "Paper", "Dataset"] %}
+          <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ render_publication(entry) }}</a></td>
+        {% else %}
           <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }} {{ entry.title }} {% if entry.get('channel') %}({{entry.get('channel')}}){% endif %}</a></td>
+        {% endif %}
           <td><span class="d-inline-block text-truncate" style="max-width: 250px;" title="{{ ', '.join(entry.get('other_names', [])) }}">{{ ", ".join(entry.get('other_names', [])) }}</span></td>
           <td>{{ entry.get("type")[0] }}</td>
           <td>{{ entry.get("country") }}</td>
