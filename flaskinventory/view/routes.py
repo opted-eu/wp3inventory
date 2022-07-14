@@ -50,14 +50,15 @@ def search():
 
         if len(result['data']) > 0:
             result = result['data']
+            for item in result:
+                if 'Entry' in item['type']:
+                    item['type'].remove('Entry')
+                if any(t in item['type'] for t in ['ResearchPaper', 'Tool', 'Corpus', 'Dataset']):
+                    restore_sequence(item)
         else:
             result = None
 
-        for item in result:
-            if 'Entry' in item['type']:
-                item['type'].remove('Entry')
-            if any(t in item['type'] for t in ['ResearchPaper', 'Tool', 'Corpus', 'Dataset']):
-                restore_sequence(item)
+        
 
         # CACHE THIS
         c_choices = get_country_choices()
