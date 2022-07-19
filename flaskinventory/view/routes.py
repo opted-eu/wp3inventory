@@ -138,6 +138,7 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
                 if isinstance(fields[key], SingleChoice):
                     if isinstance(v, list):
                         data[key] = [fields[key].choices[subval] for subval in v]
+                        data[key].sort()
                     else:
                         data[key] = fields[key].choices[v]
             except KeyError:

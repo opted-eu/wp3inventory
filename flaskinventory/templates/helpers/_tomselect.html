@@ -307,7 +307,13 @@ if (embeddedJSON) {
 
     {% if 'programming_languages' in fields %}
     
-    new TomSelect('#programming_languages', {plugins: ['remove_button']})
+    new TomSelect('#programming_languages', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }})
     
     {% endif %}
 
@@ -315,47 +321,93 @@ if (embeddedJSON) {
 
     {% if 'used_for' in fields %}
     
-    new TomSelect('#used_for', {create: true, plugins: ['remove_button']})
+    new TomSelect('#used_for', 
+    {
+        create: true, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }})
     
     {% endif %}
 
 
     {% if 'channels' in fields %}
     
-    new TomSelect('#channels', {create: false, plugins: ['remove_button']})
+    new TomSelect('#channels', 
+    {
+        create: false, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'input_file_format' in fields %}
     
-    new TomSelect('#input_file_format', {create: true, plugins: ['remove_button']})
+    new TomSelect('#input_file_format', 
+    {
+        create: true, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }})
     
     {% endif %}
 
 
     {% if 'output_file_format' in fields %}
     
-    new TomSelect('#output_file_format', {create: true, plugins: ['remove_button']})
+    new TomSelect('#output_file_format', 
+    {
+        create: true, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }})
     
     {% endif %}
 
 
     {% if 'input_data' in fields %}
     
-    new TomSelect('#input_data', {create: true, plugins: ['remove_button']})
+    new TomSelect('#input_data', 
+    {
+        create: true, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
 
     {% if 'output_data' in fields %}
     
-    new TomSelect('#output_data', {create: true, plugins: ['remove_button']})
+    new TomSelect('#output_data', 
+    {
+        create: true, plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'validation_corpus' in fields %}
     
-    new TomSelect('#validation_corpus', {plugins: ['remove_button']})
+    new TomSelect('#validation_corpus', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
@@ -427,55 +479,123 @@ if (embeddedJSON) {
 
     {% if 'related_publications' in fields %}
     if (document.querySelector('#related_publications')) {
-        new TomSelect('#related_publications', {plugins: ['remove_button']})
+        new TomSelect('#related_publications', 
+        {
+            plugins: ['remove_button'],
+            onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     }
     {% endif %}
 
     {% if 'tools_used' in fields %}
     
-    new TomSelect('#tools_used', {plugins: ['remove_button']})
+    new TomSelect('#tools_used', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'corpus_used' in fields %}
     
-    new TomSelect('#corpus_used', {plugins: ['remove_button']})
+    new TomSelect('#corpus_used', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'datasets_used' in fields %}
     
-    new TomSelect('#datasets_used', {plugins: ['remove_button']})
+    new TomSelect('#datasets_used', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'initial_source' in fields %}
     
-    new TomSelect('#initial_source', {plugins: ['remove_button']})
+    new TomSelect('#initial_source', 
+    {
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        }
+        )
     
     {% endif %}
 
     {% if 'meta_vars' in fields %}
     
-    new TomSelect('#meta_vars', {create: true, plugins: ['remove_button']})
-    
+    new TomSelect('#meta_vars', 
+    {
+        create: true, 
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                    this.setTextboxValue();
+                    this.refreshOptions();
+            }
+            })
+        
     {% endif %}
 
     {% if 'concept_vars' in fields %}
     
-    new TomSelect('#concept_vars', {create: true, plugins: ['remove_button']})
+    new TomSelect('#concept_vars', 
+        {   
+            create: true, 
+            plugins: ['remove_button'], 
+            onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
     {% if 'file_format' in fields %}
     
-    new TomSelect('#file_format', {create: true, plugins: ['remove_button']})
+    new TomSelect('#file_format', 
+    {
+        create: true, 
+        plugins: ['remove_button'],
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+    })
     
     {% endif %}
 
     {% if 'text_units' in fields %}
     
-    new TomSelect('#text_units', {create: true, plugins: ['remove_button']})
+    new TomSelect('#text_units', 
+    {
+        create: true, 
+        plugins: ['remove_button'], 
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
     
     {% endif %}
 
