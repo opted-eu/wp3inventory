@@ -153,7 +153,7 @@ icu_codes = {'af': 'Afrikaans',
              'yo': 'Yoruba',
              'zu': 'Zulu'}
 
-icu_codes_list = [{'code' key, 'name': val} for key, val in icu_codes.items()]
+icu_codes_list = [{'code': key, 'name': val} for key, val in icu_codes.items()]
 
 icu_codes_list_tuples = [(key, val) for key, val in icu_codes.items()]
 
