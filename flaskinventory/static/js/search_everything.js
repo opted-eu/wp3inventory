@@ -25,7 +25,7 @@ $.typeahead({
         item.type = item.type.filter(function(e) { return e !== 'Entry' })
         return '<span>' + channel_label + '{{name}}<small> (Type: {{type}}) ' + identifier + '</small></span>'
     },
-    emptyTemplate: "no result for {{query}}",
+    emptyTemplate: "No result for {{query}}. Press enter to perform search query in all fields!",
     source: {
         name: {
             display: ["name", "arxiv", "doi", "title"],
