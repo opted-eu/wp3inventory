@@ -9,7 +9,7 @@ import traceback
 from flask import (current_app, Blueprint, request, jsonify, url_for, abort)
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
-from flaskinventory.flaskdgraph.utils import strip_query
+from flaskinventory.flaskdgraph.utils import strip_query, validate_uid
 from flaskinventory.main.model import Source
 from flaskinventory.main.sanitizer import Sanitizer
 from flaskinventory.add.dgraph import generate_fieldoptions
@@ -22,6 +22,8 @@ endpoint = Blueprint('endpoint', __name__)
 def quicksearch():
     query = request.args.get('q')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
+    query_uid = validate_uid(query) or '0x0'
+    query_regex = f'/{strip_query(query)}/i'
     query_string = f'''
             query quicksearch($name: string)
             {{
@@ -30,9 +32,9 @@ def quicksearch():
             field3 as c(func: anyofterms(title, $name))
             field4 as d(func: eq(doi, $name))
             field5 as e(func: eq(arxiv, $name))
-            field6 as f(func: uid($name))
-            field7 as g(func: regexp(name, /$name/i))
-            field8 as h(func: regexp(unique_name, /$name/i))
+            field6 as f(func: uid($name_uid))
+            field7 as g(func: regexp(name, $name_regex))
+            field8 as h(func: regexp(unique_name, $name_regex))
             
             data(func: uid(field1, field2, field3, field4, field5, field6, field7, field8)) 
                 @normalize @filter(eq(entry_review_status, "accepted")) {{
@@ -48,7 +50,7 @@ def quicksearch():
                 }}
             }}
         '''
-    result = dgraph.query(query_string, variables={'$name': query})
+    result = dgraph.query(query_string, variables={'$name': query, '$name_uid': query_uid, '$name_regex': query_regex})
     for item in result['data']:
         if 'Entry' in item['type']:
             item['type'].remove('Entry')
