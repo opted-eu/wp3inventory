@@ -7,7 +7,7 @@
         {% for material in entry.materials %}
             <dt class="col-sm-3">{{ entry.get("materials|kind").get(loop.index0|string) or 'Material' }}</dt>
             <dd class="col-sm-9">
-                <a href="{{material}}" target="_blank">{{material}}</a>
+                <a href="{{material}}" target="_blank" class="external-link">{{material}}</a>
             </dd>
         {% endfor %}
     </dl>
