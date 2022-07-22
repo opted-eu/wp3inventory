@@ -67,25 +67,25 @@
         <dt class="col-sm-3">Link to Source</dt>
         <dd class="col-sm-9">
                 {% if entry.channel.unique_name == 'twitter' %}
-                <a class="" target="_blank" href="https://twitter.com/{{ entry.channel_url }}">
+                <a class="" target="_blank" class="external-link" href="https://twitter.com/{{ entry.channel_url }}">
                 https://twitter.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'instagram' %}
-                <a class="" target="_blank" href="https://instagram.com/{{ entry.channel_url }}">
+                <a class="" target="_blank" class="external-link" href="https://instagram.com/{{ entry.channel_url }}">
                 https://instagram.com/{{ entry.channel_url }}
                     {% elif entry.channel.unique_name == 'website' %}
-                <a class="" target="_blank" href="{{ entry.channel_url }}">
+                <a class="" target="_blank" class="external-link" href="{{ entry.channel_url }}">
                 {{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'facebook' %}
-                <a class="" target="_blank" href="https://facebook.com/{{ entry.channel_url }}">
+                <a class="" target="_blank" class="external-link" href="https://facebook.com/{{ entry.channel_url }}">
                     https://facebook.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'vkontakte' %}
-                <a class="" target="_blank" href="https://vk.com/{{ entry.channel_url }}">
+                <a class="" target="_blank" class="external-link" href="https://vk.com/{{ entry.channel_url }}">
                     https://vk.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'telegram' %}
-                    <a class="" target="_blank" href="https://t.me/{{ entry.name }}">
+                    <a class="" target="_blank" class="external-link" href="https://t.me/{{ entry.name }}">
                     https://t.me/{{ entry.name }}
                 {% endif %}
-                <i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a>
+                </a>
                 </dd>
         {% endif %}
         {% if 'verified_account' in entry.keys() %}
@@ -98,7 +98,7 @@
         {% endif %}
         {% if entry.wikidataID %}
         <dt class="col-sm-3">Wikidata</dt>
-        <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank">Q{{ entry.wikidataID }}</a>
+        <dd class="col-sm-9"><a href="https://www.wikidata.org/wiki/Q{{ entry.wikidataID }}" target="_blank" class="external-link">Q{{ entry.wikidataID }}</a>
         </dd>
         {% endif %}
         {% if entry.founded %}
@@ -120,12 +120,12 @@
         {% endif %} 
         {% if entry.url %}
             <dt class="col-sm-3">URL</dt>
-            <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank">{{ entry.url }}<i class="fas fa-external-link-alt mx-2" alt="External Link"></i></a></dd>
+            <dd class="col-sm-9"><a href="{{ entry.url }}" target="_blank" class="external-link">{{ entry.url }}</a></dd>
         {% endif %}
         {% if entry.doi %}
             <dt class="col-sm-3">DOI</dt>
             <dd class="col-sm-9">
-                <a href="https://doi.org/{{ entry.doi }}" target="_blank">{{ entry.doi }}</a>
+                <a href="https://doi.org/{{ entry.doi }}" target="_blank" class="external-link">{{ entry.doi }}</a>
                 <div class="row mt-3">
                 <div class="col-1">
                     <span class="__dimensions_badge_embed__" data-doi="{{ entry.doi }}" data-hide-zero-citations="true" data-style="small_circle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
@@ -139,19 +139,19 @@
         {% endif %}
         {% if entry.arxiv %}
             <dt class="col-sm-3">arXiv</dt>
-            <dd class="col-sm-9"><a href="https://arxiv.org/abs/{{ entry.arxiv }}" target="_blank">{{ entry.arxiv }}</a></dd>
+            <dd class="col-sm-9"><a href="https://arxiv.org/abs/{{ entry.arxiv }}" target="_blank" class="external-link">{{ entry.arxiv }}</a></dd>
         {% endif %}
         {% if entry.cran %}
             <dt class="col-sm-3">CRAN</dt>
-            <dd class="col-sm-9"><a href="https://cran.r-project.org/package={{ entry.cran }}" target="_blank">{{ entry.cran }}</a></dd>
+            <dd class="col-sm-9"><a href="https://cran.r-project.org/package={{ entry.cran }}" target="_blank" class="external-link">{{ entry.cran }}</a></dd>
         {% endif %}
         {% if entry.pypi %}
             <dt class="col-sm-3">PyPi</dt>
-            <dd class="col-sm-9"><a href="https://pypi.org/project/{{ entry.pypi }}" target="_blank">{{ entry.pypi }}</a></dd>
+            <dd class="col-sm-9"><a href="https://pypi.org/project/{{ entry.pypi }}" target="_blank" class="external-link">{{ entry.pypi }}</a></dd>
         {% endif %}
         {% if entry.github %}
             <dt class="col-sm-3">GitHub</dt>
-            <dd class="col-sm-9"><a href="https://github.com/{{ entry.github }}" target="_blank">{{ entry.github }}</a></dd>
+            <dd class="col-sm-9"><a href="https://github.com/{{ entry.github }}" target="_blank" class="external-link">{{ entry.github }}</a></dd>
         {% endif %}
     </dl>
 </div>
