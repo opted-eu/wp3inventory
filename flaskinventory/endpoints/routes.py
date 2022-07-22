@@ -25,7 +25,7 @@ def quicksearch():
     query_uid = validate_uid(query) or '0x0'
     query_regex = f'/{strip_query(query)}/i'
     query_string = f'''
-            query quicksearch($name: string)
+            query quicksearch($name: string, $name_regex: string, $name_uid: string)
             {{
             field1 as a(func: anyofterms(name, $name))
             field2 as b(func: anyofterms(other_names, $name))
