@@ -18,6 +18,8 @@ view = Blueprint('view', __name__)
 def search():
     if request.args.get('query'):
         query = request.args.get('query')
+        if validate_uid(query):
+            return view_uid(uid=validate_uid(query))
         # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
         query_string = f'''
                 query search($name: string)

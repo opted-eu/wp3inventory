@@ -22,21 +22,19 @@ endpoint = Blueprint('endpoint', __name__)
 def quicksearch():
     query = request.args.get('q')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_uid = validate_uid(query) or '0x0'
     query_regex = f'/{strip_query(query)}/i'
     query_string = f'''
-            query quicksearch($name: string, $name_regex: string, $name_uid: string)
+            query quicksearch($name: string, $name_regex: string)
             {{
             field1 as a(func: anyofterms(name, $name))
             field2 as b(func: anyofterms(other_names, $name))
             field3 as c(func: anyofterms(title, $name))
             field4 as d(func: eq(doi, $name))
             field5 as e(func: eq(arxiv, $name))
-            field6 as f(func: uid($name_uid))
-            field7 as g(func: regexp(name, $name_regex))
-            field8 as h(func: regexp(unique_name, $name_regex))
+            field6 as g(func: regexp(name, $name_regex))
+            field7 as h(func: regexp(unique_name, $name_regex))
             
-            data(func: uid(field1, field2, field3, field4, field5, field6, field7, field8)) 
+            data(func: uid(field1, field2, field3, field4, field5, field6, field7)) 
                 @normalize @filter(eq(entry_review_status, "accepted")) {{
                     uid 
                     unique_name: unique_name 
@@ -50,7 +48,7 @@ def quicksearch():
                 }}
             }}
         '''
-    result = dgraph.query(query_string, variables={'$name': query, '$name_uid': query_uid, '$name_regex': query_regex})
+    result = dgraph.query(query_string, variables={'$name': query, '$name_regex': query_regex})
     for item in result['data']:
         if 'Entry' in item['type']:
             item['type'].remove('Entry')
