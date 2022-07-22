@@ -22,7 +22,7 @@ endpoint = Blueprint('endpoint', __name__)
 def quicksearch():
     query = request.args.get('q')
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_regex = f'/{strip_query(query)}/i'
+    query_regex = f'/^{strip_query(query)}/i'
     query_string = f'''
             query quicksearch($name: string, $name_regex: string)
             {{
