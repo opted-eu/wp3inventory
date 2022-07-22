@@ -30,8 +30,11 @@ def quicksearch():
             field3 as c(func: anyofterms(title, $name))
             field4 as d(func: eq(doi, $name))
             field5 as e(func: eq(arxiv, $name))
+            field6 as f(func: uid($name))
+            field7 as g(func: regexp(name, /$name/i))
+            field8 as h(func: regexp(unique_name, /$name/i))
             
-            data(func: uid(field1, field2, field3, field4, field5)) 
+            data(func: uid(field1, field2, field3, field4, field5, field6, field7, field8)) 
                 @normalize @filter(eq(entry_review_status, "accepted")) {{
                     uid 
                     unique_name: unique_name 
