@@ -304,9 +304,30 @@ def siterankdata(site: str) -> Union[int, bool]:
         return False
 
 
-def instagram(username):
+def login_instagram():
 
     L = instaloader.Instaloader()
+
+    if current_app.config.get["INSTAGRAM_USERNAME"]:
+        try:
+            L.load_session_from_file(current_app.config.get["INSTAGRAM_USERNAME"])
+        except:
+            current_app.logger.debug('Not logged in to instagram, trying to log in aggain...')
+            L.login(current_app.config["INSTAGRAM_USERNAME"], 
+                current_app.config["INSTAGRAM_PASSWORD"])
+            try:
+                L.test_login()
+                L.save_session_to_file()
+            except Exception as e:
+                current_app.logger.error(f'Could not log in to Instagram. {e}')
+    
+    return L
+
+
+
+def instagram(username):
+
+    L = login_instagram()
 
     try:
         profile = instaloader.Profile.from_username(

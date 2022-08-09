@@ -28,6 +28,9 @@ class Config:
     SLACK_LOGGING_ENABLED = os.environ.get('SLACK_LOGGING_ENABLED', False)
     SLACK_WEBHOOK = os.environ.get('SLACK_WEBHOOK')
 
+    INSTAGRAM_USERNAME = os.environ.get("INSTAGRAM_USERNAME", None)
+    INSTAGRAM_PASSWORD = os.environ.get("INSTAGRAM_PASSWORD", None)
+
 
 """ Configure Logging """
 
