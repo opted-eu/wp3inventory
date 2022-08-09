@@ -308,9 +308,9 @@ def login_instagram():
 
     L = instaloader.Instaloader()
 
-    if current_app.config.get["INSTAGRAM_USERNAME"]:
+    if current_app.config.get("INSTAGRAM_USERNAME"):
         try:
-            L.load_session_from_file(current_app.config.get["INSTAGRAM_USERNAME"])
+            L.load_session_from_file(current_app.config.get("INSTAGRAM_USERNAME"))
         except:
             current_app.logger.debug('Not logged in to instagram, trying to log in aggain...')
             L.login(current_app.config["INSTAGRAM_USERNAME"], 
