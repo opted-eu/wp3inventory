@@ -35,3 +35,4 @@ bs4
 tweepy
 lxml
 telethon
+pandas
