@@ -87,7 +87,7 @@ def reject_entry(uid, user):
 
     for i, r in enumerate(relationships):
         var = Variable(ascii_letters[i], 'uid')
-        query.append(f'{r}(func: has(dgraph.type)) @filter(uid_in({r}, {uid.query}) {{ {var.query} }}')
+        query.append(f'{r}(func: has(dgraph.type)) @filter(uid_in({r}, {uid.query})) {{ {var.query} }}')
         vars[r] = var
 
     query = "\n".join(query)
