@@ -52,20 +52,20 @@ def refresh_wikidata():
     uid = request.form.get('uid')
     if not uid:
         flash('Need to specify a UID', 'danger')
-        return redirect(url_for('users.my_entries', uid=current_user.id))
+        return redirect(url_for('users.my_entries', uid=current_user.id, **request.args))
 
     check = check_entry(uid=uid)
     if not check:
         flash('UID not found!', 'danger')
-        return redirect(url_for('users.my_entries', uid=current_user.id))
+        return redirect(url_for('users.my_entries', uid=current_user.id, **request.args))
 
     if "Organization" not in check.get('dgraph.type'):
         flash('Only works with organizations!', 'danger')
-        return redirect(url_for('view.view_uid', uid=uid))
+        return redirect(url_for('view.view_uid', uid=uid, **request.args))
 
     if not can_edit(check, current_user):
         flash('You do not have permissions to edit this entry', 'danger')
-        return redirect(url_for('view.view_uid', uid=uid))
+        return redirect(url_for('view.view_uid', uid=uid, **request.args))
 
     query_string = f'''{{ q(func: uid({uid})) {{wikidataID}} }}'''
 
@@ -74,7 +74,7 @@ def refresh_wikidata():
         wikidataid = entry['q'][0]['wikidataID']
     except:
         flash(f"Entry {uid} does not have a wikidata ID", 'danger')
-        return redirect(url_for('view.view_uid', uid=uid))
+        return redirect(url_for('view.view_uid', uid=uid, **request.args))
 
     result = fetch_wikidata(f"Q{wikidataid}")
 
@@ -82,7 +82,7 @@ def refresh_wikidata():
         result['uid'] = uid
     else:
         flash(f"Could not retrieve wikidata", 'danger')
-        return redirect(url_for('view.view_uid', uid=uid))
+        return redirect(url_for('view.view_uid', uid=uid, **request.args))
 
     try:
         sanitizer = Sanitizer.edit(result, dgraph_type="Organization")
@@ -90,17 +90,17 @@ def refresh_wikidata():
         current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
     except Exception as e:
         flash(f'Entry could not be updated: {e}', 'danger')
-        return redirect(url_for('edit.edit_uid', uid=uid))
+        return redirect(url_for('edit.edit_uid', uid=uid, **request.args))
 
     try:
         result = dgraph.upsert(
             sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
         current_app.logger.debug(result)
         flash(f'WikiData has been refreshed', 'success')
-        return redirect(url_for('edit.edit_uid', uid=uid))
+        return redirect(url_for('edit.edit_uid', uid=uid, **request.args))
     except Exception as e:
         flash(f'Could not refresh WikiData: {e}', 'danger')
-        return redirect(url_for('edit.edit_uid', uid=uid))
+        return redirect(url_for('edit.edit_uid', uid=uid, **request.args))
 
 
 @edit.route('/edit/<string:dgraph_type>/<string:unique_name>', methods=['GET', 'POST'])
@@ -166,7 +166,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
                         None, e, e.__traceback__))
                     current_app.logger.error(e_trace)
             flash(f'{dgraph_type} could not be updated: {e}', 'danger')
-            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
+            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid, **request.args))
         try:
             result = dgraph.upsert(
                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
@@ -175,10 +175,10 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
                 return redirect(url_for('review.overview', **request.args))
             else:
                 flash(f'{dgraph_type} has been updated', 'success')
-                return redirect(url_for('view.view_uid', uid=uid))
+                return redirect(url_for('view.view_uid', uid=uid, **request.args))
         except Exception as e:
             flash(f'{dgraph_type} could not be updated: {e}', 'danger')
-            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid))
+            return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid, **request.args))
 
     sidebar_items = {'meta': entry['q'][0]}
     if dgraph_type == 'Organization':
@@ -187,7 +187,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         sidebar_items.update({'actions': {'wikidata': wikidata_form}})
     if dgraph_type == 'Source':
         if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
-            sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=entry['q'][0]['uid'])}
+            sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
 
     return render_template('edit/editform.html', 
                             title=f'Edit {dgraph_type}', 
@@ -210,7 +210,7 @@ def source_audience(uid):
 
     if check['channel']['unique_name'] not in ['print', 'facebook']:
         flash('You can only edit the audience size for print and Facebook news sources', 'info')
-        return redirect(url_for('edit.source', uid=uid))
+        return redirect(url_for('edit.source', uid=uid, **request.args))
 
     if request.method == 'POST':
         current_app.logger.debug(
@@ -234,7 +234,7 @@ def source_audience(uid):
 
         flash('Audience size updated!', 'success')
 
-        return jsonify({'status': 'success', 'redirect': url_for('view.view_generic', dgraph_type='Source', uid=uid)})
+        return jsonify({'status': 'success', 'redirect': url_for('view.view_generic', dgraph_type='Source', uid=uid, **request.args)})
 
     audience_size = get_audience(uid=uid)
     entry = get_entry(uid=uid)
@@ -257,4 +257,4 @@ def delete_draft(uid):
 
     flash('Draft deleted!', 'success')
 
-    return redirect(url_for('users.my_entries', uid=current_user.id))
+    return redirect(url_for('users.my_entries', uid=current_user.id, **request.args))
