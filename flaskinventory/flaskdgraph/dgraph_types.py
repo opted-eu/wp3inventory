@@ -69,7 +69,7 @@ class NewID:
         else:
             self.newid = f'_:{slugify(newid, separator="_")}'
 
-        if self.suffix:
+        if suffix:
             self.newid += f'_{suffix}'
         else:
             self.newid += secrets.token_urlsafe(4)
