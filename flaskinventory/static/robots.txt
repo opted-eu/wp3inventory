@@ -1,0 +1,5 @@
+User-Agent: *
+Crawl-Delay: 5
+Disallow: /login
+Disallow: /register
+Disallow: /users/

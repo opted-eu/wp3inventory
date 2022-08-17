@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_from_directory, current_app, request
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.forms import SimpleQuery
@@ -71,3 +71,10 @@ def guides_faq():
 @main.route('/guides/teaching-materials')
 def guides_teaching():
     return render_template('guides/teaching.html', show_sidebar=True)
+
+
+# Misc Routes
+
+@main.route('/robots.txt')
+def static_from_root():
+    return send_from_directory(current_app.static_folder, request.path[1:])
