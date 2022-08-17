@@ -680,6 +680,10 @@ class Archive(Entry):
     sources_included = ListRelationship(relationship_constraint='Source', allow_new=False)
     fulltext = Boolean(description='Archive contains fulltext')
     country = ListRelationship(relationship_constraint=['Country', 'Multinational'], autoload_choices=True)
+    text_units = ListRelationship(description="List of text units available in the data archive (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
+                                    relationship_constraint="TextUnit",
+                                    render_kw={'placeholder': 'Select multiple...'},
+                                    autoload_choices=True)
 
 class Dataset(Entry):
 
@@ -975,6 +979,11 @@ class ResearchPaper(Entry):
                                             autoload_choices=False,
                                             allow_new=False,
                                             relationship_constraint="Source")
+
+    text_units = ListRelationship(description="List of text units analysed in the publication (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
+                                    relationship_constraint="TextUnit",
+                                    render_kw={'placeholder': 'Select multiple...'},
+                                    autoload_choices=True)
     
     datasets_used = ListRelationship(description="Which dataset(s) where used in the publication?",
                                             autoload_choices=True,
