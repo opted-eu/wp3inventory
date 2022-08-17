@@ -63,11 +63,16 @@ class UID:
 
 class NewID:
 
-    def __init__(self, newid, facets=None):
+    def __init__(self, newid, facets=None, suffix=None):
         if newid.startswith('_:'):
             self.newid = newid.strip()
         else:
             self.newid = f'_:{slugify(newid, separator="_")}'
+
+        if self.suffix:
+            self.newid += f'_{suffix}'
+        else:
+            self.newid += secrets.token_urlsafe(4)
 
         self.facets = facets
 
@@ -408,7 +413,7 @@ class ReverseRelationship:
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! Adding new items is not allowed, the provided value is not a UID: {data}')
-            d = {'uid': NewID(data, facets=facets),
+            d = {'uid': NewID(data, facets=facets, suffix="_".join(self.relationship_constraint)) if self.relationship_constraint else NewID(data, facets=facets),
                  self._target_predicate: node}
             if self.relationship_constraint:
                 d.update({'dgraph.type': self.relationship_constraint})
@@ -562,7 +567,8 @@ class MutualRelationship:
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-            node_data = NewID(data, facets=facets)
+            node_data = NewID(data, facets=facets, suffix="_".join(
+                self.relationship_constraint)) if self.relationship_constraint else NewID(data, facets=facets)
             data_node = {'uid': node_data, self.predicate: node, 'name': data}
             if self.relationship_constraint:
                 data_node.update({'dgraph.type': self.relationship_constraint})
@@ -927,7 +933,8 @@ class SingleRelationship(Predicate):
             if not self.allow_new:
                 raise InventoryValidationError(
                     f'Error in <{self.predicate}>! provided value is not a UID: {data}')
-            d = {'uid': NewID(data, facets=facets)}
+            d = {'uid': NewID(data, facets=facets, suffix="_".join(
+                self.relationship_constraint)) if self.relationship_constraint else NewID(data, facets=facets)}
             if self.relationship_constraint:
                 d.update({'dgraph.type': self.relationship_constraint})
             return d
