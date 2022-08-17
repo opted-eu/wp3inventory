@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use the data in Meteor, please use the following citation."
+authors:
+- family-names: "Balluff"
+  given-names: "Paul"
+  orcid: "https://orcid.org/0000-0001-9548-3225"
+- family-names: "Lind"
+  given-names: "Fabienne"
+  orcid: "https://orcid.org/0000-0002-4978-9415"
+- family-names: "Stecker"
+  given-names: "Marvin"
+- family-names: "Dinhopl"
+  given-names: "Celina"
+- family-names: "Boomgaarden"
+  given-names: "Hajo G."
+  orcid: "https://orcid.org/0000-0002-5260-1284"
+- family-names: "Waldherr"
+  given-names: "Annie"
+  orcid: "https://orcid.org/0000-0001-7488-9138"
+title: "Meteor: Inventory of news sources, media organizations, and text analysis tools"
+date-released: 2022-08-01
+url: "https://meteor.opted.eu"
