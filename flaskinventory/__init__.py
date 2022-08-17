@@ -3,15 +3,23 @@ import json
 
 from flask import Flask
 from .config import create_filehandler, create_slackhandler
-
-from flask_login import LoginManager, AnonymousUserMixin
-from flask_mail import Mail
 from flaskinventory.config import Config
+
+#### Load Extensions ####
+# Login Extension
+from flask_login import LoginManager, AnonymousUserMixin
+# E-Mail Extension
+from flask_mail import Mail
+# Forms Extension
 from flask_wtf.csrf import CSRFProtect
+# Rate Limiting
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+# Markdown Rendering
 from flaskext.markdown import Markdown
 from markdown.extensions.toc import TocExtension
+
+# Custom Dgraph Extension
 from flaskinventory.flaskdgraph import DGraph
 
 dgraph = DGraph()
