@@ -3,3 +3,4 @@ Crawl-Delay: 5
 Disallow: /login
 Disallow: /register
 Disallow: /users/
+Sitemap: https://meteor.opted.eu/sitemap.xml

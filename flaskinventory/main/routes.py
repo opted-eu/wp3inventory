@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, send_from_directory, current_app, request
+from flask import Blueprint, render_template, send_from_directory, current_app, request, url_for, make_response
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.forms import SimpleQuery
+
+from datetime import datetime
 
 main = Blueprint('main', __name__)
 
@@ -40,7 +42,6 @@ def home():
 
 
 @main.route('/about')
-@main.route('/about/')
 def about():
     return render_template('main/about.html', title="About Page", show_sidebar=True)
 
@@ -78,3 +79,17 @@ def guides_teaching():
 @main.route('/robots.txt')
 def static_from_root():
     return send_from_directory(current_app.static_folder, request.path[1:])
+
+@main.route('/sitemap.xml', methods=['GET'])
+def sitemap():
+    pages = []
+
+    lastmod = datetime.now().strftime('%Y-%m-%d')
+    for rule in current_app.url_map.iter_rules():
+        if 'GET' in rule.methods and len(rule.arguments) == 0 and rule.endpoint.startswith('main'):
+            pages.append((url_for(rule.endpoint, _external=True), lastmod))
+
+    sitemap_template = render_template('main/sitemap_template.xml', pages=pages)
+    response = make_response(sitemap_template)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
