@@ -58,28 +58,33 @@ def quicksearch():
 @endpoint.route('/endpoint/orglookup')
 def orglookup():
     query = strip_query(request.args.get('q'))
+    query_regex = f"/{query}/i"
+    query_beginning = f'/^{query}/i'
     person = request.args.get('person')
     if person:
         person_filter = f'AND eq(is_person, {person})'
     else:
         person_filter = ''
     # query_string = f'{{ data(func: regexp(name, /{query}/i)) @normalize {{ uid unique_name: unique_name name: name type: dgraph.type channel {{ channel: name }}}} }}'
-    query_string = f'''{{
-            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Organization") {person_filter})
-            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Organization") {person_filter})
-  
-	        data(func: uid(field1, field2)) {{
-                uid
-                unique_name
-                name
-                dgraph.type
-                is_person
-                other_names
-                country {{ name }}
-                }}
+    query_string = f'''
+            query orglookup($query_regex: string, $query_beginning: string)
+            {{
+                field1 as var(func: regexp(name, $query_regex)) @filter(type("Organization") {person_filter})
+                field2 as var(func: regexp(other_names, $query_regex)) @filter(type("Organization") {person_filter})
+                field3 as var(func: regexp(unique_name, $query_beginning)) @filter(type("Organization") {person_filter})
+    
+                data(func: uid(field1, field2, field3)) {{
+                    uid
+                    unique_name
+                    name
+                    dgraph.type
+                    is_person
+                    other_names
+                    country {{ name }}
+                    }}
             }}
     '''
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables={'$query_regex': query_regex, '$query_beginning': query_beginning})
     result['status'] = True
     return jsonify(result)
 
@@ -87,11 +92,16 @@ def orglookup():
 @endpoint.route('/endpoint/sourcelookup')
 def sourcelookup():
     query = strip_query(request.args.get('q'))
-    query_string = f'''{{
-            field1 as var(func: regexp(name, /{query}/i)) @filter(type("Source"))
-            field2 as var(func: regexp(other_names, /{query}/i)) @filter(type("Source"))
+    query_regex = f"/{query}/i"
+    query_beginning = f'/^{query}/i'
+    query_string = f'''
+        query source($query_regex: string, $query_beginning: string)
+        {{
+            field1 as var(func: regexp(name, $query_regex)) @filter(type("Source"))
+            field2 as var(func: regexp(other_names, $query_regex)) @filter(type("Source"))
+            field3 as var(func: regexp(unique_name, $query_beginning)) @filter(type("Source"))
   
-	        data(func: uid(field1, field2)) {{
+	        data(func: uid(field1, field2, field3)) {{
                 uid
                 unique_name
                 name
@@ -101,7 +111,7 @@ def sourcelookup():
             }}
     '''
     try:
-        result = dgraph.query(query_string)
+        result = dgraph.query(query_string, variables={'$query_regex': query_regex, '$query_beginning': query_beginning})
         result['status'] = True
         return jsonify(result)
     except Exception as e:
