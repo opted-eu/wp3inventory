@@ -115,6 +115,7 @@ type Archive {
     access
     sources_included
     fulltext
+    text_units
 }
 
 
@@ -206,6 +207,7 @@ type ResearchPaper {
     datasets_used
     corpus_used
     country
+    text_units
 }
 
 
