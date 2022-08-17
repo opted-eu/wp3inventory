@@ -87,6 +87,6 @@ def create_app(config_class=Config, config_json=None):
 
     limiter.init_app(app)
 
-    Markdown(app, extensions=[TocExtension(baselevel=3, anchorlink=True)])
+    Markdown(app, extensions=[TocExtension(baselevel=3, anchorlink=True), 'fenced_code'])
 
     return app
