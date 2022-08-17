@@ -48,3 +48,15 @@
     </dl>
 </div>
 {% endif %}
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Research</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted"></small></dd>
+        {% if entry.text_units %}
+        <dt class="col-sm-3">Text Units</dt>
+        <dd class="col-sm-9">
+            {{ render_tags(entry.text_units) }}
+        </dd>
+        {% endif %}
+    </dl>
+</div>
