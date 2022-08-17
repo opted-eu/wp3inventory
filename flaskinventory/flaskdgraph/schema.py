@@ -21,18 +21,25 @@ class Schema:
     # Key = predicate (string), Val = list(Dgraph Type (string))
     __predicates__ = {}
 
+    # registry of all relationship predicates
+    __relationship_predicates__ = {}
+
     # registry of explicit reverse relationship that should generate a form field
     # key = predicate (string), val = dict of predicates
-    __reverse_predicates__ = {}
+    __reverse_relationship_predicates__ = {}
 
     def __init_subclass__(cls) -> None:
-        from .dgraph_types import Predicate, ReverseRelationship, MutualRelationship
+        from .dgraph_types import Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
         predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
+        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
         reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), ReverseRelationship)}
+        
         # inherit predicates from parent classes
         for parent in cls.__bases__:
             if parent.__name__ != Schema.__name__:
                 predicates.update({k: v for k, v in Schema.get_predicates(
+                    parent.__name__).items() if k not in predicates.keys()})
+                relationship_predicates.update({k: v for k, v in Schema.get_relationships(
                     parent.__name__).items() if k not in predicates.keys()})
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
                     parent.__name__).items() if k not in reverse_predicates.keys()})
@@ -47,7 +54,7 @@ class Schema:
                     Schema.__inheritance__[cls.__name__] = list(set(Schema.__inheritance__[cls.__name__]))
         
         Schema.__types__[cls.__name__] = predicates
-        Schema.__reverse_predicates__[cls.__name__] = reverse_predicates
+        Schema.__reverse_relationship_predicates__[cls.__name__] = reverse_predicates
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
         for key in cls.__dict__.keys():
@@ -58,6 +65,11 @@ class Schema:
                     cls.__predicates__.update({key: [cls.__name__]})
                 else:
                     cls.__predicates__[key].append(cls.__name__)
+                if isinstance(attribute, (SingleRelationship, MutualRelationship)):
+                    if key not in cls.__relationship_predicates__.keys():
+                        cls.__relationship_predicates__.update({key: [cls.__name__]})
+                    else:
+                        cls.__relationship_predicates__[key].append(cls.__name__)
 
     @classmethod
     def get_types(cls) -> list:
@@ -80,11 +92,20 @@ class Schema:
         return cls.__types__[_cls]
 
     @classmethod
+    def get_relationships(cls, _cls) -> dict:
+        from .dgraph_types import SingleRelationship, MutualRelationship
+        if not isinstance(_cls, str):
+            _cls = _cls.__name__
+        
+        relationships = cls.__types__[_cls]
+        return {k: v for k, v in relationships.items() if isinstance(v, (SingleRelationship, MutualRelationship))}
+
+    @classmethod
     def get_reverse_predicates(cls, _cls) -> dict:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        if _cls in cls.__reverse_predicates__.keys():
-            return cls.__reverse_predicates__[_cls]
+        if _cls in cls.__reverse_relationship_predicates__.keys():
+            return cls.__reverse_relationship_predicates__[_cls]
         else:
             return None
 
@@ -93,9 +114,13 @@ class Schema:
         return cls.__types__[cls.__name__]
 
     @classmethod
+    def relationship_predicates(cls) -> dict:
+        return cls.__relationship_predicates__
+
+    @classmethod
     def reverse_predicates(cls) -> dict:
-        if cls.__name__ in cls.__reverse_predicates__:
-            return cls.__reverse_predicates__[cls.__name__]
+        if cls.__name__ in cls.__reverse_relationship_predicates__:
+            return cls.__reverse_relationship_predicates__[cls.__name__]
         else:
             return None
 

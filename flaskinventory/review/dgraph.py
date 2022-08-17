@@ -1,9 +1,12 @@
 from datetime import datetime
+from string import ascii_letters
 from flask import current_app
 from flaskinventory import dgraph
+from flaskinventory.flaskdgraph import Schema
 from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scalar,
                                         GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
+from flaskinventory.errors import InventoryDatabaseError
 
 
 def get_overview(dgraphtype, country=None, user=None):
@@ -77,31 +80,24 @@ def reject_entry(uid, user):
     current_app.logger.debug(f'Rejecting entry: UID {uid}')
 
     uid = UID(uid)
-    related = Variable('v', 'uid')
-    publishes = Variable('p', 'uid')
-    owns = Variable('o', 'uid')
-    source_included = Variable('i', 'uid') 
 
-    query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query})) {{
-			            {related.query} }} 
-                    publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query})) {{
-                        {publishes.query} }}
-                    owns(func: type(Organization)) @filter(uid_in(owns, {uid.query})) {{
-                        {owns.query} }}
-                    included(func: has(dgraph.type)) @filter(uid_in(sources_inclued, {uid.query})) {{
-                        {source_included.query}
-                    }}
-                }}'''
+    relationships = list(Schema.relationship_predicates().keys())
+    query = []
+    vars = {}
 
-    delete_predicates = ['dgraph.type', 'unique_name', 'publishes',
-                         'owns', 'related']
+    for i, r in enumerate(relationships):
+        var = Variable(ascii_letters[i], 'uid')
+        query.append(f'{r}(func: has(dgraph.type)) @filter(uid_in({r}, {uid.query}) {{ {var.query} }}')
+        vars[r] = var
+
+    query = "\n".join(query)
+
+    delete_predicates = ['dgraph.type', 'unique_name'] + relationships
 
     del_nquads = [make_nquad(uid, item, Scalar('*'))
                   for item in delete_predicates]
-    del_nquads += [make_nquad(related, 'related', uid)]
-    del_nquads += [make_nquad(publishes, 'publishes', uid)]
-    del_nquads += [make_nquad(owns, 'owns', uid)]
-    del_nquads += [make_nquad(source_included, 'sources_included', uid)]
+    for k, v in vars.items():
+        del_nquads.append(make_nquad(v, k, uid))
 
     del_nquads = " \n ".join(del_nquads)
 
