@@ -15,7 +15,7 @@ Flask-Limiter
 Flask-Markdown
 grpcio
 idna
-itsdangerous==2.0.1
+pyjwt
 Jinja2
 MarkupSafe
 Pillow

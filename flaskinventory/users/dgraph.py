@@ -1,7 +1,7 @@
 from flask import current_app
 from flask_login import UserMixin
 from flaskinventory import dgraph
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import jwt
 from flaskinventory.users.constants import USER_ROLES
 import datetime
 import secrets
@@ -50,45 +50,75 @@ class User(UserMixin):
         return f'<DGraph User.uid {self.id}>'
 
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        dgraph.update_entry({'pw_reset': s.dumps({'user_id': self.id}).decode('utf-8'),
-                                         'pw_reset|used': False}, uid=self.id)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
+        reset_token = jwt.encode(
+            {
+                "confirm": self.id,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                       + datetime.timedelta(seconds=expires_sec)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+
+        dgraph.update_entry({'pw_reset': reset_token,
+                             'pw_reset|used': False}, uid=self.id)
+        return reset_token
     
     def get_invite_token(self, expires_days=7):
         expires_sec = expires_days * 24 * 60 * 60 
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
+        reset_token = jwt.encode(
+            {
+                "confirm": self.id,
+                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                       + datetime.timedelta(seconds=expires_sec)
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256"
+        )
+        return reset_token
 
     @staticmethod
     def verify_reset_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            user_id = s.loads(token)['user_id']
+            data = jwt.decode(
+                token,
+                current_app.config['SECRET_KEY'],
+                leeway=datetime.timedelta(seconds=10),
+                algorithms=["HS256"]
+            )
         except:
-            return None
+            return False 
+        
+        user_id = data.get('confirm')
+
         user = User(uid=user_id)
         if user.pw_reset_used:
-            return None
+            return False
         elif user.pw_reset != token:
-            return None
+            return Flase
         else:
             dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
             return user
 
     @staticmethod
     def verify_email_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            user_id = s.loads(token)['user_id']
+            data = jwt.decode(
+                token,
+                current_app.config['SECRET_KEY'],
+                algorithms=["HS256"]
+            )
         except:
-            return None
+            return False 
+        
+        user_id = data.get('confirm')
         user = User(uid=user_id)
         if user:
             dgraph.update_entry({'account_status': 'active'}, uid=user_id)
             return user
         else:
-            return None
+            return False
+
 
 from flaskinventory import login_manager
 @login_manager.user_loader
