@@ -121,7 +121,8 @@ class Sanitizer:
             if Schema.get_reverse_predicates(dgraph_type):
                 edit_fields.update(Schema.get_reverse_predicates(dgraph_type))
 
-        edit_fields = {key: field for key, field in edit_fields.items() if field.edit}
+        if entry_review_status != 'draft':
+            edit_fields = {key: field for key, field in edit_fields.items() if field.edit}
 
         if not isinstance(dgraph_type, str):
             dgraph_type = dgraph_type.__name__
@@ -146,13 +147,16 @@ class Sanitizer:
             for key, val in self.overwrite.items():
                 for predicate in list(set(val)):
                     del_obj.append({'uid': key, predicate: '*'})
-                    if isinstance(self.fields[predicate], (MutualRelationship, ReverseRelationship)):
-                        var = Variable(predicate, 'uid')
-                        upsert_query += f""" q_{predicate}(func: has(dgraph.type)) 
-                                                @filter(uid_in({predicate}, {key.query})) {{
-                                                    {var.query}
-                                                }} """
-                        del_obj.append({'uid': var, predicate: key})
+                    try:
+                        if isinstance(self.fields[predicate], (MutualRelationship, ReverseRelationship)):
+                            var = Variable(predicate, 'uid')
+                            upsert_query += f""" q_{predicate}(func: has(dgraph.type)) 
+                                                    @filter(uid_in({predicate}, {key.query})) {{
+                                                        {var.query}
+                                                    }} """
+                            del_obj.append({'uid': var, predicate: key})
+                    except KeyError:
+                        pass
 
             nquads = [" \n".join(dict_to_nquad(obj)) for obj in del_obj]
             self.delete_nquads = " \n".join(nquads)
