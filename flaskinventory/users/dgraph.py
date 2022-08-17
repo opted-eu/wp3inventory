@@ -95,7 +95,7 @@ class User(UserMixin):
         if user.pw_reset_used:
             return False
         elif user.pw_reset != token:
-            return Flase
+            return False
         else:
             dgraph.update_entry({'pw_reset|used': True}, uid=user_id)
             return user
