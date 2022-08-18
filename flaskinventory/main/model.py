@@ -42,7 +42,7 @@ class AddressAutocode(Geo):
     autoinput = 'name'
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(overwrite=True, *args, **kwargs)
 
     def validation_hook(self, data):
         return str(data)
