@@ -44,25 +44,29 @@
 {% endmacro %}
 
 {% macro render_publication(publication) %}
-
-<a href="{{ url_for('view.view_uid', uid=publication.uid) }}" class="me-2">{{ publication.title if publication.title else publication.name }}</a>
-<span>
-{% if publication.authors is string %} 
-    {{ publication.authors }}
-{% else %}
-    {{ publication.authors[0] }} {{ 'et al.' if publication.authors|length > 1 else '' }}
-{% endif %}
-{% if publication.published_date %}
-    <span>({{ publication.published_date.strftime('%Y') }})</span>
-{% endif %}
-</span>
-
+    <a href="{{ url_for('view.view_uid', uid=publication.uid) }}" class="me-1">{{ publication.title if publication.title else publication.name }}</a>
+    <span>
+    {% if publication.authors is string %} 
+        {{ publication.authors }}
+    {% else %}
+        {{ publication.authors[0] }} {{ 'et al.' if publication.authors|length > 1 else '' }}
+    {% endif %}
+    {% if publication.published_date %}
+        <span>({{ publication.published_date.strftime('%Y') }})</span>
+    {% endif %}
+    </span>
+    {% if publication.entry_review_status == 'pending' %}
+    <small data-bs-toggle="tooltip" data-bs-placement="top" title="This entry has to be checked by a reviewer first." class="text-muted">(pending)</small>
+    {% endif %}
 {% endmacro %}
 
 {% macro render_tags(tags) %}
 <ul class="list-inline">
 {% for tag in tags %}
-    <li class="list-inline-item"><a href="{{ url_for('view.view_uid', uid=tag.uid) }}">{{tag.name}}</a></li>
+    <li class="list-inline-item"><a href="{{ url_for('view.view_uid', uid=tag.uid) }}">{{tag.name}}</a>
+        {% if tag.entry_review_status == 'pending' %}
+        <small data-bs-toggle="tooltip" data-bs-placement="top" title="This entry has to be checked by a reviewer first." class="text-muted">(pending)</small>
+        {% endif %}</li>
 {% endfor %}
 </ul>
 {% endmacro %}
