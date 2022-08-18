@@ -390,11 +390,14 @@ class Sanitizer:
                 self.entry['unique_name'] = f'{name}_{secrets.token_urlsafe(4)}'
 
     def parse_wikidata(self):
+        predicates = Schema.get_predicates(self.dgraph_type)
         if not self.is_upsert:
             wikidata = get_wikidata(self.data.get('name'))
             if wikidata:
                 for key, val in wikidata.items():
                     if val is None: continue
+                    if key not in predicates.keys():
+                        continue
                     if key not in self.entry.keys():
                         self.entry[key] = val
                     elif key == 'other_names':
