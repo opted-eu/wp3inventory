@@ -10,7 +10,7 @@ function fetchMetaData(button) {
 
     if (!platform || platform == 'choose...') {
         document.getElementById('magic-platform').classList.add('is-invalid')
-        buttonWarning(button, message="Magic")
+        buttonWarning(button, message = "Magic")
         return false
     }
 
@@ -38,12 +38,11 @@ function fetchMetaData(button) {
 
         if (!doi_regex.test(doi)) {
             hideSpinner(button)
-            buttonWarning(button, message="DOI Invalid!")
+            buttonWarning(button, message = "DOI Invalid!")
             return false
         }
 
         // check if already in inventory
-
         fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?doi=' + doi)
             .then(response => response.json())
             .then(result => checkInventory(result))
@@ -65,6 +64,11 @@ function fetchMetaData(button) {
         arxiv = arxiv.replace('arxiv.org/abs/', '')
         arxiv = arxiv.replace('abs/', '')
 
+        // check if already in inventory
+        fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?arxiv=' + arxiv)
+            .then(response => response.json())
+            .then(result => checkInventory(result))
+
         let api = "https://export.arxiv.org/api/query?id_list="
 
         fetch(api + arxiv)
@@ -77,25 +81,46 @@ function fetchMetaData(button) {
     } else if (platform == 'cran') {
 
         // sanitize identifier string
+        cran = identifier.replace('https://cran.r-project.org/web/packages/', '')
+        cran = cran.replace('http://cran.r-project.org/web/packages/', '')
+        cran = cran.replace('/index.html', '')
+        cran = cran.replace('https://CRAN.R-project.org/package=', '')
+        cran = cran.replace('https://cran.r-project.org/package=', '')
+
+        // check if already in inventory
+        fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?cran=' + cran)
+            .then(response => response.json())
+            .then(result => checkInventory(result))
 
         let api = $SCRIPT_ROOT + '/endpoint/cran?package='
 
-        fetch(api + identifier)
+        fetch(api + cran)
             .then(response => response.json())
             .then(result => fillForm(result))
             .then(_ => hideSpinner(button), buttonSuccess(button))
             .catch(error => handleError(error, button))
 
     } else if (platform == 'python') {
+
+        pypi = identifier.replace("https://pypi.org/project/", "")
+        pypi = pypi.replace('http://pypi.org/project/', '')
+        pypi = pypi.replace('pypi.org/project/', '')
+        pypi = pypi.replace('project/', '')
+
+        // check if already in inventory
+        fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?pypi=' + pypi)
+            .then(response => response.json())
+            .then(result => checkInventory(result))
+
         let api = "https://pypi.org/pypi/"
 
-        fetch(api + identifier + '/json')
+        fetch(api + pypi + '/json')
             .then(response => response.json())
             .then(json => parsePyPi(json))
             .then(result => fillForm(result))
             .then(_ => hideSpinner(button), buttonSuccess(button))
             .catch(error => handleError(error, button))
-    
+
     } else if (platform == 'github') {
         let api = "https://api.github.com/repos/"
 
@@ -106,6 +131,11 @@ function fetchMetaData(button) {
         github = github.replace('https://github.com/', '')
         github = github.replace('http://github.com/', '')
         github = github.replace('github.com/', '')
+
+        // check if already in inventory
+        fetch($SCRIPT_ROOT + '/endpoint/identifier/lookup?github=' + github)
+            .then(response => response.json())
+            .then(result => checkInventory(result))
 
         fetch(api + github)
             .then(response => response.json())
@@ -120,6 +150,7 @@ function fetchMetaData(button) {
 function checkInventory(data) {
     console.log(data)
     let container = document.getElementById('magic-warning-container')
+    let button = document.getElementById('magic')
     if (data.status) {
         let identifier = data.data[0].doi
         if (!identifier) {
@@ -128,10 +159,10 @@ function checkInventory(data) {
         container.getElementsByTagName('p')[0].innerHTML = `This entry is already in the inventory! 
             You can find it by entering the identifier "${identifier}" in the search box above`
         container.hidden = false
+        buttonWarning(button, 'Warning!')
     } else {
         container.hidden = true
     }
-
 }
 
 function fillForm(data) {
@@ -186,7 +217,7 @@ function buttonSuccess(button) {
     document.getElementById('magic-error-container').hidden = true
 }
 
-function buttonWarning(button, message="Invalid Identifier!") {
+function buttonWarning(button, message = "Invalid Identifier!") {
     button.classList = ['btn btn-warning w-100']
     button.getElementsByClassName('spinner-grow')[0].hidden = true
     button.getElementsByClassName('button-loading')[0].hidden = true

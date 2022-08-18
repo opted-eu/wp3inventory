@@ -185,10 +185,10 @@ def cran():
 @endpoint.route('/endpoint/identifier/lookup')
 def identifier_lookup():
     if request.args.get('doi'):
-        identifier = request.args.get('doi')
+        identifier = request.args.get('doi').strip()
         field = 'doi'
     elif request.args.get('arxiv'):
-        identifier = request.args.get('arxiv')
+        identifier = request.args.get('arxiv').strip()
         field = 'arxiv'
     else:
         return jsonify({'status': False})
