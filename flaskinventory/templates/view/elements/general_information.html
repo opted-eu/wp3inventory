@@ -67,22 +67,22 @@
         <dt class="col-sm-3">Link to Source</dt>
         <dd class="col-sm-9">
                 {% if entry.channel.unique_name == 'twitter' %}
-                <a class="" target="_blank" class="external-link" href="https://twitter.com/{{ entry.channel_url }}">
-                https://twitter.com/{{ entry.channel_url }}
+                <a target="_blank" class="external-link" href="https://twitter.com/{{ entry.channel_url }}">
+                    https://twitter.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'instagram' %}
-                <a class="" target="_blank" class="external-link" href="https://instagram.com/{{ entry.channel_url }}">
-                https://instagram.com/{{ entry.channel_url }}
-                    {% elif entry.channel.unique_name == 'website' %}
-                <a class="" target="_blank" class="external-link" href="{{ entry.channel_url }}">
-                {{ entry.channel_url }}
+                <a target="_blank" class="external-link" href="https://instagram.com/{{ entry.channel_url }}">
+                    https://instagram.com/{{ entry.channel_url }}
+                {% elif entry.channel.unique_name == 'website' %}
+                <a target="_blank" class="external-link" href="{{ entry.channel_url }}">
+                    {{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'facebook' %}
-                <a class="" target="_blank" class="external-link" href="https://facebook.com/{{ entry.channel_url }}">
+                <a target="_blank" class="external-link" href="https://facebook.com/{{ entry.channel_url }}">
                     https://facebook.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'vkontakte' %}
-                <a class="" target="_blank" class="external-link" href="https://vk.com/{{ entry.channel_url }}">
+                <a target="_blank" class="external-link" href="https://vk.com/{{ entry.channel_url }}">
                     https://vk.com/{{ entry.channel_url }}
                 {% elif entry.channel.unique_name == 'telegram' %}
-                    <a class="" target="_blank" class="external-link" href="https://t.me/{{ entry.name }}">
+                    <a target="_blank" class="external-link" href="https://t.me/{{ entry.name }}">
                     https://t.me/{{ entry.name }}
                 {% endif %}
                 </a>
