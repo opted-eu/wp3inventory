@@ -173,7 +173,7 @@ def submit():
 
 @endpoint.route('/endpoint/cran')
 def cran():
-    package = request.args.get('package')
+    package = request.args.get('package').strip()
     from flaskinventory.add.external import cran
 
     result = cran(package)
@@ -190,6 +190,15 @@ def identifier_lookup():
     elif request.args.get('arxiv'):
         identifier = request.args.get('arxiv').strip()
         field = 'arxiv'
+    elif request.args.get('cran'):
+        identifier = request.args.get('cran').strip()
+        field = 'cran'
+    elif request.args.get('pypi'):
+        identifier = request.args.get('pypi').strip()
+        field = 'pypi'
+    elif request.args.get('github'):
+        identifier = request.args.get('github').strip()
+        field = 'github'
     else:
         return jsonify({'status': False})
 
@@ -206,6 +215,8 @@ def identifier_lookup():
                         title
                         doi
                         arxiv
+                        cran
+                        pypi
                     }}
                 }}
         '''
