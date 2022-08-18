@@ -8,7 +8,7 @@ from flaskinventory.flaskdgraph.dgraph_types import UID, Variable, Scalar, make_
 def get_entry(unique_name=None, uid=None):
     query_string = 'query get_entry($query: string) {'
     if unique_name:
-        query_string += 'q(func: eq(unique_name, "$query"))'
+        query_string += 'q(func: eq(unique_name, $query))'
         variables = {'$query': unique_name}
     elif uid:
         query_string += 'q(func: uid($query))'

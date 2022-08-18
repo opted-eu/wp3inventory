@@ -56,7 +56,7 @@ def check_entry(uid=None, unique_name=None):
         query_string += 'q(func: uid($query)) @filter(has(dgraph.type))'
         variables = {'$query': uid}
     elif unique_name:
-        query_string += 'q(func: eq(unique_name, "$query"))'''
+        query_string += 'q(func: eq(unique_name, $query))'''
         variables = {'$query': unique_name}
     else:
         return False
