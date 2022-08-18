@@ -18,6 +18,22 @@
     </dl>
 </div>
 {% from "helpers/_viewhelpers.html" import render_publication %}
+{% if entry.corpus_used %} 
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Corpora</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">This publication used the following corpora.</small></dd>
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9 mb-4">
+        {% if entry.corpus_used %} 
+            {% for corp in entry.corpus_used %}
+                <p>{{ render_publication(corp) }}</p>
+            {% endfor %}
+        {% endif %}
+        </dd>
+    </dl>
+</div>
+{% endif %}
 {% if entry.datasets_used %} 
 <div class="border rounded p-3">
     <dl class="row">
@@ -28,22 +44,6 @@
             {% for dataset in entry.datasets_used %}
             <p>{{ render_publication(dataset) }}</p>
             {% endfor %}
-        </dd>
-    </dl>
-</div>
-{% endif %}
-{% if entry.corpus_used %} 
-<div class="border rounded p-3">
-    <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Corpus</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted">This publication used the following corpus.</small></dd>
-        <dt class="col-sm-3"></dt>
-        <dd class="col-sm-9 mb-4">
-        {% if entry.corpus_used %} 
-            {% for corp in entry.corpus_used %}
-                <p>{{ render_publication(corp) }}</p>
-            {% endfor %}
-        {% endif %}
         </dd>
     </dl>
 </div>

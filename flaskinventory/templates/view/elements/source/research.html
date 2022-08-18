@@ -33,13 +33,13 @@
 {% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Datasets</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted">Following datasets include the news source.</small></dd>
+        <dt class="col-sm-3 mb-4"><h5>Corpora</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following corpora include the news source.</small></dd>
         <dt class="col-sm-3"></dt>
         <dd class="col-sm-9 mb-4">
-        {% if entry.datasets %} 
-            {% for dataset in entry.datasets %}
-                <p>{{ render_publication(dataset) }}</p>
+        {% if entry.corpora %} 
+            {% for corpus in entry.corpora %}
+                <p>{{ render_publication(corpus) }}</p>
             {% endfor %}
         {% endif %}
         </dd>
@@ -47,13 +47,13 @@
 </div>
 <div class="border rounded p-3">
     <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Corpus</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted">Following corpora include the news source.</small></dd>
+        <dt class="col-sm-3 mb-4"><h5>Datasets</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following datasets include the news source.</small></dd>
         <dt class="col-sm-3"></dt>
         <dd class="col-sm-9 mb-4">
-        {% if entry.corpora %} 
-            {% for corpus in entry.corpora %}
-                <p>{{ render_publication(corpus) }}</p>
+        {% if entry.datasets %} 
+            {% for dataset in entry.datasets %}
+                <p>{{ render_publication(dataset) }}</p>
             {% endfor %}
         {% endif %}
         </dd>

@@ -1,7 +1,21 @@
 {% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Dataset</h5></dt>
+        <dt class="col-sm-3 mb-4"><h5>Corpora</h5></dt>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">These corpora have this meta variable.</small></dd>
+        <dt class="col-sm-3 mb-4"></dt>
+        <dd class="col-sm-9 mb-4">
+        {% if entry.corpus %} 
+            {% for corp in entry.corpus %}
+            <p>{{ render_publication(corp) }}</p>
+            {% endfor %}
+        {% endif %}
+        </dd>
+    </dl>
+</div>
+<div class="border rounded p-3">
+    <dl class="row">
+        <dt class="col-sm-3 mb-4"><h5>Datasets</h5></dt>
         <dd class="col-sm-9 mb-4"><small class="text-muted">These datasets have this meta variable.</small></dd>
         <dt class="col-sm-3 mb-4"></dt>
         <dd class="col-sm-9 mb-4">
@@ -14,17 +28,3 @@
     </dl>
 </div>
 
-<div class="border rounded p-3">
-    <dl class="row">
-        <dt class="col-sm-3 mb-4"><h5>Corpus</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted">These corpora have this meta variable.</small></dd>
-        <dt class="col-sm-3 mb-4"></dt>
-        <dd class="col-sm-9 mb-4">
-        {% if entry.corpus %} 
-            {% for corp in entry.corpus %}
-            <p>{{ render_publication(corp) }}</p>
-            {% endfor %}
-        {% endif %}
-        </dd>
-    </dl>
-</div>
