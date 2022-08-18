@@ -25,27 +25,30 @@ def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
         query = strip_query(form.name.data)
+        identifier = form.name.data.strip()
         query_string = f'''
-                query database_check($query: string)
+                query database_check($query: string, $identifier: string)
                 {{
                     field1 as a(func: regexp(name, /$query/i)) @filter(type("{form.entity.data}"))
                     field2 as b(func: allofterms(name, $query)) @filter(type("{form.entity.data}"))
                     field3 as c(func: allofterms(other_names, $query)) @filter(type("{form.entity.data}"))
                     field4 as d(func: match(name, $query, 3)) @filter(type("{form.entity.data}"))
                     field5 as e(func: allofterms(title, $query)) @filter(type("{form.entity.data}"))
-                    doi as f(func: eq(doi, $query))
-                    arxiv as g(func: eq(arxiv, $query))
+                    doi as f(func: eq(doi, $identifier))
+                    arxiv as g(func: eq(arxiv, $identifier))
+                    cran as h(func: eq(cran, $identifier))
+                    pypi as i(func: eq(pypi, $identifier))
+                    github as j(func: eq(github, $identifier))
 
-                    data(func: uid(field1, field2, field3, field4, field5, doi, arxiv)) {{
+                    check(func: uid(field1, field2, field3, field4, field5, doi, arxiv, cran, pypi, github)) {{
                         uid
                         expand(_all_) {{ name }}
                         }}
                 }}
         '''
-        result = dgraph.query(query_string, variables={'$query': query})
-        if len(result['data']) > 0:
-            return render_template('add/database_check.html', query=form.name.data, result=result['data'], entity=form.entity.data)
-            # return redirect(url_for('add.database_check', result=result['data']))
+        result = dgraph.query(query_string, variables={'$query': query, '$identifier': identifier})
+        if len(result['check']) > 0:
+            return render_template('add/database_check.html', query=form.name.data, result=result['check'], entity=form.entity.data)
         else:
             if form.entity.data == 'Source':
                 return redirect(url_for('add.new_source', entry_name=form.name.data))
