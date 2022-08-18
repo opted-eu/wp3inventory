@@ -1,3 +1,5 @@
+__version__ = "1.0.4"
+
 import logging
 import json
 
@@ -68,7 +70,7 @@ def create_app(config_class=Config, config_json=None):
         except Exception as e:
             app.logger.error(f'Slack Logging not working: {e}')
 
-    app.config['APP_VERSION'] = "1.0.3"
+    app.config['APP_VERSION'] = __version__
 
     from flaskinventory.users.routes import users
     from flaskinventory.view.routes import view
