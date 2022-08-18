@@ -1,14 +1,23 @@
+const doi_regex = new RegExp("^10.\\d{4,9}\/[-._;()/:A-Z0-9]+$", "i")
+
+
 function fetchMetaData(button) {
+
+    document.getElementById('magic-platform').classList.remove('is-invalid')
+    document.getElementById('magic-identifier').classList.remove('is-invalid')
 
     var platform = document.getElementById('magic-platform').value
 
-    if (!platform) {
+    if (!platform || platform == 'choose...') {
+        document.getElementById('magic-platform').classList.add('is-invalid')
+        buttonWarning(button, message="Magic")
         return false
     }
 
-    var identifier = document.getElementById('magic-identifier').value
+    var identifier = document.getElementById('magic-identifier').value.trim()
 
     if (!identifier) {
+        document.getElementById('magic-identifier').classList.add('is-invalid')
         return false
     }
 
@@ -26,6 +35,12 @@ function fetchMetaData(button) {
         doi = identifier.replace("https://doi.org/", "")
         doi = doi.replace("http://doi.org/", "")
         doi = doi.replace("doi.org/", "")
+
+        if (!doi_regex.test(doi)) {
+            hideSpinner(button)
+            buttonWarning(button, message="DOI Invalid!")
+            return false
+        }
 
         // check if already in inventory
 
@@ -169,6 +184,15 @@ function buttonSuccess(button) {
     button.classList = ['btn btn-success w-100']
     button.getElementsByClassName('button-text')[0].innerText = 'Success!'
     document.getElementById('magic-error-container').hidden = true
+}
+
+function buttonWarning(button, message="Invalid Identifier!") {
+    button.classList = ['btn btn-warning w-100']
+    button.getElementsByClassName('spinner-grow')[0].hidden = true
+    button.getElementsByClassName('button-loading')[0].hidden = true
+    button.getElementsByClassName('button-text')[0].hidden = false
+    button.getElementsByClassName('button-text')[0].innerText = message
+    console.error(error)
 }
 
 function resolveDOI(text) {
