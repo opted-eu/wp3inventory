@@ -860,7 +860,24 @@ class Year(DateTime):
 
 class Boolean(Predicate):
 
+    """
+        Boolean Predicate (True / False). 
+        Default always `False`. To change this behaviour set the `default` parameter to `True`
+
+        :param label:
+            User facing label for predicate, 
+            default: automatically generated from 'predicate'
+        :param default (False):
+            Default value when validating when nothing is specified
+        :param description:
+            Passes description to WTF Field, will be rendered next to check box.
+            E.g., "Yes, I agree"
+    """
+
     dgraph_predicate_type = 'bool'
+
+    def __init__(self, label: str = None, default=False, overwrite=True, **kwargs) -> None:
+        super().__init__(label, default=default, overwrite=overwrite, **kwargs)
 
     def validation_hook(self, data):
         if isinstance(data, bool):

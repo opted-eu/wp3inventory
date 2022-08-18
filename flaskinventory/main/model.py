@@ -403,8 +403,7 @@ class Organization(Entry):
                              render_kw={'placeholder': 'Separate by comma'})
     
     is_person = Boolean(label='Yes, is a person',
-                        description='Is the media organisation a person?',
-                        default=False)
+                        description='Is the media organisation a person?')
     
     ownership_kind = SingleChoice(choices={
                                     'NA': "Don't know / NA",
