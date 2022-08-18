@@ -126,8 +126,11 @@ class SubunitAutocode(ListRelationship):
         geo_result = geocode(query)
         if geo_result:
             current_app.logger.debug(f'Got a result for "{query}": {geo_result}')
-            dql_string = f'''{{ q(func: eq(country_code, "{geo_result['address']['country_code']}")) @filter(type("Country")) {{ uid }} }}'''
-            dql_result = dgraph.query(dql_string)
+            dql_string = '''
+            query get_country($country_code: string) {
+                q(func: eq(country_code, $country_code)) @filter(type("Country")) { uid } 
+                }'''
+            dql_result = dgraph.query(dql_string, variables={'$country_code': geo_result['address']['country_code']})
             try:
                 country_uid = dql_result['q'][0]['uid']
             except Exception:

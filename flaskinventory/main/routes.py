@@ -17,19 +17,19 @@ def home():
     form = SimpleQuery()
     form.country.choices = c_choices
 
-    query_string = f'''{{
+    query_string = '''{
                         data(func: has(dgraph.type), orderdesc: creation_date, first: 5) 
-                            @filter(eq(entry_review_status, "accepted") AND has(creation_date)) {{
+                            @filter(eq(entry_review_status, "accepted") AND has(creation_date)) {
                                 uid
                                 unique_name 
                                 name 
                                 dgraph.type 
                                 title
                                 creation_date
-                                channel {{ name }}
-                                country {{ name }}
-                            }}
-                        }}'''
+                                channel { name }
+                                country { name }
+                            }
+                        }'''
     
     result = dgraph.query(query_string)
     for entry in result['data']:

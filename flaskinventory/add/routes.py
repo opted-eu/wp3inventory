@@ -4,11 +4,9 @@ from flask import (current_app, Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.schema import Schema
-from flaskinventory.main.model import Organization
 from flaskinventory.add.forms import NewEntry, AutoFill
 from flaskinventory.add.dgraph import check_draft, get_draft, get_existing
 from flaskinventory.main.sanitizer import Sanitizer
-from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 from flaskinventory.users.dgraph import list_entries
 from flaskinventory.flaskdgraph.utils import strip_query, validate_uid
@@ -87,14 +85,17 @@ def from_draft(entity=None, uid=None):
         else:
             return render_template("not_implemented.html")
 
-    query_string = f"""{{ q(func: uid({current_user.uid})) {{
+    query_string = f"""
+    query user_drafts($user: string){{
+        q(func: uid($user)) {{
                 user_displayname
                 uid
                 drafts: ~entry_added @filter(type(Source) and eq(entry_review_status, "draft")) 
                 @facets(orderdesc: timestamp) (first: 1) {{ uid }}
-            }} }}"""
+            }} 
+        }}"""
 
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables={'$user': current_user.uid})
     if result['q'][0].get('drafts'):
         return redirect(url_for('add.new_source', draft=result['q'][0]['drafts'][0]['uid']))
     else:

@@ -23,10 +23,14 @@ edit = Blueprint('edit', __name__)
 @edit.route('/edit/uid/<string:uid>')
 @login_required
 def edit_uid(uid):
-    query_string = f'''{{ q(func: uid({uid})) {{
-		uid unique_name entry_review_status dgraph.type }} }}'''
+    query_string = '''
+        query edit_uid($query: string) { 
+            q(func: uid($query)) {
+            uid unique_name entry_review_status dgraph.type 
+            } 
+        }'''
 
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables={'$query': uid})
 
     if len(result['q']) == 0:
         return abort(404)
@@ -40,7 +44,7 @@ def edit_uid(uid):
         result['q'][0]['dgraph.type'].remove('Resource')
 
     if result['q'][0]['dgraph.type'][0] in Schema.get_types():
-        return redirect(url_for('edit.entry', dgraph_type=result['q'][0]['dgraph.type'][0].title(), uid=result['q'][0]['uid'], **request.args))
+        return redirect(url_for('edit.entry', dgraph_type=result['q'][0]['dgraph.type'][0], unique_name=result['q'][0]['unique_name'], **request.args))
     else:
         return abort(404)
 
@@ -67,9 +71,12 @@ def refresh_wikidata():
         flash('You do not have permissions to edit this entry', 'danger')
         return redirect(url_for('view.view_uid', uid=uid, **request.args))
 
-    query_string = f'''{{ q(func: uid({uid})) {{wikidataID}} }}'''
+    query_string = '''
+        query get_wikidata($query: string ) {
+            q(func: uid($query)) { wikidataID } 
+        }'''
 
-    entry = dgraph.query(query_string)
+    entry = dgraph.query(query_string, variables={'$query': uid})
     try:
         wikidataid = entry['q'][0]['wikidataID']
     except:

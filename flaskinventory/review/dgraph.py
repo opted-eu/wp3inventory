@@ -48,17 +48,21 @@ def get_overview(dgraphtype, country=None, user=None):
 
 
 def check_entry(uid=None, unique_name=None):
-
+    query_string = "query check_entry($query: string) {"
     if uid:
         uid = validate_uid(uid)
         if not uid:
             return False
-        query = f'''{{ q(func: uid({uid})) @filter(has(dgraph.type))'''
+        query_string += 'q(func: uid($query)) @filter(has(dgraph.type))'
+        variables = {'$query': uid}
     elif unique_name:
-        query = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
+        query_string += '{ q(func: eq(unique_name, "$query"))'''
+        variables = {'$query': unique_name}
+    else:
+        return False
 
-    query += "{ uid unique_name dgraph.type entry_review_status entry_added { uid } channel { unique_name } } }"
-    data = dgraph.query(query)
+    query_string += "{ uid unique_name dgraph.type entry_review_status entry_added { uid } channel { unique_name } } }"
+    data = dgraph.query(query_string, variables=variables)
 
     if len(data['q']) == 0:
         return False

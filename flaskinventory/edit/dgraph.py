@@ -1,25 +1,35 @@
+from string import ascii_letters
+
 from flaskinventory import dgraph
 from flask import current_app
+from flaskinventory.flaskdgraph import Schema
 from flaskinventory.flaskdgraph.dgraph_types import UID, Variable, Scalar, make_nquad, dict_to_nquad
 
 def get_entry(unique_name=None, uid=None):
+    query_string = 'query get_entry($query: string) {'
     if unique_name:
-        query_string = f'''{{ q(func: eq(unique_name, "{unique_name}"))'''
+        query_string += 'q(func: eq(unique_name, "$query"))'
+        variables = {'$query': unique_name}
     elif uid:
-        query_string = f'''{{ q(func: uid({uid}))'''
+        query_string += 'q(func: uid($query))'
+        variables = {'$query': uid}
     else:
         return False
     query_string += '{ uid expand(_all_) { name unique_name uid user_displayname } } }'
 
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables=variables)
     return result
 
 def get_audience(uid):
-    query_string = f'''{{ q(func: uid({uid})) {{ 
-                    uid unique_name audience_size @facets 
-                    channel {{ unique_name }} }} }}'''
+    query_string = '''
+    query get_audience($query: string) {
+        q(func: uid($query)) { 
+            uid unique_name audience_size @facets 
+            channel { unique_name } 
+            } 
+        }'''
     
-    result = dgraph.query(query_string)
+    result = dgraph.query(query_string, variables={"$query": uid})
 
     data = result['q'][0]
 
@@ -54,31 +64,23 @@ def draft_delete(uid):
     current_app.logger.debug(f'Deleting draft: UID {uid}')
 
     uid = UID(uid)
-    related = Variable('v', 'uid')
-    publishes = Variable('p', 'uid')
-    owns = Variable('o', 'uid')
-    source_included = Variable('i', 'uid') 
-    query = f'''{{  related(func: type(Source)) @filter(uid_in(related, {uid.query})) {{
-			            {related.query} }} 
-                    publishes(func: type(Organization)) @filter(uid_in(publishes, {uid.query})) {{
-                        {publishes.query} }}
-                    owns(func: type(Organization)) @filter(uid_in(owns, {uid.query})) {{
-                        {owns.query} }}
-                    included(func: has(dgraph.type)) @filter(uid_in(sources_inclued, {uid.query})) {{
-                        {source_included.query}
-                    }}
-                    
-                }}'''
+    relationships = list(Schema.relationship_predicates().keys())
+    query = []
+    vars = {}
 
-    delete_predicates = ['dgraph.type', 'unique_name', 'publishes',
-                         'owns', 'related']
+    for i, r in enumerate(relationships):
+        var = Variable(ascii_letters[i], 'uid')
+        query.append(f'{r}(func: has(dgraph.type)) @filter(uid_in({r}, {uid.query})) {{ {var.query} }}')
+        vars[r] = var
+
+    query = "\n".join(query)
+
+    delete_predicates = ['dgraph.type', 'unique_name'] + relationships
 
     del_nquads = [make_nquad(uid, item, Scalar('*'))
                   for item in delete_predicates]
-    del_nquads += [make_nquad(related, 'related', uid)]
-    del_nquads += [make_nquad(publishes, 'publishes', uid)]
-    del_nquads += [make_nquad(owns, 'owns', uid)]
-    del_nquads += [make_nquad(source_included, 'sources_included', uid)]
+    for k, v in vars.items():
+        del_nquads.append(make_nquad(v, k, uid))
 
     del_nquads = " \n ".join(del_nquads)
 

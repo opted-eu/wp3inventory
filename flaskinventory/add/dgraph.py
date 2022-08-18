@@ -34,10 +34,15 @@ async def generate_fieldoptions():
 
 
 def check_draft(draft, form):
-    query_string = f"""{{ q(func: uid({draft}))  @filter(eq(entry_review_status, "draft")) {{ 
-                            uid expand(_all_) {{ name unique_name uid }}
-                            }} }}"""
-    draft = dgraph.query(query_string)
+    query_string = f"""
+        query check_draft($draft: string) {{
+            q(func: uid($draft))  @filter(eq(entry_review_status, "draft")) {{ 
+                uid expand(_all_) {{ 
+                    name unique_name uid 
+                    }}
+                }} 
+            }}"""
+    draft = dgraph.query(query_string, variables={'$draft': draft})
     if len(draft['q']) > 0:
         draft = draft['q'][0]
         entry_added = draft.pop('entry_added')
@@ -68,19 +73,27 @@ def check_draft(draft, form):
 
 
 def get_draft(uid):
-    query_string = f"""{{ q(func: uid({uid}))  @filter(eq(entry_review_status, "draft")) {{ uid
-                                expand(_all_) {{ uid unique_name name dgraph.type channel {{ name }}
-                                            }}
-                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
-                                    uid unique_name name }} 
-                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
-                                    uid unique_name name }} 
-                                }} }}"""
-    draft = dgraph.query(query_string)
+    query_string = f"""
+    query get_draft($draft: string) {{
+        q(func: uid($draft)) @filter(eq(entry_review_status, "draft")) {{ 
+            uid expand(_all_) {{ 
+                uid unique_name name dgraph.type channel {{ name }}
+                }}
+            publishes_org: ~publishes @filter(eq(is_person, false)) {{
+                uid unique_name name ownership_kind country {{ name }} 
+                }}
+            publishes_person: ~publishes @filter(eq(is_person, true)) {{
+                uid unique_name name ownership_kind country {{ name }} 
+                }}
+            archives: ~sources_included @facets @filter(type("Archive")) {{ 
+                uid unique_name name 
+                }} 
+            datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
+                uid unique_name name 
+                }} 
+            }} 
+        }}"""
+    draft = dgraph.query(query_string, variables={'$draft': uid})
     if len(draft['q']) > 0:
         draft = draft['q'][0]
         entry_added = draft.pop('entry_added')
@@ -99,19 +112,27 @@ def get_draft(uid):
 
 
 def get_existing(uid):
-    query_string = f"""{{ q(func: uid({uid})) @filter(type(Source)) {{ 
-                                uid expand(_all_) {{
-                                    uid unique_name name dgraph.type channel {{ name }} }}
-                                publishes_org: ~publishes @filter(eq(is_person, false)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                publishes_person: ~publishes @filter(eq(is_person, true)) {{
-                                    uid unique_name name ownership_kind country {{ name }} }}
-                                archives: ~sources_included @facets @filter(type("Archive")) {{ 
-                                    uid unique_name name }} 
-                                datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
-                                    uid unique_name name }} 
-                                }} }}"""
-    existing = dgraph.query(query_string)
+    query_string = f"""
+    query get_existing($existing: string) {{
+        q(func: uid($existing)) @filter(type(Source)) {{ 
+            uid expand(_all_) {{
+                uid unique_name name dgraph.type channel {{ name }} 
+                }}
+            publishes_org: ~publishes @filter(eq(is_person, false)) {{
+                uid unique_name name ownership_kind country {{ name }} 
+                }}
+            publishes_person: ~publishes @filter(eq(is_person, true)) {{
+                uid unique_name name ownership_kind country {{ name }} 
+                }}
+            archives: ~sources_included @facets @filter(type("Archive")) {{ 
+                uid unique_name name 
+                }} 
+            datasets: ~sources_included @facets @filter(type("Dataset")) {{ 
+                uid unique_name name 
+                }} 
+            }} 
+        }}"""
+    existing = dgraph.query(query_string, variables={'$existing': uid})
     if len(existing['q']) > 0:
         existing = existing['q'][0]
         related = {'uid': existing.pop('uid'), 'unique_name': existing.pop(
