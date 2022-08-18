@@ -102,7 +102,7 @@ def from_draft(entity=None, uid=None):
 @add.route("/add/<string:dgraph_type>", methods=['GET', 'POST'])
 @add.route("/add/<string:dgraph_type>/draft/<string:draft>", methods=['GET', 'POST'])
 @login_required
-def new(dgraph_type=None, draft=None):
+def new(dgraph_type=None, draft=None, populate_form: dict=None):
     try:
         dgraph_type = Schema.get_type(dgraph_type)
     except:
@@ -111,7 +111,7 @@ def new(dgraph_type=None, draft=None):
     if not dgraph_type:
         return abort(404)
 
-    form = Schema.generate_new_entry_form(dgraph_type=dgraph_type)
+    form = Schema.generate_new_entry_form(dgraph_type=dgraph_type, populate_obj=populate_form)
     
     if draft is None:
         draft = request.args.get('draft')

@@ -150,8 +150,34 @@ class Schema:
             _cls = _cls.__name__
         return cls.__perm_registry_edit__[_cls]
 
+    @staticmethod
+    def populate_form(form: FlaskForm, populate_obj: dict, fields: dict) -> FlaskForm:
+        from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
+
+        for k, value in populate_obj.items():
+            if hasattr(form, k):
+                if type(value) is dict:
+                    if 'uid' in value.keys():
+                        value = value['uid']
+                elif type(value) is list and not isinstance(fields[k], SingleChoice):
+                    if type(value[0]) is str:
+                        delimiter = getattr(fields[k], 'delimiter', ',')
+                        value = delimiter.join(value)
+                    elif type(value[0]) is int:
+                        value = [str(val) for val in value]
+                    elif 'uid' in value[0].keys():
+                        value = [subval['uid'] for subval in value]
+                        if len(value) == 1:
+                            value = value[0]
+                if isinstance(getattr(form, k), IntegerField) and isinstance(value, datetime):
+                    # cast datetime as year if field does not need to be too specific
+                    value = value.year
+                setattr(getattr(form, k), 'data', value)
+        return form
+
+
     @classmethod
-    def generate_new_entry_form(cls, dgraph_type=None) -> FlaskForm:
+    def generate_new_entry_form(cls, dgraph_type=None, populate_obj: dict=None) -> FlaskForm:
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
@@ -177,8 +203,14 @@ class Schema:
         for k, v in fields.items():
             if v.new:
                 setattr(F, k, v.wtf_field)
+        
+        form = F()
+        # ability to pre-populate the form with data
+        if populate_obj:
+            form = cls.populate_form(form, populate_obj, fields)
 
-        return F()
+        return form
+
 
     @classmethod
     def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict={}, entry_review_status='pending', skip_fields: list=None) -> FlaskForm:
@@ -226,24 +258,6 @@ class Schema:
         form = F()
 
         # Populate instance with existing values
-        for k, value in populate_obj.items():
-            if hasattr(form, k):
-                if type(value) is dict:
-                    if 'uid' in value.keys():
-                        value = value['uid']
-                elif type(value) is list:
-                    if type(value[0]) is str:
-                        delimiter = getattr(fields[k], 'delimiter', ',')
-                        value = delimiter.join(value)
-                    elif type(value[0]) is int:
-                        value = [str(val) for val in value]
-                    elif 'uid' in value[0].keys():
-                        value = [subval['uid'] for subval in value]
-                        if len(value) == 1:
-                            value = value[0]
-                if isinstance(getattr(form, k), IntegerField) and isinstance(value, datetime):
-                    # cast datetime as year if field does not need to be too specific
-                    value = value.year
-                setattr(getattr(form, k), 'data', value)
+        form = cls.populate_form(form, populate_obj, fields)
 
         return form
