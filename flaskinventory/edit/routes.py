@@ -118,7 +118,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
     check = check_entry(unique_name=unique_name, uid=uid)
     if not check:
         return abort(404)
-    
+
     if dgraph_type not in check['dgraph.type']:
         return abort(404)
 
@@ -137,7 +137,8 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         entry = get_entry(uid=uid)
         restore_sequence(entry['q'][0])
     except Exception as e:
-        current_app.logger.error(f'Could not populate form for <{uid}>: {e}', stack_info=True)
+        current_app.logger.error(
+            f'Could not populate form for <{uid}>: {e}', stack_info=True)
         return abort(404)
 
     skip_fields = []
@@ -146,10 +147,12 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         skip_fields = channel_filter(entry['q'][0]['channel']['unique_name'])
 
     if request.method == 'GET':
-        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, populate_obj=entry['q'][0], entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
+        form = Schema.generate_edit_entry_form(
+            dgraph_type=dgraph_type, populate_obj=entry['q'][0], entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
     else:
-        form = Schema.generate_edit_entry_form(dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
-    
+        form = Schema.generate_edit_entry_form(
+            dgraph_type=dgraph_type, entry_review_status=check['entry_review_status'], skip_fields=skip_fields)
+
     fields = Schema.get_predicates(dgraph_type)
 
     if form.validate_on_submit():
@@ -162,9 +165,9 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
             sanitizer = Sanitizer.edit(data, dgraph_type=dgraph_type)
         except Exception as e:
             if current_app.debug:
-                    e_trace = "".join(traceback.format_exception(
-                        None, e, e.__traceback__))
-                    current_app.logger.error(e_trace)
+                e_trace = "".join(traceback.format_exception(
+                    None, e, e.__traceback__))
+                current_app.logger.error(e_trace)
             flash(f'{dgraph_type} could not be updated: {e}', 'danger')
             return redirect(url_for('edit.entry', dgraph_type=dgraph_type, uid=uid, **request.args))
         try:
@@ -187,13 +190,15 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         sidebar_items.update({'actions': {'wikidata': wikidata_form}})
     if dgraph_type == 'Source':
         if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
-            sidebar_items['actions'] = {'audience_size': url_for('edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
+            sidebar_items['actions'] = {'audience_size': url_for(
+                'edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
+    
+    return render_template('edit/editform.html',
+                           title=f'Edit {dgraph_type}',
+                           form=form, fields=fields.keys(),
+                           sidebar_items=sidebar_items, show_sidebar=True,
+                           entry=json.dumps(entry['q'][0], default=str))
 
-    return render_template('edit/editform.html', 
-                            title=f'Edit {dgraph_type}', 
-                            form=form, fields=fields.keys(), 
-                            sidebar_items=sidebar_items, show_sidebar=True,
-                            entry=json.dumps(entry['q'][0], default=str))
 
 @edit.route('/edit/source/uid/<string:uid>/audience', methods=['GET', 'POST'])
 @login_required
@@ -219,10 +224,11 @@ def source_audience(uid):
             sanitizer = EditAudienceSizeSanitizer(uid, request.get_json())
         except Exception as e:
             return jsonify({'status': 'error', 'error': f'{e}'})
-        
+
         try:
             current_app.logger.debug(f'Set Nquads: {sanitizer.set_nquads}')
-            current_app.logger.debug(f'Delete Nquads: {sanitizer.delete_nquads}')
+            current_app.logger.debug(
+                f'Delete Nquads: {sanitizer.delete_nquads}')
 
             delete = dgraph.upsert(
                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads)
@@ -252,7 +258,7 @@ def delete_draft(uid):
         return abort(404)
     if not can_delete(check):
         return abort(403)
-    
+
     draft_delete(check['uid'])
 
     flash('Draft deleted!', 'success')
