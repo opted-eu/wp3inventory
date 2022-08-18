@@ -5,6 +5,7 @@ from wtforms import IntegerField
 
 from flaskinventory.users.constants import USER_ROLES
 
+
 class Schema:
 
     # registry of all types and which predicates they have
@@ -30,10 +31,13 @@ class Schema:
 
     def __init_subclass__(cls) -> None:
         from .dgraph_types import Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
-        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
-        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
-        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys() if isinstance(getattr(cls, key), ReverseRelationship)}
-        
+        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
+        ) if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
+        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
+        ) if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
+        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
+        ) if isinstance(getattr(cls, key), ReverseRelationship)}
+
         # inherit predicates from parent classes
         for parent in cls.__bases__:
             if parent.__name__ != Schema.__name__:
@@ -48,13 +52,17 @@ class Schema:
                 if cls.__name__ not in Schema.__inheritance__.keys():
                     Schema.__inheritance__[cls.__name__] = [parent.__name__]
                 else:
-                    Schema.__inheritance__[cls.__name__].append(parent.__name__)
+                    Schema.__inheritance__[
+                        cls.__name__].append(parent.__name__)
                 if parent.__name__ in Schema.__inheritance__.keys():
-                    Schema.__inheritance__[cls.__name__] += Schema.__inheritance__[parent.__name__]
-                    Schema.__inheritance__[cls.__name__] = list(set(Schema.__inheritance__[cls.__name__]))
-        
+                    Schema.__inheritance__[
+                        cls.__name__] += Schema.__inheritance__[parent.__name__]
+                    Schema.__inheritance__[cls.__name__] = list(
+                        set(Schema.__inheritance__[cls.__name__]))
+
         Schema.__types__[cls.__name__] = predicates
-        Schema.__reverse_relationship_predicates__[cls.__name__] = reverse_predicates
+        Schema.__reverse_relationship_predicates__[
+            cls.__name__] = reverse_predicates
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
         for key in cls.__dict__.keys():
@@ -67,9 +75,11 @@ class Schema:
                     cls.__predicates__[key].append(cls.__name__)
                 if isinstance(attribute, (SingleRelationship, MutualRelationship)):
                     if key not in cls.__relationship_predicates__.keys():
-                        cls.__relationship_predicates__.update({key: [cls.__name__]})
+                        cls.__relationship_predicates__.update(
+                            {key: [cls.__name__]})
                     else:
-                        cls.__relationship_predicates__[key].append(cls.__name__)
+                        cls.__relationship_predicates__[
+                            key].append(cls.__name__)
 
     @classmethod
     def get_types(cls) -> list:
@@ -79,7 +89,7 @@ class Schema:
     def get_type(cls, dgraph_type: str) -> str:
         # get the correct name of a dgraph type
         # helpful when input is all lower case
-        assert isinstance(dgraph_type, str) 
+        assert isinstance(dgraph_type, str)
         for t in list(cls.__types__.keys()):
             if t.lower() == dgraph_type.lower():
                 return t
@@ -96,7 +106,7 @@ class Schema:
         from .dgraph_types import SingleRelationship, MutualRelationship
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        
+
         relationships = cls.__types__[_cls]
         return {k: v for k, v in relationships.items() if isinstance(v, (SingleRelationship, MutualRelationship))}
 
@@ -175,9 +185,8 @@ class Schema:
                 setattr(getattr(form, k), 'data', value)
         return form
 
-
     @classmethod
-    def generate_new_entry_form(cls, dgraph_type=None, populate_obj: dict=None) -> FlaskForm:
+    def generate_new_entry_form(cls, dgraph_type=None, populate_obj: dict = None) -> FlaskForm:
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
@@ -203,7 +212,7 @@ class Schema:
         for k, v in fields.items():
             if v.new:
                 setattr(F, k, v.wtf_field)
-        
+
         form = F()
         # ability to pre-populate the form with data
         if populate_obj:
@@ -211,9 +220,8 @@ class Schema:
 
         return form
 
-
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict={}, entry_review_status='pending', skip_fields: list=None) -> FlaskForm:
+    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict = {}, entry_review_status='pending', skip_fields: list = None) -> FlaskForm:
 
         from .dgraph_types import SingleRelationship, ReverseRelationship, MutualRelationship
 
@@ -224,7 +232,8 @@ class Schema:
 
         if not isinstance(dgraph_type, str):
             dtype_label = dgraph_type.__name__
-        else: dtype_label = dgraph_type
+        else:
+            dtype_label = dgraph_type
 
         class F(FlaskForm):
 
@@ -242,12 +251,14 @@ class Schema:
         # Add fields depending on DGraph Type
         skip_fields = skip_fields or []
         for k, v in fields.items():
-            # Allow to manually filter out some fields / hide them from users 
-            if k in skip_fields: continue
+            # Allow to manually filter out some fields / hide them from users
+            if k in skip_fields:
+                continue
             if v.edit and current_user.user_role >= v.permission:
                 if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)) and k in populate_obj.keys():
                     if not v.autoload_choices:
-                        choices = [(subval['uid'], subval['name']) for subval in populate_obj[k]]
+                        choices = [(subval['uid'], subval['name'])
+                                   for subval in populate_obj[k]]
                         v.choices_tuples = choices
                 setattr(F, k, v.wtf_field)
 
