@@ -329,8 +329,8 @@ class TestSanitizers(unittest.TestCase):
 
     def test_new_source(self):
 
-        test_draft = {'uid': '0x7a244', 'channel': '0x7a140', 'channel_unique_name': 'website', 'name': 'https://www.schwaebische-post.de/', 'website_allows_comments': 'yes', 'website_comments_registration_required': 'no', 'founded': '2000', 'publication_kind': 'newspaper', 'special_interest': 'no', 'publication_cycle': 'continuous',
-                      'geographic_scope': 'subnational', 'country': '0x7a156', 'geographic_scope_subunit': '0x7a247', 'geographic_scope_single': '0x7a156', 'languages': 'de', 'payment_model': 'partly free', 'contains_ads': 'non subscribers', 'publishes_org': '0x7a245', 'related': ['0x7a246', '0x7a248'], 'entry_review_status': 'pending'}
+        test_draft = {'uid': '0x7a244', 'channel': self.channel_website, 'channel_unique_name': 'website', 'name': 'https://www.schwaebische-post.de/', 'website_allows_comments': 'yes', 'website_comments_registration_required': 'no', 'founded': '2000', 'publication_kind': 'newspaper', 'special_interest': 'no', 'publication_cycle': 'continuous',
+                      'geographic_scope': 'subnational', 'country': self.germany_uid, 'languages': 'de', 'payment_model': 'partly free', 'contains_ads': 'non subscribers', 'publishes_org': self.derstandard_mbh_uid, 'related': [self.falter_print_uid], 'entry_review_status': 'pending'}
 
         mock_website = {
             "channel_unique_name": "website",
