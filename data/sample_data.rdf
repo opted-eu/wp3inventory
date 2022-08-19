@@ -8,6 +8,33 @@
         _:austria <country_code> "at" .
         _:austria <opted_scope> "true" .
 
+        _:germany <dgraph.type> "Country" .
+        _:germany <unique_name> "germany" .
+        _:germany <name> "Germany" .
+        _:germany <other_names> "Deutschland" .
+        _:germany <wikidataID> "183" .
+        _:germany <country_code> "de" .
+        _:germany <opted_scope> "true" .
+
+        _:denmark <dgraph.type> "Country" .
+        _:denmark <unique_name> "denmark" .
+        _:denmark <name> "Denmark" .
+        _:denmark <wikidataID> "35" .
+        _:denmark <country_code> "dk" .
+        _:denmark <opted_scope> "true" .
+
+        _:switzerland <dgraph.type> "Country" .
+        _:switzerland <unique_name> "switzerland" .
+        _:switzerland <name> "Switzerland" .
+        _:switzerland <wikidataID> "39" .
+        _:switzerland <country_code> "ch" .
+        _:switzerland <opted_scope> "true" .
+
+        _:global <dgraph.type> "Multinational" .
+        _:global <unique_name> "global" .
+        _:global <name> "Global Scope" .
+        _:global <opted_scope> "true" .
+
         _:vienna <dgraph.type> "Subunit" .
         _:vienna <unique_name> "vienna" .
         _:vienna <name> "Vienna" .
@@ -304,6 +331,98 @@
         _:reviewer <date_joined> "2022-03-02" .
         _:reviewer <user_role> "2" .
         _:reviewer <account_status> "active" .
+
+        _:globalvoices_website <dgraph.type> "Source" .
+        _:globalvoices_website <channel_url> "https://globalvoices.org/" .
+        _:globalvoices_website <contains_ads> "no" .
+        _:globalvoices_website <publication_cycle> "continuous" .
+        _:globalvoices_website <geographic_scope> "multinational" .
+        _:globalvoices_website <payment_model> "free" .
+        _:globalvoices_website <audience_size> "2022-02-15T00:00:00Z" (data_from="https://siterankdata.com/globalvoices.org", daily_visitors=24423) .
+        _:globalvoices_website <website_allows_comments> "yes" .
+        _:globalvoices_website <creation_date> "2022-02-15T10:55:48.638221Z" .
+        _:globalvoices_website <website_comments_registration_required> "no" .
+        _:globalvoices_website <unique_name> "globalvoices_org_website" .
+        _:globalvoices_website <other_names> "Global Voices · Citizen media stories from around the world" .
+        _:globalvoices_website <other_names> "https://globalvoices.org" .
+        _:globalvoices_website <name> "globalvoices.org" .
+        _:globalvoices_website <party_affiliated> "no" .
+        _:globalvoices_website <publication_kind> "news blog" .
+        _:globalvoices_website <special_interest> "false" .
+        _:globalvoices_website <languages> "ne" .
+        _:globalvoices_website <languages> "yo" .
+        _:globalvoices_website <languages> "ig" .
+        _:globalvoices_website <languages> "pa" .
+        _:globalvoices_website <languages> "tl" .
+        _:globalvoices_website <languages> "en" .
+        _:globalvoices_website <languages> "hu" .
+        _:globalvoices_website <languages> "da" .
+        _:globalvoices_website <languages> "am" .
+        _:globalvoices_website <languages> "ca" .
+        _:globalvoices_website <languages> "ps" .
+        _:globalvoices_website <languages> "sq" .
+        _:globalvoices_website <languages> "sw" .
+        _:globalvoices_website <languages> "my" .
+        _:globalvoices_website <languages> "ko" .
+        _:globalvoices_website <languages> "pt" .
+        _:globalvoices_website <languages> "sat" .
+        _:globalvoices_website <languages> "xnz" .
+        _:globalvoices_website <languages> "cs" .
+        _:globalvoices_website <languages> "tr" .
+        _:globalvoices_website <languages> "eo" .
+        _:globalvoices_website <languages> "es" .
+        _:globalvoices_website <languages> "hi" .
+        _:globalvoices_website <languages> "nl" .
+        _:globalvoices_website <languages> "ur" .
+        _:globalvoices_website <languages> "it" .
+        _:globalvoices_website <languages> "fa" .
+        _:globalvoices_website <languages> "ru" .
+        _:globalvoices_website <languages> "fr" .
+        _:globalvoices_website <languages> "tdt" .
+        _:globalvoices_website <languages> "ja" .
+        _:globalvoices_website <languages> "ro" .
+        _:globalvoices_website <languages> "uk" .
+        _:globalvoices_website <languages> "id" .
+        _:globalvoices_website <languages> "mg" .
+        _:globalvoices_website <languages> "km" .
+        _:globalvoices_website <languages> "mk" .
+        _:globalvoices_website <languages> "or" .
+        _:globalvoices_website <languages> "sr" .
+        _:globalvoices_website <languages> "bn" .
+        _:globalvoices_website <languages> "kk" .
+        _:globalvoices_website <languages> "el" .
+        _:globalvoices_website <languages> "uz" .
+        _:globalvoices_website <languages> "he" .
+        _:globalvoices_website <languages> "ku" .
+        _:globalvoices_website <languages> "sv" .
+        _:globalvoices_website <languages> "pl" .
+        _:globalvoices_website <languages> "ar" .
+        _:globalvoices_website <languages> "bg" .
+        _:globalvoices_website <founded> "2005-01-01T00:00:00Z" .
+        _:globalvoices_website <channel> _:website .
+        _:globalvoices_website <country> _:global .
+
+        _:direkt_print <dgraph.type> "Source" .
+        _:direkt_print <publication_kind> "alternative media" . 
+        _:direkt_print <languages> "de" . 
+        _:direkt_print <channel_epaper> "yes" . 
+        _:direkt_print <payment_model> "not free" . 
+        _:direkt_print <geographic_scope> "multinational" . 
+        _:direkt_print <creation_date> "2022-03-11T12:12:40.393389Z" . 
+        _:direkt_print <contains_ads> "yes" . 
+        _:direkt_print <special_interest> "false" . 
+        _:direkt_print <publication_cycle> "less than monthly" . 
+        _:direkt_print <name> "Direkt" . 
+        _:direkt_print <party_affiliated> "yes" . 
+        _:direkt_print <unique_name> "direkt_print" . 
+        _:direkt_print <country> _:germany . 
+        _:direkt_print <country> _:austria . 
+        _:direkt_print <country> _:switzerland .
+        _:direkt_print <channel> _:print . 
+
+
+
+         
 
     }
 }

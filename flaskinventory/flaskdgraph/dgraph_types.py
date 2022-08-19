@@ -18,7 +18,7 @@ from dateutil import parser as dateparser
 from flaskinventory import dgraph
 
 from .customformfields import NullableDateField, TomSelectField, TomSelectMutlitpleField
-from .utils import validate_uid
+from .utils import validate_uid, strip_query
 
 from flaskinventory.errors import InventoryPermissionError, InventoryValidationError
 from flaskinventory.add.external import geocode, reverse_geocode
@@ -95,7 +95,32 @@ class NewID:
         return f'{self.newid}'
 
 
-class Predicate:
+class PrimitivePredicate:
+
+    # corresponds to the type of the predicate
+    dgraph_predicate_type = 'string'
+    is_list_predicate = False
+    comparison_operator = "eq"
+
+    def query_filter(self, vals: Union[str, list], **kwargs) -> str:
+
+        if vals is None:
+            return f'has({self.predicate})'
+
+        if not isinstance(vals, list):
+            vals = [vals]
+
+        if self.is_list_predicate:
+            return " AND ".join([f'{self.comparison_operator}({self.predicate}, "{strip_query(val)}")' for val in vals])
+        else:
+            if not 'uid' in self.dgraph_predicate_type:
+                vals = ", ".join([f'"{strip_query(val)}"' for val in vals])
+            else:
+                vals = ", ".join(
+                    [f'{validate_uid(val)}' for val in vals if validate_uid(val)])
+            return f'{self.comparison_operator}({self.predicate}, [{vals}])'
+
+class Predicate(PrimitivePredicate):
 
     """
         Base Class for representing DGraph Predicates
@@ -103,9 +128,6 @@ class Predicate:
         and also provides generators for WTF Form Fields
 
     """
-
-    # corresponds to the type of the predicate
-    dgraph_predicate_type = 'string'
 
     def __init__(self,
                  label: str = None,
@@ -350,12 +372,14 @@ class Variable:
         return f'{self.var} as {self.predicate}'
 
 
-class ReverseRelationship:
+class ReverseRelationship(PrimitivePredicate):
 
     """
-
-    default_predicates: dict with additional predicates that should be assigned to new entries
+        default_predicates: dict with additional predicates that should be assigned to new entries
     """
+
+    dgraph_predicate_type = 'uid'
+    comparison_operator = 'uid_in'
 
     def __init__(self,
                  predicate_name,
@@ -399,6 +423,15 @@ class ReverseRelationship:
 
         if read_only:
             self.render_kw.update(readonly=read_only)
+
+    def __str__(self) -> str:
+        return f'{self._predicate}'
+
+    def __repr__(self) -> str:
+        if self._predicate:
+            return f'<DGraph Reverse Relationship "{self._predicate}">'
+        else:
+            return f'<Unbound DGraph Reverse Relationship>'
 
     @property
     def label(self):
@@ -462,6 +495,8 @@ class ReverseRelationship:
 
 class ReverseListRelationship(ReverseRelationship):
 
+    is_list_predicate = True
+
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         if isinstance(data, str):
             data = data.split(',')
@@ -509,7 +544,11 @@ class ReverseListRelationship(ReverseRelationship):
         return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
-class MutualRelationship:
+class MutualRelationship(PrimitivePredicate):
+
+    dgraph_predicate_type = 'uid'
+    is_list_predicate = False
+    comparison_operator = "uid_in"
 
     def __init__(self,
                  allow_new=False,
@@ -548,6 +587,15 @@ class MutualRelationship:
 
         if read_only:
             self.render_kw.update(readonly=read_only)
+
+    def __str__(self) -> str:
+        return f'{self.predicate}'
+
+    def __repr__(self) -> str:
+        if self.predicate:
+            return f'<Mutual Relationship Predicate "{self.predicate}">'
+        else:
+            return f'<Unbound Mutual Relationship Predicate>'
 
     @property
     def label(self):
@@ -618,6 +666,9 @@ class MutualRelationship:
 
 class MutualListRelationship(MutualRelationship):
 
+    dgraph_predicate_type = '[uid]'
+    is_list_predicate = True
+
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         if isinstance(data, (str)):
             data = data.split(',')
@@ -653,6 +704,7 @@ class MutualListRelationship(MutualRelationship):
 class String(Predicate):
 
     dgraph_predicate_type = 'string'
+    is_list_predicate = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -661,6 +713,8 @@ class String(Predicate):
 class UIDPredicate(Predicate):
 
     dgraph_predicate_type = 'uid'
+    is_list_predicate = False
+    comparison_operator = 'uid_in'
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(read_only=True, hidden=True, new=False,
@@ -676,6 +730,7 @@ class UIDPredicate(Predicate):
 class Integer(Predicate):
 
     dgraph_predicate_type = 'int'
+    is_list_predicate = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -695,6 +750,7 @@ class Integer(Predicate):
 class ListString(String):
 
     dgraph_predicate_type = '[string]'
+    is_list_predicate = True
 
     def __init__(self, delimiter=',', overwrite=True, *args, **kwargs) -> None:
         self.delimiter = delimiter
@@ -772,6 +828,7 @@ class SingleChoice(String):
 class MultipleChoice(SingleChoice):
 
     dgraph_predicate_type = '[string]'
+    is_list_predicate = True
 
     def __init__(self, overwrite=True, *args, **kwargs) -> None:
         super().__init__(overwrite=overwrite, *args, **kwargs)
@@ -805,6 +862,8 @@ class MultipleChoice(SingleChoice):
 class DateTime(Predicate):
 
     dgraph_predicate_type = 'datetime'
+    is_list_predicate = False
+    comparison_operator = 'between'
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -833,6 +892,22 @@ class DateTime(Predicate):
         else:
             return NullableDateField(label=self.label, description=self.form_description, render_kw=render_kw)
 
+    def query_filter(self, vals: Union[str, list, int], custom_operator: Union['lt', 'gt']=None):
+        if vals is None:
+            return f'has({self.predicate})'
+            
+        if isinstance(vals, list) and len(vals) > 1:
+            vals = [self.validation_hook(val) for val in vals[:2]]
+            return f'{self.comparison_operator}({self.predicate}, "{vals[0].year}-01-01", "{vals[1].year}-12-31")'
+
+        else:
+            if isinstance(vals, list):
+                vals = vals[0]
+            date = self.validation_hook(vals)
+            if custom_operator:
+                return f'{custom_operator}({self.predicate}, "{date.year}")'
+            else:
+                return f'{self.comparison_operator}({self.predicate}, "{date.year}-01-01", "{date.year}-12-31")'
 
 class Year(DateTime):
 
@@ -875,6 +950,7 @@ class Boolean(Predicate):
     """
 
     dgraph_predicate_type = 'bool'
+    is_list_predicate = False
 
     def __init__(self, label: str = None, default=False, overwrite=True, **kwargs) -> None:
         super().__init__(label, default=default, overwrite=overwrite, **kwargs)
@@ -898,6 +974,7 @@ class Boolean(Predicate):
 class Geo(Predicate):
 
     dgraph_predicate_type = 'geo'
+    is_list_predicate = False
     geo_type = 'Point'
 
     def __init__(self, *args, **kwargs) -> None:
@@ -923,6 +1000,8 @@ class Geo(Predicate):
 class SingleRelationship(Predicate):
 
     dgraph_predicate_type = 'uid'
+    is_list_predicate = False
+    comparison_operator = 'uid_in'
 
     def __init__(self,
                  relationship_constraint=None,
@@ -1004,6 +1083,7 @@ class SingleRelationship(Predicate):
 class ListRelationship(SingleRelationship):
 
     dgraph_predicate_type = '[uid]'
+    is_list_predicate = True
 
     def __init__(self, overwrite=True, relationship_constraint=None, allow_new=True, autoload_choices=False, *args, **kwargs) -> None:
         super().__init__(relationship_constraint=relationship_constraint, allow_new=allow_new,

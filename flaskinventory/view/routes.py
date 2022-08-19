@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import current_user, login_required
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
-from flaskinventory.flaskdgraph.schema import Schema
+from flaskinventory.flaskdgraph import Schema, build_query_string
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.view.dgraph import (get_entry, get_rejected, list_by_type)
@@ -188,3 +188,13 @@ def query():
 @view.route("/query/advanced")
 def advanced_query():
     return render_template('not_implemented.html')
+
+
+@view.route("/query/development")
+@login_required
+def query_dev():
+    query_string = build_query_string(request.args.to_dict(flat=False))
+
+    result = dgraph.query(query_string)
+
+    return jsonify(result['q'])
