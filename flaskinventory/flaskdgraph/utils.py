@@ -1,14 +1,14 @@
 import re
 from typing import Any, Union
 
-def strip_query(query):
+def strip_query(query: str) -> str:
     # Dgraph query strings have some weaknesses 
     # towards certain special characters
     # for term matching and regex these characters
     # can simply be removed
     return re.sub(r'"|/|\\|\(|\)|<|>|\{|\}|\[|\]|\$|&|#|\+|\^|\?|\*', '', query)
 
-def escape_query(query):
+def escape_query(query: str) -> str:
     return re.sub(r'("|/|\\|\(|\)|<|>|\{|\}|\[|\]|\$|&|#|\+|\^|\?|\*)', r'\\\1', query)
 
 def validate_uid(uid: Any) -> Union[str, bool]:

@@ -12,14 +12,19 @@ class Schema:
     # Key = Dgraph Type (string), val = dict of predicates
     __types__ = {}
 
+    # registry of all predicates and which types use them
+    # Key = predicate (string), Val = list(Dgraph Type (string))
+    __predicates_types__ = {}
+
     __inheritance__ = {}
 
     # Registry of permissions for each type
     __perm_registry_new__ = {}
     __perm_registry_edit__ = {}
 
-    # registry of all predicates and which types use them
-    # Key = predicate (string), Val = list(Dgraph Type (string))
+    
+    # Registry of all predicates
+    # key = Name of predicate (string), value = predicate (object) 
     __predicates__ = {}
 
     # registry of all relationship predicates
@@ -69,10 +74,10 @@ class Schema:
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
-                if key not in cls.__predicates__.keys():
-                    cls.__predicates__.update({key: [cls.__name__]})
+                if key not in cls.__predicates_types__.keys():
+                    cls.__predicates_types__.update({key: [cls.__name__]})
                 else:
-                    cls.__predicates__[key].append(cls.__name__)
+                    cls.__predicates_types__[key].append(cls.__name__)
                 if isinstance(attribute, (SingleRelationship, MutualRelationship)):
                     if key not in cls.__relationship_predicates__.keys():
                         cls.__relationship_predicates__.update(
@@ -80,15 +85,24 @@ class Schema:
                     else:
                         cls.__relationship_predicates__[
                             key].append(cls.__name__)
+                if key not in cls.__predicates__.keys():
+                    cls.__predicates__.update({key: attribute})
 
     @classmethod
     def get_types(cls) -> list:
+        """
+            Get all types registered in the Schema.
+            `Schema.get_types()` -> Returns a list of strings
+        """
         return list(cls.__types__.keys())
 
     @classmethod
     def get_type(cls, dgraph_type: str) -> str:
-        # get the correct name of a dgraph type
-        # helpful when input is all lower case
+        """
+            Get the correct name of a DGraph Type
+            Helpful when input is all lower case
+            `Schema.get_type('fileformat')` -> 'FileFormat'
+        """
         assert isinstance(dgraph_type, str)
         for t in list(cls.__types__.keys()):
             if t.lower() == dgraph_type.lower():
@@ -97,12 +111,22 @@ class Schema:
 
     @classmethod
     def get_predicates(cls, _cls) -> dict:
+        """
+            Get all predicates of a DGraph Type
+            Returns a dict of `{'predicate_name': <DGraph Predicate>}`
+            `Schema.get_predicates('Source')` -> {'name': <DGraph Predicate "name"> ...}
+        """
         if not isinstance(_cls, str):
             _cls = _cls.__name__
         return cls.__types__[_cls]
 
     @classmethod
     def get_relationships(cls, _cls) -> dict:
+        """
+            Get all Relationships from the DGraph Type to other DGraph Types.
+            Returns a dict of `{'predicate_name': <DGraph Predicate>}`
+            `Schema.get_relationships('Source')` -> {'channel': <DGraph Predicate "channel"> ...}
+        """
         from .dgraph_types import SingleRelationship, MutualRelationship
         if not isinstance(_cls, str):
             _cls = _cls.__name__
@@ -112,6 +136,11 @@ class Schema:
 
     @classmethod
     def get_reverse_predicates(cls, _cls) -> dict:
+        """
+            Get all explicit reverse relationships from other DGraph Types to this DGraph Type.
+            Returns a dict of `{'alias_reverse_predicate': <DGraph Predicate>}`
+            `Schema.get_reverse_predicates('Source')` -> {'publishes_org': <DGraph Reverse Relationship "~publishes"> ...}
+        """
         if not isinstance(_cls, str):
             _cls = _cls.__name__
         if _cls in cls.__reverse_relationship_predicates__.keys():
@@ -121,7 +150,20 @@ class Schema:
 
     @classmethod
     def predicates(cls) -> dict:
-        return cls.__types__[cls.__name__]
+        """
+            Get all predicates.
+            If used on `Schema` get a complete dict of all registered predicates.
+            If used on a class of a DGraph Type get a dict of all predicates for this type.
+            Returns a dict of `{'predicate_name': <DGraph Predicate>}`
+            `Schema.predicates()` -> Complete dict
+            `FileFormat.predicates()` -> Only predicates for this DGraph Type
+        """
+        try:
+            predicates = cls.__types__[cls.__name__]
+        except KeyError:
+            predicates = cls.__predicates__
+        
+        return predicates
 
     @classmethod
     def relationship_predicates(cls) -> dict:
@@ -136,7 +178,12 @@ class Schema:
 
     @classmethod
     def predicate_names(cls) -> list:
-        return list(cls.__types__[cls.__name__].keys())
+        try:
+            predicates = list(cls.__types__[cls.__name__].keys())
+        except KeyError:
+            predicates = list(cls.__predicates__.keys())
+        
+        return predicates
 
     @classmethod
     def resolve_inheritance(cls, _cls) -> list:
