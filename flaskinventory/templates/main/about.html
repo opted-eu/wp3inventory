@@ -68,6 +68,24 @@ If you are using the data in this inventory, please use the following citation:
 
 # Changelog
 
+### 18 Aug 2022 (Version 1.0.4): Bug Fixes & UI Improvements
+
+ - Fixed bug that prevented addresses to be deleted from Organizations
+ - Defunct markers can now be removed again
+ - UI: links to "pending" entries indicate the review status
+ - When entering a DOI (or other identifier) in the "Add Entry" screen, 
+    it now checks whether an entry with this identifier is already in *Meteor* 
+ - WikiData API does no longer not assign countries to Tools or similar Entry types
+ - Adding tools: Better cleaning and querying of third-party APIs
+ - Fixed bug where multiple choice fields would pre-populate forms with wrong data when editing an entry
+ - When a form is submitted and returns an error, the form content should now be restored instead of cleared
+ - When adding a draft source the publishing organizations (reverse relationships) are now stored properly
+ - Rejecting entries now completely removes all their relationships
+ - Some quality of life changes for editing and reviewing entries
+ - Meteor now has a `robots.txt` and `sitemap.xml`
+ - Free text search box now can search all kinds of diacritics (e.g., `ceska` now also matches `Česká`)
+ - Free text search also can search for author names now
+
 ### 05 Jul 2022: Materials
 
  - Added teaching materials and rearranged top navigation
