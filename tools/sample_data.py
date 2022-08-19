@@ -21,7 +21,7 @@ def main():
     sample_data = sample_data[:-3]
     sample_data = "\n".join(sample_data)
 
-    with open('./data/countries_noaustria.json', 'r') as f:
+    with open('./data/countries_sample.json', 'r') as f:
         countries = json.load(f)
     
     with open('./data/countries_nonopted.json', 'r') as f:
