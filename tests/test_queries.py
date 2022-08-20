@@ -274,6 +274,22 @@ class TestQueries(unittest.TestCase):
             # TODO: arbitrary filtering for facets:
             # papers_sold / copies_sold / followers ????
 
+    def test_type_filters(self):
+        if self.verbatim:
+            print('-- test_type_filters() --\n')
+        
+        with self.client as c:
+            query_string = {"dgraph.type": "Source",
+                            "country": self.germany_uid}
+
+            response = c.get(f'/query/development', query_string=query_string)
+            self.assertEqual(len(response.json), 1)
+
+            query_string = {"dgraph.type": ["Source", "Organization"],
+                            "country": self.austria_uid}
+
+            response = c.get(f'/query/development', query_string=query_string)
+            self.assertEqual(len(response.json), 11)
 
 
 if __name__ == "__main__":

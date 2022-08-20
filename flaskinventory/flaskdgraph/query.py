@@ -15,6 +15,15 @@ from .schema import Schema
 def build_query_string(query: dict, public=True) -> str:
 
     from flaskinventory.flaskdgraph.dgraph_types import MutualRelationship, SingleRelationship
+    filters = []
+    try:
+        dgraph_type = query.pop('dgraph.type')
+        if isinstance(dgraph_type, str):
+            dgraph_type = [dgraph_type]
+        type_filter = " OR ".join([f'type("{dt}")' for dt in dgraph_type])
+        filters.append(f'({type_filter})')
+    except KeyError:
+        dgraph_type = None
 
     # first we clean the query dict
     # make sure that the predicates exists (cannot query arbitrary predicates)
@@ -27,8 +36,7 @@ def build_query_string(query: dict, public=True) -> str:
         if k not in cleaned_query.keys() and k in Schema.predicates().keys():
             cleaned_query.update({k: None})
 
-    filters = []
-    query_parts = ['uid', 'unique_name', 'name']
+    query_parts = ['uid', 'unique_name', 'name', 'dgraph.type']
     if public:
         filters.append('eq(entry_review_status, "accepted")')
 
