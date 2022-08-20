@@ -15,6 +15,22 @@ from .schema import Schema
 def build_query_string(query: dict, public=True) -> str:
 
     from flaskinventory.flaskdgraph.dgraph_types import MutualRelationship, SingleRelationship
+
+    try:
+        max_results = query.pop('_max_results')
+        max_results = int(max_results[0]) if isinstance(max_results, list) else int(max_results)
+        if max_results > 50 or max_results < 0:
+            max_results = 50
+    except (KeyError, ValueError):
+        max_results = 25
+
+    try:
+        page = query.pop('_page')
+        page = int(page[0]) if isinstance(page, list) else int(page)
+        page = page - 1 if page > 0 else 0
+    except (KeyError, ValueError):
+        page = 0
+
     filters = []
     try:
         dgraph_type = query.pop('dgraph.type')
@@ -89,8 +105,9 @@ def build_query_string(query: dict, public=True) -> str:
         cascade = ""
 
     query_string = f"""{{
-        q(func: has(dgraph.type)) @filter({filters}) {cascade} {{
-            {" ".join(query_parts)}
+        q(func: has(dgraph.type), orderasc: unique_name, first: {max_results}, offset: {page * max_results}) 
+            @filter({filters}) {cascade} {{
+                {" ".join(query_parts)}
             }}
         }}
     """
