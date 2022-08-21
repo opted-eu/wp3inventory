@@ -263,14 +263,14 @@ if (embeddedJSON) {
     
     {% if 'publication_kind' in fields %}
     
-    new TomSelect('#publication_kind', {create: true, plugins: ['remove_button']})
+    new TomSelect('#publication_kind', {plugins: ['remove_button']})
     
     {% endif %}
     
     
     {% if 'topical_focus' in fields %}
     
-    new TomSelect('#topical_focus', {create: true, plugins: ['remove_button']})
+    new TomSelect('#topical_focus', {plugins: ['remove_button']})
     
     
     {% endif %}
