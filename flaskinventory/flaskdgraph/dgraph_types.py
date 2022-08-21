@@ -5,7 +5,7 @@
     May later be used for automatic query building
 """
 
-from typing import Union
+from typing import Union, Any
 import datetime
 import json
 
@@ -17,6 +17,7 @@ from dateutil import parser as dateparser
 
 from flaskinventory import dgraph
 
+from .schema import Schema
 from .customformfields import NullableDateField, TomSelectField, TomSelectMutlitpleField
 from .utils import validate_uid, strip_query
 
@@ -95,39 +96,16 @@ class NewID:
         return f'{self.newid}'
 
 
-class PrimitivePredicate:
+class _PrimitivePredicate:
 
-    # corresponds to the type of the predicate
+    """
+        Private Class to resolve inheritance conflicts
+        Base class for constructing Predicate Classes
+    """
+
     dgraph_predicate_type = 'string'
     is_list_predicate = False
     comparison_operator = "eq"
-
-    def query_filter(self, vals: Union[str, list], **kwargs) -> str:
-
-        if vals is None:
-            return f'has({self.predicate})'
-
-        if not isinstance(vals, list):
-            vals = [vals]
-
-        if self.is_list_predicate:
-            return " AND ".join([f'{self.comparison_operator}({self.predicate}, "{strip_query(val)}")' for val in vals])
-        else:
-            if not 'uid' in self.dgraph_predicate_type:
-                vals = ", ".join([f'"{strip_query(val)}"' for val in vals])
-            else:
-                vals = ", ".join(
-                    [f'{validate_uid(val)}' for val in vals if validate_uid(val)])
-            return f'{self.comparison_operator}({self.predicate}, [{vals}])'
-
-class Predicate(PrimitivePredicate):
-
-    """
-        Base Class for representing DGraph Predicates
-        Is used for validating data, generating DGraph queries & mutations,
-        and also provides generators for WTF Form Fields
-
-    """
 
     def __init__(self,
                  label: str = None,
@@ -136,6 +114,7 @@ class Predicate(PrimitivePredicate):
                  overwrite=False,
                  new=True,
                  edit=True,
+                 queryable=False,
                  permission=USER_ROLES.Contributor,
                  read_only=False,
                  hidden=False,
@@ -143,33 +122,9 @@ class Predicate(PrimitivePredicate):
                  tom_select=False,
                  render_kw: dict = None,
                  predicate_alias: list = None,
-                 large_textfield=False) -> None:
+                 comparison_operator: str = None) -> None:
         """
-            Contruct a new predicate
-
-            :param label:
-                User facing label for predicate, 
-                default: automatically generated from 'predicate'
-            :param default:
-                Default value when validating when nothing is specified
-            :param overwrite:
-                delete all values first before writing new ones.
-            :param new:
-                show this predicate when a new entry is made.
-            :param edit:
-                show this predicate when entry is edited.
-            :param read_only:
-                if 'True' users cannot edit this field.
-            :param hidden:
-                if 'True' form field will be hidden from users.
-            :param required:
-                Sets required flag for generated WTF Field.
-            :param description:
-                Passes description to WTF Field.
-            :param tom_select:
-                Instantiate TomSelect classes for WTF Fields.
-            :param large_textfield:
-                If true renders a TextAreaField
+            Contruct a new Primitive Predicate
         """
 
         self.predicate = None
@@ -178,14 +133,16 @@ class Predicate(PrimitivePredicate):
         self.hidden = hidden
         self.new = new
         self.edit = edit
+        self.queryable = queryable
         self.permission = permission
+        if comparison_operator:
+            self.comparison_operator = comparison_operator
 
         # WTF Forms
         self.required = required
         self.form_description = description
         self.tom_select = tom_select
         self.render_kw = render_kw or {}
-        self.large_textfield = large_textfield
 
         if hidden:
             self.render_kw.update(hidden=hidden)
@@ -205,33 +162,15 @@ class Predicate(PrimitivePredicate):
         # other references to this predicate (might delete later)
         self.predicate_alias = predicate_alias
 
+
     def __str__(self) -> str:
         return f'{self.predicate}'
 
     def __repr__(self) -> str:
         if self.predicate:
-            return f'<DGraph Predicate "{self.predicate}">'
+            return f'<Primitive "{self.predicate}">'
         else:
-            return f'<Unbound DGraph Predicate>'
-
-    def validation_hook(self, data):
-        # this method is called in validation by default
-        # when custom validation is required, overwriting this hook
-        # is the preferred way.
-        return data
-
-    def validate(self, data, facets=None, **kwargs):
-        # Validation method that is called by data sanitizer
-        # When overwriting this method make sure to accept
-        # `facets` as keyword argument
-        # preferably this method should return a Scalar object
-        data = self.validation_hook(data)
-        if isinstance(data, (list, set, tuple)):
-            return [Scalar(item, facets=facets) if isinstance(item, (str, int, datetime.datetime, datetime.date)) else item for item in data]
-        elif isinstance(data, (str, int, datetime.datetime, datetime.date)):
-            return Scalar(data, facets=facets)
-        else:
-            return data
+            return f'<Unbound Primitive>'
 
     @classmethod
     def from_key(cls, key):
@@ -260,6 +199,112 @@ class Predicate(PrimitivePredicate):
     @property
     def query(self) -> str:
         return f'{self.predicate}'
+
+    def validation_hook(self, data):
+        # this method is called in validation by default
+        # when custom validation is required, overwriting this hook
+        # is the preferred way.
+        return data
+
+    def validate(self, data, facets=None, **kwargs):
+        # Validation method that is called by data sanitizer
+        # When overwriting this method make sure to accept
+        # `facets` as keyword argument
+        # preferably this method should return a Scalar object
+        data = self.validation_hook(data)
+        if isinstance(data, (list, set, tuple)):
+            return [Scalar(item, facets=facets) if isinstance(item, (str, int, datetime.datetime, datetime.date)) else item for item in data]
+        elif isinstance(data, (str, int, datetime.datetime, datetime.date)):
+            return Scalar(data, facets=facets)
+        else:
+            return data
+
+    def query_filter(self, vals: Union[str, list], **kwargs) -> str:
+
+        if vals is None:
+            return f'has({self.predicate})'
+
+        if not isinstance(vals, list):
+            vals = [vals]
+
+        if self.is_list_predicate:
+            return " AND ".join([f'{self.comparison_operator}({self.predicate}, "{strip_query(val)}")' for val in vals])
+        else:
+            if not 'uid' in self.dgraph_predicate_type:
+                vals_string = ", ".join([f'"{strip_query(val)}"' for val in vals])
+            else:
+                vals_string = ", ".join(
+                    [f'{validate_uid(val)}' for val in vals if validate_uid(val)])
+            if len(vals) == 1:
+                return f'{self.comparison_operator}({self.predicate}, {vals_string})'
+            else:
+                return f'{self.comparison_operator}({self.predicate}, [{vals_string}])'
+
+    def _prepare_query_field(self):
+        # not a very elegant solution...
+        # provides a hook for UI (JavaScript)
+        if self.predicate:
+            self.render_kw.update({'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
+
+    @property
+    def query_field(self) -> StringField:
+        self._prepare_query_field()
+        return StringField(label=self.label, render_kw=self.render_kw)
+
+
+
+class Predicate(_PrimitivePredicate):
+
+    """
+        Base Class for representing DGraph Predicates
+        Is used for validating data, generating DGraph queries & mutations,
+        and also provides generators for WTF Form Fields
+
+    """
+
+
+    def __init__(self, large_textfield=False, *args, **kwargs) -> None:
+        """
+            Contruct a new predicate
+
+            :param label:
+                User facing label for predicate, 
+                default: automatically generated from 'predicate'
+            :param default:
+                Default value when validating when nothing is specified
+            :param overwrite:
+                delete all values first before writing new ones.
+            :param new:
+                show this predicate when a new entry is made.
+            :param edit:
+                show this predicate when entry is edited.
+            :param read_only:
+                if 'True' users cannot edit this field.
+            :param hidden:
+                if 'True' form field will be hidden from users.
+            :param required:
+                Sets required flag for generated WTF Field.
+            :param description:
+                Passes description to WTF Field.
+            :param tom_select:
+                Instantiate TomSelect classes for WTF Fields.
+            :param large_textfield:
+                If true renders a TextAreaField
+        """
+
+        super().__init__(*args, **kwargs)
+
+        self.large_textfield = large_textfield
+
+
+    def __str__(self) -> str:
+        return f'{self.predicate}'
+
+    def __repr__(self) -> str:
+        if self.predicate:
+            return f'<DGraph Predicate "{self.predicate}">'
+        else:
+            return f'<Unbound DGraph Predicate>'
 
     @property
     def wtf_field(self) -> StringField:
@@ -349,6 +394,8 @@ class GeoScalar(Scalar):
 
 class Variable:
 
+    """ Represents DGraph Query Variable """
+
     def __init__(self, var, predicate, val=False):
         self.var = var
         self.predicate = predicate
@@ -372,7 +419,7 @@ class Variable:
         return f'{self.var} as {self.predicate}'
 
 
-class ReverseRelationship(PrimitivePredicate):
+class ReverseRelationship(_PrimitivePredicate):
 
     """
         default_predicates: dict with additional predicates that should be assigned to new entries
@@ -388,13 +435,9 @@ class ReverseRelationship(PrimitivePredicate):
                  relationship_constraint=None,
                  overwrite=False,
                  default_predicates=None,
-                 label=None,
-                 description=None,
-                 render_kw=None,
-                 read_only=False,
-                 new=True,
-                 edit=False,
-                 permission=USER_ROLES.Contributor) -> None:
+                 *args, **kwargs) -> None:
+
+        super().__init__(overwrite=overwrite, *args, **kwargs)
 
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
@@ -404,25 +447,14 @@ class ReverseRelationship(PrimitivePredicate):
         self.predicate = predicate_name
         self.allow_new = allow_new
 
-        self.new = new
-        self.edit = edit
-        self.overwrite = overwrite
         self.default_predicates = default_predicates
 
-        self.permission = permission
-
         # WTForms
-        self._label = label
-        self.form_description = description
-        self.render_kw = render_kw or {}
         # if we want the form field to show all choices automatically.
         self.autoload_choices = autoload_choices
         self.choices = {}
         self.choices_tuples = []
         self.entry_uid = None
-
-        if read_only:
-            self.render_kw.update(readonly=read_only)
 
     def __str__(self) -> str:
         return f'{self._predicate}'
@@ -432,13 +464,6 @@ class ReverseRelationship(PrimitivePredicate):
             return f'<DGraph Reverse Relationship "{self._predicate}">'
         else:
             return f'<Unbound DGraph Reverse Relationship>'
-
-    @property
-    def label(self):
-        if self._label:
-            return self._label
-        else:
-            return self.predicate.replace('_', ' ').title()
 
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         uid = validate_uid(data)
@@ -538,13 +563,13 @@ class ReverseListRelationship(ReverseRelationship):
                                      for c in choices[dgraph_type.lower()]})
 
     @property
-    def wtf_field(self) -> TomSelectField:
+    def wtf_field(self) -> TomSelectMutlitpleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
-        return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
-class MutualRelationship(PrimitivePredicate):
+class MutualRelationship(_PrimitivePredicate):
 
     dgraph_predicate_type = 'uid'
     is_list_predicate = False
@@ -554,39 +579,22 @@ class MutualRelationship(PrimitivePredicate):
                  allow_new=False,
                  autoload_choices=True,
                  relationship_constraint=None,
-                 permission=USER_ROLES.Contributor,
-                 label=None,
-                 description=None,
-                 render_kw=None,
-                 read_only=False,
-                 new=True,
-                 edit=True,
-                 overwrite=True) -> None:
+                 overwrite=True, 
+                 *args, **kwargs) -> None:
+
+        super().__init__(overwrite=overwrite, *args, **kwargs)
 
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
         self.relationship_constraint = relationship_constraint
-        self.predicate = None
+        
         self.allow_new = allow_new
 
-        self.new = new
-        self.edit = edit
-
-        self.permission = permission
-        self.overwrite = overwrite
-
-        # WTForms
-        self._label = label
-        self.form_description = description
-        self.render_kw = render_kw or {}
         # if we want the form field to show all choices automatically.
         self.autoload_choices = autoload_choices
         self.choices = {}
         self.choices_tuples = []
         self.entry_uid = None
-
-        if read_only:
-            self.render_kw.update(readonly=read_only)
 
     def __str__(self) -> str:
         return f'{self.predicate}'
@@ -597,12 +605,6 @@ class MutualRelationship(PrimitivePredicate):
         else:
             return f'<Unbound Mutual Relationship Predicate>'
 
-    @property
-    def label(self):
-        if self._label:
-            return self._label
-        else:
-            return self.predicate.replace('_', ' ').title()
 
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         """
@@ -746,6 +748,10 @@ class Integer(Predicate):
             validators = [Optional()]
         return IntegerField(label=self.label, validators=validators, description=self.form_description)
 
+    @property
+    def query_field(self) -> IntegerField:
+        self._prepare_query_field()
+        return IntegerField(label=self.label, render_kw=self.render_kw)
 
 class ListString(String):
 
@@ -824,6 +830,11 @@ class SingleChoice(String):
             return SelectField(label=self.label, validators=validators, description=self.form_description,
                                choices=self.choices_tuples, render_kw=self.render_kw)
 
+    @property
+    def query_field(self) -> TomSelectMutlitpleField:
+        self._prepare_query_field()
+        return TomSelectMutlitpleField(label=self.label, choices=self.choices_tuples, render_kw=self.render_kw)
+
 
 class MultipleChoice(SingleChoice):
 
@@ -858,6 +869,11 @@ class MultipleChoice(SingleChoice):
         return SelectMultipleField(label=self.label, validators=validators, description=self.form_description,
                                    choices=self.choices_tuples, render_kw=self.render_kw)
 
+    @property
+    def query_field(self) -> TomSelectMutlitpleField:
+        self._prepare_query_field()
+        return TomSelectMutlitpleField(label=self.label, choices=self.choices_tuples, render_kw=self.render_kw)
+
 
 class DateTime(Predicate):
 
@@ -891,6 +907,14 @@ class DateTime(Predicate):
             return DateField(label=self.label, description=self.form_description, render_kw=render_kw)
         else:
             return NullableDateField(label=self.label, description=self.form_description, render_kw=render_kw)
+
+    @property
+    def query_field(self) -> IntegerField:
+        self._prepare_query_field()
+        render_kw = {'step': 1, 'min': 1500, 'max': 2100}
+        if self.render_kw:
+            render_kw = {**self.render_kw, **render_kw}
+        return IntegerField(label=self.label, render_kw=self.render_kw)
 
     def query_filter(self, vals: Union[str, list, int], custom_operator: Union['lt', 'gt']=None):
         if vals is None:
@@ -966,9 +990,32 @@ class Boolean(Predicate):
             raise InventoryValidationError(
                 f'Cannot evaluate provided value as bool: {data}!')
 
+    def query_filter(self, vals, custom_operator=None):
+        if isinstance(vals, list):
+            vals = vals[0]
+
+        # use DGraph native syntax first
+        if vals in ['true', 'false']:
+            return super().query_filter(vals)
+
+        else:
+            # try to coerce to bool
+            vals = self.validation_hook(vals)
+            try:
+                return super().query_filter(str(vals).lower())
+            except: 
+                return f'has({self.predicate})'
+            
+
     @property
     def wtf_field(self) -> BooleanField:
         return BooleanField(label=self.label, description=self.form_description)
+
+    @property
+    def query_field(self) -> BooleanField:
+        self._prepare_query_field()
+        self.render_kw.update({'value': 'true'})
+        return BooleanField(label=self.label, render_kw=self.render_kw)
 
 
 class Geo(Predicate):
@@ -1077,7 +1124,20 @@ class SingleRelationship(Predicate):
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectField(label=self.label, validators=validators, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectField(label=self.label, 
+                                validators=validators, 
+                                description=self.form_description, 
+                                choices=self.choices_tuples, 
+                                render_kw=self.render_kw)
+
+    @property
+    def query_field(self) -> TomSelectMutlitpleField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
+        self._prepare_query_field()
+        return TomSelectMutlitpleField(label=self.label, 
+                                        choices=self.choices_tuples, 
+                                        render_kw=self.render_kw)
 
 
 class ListRelationship(SingleRelationship):
