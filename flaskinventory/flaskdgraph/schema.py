@@ -22,9 +22,9 @@ class Schema:
     __perm_registry_new__ = {}
     __perm_registry_edit__ = {}
 
-    
+
     # Registry of all predicates
-    # key = Name of predicate (string), value = predicate (object) 
+    # key = Name of predicate (string), value = predicate (object)
     __predicates__ = {}
 
     # registry of all relationship predicates
@@ -34,32 +34,44 @@ class Schema:
     # key = predicate (string), val = dict of predicates
     __reverse_relationship_predicates__ = {}
 
+    # registry of all predicates that can be queried by users
+    # have their attribute `queryable` set to `True`
+    __queryable_predicates__ = {}
+
+    __queryable_predicates_by_type__ = {}
+
+
+
     def __init_subclass__(cls) -> None:
         from .dgraph_types import Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
-        predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
-        ) if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
-        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
-        ) if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
-        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__.keys(
-        ) if isinstance(getattr(cls, key), ReverseRelationship)}
+        predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
+
+        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
+
+        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), ReverseRelationship)}
+
+        queryable_predicates = {key: val for key, val in predicates.items() if val.queryable}
+        queryable_predicates.update({key: val for key, val in reverse_predicates.items() if val.queryable})
+
+        Schema.__queryable_predicates__.update(queryable_predicates)
 
         # inherit predicates from parent classes
         for parent in cls.__bases__:
             if parent.__name__ != Schema.__name__:
                 predicates.update({k: v for k, v in Schema.get_predicates(
-                    parent.__name__).items() if k not in predicates.keys()})
+                    parent.__name__).items() if k not in predicates})
                 relationship_predicates.update({k: v for k, v in Schema.get_relationships(
-                    parent.__name__).items() if k not in predicates.keys()})
+                    parent.__name__).items() if k not in predicates})
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
-                    parent.__name__).items() if k not in reverse_predicates.keys()})
+                    parent.__name__).items() if k not in reverse_predicates})
 
                 # register inheritance
-                if cls.__name__ not in Schema.__inheritance__.keys():
+                if cls.__name__ not in Schema.__inheritance__:
                     Schema.__inheritance__[cls.__name__] = [parent.__name__]
                 else:
                     Schema.__inheritance__[
                         cls.__name__].append(parent.__name__)
-                if parent.__name__ in Schema.__inheritance__.keys():
+                if parent.__name__ in Schema.__inheritance__:
                     Schema.__inheritance__[
                         cls.__name__] += Schema.__inheritance__[parent.__name__]
                     Schema.__inheritance__[cls.__name__] = list(
@@ -70,22 +82,27 @@ class Schema:
             cls.__name__] = reverse_predicates
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
-        for key in cls.__dict__.keys():
+
+        Schema.__queryable_predicates_by_type__[cls.__name__] = {key: val for key, val in predicates.items() if val.queryable}
+        Schema.__queryable_predicates_by_type__[cls.__name__].update({key: val for key, val in reverse_predicates.items() if val.queryable})
+        
+        # Bind and "activate" predicates for initialized class 
+        for key in cls.__dict__:
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
-                if key not in cls.__predicates_types__.keys():
+                if key not in cls.__predicates_types__:
                     cls.__predicates_types__.update({key: [cls.__name__]})
                 else:
                     cls.__predicates_types__[key].append(cls.__name__)
                 if isinstance(attribute, (SingleRelationship, MutualRelationship)):
-                    if key not in cls.__relationship_predicates__.keys():
+                    if key not in cls.__relationship_predicates__:
                         cls.__relationship_predicates__.update(
                             {key: [cls.__name__]})
                     else:
                         cls.__relationship_predicates__[
                             key].append(cls.__name__)
-                if key not in cls.__predicates__.keys():
+                if key not in cls.__predicates__:
                     cls.__predicates__.update({key: attribute})
 
     @classmethod
@@ -143,7 +160,7 @@ class Schema:
         """
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        if _cls in cls.__reverse_relationship_predicates__.keys():
+        if _cls in cls.__reverse_relationship_predicates__:
             return cls.__reverse_relationship_predicates__[_cls]
         else:
             return None
@@ -162,7 +179,7 @@ class Schema:
             predicates = cls.__types__[cls.__name__]
         except KeyError:
             predicates = cls.__predicates__
-        
+
         return predicates
 
     @classmethod
@@ -182,16 +199,16 @@ class Schema:
             predicates = list(cls.__types__[cls.__name__].keys())
         except KeyError:
             predicates = list(cls.__predicates__.keys())
-        
+
         return predicates
 
     @classmethod
     def resolve_inheritance(cls, _cls) -> list:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        assert _cls in cls.__types__.keys(), f'DGraph Type "{_cls}" not found!'
+        assert _cls in cls.__types__, f'DGraph Type "{_cls}" not found!'
         dgraph_types = [_cls]
-        if _cls in cls.__inheritance__.keys():
+        if _cls in cls.__inheritance__:
             dgraph_types += cls.__inheritance__[_cls]
         return dgraph_types
 
@@ -206,6 +223,25 @@ class Schema:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
         return cls.__perm_registry_edit__[_cls]
+
+    @classmethod
+    def get_queryable_predicates(cls, _cls=None) -> dict:
+        if _cls is None:
+            try:
+                return cls.__queryable_predicates_by_type__[cls.__name__]
+            except KeyError:
+                return cls.__queryable_predicates__
+    
+        if not isinstance(_cls, str):
+            _cls = _cls.__name__
+        else:
+            _cls = cls.get_type(_cls)
+        
+        try:
+            return cls.__queryable_predicates_by_type__[_cls]
+        except KeyError:
+            return {}
+
 
     @staticmethod
     def populate_form(form: FlaskForm, populate_obj: dict, fields: dict) -> FlaskForm:
@@ -268,9 +304,15 @@ class Schema:
         return form
 
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, populate_obj: dict = {}, entry_review_status='pending', skip_fields: list = None) -> FlaskForm:
+    def generate_edit_entry_form(cls, dgraph_type=None, 
+                                populate_obj: dict = None, 
+                                entry_review_status='pending', 
+                                skip_fields: list = None) -> FlaskForm:
 
         from .dgraph_types import SingleRelationship, ReverseRelationship, MutualRelationship
+
+        if populate_obj is None:
+            populate_obj = {}
 
         if dgraph_type:
             fields = cls.get_predicates(dgraph_type)
