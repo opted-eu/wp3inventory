@@ -1,60 +1,127 @@
 {% macro render_field(field) %}
-{% if field %}
-{% if field.name == 'uid' %}
-{{ field(class="form-control form-control-lg", hidden="true") }} 
-{% elif field.type == 'BooleanField' %}
-    {% if field.description %}
-        <p class="fw-bold fs-5" style='padding-left: 0!;'>{{ field.description }}</p>
-    {% endif %}
-    <div class="mb-3 form-check">
-            {{ field(class="form-check-input") }} 
-        <label for="{{ field.id}}" class="form-label fs-5">
-            {{ field.label.text }}
-        </label>
-    </div>
-
-{% else %}
-
-<div class="mb-5">
-    {% if field.render_kw.hidden %}
-    {% else %}
-    <label for="{{ field.id}}" class="form-label fw-bold fs-5">
-        {% if field.description %}
-            {{ field.description }}
-        {% else %}
-            {{ field.label.text }}
-        {% endif %}
+    {% if field %}
+    <!-- {{  field.id }} -->
+    {% if field.type not in ['SubmitField', 'CSRFTokenField'] %}
+        {% if field.name == 'uid' %}
+            {{ field(class="form-control form-control-lg", hidden="true") }} 
         
-        {% if field.flags.required %}
-            <span class="text-danger">*</span>
-        {% else %}
-            <span class="text-muted">(optional)</span>
-        {% endif %}
-    </label>
-    {% endif %}
-    {% if field.errors %} 
-        {{ field(class="form-control form-control-lg is-invalid") }}
-        <div class="invalid-feedback">
-            {% for error in field.errors %}
-            <span>{{ error }}</span> 
-            {% endfor %}
-        </div>
-    {% else %} 
-        {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
-            {{ field(class="form-select form-select-lg") }} 
-        {% elif field.type == 'RadioField' %}
-            {% for subfield in field %}
-            <div class="form-check">
-                {{ subfield(class="form-check-input") }}
-                {{ subfield.label(class="form-check-label") }}
+        {% elif field.type == 'BooleanField' %}
+            {% if field.description %}
+                <p class="fw-bold fs-5" style='padding-left: 0!;'>{{ field.description }}</p>
+            {% endif %}
+            <div class="mb-3 form-check">
+                    {{ field(class="form-check-input") }} 
+                <label for="{{ field.id}}" class="form-label fs-5">
+                    {{ field.label.text }}
+                </label>
             </div>
-            {% endfor %} 
-        {% else %}
-            {{ field(class="form-control form-control-lg") }} 
-        {% endif %}
-    {% endif %} 
-</div>
-{% endif %}
 
-{% endif %}
+        {% else %}
+
+        <div class="mb-5">
+            {% if field.render_kw.hidden %}
+            {% else %}
+            <label for="{{ field.id}}" class="form-label fw-bold fs-5">
+                {% if field.description %}
+                    {{ field.description }}
+                {% else %}
+                    {{ field.label.text }}
+                {% endif %}
+                
+                {% if field.flags.required %}
+                    <span class="text-danger">*</span>
+                {% else %}
+                    <span class="text-muted">(optional)</span>
+                {% endif %}
+            </label>
+            {% endif %}
+            {% if field.errors %} 
+                {{ field(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in field.errors %}
+                    <span>{{ error }}</span> 
+                    {% endfor %}
+                </div>
+            {% else %} 
+                {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+                    {{ field(class="form-select form-select-lg") }} 
+                {% elif field.type == 'RadioField' %}
+                    {% for subfield in field %}
+                    <div class="form-check">
+                        {{ subfield(class="form-check-input") }}
+                        {{ subfield.label(class="form-check-label") }}
+                    </div>
+                    {% endfor %} 
+                {% else %}
+                    {{ field(class="form-control form-control-lg") }} 
+                {% endif %}
+            {% endif %} 
+        </div>
+        {% endif %}
+
+    {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+
+
+
+
+
+{% macro render_query_field(field) %}
+    {% if field %}
+    <!-- {{  field.id }} -->
+    {% if field.type not in ['SubmitField', 'CSRFTokenField'] %}        
+        {% if field.type == 'BooleanField' %}
+            {% if field.description %}
+                <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
+            {% endif %}
+            <div class="form-check">
+                    {{ field(class="form-check-input") }} 
+                <label for="{{ field.id}}" class="form-label">
+                    {{ field.label.text }}
+                </label>
+            </div>
+
+        {% else %}
+
+        <div class="mb-1">
+            {% if field.render_kw.hidden %}
+            {% else %}
+            <label for="{{ field.id}}" class="form-label">
+                {% if field.description %}
+                    {{ field.description }}
+                {% else %}
+                    {{ field.label.text }}
+                {% endif %}
+                
+            </label>
+            {% endif %}
+            {% if field.errors %} 
+                {{ field(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in field.errors %}
+                    <span>{{ error }}</span> 
+                    {% endfor %}
+                </div>
+            {% else %} 
+                {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+                    {{ field(class="form-select") }} 
+                {% elif field.type == 'RadioField' %}
+                    {% for subfield in field %}
+                    <div class="form-check">
+                        {{ subfield(class="form-check-input") }}
+                        {{ subfield.label(class="form-check-label") }}
+                    </div>
+                    {% endfor %} 
+                {% else %}
+                    {{ field(class="form-control") }} 
+                {% endif %}
+            {% endif %} 
+        </div>
+        {% endif %}
+
+    {% endif %}
+    {% endif %}
 {% endmacro %}

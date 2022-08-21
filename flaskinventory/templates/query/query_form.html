@@ -1,0 +1,103 @@
+{% extends "layout.html" %} {% block content %}
+
+
+{% from "helpers/_formhelpers.html" import render_query_field %}
+
+
+<form method="POST" action="{{ url_for('view.query_dev_result') }}" id="query" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group mb-3">
+        {# <legend class="border-bottom mb-4">{{ title }}</legend> #}
+        {% for field in form._fields %} 
+            {% if field.type not in ['SubmitField'] %}
+                {{ render_query_field(form.get_field(field)) }} 
+            {% endif %}
+        {% endfor %}
+    </fieldset>
+    <div class="form-group mb-3">
+         {{ form.submit(class="btn btn-success my-4") }} 
+        {# <button class="btn btn-primary btn-lg mx-2" type="submit">Query</button> #}
+    </div>
+</form>
+
+<script>
+{% for f in form._fields %} 
+
+    {% set field = form.get_field(f) %}
+
+    {% if field.type ==  "TomSelectMutlitpleField" %}
+
+    new TomSelect('#{{ field.id.replace('.', '\\\.') }}', 
+    {
+        create: false, 
+        plugins: ['remove_button'], 
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
+
+    {% endif %}
+
+{% endfor %}
+</script>
+
+
+
+<script>
+
+const entitySelector = document.getElementById('dgraph.type')
+const alwaysVisible = ['country', 'languages', 'channel']
+
+function showFields(event) {
+    hideFields()
+    for (o of event.target.options) {
+        if (o.selected) {
+            console.log(o.value)
+            let fields = document.querySelectorAll(`[data-entities*="${o.value}"]`)
+            for (f of fields) {
+                f.parentElement.hidden = false
+            }
+
+        }
+    }
+}
+
+function hideFields() {
+    let all = document.querySelectorAll('[data-entities]')
+        for (element of all) {
+            if (!alwaysVisible.includes(element.id)) {
+                element.parentElement.hidden = true
+            }
+        }
+}
+
+hideFields()
+
+entitySelector.addEventListener("change", showFields)
+
+/* Custom adjust order of query fields */
+
+function rearrange() {
+    let all = document.querySelectorAll('[data-entities]')
+    for (e of all) {
+        if (alwaysVisible.includes(element.id)) {
+            e.parentElement.classList.add('order-1')
+        } else {
+            e.parentElement.classList.add('order-5')
+            }
+    }
+}
+
+rearrange()
+
+</script>
+
+
+{% endblock content %}
+
+
+{% block sidebar %}
+
+
+{% endblock sidebar %}

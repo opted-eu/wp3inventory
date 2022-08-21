@@ -380,7 +380,7 @@ class Entry(Schema):
                          overwrite=True,
                          new=False)
 
-    description = String(large_textfield=True)
+    description = String(large_textfield=True, queryable=True, comparison_operator="alloftext")
 
     entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
                          large_textfield=True)
@@ -406,7 +406,8 @@ class Organization(Entry):
                              render_kw={'placeholder': 'Separate by comma'})
     
     is_person = Boolean(label='Yes, is a person',
-                        description='Is the media organisation a person?')
+                        description='Is the media organisation a person?',
+                        queryable=True)
     
     ownership_kind = SingleChoice(choices={
                                     'NA': "Don't know / NA",
@@ -414,15 +415,16 @@ class Organization(Entry):
                                     'public ownership': 'Mainly public ownership',
                                     'political party': 'Political Party',
                                     'unknown': 'Unknown Ownership'},
-                                  description='Is the media organization mainly privately owned or publicly owned?')
+                                  description='Is the media organization mainly privately owned or publicly owned?',
+                                  queryable=True)
 
     country = SingleRelationship(relationship_constraint='Country', 
                                  allow_new=False,
                                  overwrite=True,
                                  autoload_choices=True, 
                                  description='In which country is the organisation located?',
-                                 render_kw={'placeholder': 'Select a country...'}
-                                 )
+                                 render_kw={'placeholder': 'Select a country...'},
+                                 queryable=True)
     
     publishes = ListRelationship(allow_new=False, 
                                  relationship_constraint='Source', 
@@ -441,7 +443,8 @@ class Organization(Entry):
                                         'yes': 'Yes',
                                         'no': 'No'
                                     },
-                                    new=False)
+                                    new=False,
+                                    queryable=True)
     
     address_string = AddressAutocode(new=False,
                                      render_kw={'placeholder': 'Main address of the organization.'})
@@ -453,7 +456,7 @@ class Organization(Entry):
                            'placeholder': 'Most recent figure as plain number'},
                        new=False)
     
-    founded = DateTime(new=False, overwrite=True)
+    founded = DateTime(new=False, overwrite=True, queryable=True)
 
 
 
@@ -465,7 +468,8 @@ class Source(Entry):
                                  autoload_choices=True,
                                  relationship_constraint='Channel',
                                  read_only=True,
-                                 required=True)
+                                 required=True,
+                                 queryable=True)
 
     name = String(label='Name of the News Source',
                   required=True,
@@ -475,7 +479,7 @@ class Source(Entry):
     channel_url = String(label='URL of Channel',
                          description="What is the url or social media handle of the news source?")
     
-    verified_account = Boolean(new=False, edit=False)
+    verified_account = Boolean(new=False, edit=False, queryable=True)
 
     other_names = ListString(description='Is the news source known by alternative names (e.g. Krone, Die Kronen Zeitung)?',
                              render_kw={'placeholder': 'Separate by comma'}, 
@@ -485,12 +489,14 @@ class Source(Entry):
                                     choices={'tv':  "TV (broadcast, cable, satellite, etc)",
                                              'radio': "Radio",
                                              "podcast": "Podcast",
-                                             "NA": "Don't know / NA"})
+                                             "NA": "Don't know / NA"},
+                                    queryable=True)
 
     website_allows_comments = SingleChoice(description='Does the online news source have user comments below individual news articles?',
                                            choices={'yes': 'Yes',
                                                     'no': 'No',
-                                                    'NA': "Don't know / NA"})
+                                                    'NA': "Don't know / NA"},
+                                            queryable=True)
 
     website_comments_registration_required = SingleChoice(label="Registraion required for posting comments",
                                                           description='Is a registration or an account required to leave comments?',
@@ -498,7 +504,9 @@ class Source(Entry):
                                                                     'no': 'No',
                                                                     'NA': "Don't know / NA"})
 
-    founded = Year(description="What year was the news source founded?", overwrite=True)
+    founded = Year(description="What year was the news source founded?", 
+                    overwrite=True,
+                    queryable=True)
 
     publication_kind = MultipleChoice(description='What label or labels describe the main source?',
                                       choices={'newspaper': 'Newspaper / News Site', 
@@ -510,10 +518,12 @@ class Source(Entry):
                                                 'news blog': 'News Blog', 
                                                 'alternative media': 'Alternative Media'},
                                         tom_select=True,
-                                        required=True)
+                                        required=True,
+                                        queryable=True)
 
     special_interest = Boolean(description='Does the news source have one main topical focus?',
-                                label='Yes, is a special interest publication')
+                                label='Yes, is a special interest publication',
+                                queryable=True)
     
     topical_focus = MultipleChoice(description="What is the main topical focus of the news source?",
                                     choices={'politics': 'Politics', 
@@ -524,7 +534,8 @@ class Source(Entry):
                                              'media': 'Media', 
                                              'environment': 'Environment', 
                                              'education': 'Education'},
-                                    tom_select=True)
+                                    tom_select=True,
+                                    queryable=True)
     
     publication_cycle = SingleChoice(description="What is the publication cycle of the source?",
                                         choices={'continuous': 'Continuous', 
@@ -535,7 +546,8 @@ class Source(Entry):
                                                  'monthly': 'Monthly', 
                                                  'less than monthly': 'Less frequent than monthly', 
                                                  'NA': "Don't Know / NA"},
-                                                 required=True)
+                                                 required=True,
+                                        queryable=True)
 
     publication_cycle_weekday = MultipleChoiceInt(description="Please indicate the specific day(s) when the news source publishes.",
                                                 choices={"1": 'Monday', 
@@ -554,20 +566,24 @@ class Source(Entry):
                                              'subnational': 'Subnational', 
                                              'NA': "Don't Know / NA"},
                                     required=True,
-                                    radio_field=True)
+                                    radio_field=True,
+                                    queryable=True)
 
     country = SourceCountrySelection(label='Countries', 
                                         description='Which countries are in the geographic scope?',
-                                        required=True)
+                                        required=True,
+                                        queryable=True)
 
     geographic_scope_subunit = SubunitAutocode(label='Subunits',
                                                 description='What is the subnational scope?',
-                                                tom_select=True)
+                                                tom_select=True,
+                                                queryable=True)
 
     languages = MultipleChoice(description="In which language(s) does the news source publish its news texts?",
                                 required=True,
                                 choices=icu_codes,
-                                tom_select=True)
+                                tom_select=True,
+                                queryable=True)
 
     payment_model = SingleChoice(description="Is the content produced by the news source accessible free of charge?",
                                     choices={'free': 'All content is free of charge', 
@@ -575,7 +591,8 @@ class Source(Entry):
                                             'not free': 'No content is free of charge', 
                                             'NA': "Don't Know / NA"},
                                     required=True,
-                                    radio_field=True)
+                                    radio_field=True,
+                                    queryable=True)
 
     contains_ads = SingleChoice(description="Does the news source contain advertisements?",
                                     choices={'yes': 'Yes', 
@@ -583,9 +600,10 @@ class Source(Entry):
                                                 'non subscribers': 'Only for non-subscribers', 
                                                 'NA': "Don't Know / NA"},
                                     required=True,
-                                    radio_field=True)
+                                    radio_field=True,
+                                    queryable=True)
 
-    audience_size = Year(default=datetime.date.today(), edit=False)
+    audience_size = Year(default=datetime.date.today(), edit=False, queryable=True)
 
     publishes_org = OrganizationAutocode('publishes', 
                                        label='Published by',
@@ -598,7 +616,8 @@ class Source(Entry):
     channel_epaper = SingleChoice(description='Does the print news source have an e-paper version?',
                                     choices={'yes': 'Yes',
                                             'no': 'No',
-                                            'NA': "Don't know / NA"})
+                                            'NA': "Don't know / NA"},
+                                    queryable=True)
 
     archive_sources_included = ReverseListRelationship('sources_included', 
                                                     allow_new=False, 
@@ -623,9 +642,11 @@ class Source(Entry):
                                     choices={'NA': "Don't know / NA",
                                             'yes': 'Yes',
                                             'no': 'No',
-                                            })
+                                            },
+                                    queryable=True)
     
-    defunct = Boolean(description="Is the news source defunct or out of business?") 
+    defunct = Boolean(description="Is the news source defunct or out of business?",
+                        queryable=True) 
 
     related = MutualListRelationship(allow_new=True, autoload_choices=False, relationship_constraint='Source')
 
@@ -839,7 +860,8 @@ class Tool(Entry):
                             required=True)
                             
     published_date = Year(label='Year of publication', 
-                            description="Which year was the tool published?")
+                            description="Which year was the tool published?",
+                            queryable=True)
     
     last_updated = DateTime(description="When was the tool last updated?", new=False)
 
@@ -868,19 +890,22 @@ class Tool(Entry):
                                             'linux': 'Linux', 
                                             'macos': 'macOS'},
                                     required=True,
-                                    tom_select=True)
+                                    tom_select=True,
+                                    queryable=True)
 
     programming_languages = MultipleChoice(label="Programming Languages",
                                             description="Which programming languages are used for the tool? \
                                             Please also include language that can directly interface with this tool.",
                                            choices=programming_languages,
                                            required=False,
-                                            tom_select=True)
+                                            tom_select=True,
+                                            queryable=True)
 
     open_source = SingleChoice(description="Is this tool open source?",
                                 choices={'na': 'NA / Unknown',
                                         'yes': 'Yes',
-                                        'no': 'No, proprietary'})
+                                        'no': 'No, proprietary'},
+                                queryable=True)
 
     license = String(description="What kind of license attached to the tool?")
 
@@ -889,50 +914,61 @@ class Tool(Entry):
                                         'free': 'Free',
                                         'registration': 'Registration',
                                         'request': 'Upon Request',
-                                        'purchase': 'Purchase'})
+                                        'purchase': 'Purchase'},
+                                queryable=True)
 
     used_for = ListRelationship(description="Which operations can the tool perform?",
                                 relationship_constraint="Operation",
                                 autoload_choices=True,
-                                required=True)
+                                required=True,
+                                queryable=True)
 
     concept_vars = ListRelationship(description="Which concepts can the tool measuere (e.g. sentiment, frames, etc)",
                                         relationship_constraint="ConceptVar",
                                         render_kw={'placeholder': 'Select multiple...'},
-                                        autoload_choices=True)
+                                        autoload_choices=True,
+                                        queryable=True)
 
     graphical_user_interface = Boolean(description="Does the tool have a graphical user interface?",
                                         label="Yes, it does have a GUI",
-                                        default=False)
+                                        default=False,
+                                        queryable=True)
 
     channels = ListRelationship(description="Is the tool designed for specific channels?",
                                 autoload_choices=True,
                                 allow_new=False,
-                                relationship_constraint="Channel")
+                                relationship_constraint="Channel",
+                                queryable=True)
 
     language_independent = Boolean(description="Is the tool language independent?",
-                                    label="Yes")
+                                    label="Yes",
+                                    queryable=True)
 
     languages = MultipleChoice(description="Which languages does the tool support?",
                                 choices=icu_codes,
-                                tom_select=True)
+                                tom_select=True,
+                                queryable=True)
 
     input_file_format = ListRelationship(description="Which file formats does the tool take as input?",
                                         autoload_choices=True,
-                                        relationship_constraint="FileFormat")
+                                        relationship_constraint="FileFormat",
+                                        queryable=True)
 
     output_file_format = ListRelationship(description="Which file formats does the tool output?",
                                         autoload_choices=True,
-                                        relationship_constraint="FileFormat")
+                                        relationship_constraint="FileFormat",
+                                        queryable=True)
 
     author_validated = SingleChoice(description="Do the authors of the tool report any validation?",
-                                choices={'na': 'NA / Unknown',
-                                        'yes': 'Yes',
-                                        'no': 'No, not reported'})
+                                    choices={'na': 'NA / Unknown',
+                                            'yes': 'Yes',
+                                            'no': 'No, not reported'},
+                                    queryable=True)
 
     validation_corpus = ListRelationship(description="Which corpus was used to validate the tool?",
                                             autoload_choices=True,
-                                            relationship_constraint="Corpus")
+                                            relationship_constraint="Corpus",
+                                            queryable=True)
 
     materials = ListString(description="Are there additional materials for the tool? (e.g., FAQ, Tutorials, Website, etc)",
                             tom_select=True, render_kw={'placeholder': 'please paste the URLs to the materials here!'})
@@ -944,7 +980,7 @@ class Tool(Entry):
                                             new=False,
                                             relationship_constraint="ResearchPaper")
 
-    defunct = Boolean(description="Is the tool defunct?") 
+    defunct = Boolean(description="Is the tool defunct?", queryable=True) 
 
 
 class ResearchPaper(Entry):

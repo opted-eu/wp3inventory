@@ -107,7 +107,7 @@ class TestQueries(unittest.TestCase):
                             'email': "wp3@opted.eu"
                         }
 
-            response = c.get('/query/development', query_string=query_string)
+            response = c.get('/query/development/json', query_string=query_string)
             req_dict = request.args.to_dict(flat=False)
             # print(req_dict)
             self.assertCountEqual(req_dict['languages'], ['en', 'de'])
@@ -127,14 +127,14 @@ class TestQueries(unittest.TestCase):
                             "publication_kind": "alternative media",
                             "channel": self.channel_print}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], "direkt_print")
 
             query_string = {"publication_kind": "newspaper",
                             "channel": self.channel_website,
                             "country": self.austria_uid}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], "www.derstandard.at")
 
     # same Scalar predicates are combined with OR operators
@@ -149,7 +149,7 @@ class TestQueries(unittest.TestCase):
                             "payment_model": ["free", "partly free"]
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], "www.derstandard.at")
 
             # English that is free OR partly for free
@@ -157,7 +157,7 @@ class TestQueries(unittest.TestCase):
                             "payment_model": ["free", "partly free"]
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], "globalvoices_org_website")
 
             # Free or partly for free IN Germany, but in English
@@ -166,7 +166,7 @@ class TestQueries(unittest.TestCase):
                             "country": self.germany_uid
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 0)
 
             # twitter OR instagram IN austria
@@ -174,7 +174,7 @@ class TestQueries(unittest.TestCase):
                             "country": self.austria_uid
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 2)
 
 
@@ -190,7 +190,7 @@ class TestQueries(unittest.TestCase):
                             "payment_model": ["free", "partly free"]
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 0)
 
             # English AND Hungarian speaking that is either free or partly free
@@ -198,7 +198,7 @@ class TestQueries(unittest.TestCase):
                             "payment_model": ["free", "partly free"]
                             }
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], "globalvoices_org_website")
 
     def test_date_predicates(self):
@@ -209,28 +209,28 @@ class TestQueries(unittest.TestCase):
             # Founded by exact year
             query_string = {"founded": ["1995"]}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 2)
             
 
             # Founded in range
             query_string = {"founded": ["1990", "2000"]}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 4)
 
             # Founded before year
             query_string = {"founded": ["2000"],
-                            "founded+operator": 'lt'}
+                            "founded*operator": 'lt'}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 6)
 
             # Founded after year
             query_string = {"founded": ["2000"],
-                            "founded+operator": 'gt'}
+                            "founded*operator": 'gt'}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 5)
 
 
@@ -243,32 +243,34 @@ class TestQueries(unittest.TestCase):
             # verified social media account
             query_string = {"verified_account": True}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 3)
 
             query_string = {"verified_account": 'true'}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 3)
 
     
     def test_integer_predicates(self):
         if self.verbatim:
             print('-- test_integer_predicates() --\n')
-        with self.client as c:
-            query_string = {"publication_cycle_weekday": 3}
+        # No queryable integer predicate in current data model
+        # with self.client as c:
+        #     query_string = {"publication_cycle_weekday": 3}
 
-            response = c.get(f'/query/development', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], 'falter_print')
+        #     response = c.get(f'/query/development/json', query_string=query_string)
+        #     self.assertEqual(response.json[0]['unique_name'], 'falter_print')
+
 
     def test_facet_filters(self):
         if self.verbatim:
             print('-- test_facet_filters() --\n')
         with self.client as c:
             query_string = {"audience_size|papers_sold": 52000,
-                            "audience_size|papers_sold+operator": 'gt'}
+                            "audience_size|papers_sold*operator": 'gt'}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], 'derstandard_print')
 
             # TODO: arbitrary filtering for facets:
@@ -282,13 +284,13 @@ class TestQueries(unittest.TestCase):
             query_string = {"dgraph.type": "Source",
                             "country": self.germany_uid}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 1)
 
             query_string = {"dgraph.type": ["Source", "Organization"],
                             "country": self.austria_uid}
 
-            response = c.get(f'/query/development', query_string=query_string)
+            response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(len(response.json), 11)
 
 

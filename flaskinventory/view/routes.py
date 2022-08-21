@@ -190,7 +190,7 @@ def advanced_query():
     return render_template('not_implemented.html')
 
 
-@view.route("/query/development")
+@view.route("/query/development/json")
 @login_required
 def query_dev():
     query_string = build_query_string(request.args.to_dict(flat=False))
@@ -198,3 +198,31 @@ def query_dev():
     result = dgraph.query(query_string)
 
     return jsonify(result['q'])
+
+
+
+@view.route("/query/development", methods=['GET', 'POST'])
+@login_required
+def query_dev_result():
+    if request.method == 'POST':
+        r = request.form.to_dict(flat=False)
+        r.pop('csrf_token')
+        r.pop('submit')
+        r = {k: v for k, v in r.items() if not v[0] == ''}
+        return redirect(url_for("view.query_dev_result", **r))
+    r = request.args.to_dict(flat=False)
+    query_string = build_query_string(r)
+
+    result = dgraph.query(query_string)
+
+    return jsonify(result['q'])
+
+@view.route("/query/development/form")
+@login_required
+def query_dev_form():
+    
+    from flaskinventory.flaskdgraph.query import generate_query_forms
+
+    form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool'])
+
+    return render_template("query/query_form.html", form=form)
