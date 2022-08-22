@@ -620,6 +620,14 @@ class Source(Entry):
                                             'NA': "Don't know / NA"},
                                     queryable=True)
 
+    sources_included = ReverseListRelationship('sources_included',
+                                                allow_new=False, 
+                                                relationship_constraint=['Archive', 'Dataset', 'Corpus', 'ResearchPaper'],
+                                                query_label='News source included in these resources',
+                                                queryable=True,
+                                                new=False,
+                                                edit=False)
+
     archive_sources_included = ReverseListRelationship('sources_included', 
                                                     allow_new=False, 
                                                     relationship_constraint='Archive',
