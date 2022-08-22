@@ -49,20 +49,20 @@
     <ul class="pagination">
         {% if current_page == 1 %}
             <li class="page-item disabled">
-                <span class="page-link">&laquo;</span>
+                <span class="page-link"><i class="fas fa-angle-double-left" alt="First"></i></span>
             </li>
             <li class="page-item disabled">
-                <span class="page-link">&lsaquo;</span>
+                <span class="page-link"><i class="fas fa-angle-left" alt="Previous"></i></span>
             </li>
         {% else %}
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('view.query_dev_result', _page=1, **r_args) }}" aria-label="First">
-                    <span aria-hidden="true">&laquo;</span>
+                    <span aria-hidden="true"><i class="fas fa-angle-double-left" alt="First"></i></span>
                 </a>
             </li>
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('view.query_dev_result', _page=current_page-1, **r_args) }}" aria-label="Previous">
-                    <span aria-hidden="true">&lsaquo;</span>
+                    <span aria-hidden="true"><i class="fas fa-angle-left" alt="Previous"></i></span>
                 </a>
             </li>
         {% endif %}
@@ -95,20 +95,20 @@
 
         {% if current_page == pages %}
             <li class="page-item disabled">
-                <span class="page-link">&rsaquo;</span>
+                <span class="page-link"><i class="fas fa-angle-right" alt="Next"></i></span>
             </li>
             <li class="page-item disabled">
-                <span class="page-link">&raquo;</span>
+                <span class="page-link"><i class="fas fa-angle-double-right" alt="Last"></i></span>
             </li>
         {% else %}
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('view.query_dev_result', _page=current_page+1, **r_args) }}" aria-label="Next">
-                <span aria-hidden="true">&rsaquo;</span>
+                <span aria-hidden="true"><i class="fas fa-angle-right" alt="Next"></i></span>
                 </a>
             </li>
             <li class="page-item">
                 <a class="page-link" href="{{ url_for('view.query_dev_result', _page=pages, **r_args) }}" aria-label="Last">
-                <span aria-hidden="true">&raquo;</span>
+                <span aria-hidden="true"><i class="fas fa-angle-double-right" alt="Last"></i></span>
                 </a>
             </li>
         {% endif %}
