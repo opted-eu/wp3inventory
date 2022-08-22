@@ -92,3 +92,7 @@ Add it as cronjob with `crontab -e`
 ```
 0 1 * * * /usr/bin/python3 /home/user/wp3inventory/tools/backup.py
 ```
+
+### Restore Backup
+
+- Get backup files and run the following command: `dgraph live --files g01.rdf.gz --schema g01.schema --zero localhost:5080`
