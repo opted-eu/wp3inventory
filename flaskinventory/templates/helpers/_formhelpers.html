@@ -72,7 +72,7 @@
 {% macro render_query_field(field) %}
     {% if field %}
     <!-- {{  field.id }} -->
-    {% if field.type not in ['SubmitField', 'CSRFTokenField'] %}        
+    {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') %}        
         {% if field.type == 'BooleanField' %}
             {% if field.description %}
                 <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
@@ -86,10 +86,10 @@
 
         {% else %}
 
-        <div class="mb-1">
+        <div class="mb-2">
             {% if field.render_kw.hidden %}
             {% else %}
-            <label for="{{ field.id}}" class="form-label">
+            <label for="{{ field.id}}" class="form-label mb-0">
                 {% if field.description %}
                     {{ field.description }}
                 {% else %}
@@ -110,7 +110,7 @@
                     {{ field(class="form-select") }} 
                 {% elif field.type == 'RadioField' %}
                     {% for subfield in field %}
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         {{ subfield(class="form-check-input") }}
                         {{ subfield.label(class="form-check-label") }}
                     </div>
