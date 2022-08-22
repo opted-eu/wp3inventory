@@ -119,6 +119,8 @@ class _PrimitivePredicate:
                  read_only=False,
                  hidden=False,
                  description='',
+                 query_label=None,
+                 query_description=None,
                  tom_select=False,
                  render_kw: dict = None,
                  predicate_alias: list = None,
@@ -134,6 +136,8 @@ class _PrimitivePredicate:
         self.new = new
         self.edit = edit
         self.queryable = queryable
+        self.query_label = query_label or label
+        self.query_description = query_description
         self.permission = permission
         if comparison_operator:
             self.comparison_operator = comparison_operator
@@ -248,13 +252,15 @@ class _PrimitivePredicate:
     def _prepare_query_field(self):
         # not a very elegant solution...
         # provides a hook for UI (JavaScript)
-        if self.predicate:
+        if isinstance(self, ReverseRelationship):
+            self.render_kw.update({'data-entities': ",".join(Schema.__reverse_predicates_types__[self.predicate])})
+        elif self.predicate:
             self.render_kw.update({'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
 
     @property
     def query_field(self) -> StringField:
         self._prepare_query_field()
-        return StringField(label=self.label, render_kw=self.render_kw)
+        return StringField(label=self.query_label, render_kw=self.render_kw)
 
 
 
@@ -522,6 +528,17 @@ class ReverseRelationship(_PrimitivePredicate):
             self.get_choices()
         return TomSelectField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
+    def query_filter(self, vals: Union[str, list], **kwargs) -> str:
+        return super().query_filter(vals, predicate=self._predicate, **kwargs)
+
+    @property
+    def query_field(self) -> TomSelectMutlitpleField:
+        if self.autoload_choices and self.relationship_constraint:
+            self.get_choices()
+        self._prepare_query_field()
+        return TomSelectMutlitpleField(label=self.query_label, 
+                                        choices=self.choices_tuples, 
+                                        render_kw=self.render_kw)
 
 class ReverseListRelationship(ReverseRelationship):
 
@@ -756,7 +773,7 @@ class Integer(Predicate):
     @property
     def query_field(self) -> IntegerField:
         self._prepare_query_field()
-        return IntegerField(label=self.label, render_kw=self.render_kw)
+        return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
 class ListString(String):
 
@@ -838,7 +855,7 @@ class SingleChoice(String):
     @property
     def query_field(self) -> TomSelectMutlitpleField:
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.label, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class MultipleChoice(SingleChoice):
@@ -877,7 +894,7 @@ class MultipleChoice(SingleChoice):
     @property
     def query_field(self) -> TomSelectMutlitpleField:
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.label, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class DateTime(Predicate):
@@ -919,7 +936,7 @@ class DateTime(Predicate):
         render_kw = {'step': 1, 'min': 1500, 'max': 2100}
         if self.render_kw:
             render_kw = {**self.render_kw, **render_kw}
-        return IntegerField(label=self.label, render_kw=self.render_kw)
+        return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
     def query_filter(self, vals: Union[str, list, int], custom_operator: Union['lt', 'gt']=None):
         if vals is None:
@@ -1020,7 +1037,7 @@ class Boolean(Predicate):
     def query_field(self) -> BooleanField:
         self._prepare_query_field()
         self.render_kw.update({'value': 'true'})
-        return BooleanField(label=self.label, render_kw=self.render_kw)
+        return BooleanField(label=self.query_label, render_kw=self.render_kw)
 
 
 class Geo(Predicate):
@@ -1140,7 +1157,7 @@ class SingleRelationship(Predicate):
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.label, 
+        return TomSelectMutlitpleField(label=self.query_label, 
                                         choices=self.choices_tuples, 
                                         render_kw=self.render_kw)
 
