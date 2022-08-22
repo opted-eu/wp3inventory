@@ -25,7 +25,7 @@
     <div class="progress my-4">
         <div id="questionnaire-progress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
-    <fieldset id="section-general">
+    <fieldset id="section-general" class="multi-step-form">
         <h3 class="mb-4">General Information</h3>
         <div class="mb-5 form-group">
             <input type="text" name="uid" id="uid-hidden" value='' readonly hidden>
@@ -168,7 +168,7 @@
 
     <!-- SECTION JOURNALISTIC ROUTINE -->
 
-    <fieldset id="section-routines" hidden>
+    <fieldset id="section-routines" class="multi-step-form" hidden>
         <h3 class="mb-4">Information about Journalistic Routines</h3>
 
         <div id="group-publication-kind" class="mb-5 form-group">
@@ -365,7 +365,7 @@
 
 
     <!-- SECTION: ECONOMIC VARIABLES -->
-    <fieldset id="section-economic" hidden>
+    <fieldset id="section-economic" class="multi-step-form" hidden>
         <h3 class="mb-4">Economic Information</h3>
         <div id="group-payment-model" class="mb-5 form-group fs-5">
             <p class="form-label fw-bold fs-5">Is the content produced by the news source accessible free of charge?
@@ -462,7 +462,7 @@
 
     <!-- SECTION AUDIENCE RELATED -->
 
-    <fieldset id="section-audience" hidden>
+    <fieldset id="section-audience" class="multi-step-form" hidden>
         <h3 class="mb-4">Information about the Audience</h3>
         <div id="group-audience-size-followers" class="mb-5">
             <label for="audience-size-followers" class="form-label fw-bold fs-5">How many likes does the Facebook page currently have?
@@ -512,7 +512,7 @@
 
     <!-- SECTION ACCESS TO RAW TEXT AND ANNOTATION -->
 
-    <fieldset id="section-annotations" hidden>
+    <fieldset id="section-annotations" class="multi-step-form" hidden>
         <h3 class="mb-4">Access to Raw Text and Annotations</h3>
 
         <div id="group-epaper" class="mb-5 form-group fs-5" hidden>
@@ -564,7 +564,7 @@
 
     <!-- SECTION OTHER -->
 
-    <fieldset id="section-other" hidden>
+    <fieldset id="section-other" class="multi-step-form" hidden>
         <h3 class="mb-4">Other Information</h3>
 
         <!-- Optional Field -->
@@ -620,7 +620,7 @@
     </fieldset>
 
 
-    <fieldset id="section-final" hidden>
+    <fieldset id="section-final" class="multi-step-form" hidden>
         <h3 class="mb-5">Summary</h3>
 
         <div id='summary-container'>
