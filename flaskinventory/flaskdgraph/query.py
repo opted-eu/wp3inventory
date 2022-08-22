@@ -1,6 +1,6 @@
 from .schema import Schema
 
-from wtforms import SubmitField
+from wtforms import SubmitField, SelectField
 from flask_wtf import FlaskForm
 from .customformfields import TomSelectMutlitpleField
 
@@ -17,6 +17,10 @@ from .customformfields import TomSelectMutlitpleField
 
 
 def build_query_string(query: dict, public=True) -> str:
+    """
+        Construct a query string from a dictionary of filters.
+        Returns a dql query string with two queries: `total` and `q`
+    """
 
     from flaskinventory.flaskdgraph.dgraph_types import MutualRelationship, SingleRelationship
 
@@ -64,7 +68,11 @@ def build_query_string(query: dict, public=True) -> str:
         if k not in cleaned_query.keys() and k in Schema.get_queryable_predicates():
             cleaned_query.update({k: None})
 
-    query_parts = ['uid', 'unique_name', 'name', 'dgraph.type']
+    # prevent querying everything
+    if len(cleaned_query) == 0 and len(filters) == 0:
+        return False
+
+    query_parts = ['uid', 'unique_name', 'name', 'dgraph.type', 'authors', 'other_names', 'published_date']
     if public:
         filters.append('eq(entry_review_status, "accepted")')
 
@@ -76,7 +84,17 @@ def build_query_string(query: dict, public=True) -> str:
         operator = operators.get(key, None)
 
         # Let the predicate object generate the filter query part
-        filters.append(predicate.query_filter(val, custom_operator=operator))
+        predicate_filter = predicate.query_filter(val, custom_operator=operator)
+
+        # check if there are aliases for this predicate
+        if predicate.predicate_alias:
+            alias_filters = [predicate_filter]
+            for alias in predicate.predicate_alias:
+                alias_filters.append(predicate.query_filter(val, predicate=alias, custom_operator=operator))
+            predicate_filter = " OR ".join(alias_filters)
+            predicate_filter = f'({predicate_filter})'
+
+        filters.append(predicate_filter)
 
         facet_filter = []
         facet_list = []
@@ -118,6 +136,11 @@ def build_query_string(query: dict, public=True) -> str:
         cascade = ""
 
     query_string = f"""{{
+        total(func: has(dgraph.type)) 
+            @filter({filters}) {cascade} {{
+                count(uid)
+            }}
+
         q(func: has(dgraph.type), orderasc: unique_name, first: {max_results}, offset: {page * max_results}) 
             @filter({filters}) {cascade} {{
                 {" ".join(query_parts)}
@@ -128,7 +151,7 @@ def build_query_string(query: dict, public=True) -> str:
     return query_string
 
 
-def generate_query_forms(dgraph_types: list = None):
+def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -> FlaskForm:
 
     if not dgraph_types:
         dgraph_types = Schema.get_types()
@@ -149,21 +172,20 @@ def generate_query_forms(dgraph_types: list = None):
             if not hasattr(F, k):
                 setattr(F, k, v.query_field)
 
+    # add pagination parameters
+    max_results = SelectField('max results', choices=[10, 25, 50], default=25, name='_max_results')
+    setattr(F, 'max_results', max_results)
+
     form = F()
 
-    # add a hook for JavaScript to hide / show fields according to selected entities
-    # feels a bit Hacky...
-    # the predicates themselves should know, which entity types they belong to
-    # for field in form._fields:
-    #     try:
-    #         associated = Schema.__predicates_types__[field]
-    #         getattr(form, field).render_kw.update(
-    #             {'data-entities': ",".join(associated)})
-    #     except KeyError:
-    #         pass
-
     # ability to pre-populate the form with data
-    # if populate_obj:
-    #     form = cls.populate_form(form, populate_obj, fields)
+    if populate_obj:
+        print(populate_obj)
+        for k, v in populate_obj.items():
+            if k.startswith('_'):
+                k_name = k[1:]
+            else: k_name = k
+            if hasattr(form, k_name):
+                setattr(getattr(form, k_name), 'data', v)
 
     return form

@@ -159,7 +159,9 @@ class _PrimitivePredicate:
         # delete all values first before writing new ones
         self.overwrite = overwrite
 
-        # other references to this predicate (might delete later)
+        # other references to this predicate
+        # this is used for querying several predicates at once
+        # but they also have different creation logics 
         self.predicate_alias = predicate_alias
 
 
@@ -219,16 +221,19 @@ class _PrimitivePredicate:
         else:
             return data
 
-    def query_filter(self, vals: Union[str, list], **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], predicate=None, **kwargs) -> str:
+
+        if not predicate:
+            predicate = self.predicate
 
         if vals is None:
-            return f'has({self.predicate})'
+            return f'has({predicate})'
 
         if not isinstance(vals, list):
             vals = [vals]
 
         if self.is_list_predicate:
-            return " AND ".join([f'{self.comparison_operator}({self.predicate}, "{strip_query(val)}")' for val in vals])
+            return " AND ".join([f'{self.comparison_operator}({predicate}, "{strip_query(val)}")' for val in vals])
         else:
             if not 'uid' in self.dgraph_predicate_type:
                 vals_string = ", ".join([f'"{strip_query(val)}"' for val in vals])
@@ -236,9 +241,9 @@ class _PrimitivePredicate:
                 vals_string = ", ".join(
                     [f'{validate_uid(val)}' for val in vals if validate_uid(val)])
             if len(vals) == 1:
-                return f'{self.comparison_operator}({self.predicate}, {vals_string})'
+                return f'{self.comparison_operator}({predicate}, {vals_string})'
             else:
-                return f'{self.comparison_operator}({self.predicate}, [{vals_string}])'
+                return f'{self.comparison_operator}({predicate}, [{vals_string}])'
 
     def _prepare_query_field(self):
         # not a very elegant solution...
