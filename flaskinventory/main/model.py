@@ -469,7 +469,8 @@ class Source(Entry):
                                  relationship_constraint='Channel',
                                  read_only=True,
                                  required=True,
-                                 queryable=True)
+                                 queryable=True,
+                                 predicate_alias=['channels'])
 
     name = String(label='Name of the News Source',
                   required=True,
@@ -937,8 +938,7 @@ class Tool(Entry):
     channels = ListRelationship(description="Is the tool designed for specific channels?",
                                 autoload_choices=True,
                                 allow_new=False,
-                                relationship_constraint="Channel",
-                                queryable=True)
+                                relationship_constraint="Channel")
 
     language_independent = Boolean(description="Is the tool language independent?",
                                     label="Yes",
