@@ -1,103 +1,134 @@
-{% extends "layout.html" %} {% block content %}
+{% set show_sidebar = True %}
+{% extends "layout.html" %} 
+
+{% block content %}
+
+{% from "helpers/_viewhelpers.html" import render_publication %}
 
 
-{% from "helpers/_formhelpers.html" import render_query_field %}
+{% if result %}
 
+<!--- Results Table --->
 
-<form method="POST" action="{{ url_for('view.query_dev_result') }}" id="query" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
-    <fieldset class="form-group mb-3">
-        {# <legend class="border-bottom mb-4">{{ title }}</legend> #}
-        {% for field in form._fields %} 
-            {% if field.type not in ['SubmitField'] %}
-                {{ render_query_field(form.get_field(field)) }} 
+<table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Country</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+      {% for entry in result %}
+      <tr>
+        {% if entry.get('dgraph.type')[0] in ["Tool", "Paper", "Dataset"] %}
+          <td><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ render_publication(entry) }}</td>
+        {% else %}
+          <td><a href="{{ url_for('view.view_generic', unique_name=entry.get('unique_name'), dgraph_type=entry.get('dgraph.type')[0])}}">{{ entry.name }} {{ entry.title }} {% if entry.get('channel') %}({{entry.channel.name }}){% endif %}</a></td>
+        {% endif %}
+          <td>{{ entry.get("dgraph.type")[0] }}</td>
+          <td>
+            {% if entry.get("country") %} 
+                <span class="d-inline-block text-truncate" style="max-width: 250px;"
+                title="{% for country in entry.country %}{{ country.name }}{{ ", " if not loop.last else "" }}{% endfor %}">
+                {% for country in entry.country %}
+                    {{ country.name }}{{ "," if not loop.last else "" }}
+                {% endfor %}
+                </span>
+            {% endif %}
+          </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+
+<!--- Pagination Nav --->
+{% if pages > 1 %}
+    <nav aria-label="Pagination" class="mt-4">
+    <ul class="pagination">
+        {% if current_page == 1 %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&lsaquo;</span>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('view.query_dev_result', _page=1, **r_args) }}" aria-label="First">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('view.query_dev_result', _page=current_page-1, **r_args) }}" aria-label="Previous">
+                    <span aria-hidden="true">&lsaquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if current_page - 3 > 1 %}
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+        {% endif %}
+        
+        {% for page in range(1, pages + 1) %}
+            {% if page == current_page %}
+                <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+            {% elif page > current_page-3 and page < current_page+3 %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('view.query_dev_result', _page=page, **r_args) }}">{{ page }}</a></li>
+            {% else %}
             {% endif %}
         {% endfor %}
-    </fieldset>
-    <div class="form-group mb-3">
-         {{ form.submit(class="btn btn-success my-4") }} 
-        {# <button class="btn btn-primary btn-lg mx-2" type="submit">Query</button> #}
-    </div>
-</form>
 
-<script>
-{% for f in form._fields %} 
+        {% if current_page + 3 <= pages %}
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            {% if current_page + 3 < pages %}
+                {% for page in range(pages -2, pages + 1) %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('view.query_dev_result', _page=page, **r_args) }}">{{ page }}</a></li>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
 
-    {% set field = form.get_field(f) %}
+        {% if current_page == pages %}
+            <li class="page-item disabled">
+                <span class="page-link">&rsaquo;</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('view.query_dev_result', _page=current_page+1, **r_args) }}" aria-label="Next">
+                <span aria-hidden="true">&rsaquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('view.query_dev_result', _page=pages, **r_args) }}" aria-label="Last">
+                <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+    </nav>
+{% endif %}
 
-    {% if field.type ==  "TomSelectMutlitpleField" %}
 
-    new TomSelect('#{{ field.id.replace('.', '\\\.') }}', 
-    {
-        create: false, 
-        plugins: ['remove_button'], 
-        onItemAdd:function(){ // clear input after item was selected
-                this.setTextboxValue();
-                this.refreshOptions();
-        }
-        })
+{% else %}
 
-    {% endif %}
+<p>No result!</p>
 
-{% endfor %}
-</script>
-
-
-
-<script>
-
-const entitySelector = document.getElementById('dgraph.type')
-const alwaysVisible = ['country', 'languages', 'channel']
-
-function showFields(event) {
-    hideFields()
-    for (o of event.target.options) {
-        if (o.selected) {
-            console.log(o.value)
-            let fields = document.querySelectorAll(`[data-entities*="${o.value}"]`)
-            for (f of fields) {
-                f.parentElement.hidden = false
-            }
-
-        }
-    }
-}
-
-function hideFields() {
-    let all = document.querySelectorAll('[data-entities]')
-        for (element of all) {
-            if (!alwaysVisible.includes(element.id)) {
-                element.parentElement.hidden = true
-            }
-        }
-}
-
-hideFields()
-
-entitySelector.addEventListener("change", showFields)
-
-/* Custom adjust order of query fields */
-
-function rearrange() {
-    let all = document.querySelectorAll('[data-entities]')
-    for (e of all) {
-        if (alwaysVisible.includes(element.id)) {
-            e.parentElement.classList.add('order-1')
-        } else {
-            e.parentElement.classList.add('order-5')
-            }
-    }
-}
-
-rearrange()
-
-</script>
-
+{% endif %}
 
 {% endblock content %}
 
 
 {% block sidebar %}
 
+
+{% include "query/sidebar.html" %}
 
 {% endblock sidebar %}

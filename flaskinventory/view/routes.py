@@ -6,6 +6,7 @@ from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
 from flaskinventory.flaskdgraph import Schema, build_query_string
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
+from flaskinventory.users.utils import requires_access_level
 from flaskinventory.view.dgraph import (get_entry, get_rejected, list_by_type)
 from flaskinventory.view.utils import can_view
 from flaskinventory.view.forms import SimpleQuery
@@ -192,6 +193,7 @@ def advanced_query():
 
 @view.route("/query/development/json")
 @login_required
+@requires_access_level(USER_ROLES.Admin)
 def query_dev():
     query_string = build_query_string(request.args.to_dict(flat=False))
 
@@ -203,6 +205,7 @@ def query_dev():
 
 @view.route("/query/development", methods=['GET', 'POST'])
 @login_required
+@requires_access_level(USER_ROLES.Admin)
 def query_dev_result():
     if request.method == 'POST':
         r = request.form.to_dict(flat=False)
@@ -210,15 +213,48 @@ def query_dev_result():
         r.pop('submit')
         r = {k: v for k, v in r.items() if not v[0] == ''}
         return redirect(url_for("view.query_dev_result", **r))
+    total = None
+    pages = 1
     r = request.args.to_dict(flat=False)
-    query_string = build_query_string(r)
+    if len(r) > 0:
+        query_string = build_query_string(r)
+        if query_string:
+            result = dgraph.query(query_string)
+            total = result['total'][0]['count']
 
-    result = dgraph.query(query_string)
+            max_results = int(request.args.get('_max_results', 25))
+            # make sure no random values are passed in as parameters
+            if not max_results in [10, 25, 50]: max_results = 25
 
-    return jsonify(result['q'])
+            # fancy ceiling division
+            pages = -(total // -max_results)
+
+            result = result['q']
+
+            # clean 'Entry' from types
+            if len(result) > 0:
+                for item in result:
+                    if 'Entry' in item['dgraph.type']:
+                        item['dgraph.type'].remove('Entry') 
+    
+    else: result = None
+
+    from flaskinventory.flaskdgraph.query import generate_query_forms
+
+
+    r_args = {k: v for k, v in request.args.to_dict(flat=False).items() if v[0] != ''}
+    if '_page' in r_args:
+        current_page = int(r_args.pop('_page')[0])
+    else:
+        current_page = 1
+
+    form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool'], populate_obj=r_args)
+
+    return render_template("query/query_form.html", form=form, result=result, r_args=r_args, total=total, pages=pages, current_page=current_page)
 
 @view.route("/query/development/form")
 @login_required
+@requires_access_level(USER_ROLES.Admin)
 def query_dev_form():
     
     from flaskinventory.flaskdgraph.query import generate_query_forms

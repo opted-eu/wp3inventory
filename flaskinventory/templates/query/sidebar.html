@@ -1,0 +1,150 @@
+{% from "helpers/_formhelpers.html" import render_query_field %}
+<span  class="d-flex px-3 py-1 border-bottom">
+    <h5 class="flex-grow-1">Query </h5>
+    {% if total %}<span class="badge bg-primary align-self-baseline fs-6">Total results: {{ total }}</span>{% endif %}
+</span>
+<div class="list-group list-group-flush border-bottom scrollarea">
+
+    <form class="list-group-item px-3 lh-tight" method="POST" action="{{ url_for('view.query_dev_result') }}" id="query-sidebar" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group my-2" id="fieldset-container-sorted">
+        </fieldset>
+        <a class="link-secondary" href="javascript:;" id="more-filters" onClick="toggleMoreFilters(this)" hidden>show more filters</a>
+        <fieldset class="form-group my-1" id="fieldset-container-unsorted" hidden>
+            {# <legend class="border-bottom mb-4">{{ title }}</legend> #}
+            {% for field in form._fields %} 
+                {% if field.type not in ['SubmitField'] %}
+                    {{ render_query_field(form.get_field(field)) }} 
+                {% endif %}
+            {% endfor %}
+        </fieldset>
+        <div class="d-flex flex-row align-content-end my-1">
+            {{ form.submit(class="btn btn-primary align-self-end") }} 
+
+            <div class="align-self-end mx-2">
+                {{ form.max_results.label(class='form-label mb-0') }}
+                {{ form.max_results(class='form-select form-select-sm') }}
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+{% for f in form._fields %} 
+
+    {% set field = form.get_field(f) %}
+
+    {% if field.type ==  "TomSelectMutlitpleField" %}
+
+    new TomSelect('#{{ field.id.replace('.', '\\\.') }}', 
+    {
+        create: false, 
+        plugins: ['remove_button'], 
+        onItemAdd:function(){ // clear input after item was selected
+                this.setTextboxValue();
+                this.refreshOptions();
+        }
+        })
+
+    {% endif %}
+
+{% endfor %}
+</script>
+
+
+
+<script>
+
+const entitySelector = document.getElementById('dgraph.type')
+const alwaysVisible = ['country', 'languages', 'channel']
+
+function hideFields() {
+    let all = document.querySelectorAll('[data-entities]')
+    for (element of all) {
+        if (!alwaysVisible.includes(element.id)) {
+            element.parentElement.hidden = true
+        }
+    }
+}
+
+function showFields(event) {
+    hideFields()
+    if (event.target.selectedOptions.length > 0) {
+        document.getElementById('more-filters').hidden = false
+    } else {
+        document.getElementById('more-filters').hidden = true
+    }
+    for (o of event.target.options) {
+        if (o.selected) {
+            let fields = document.querySelectorAll(`[data-entities*="${o.value}"]`)
+            for (f of fields) {
+                f.parentElement.hidden = false
+            }
+        } 
+    }
+}
+
+function clearFields(event) {
+    let all = document.querySelectorAll('[data-entities]')
+    let selectedEntities = [... event.target.selectedOptions].map(e => e.value)
+    console.log(selectedEntities)
+    for (el of all) {
+        let entities = el.attributes['data-entities'].value.split(',')
+        let diff = selectedEntities.filter(a => entities.includes(a))
+        if (diff.length == 0 && !alwaysVisible.includes(el.id)) {
+            try {
+                el.tomselect.clear()
+            } catch {
+                el.value = ""
+            }
+        }
+    }
+}
+
+
+
+entitySelector.addEventListener("change", showFields)
+entitySelector.addEventListener("change", clearFields)
+var event = new Event('change');
+
+entitySelector.dispatchEvent(event)
+
+/* Custom adjust order of query fields */
+
+const sortedContainer = document.getElementById('fieldset-container-sorted')
+const unsortedContainer = document.getElementById('fieldset-container-unsorted')
+
+const correctOrder = ["dgraph.type", 
+                        "country", "channel", "languages", 
+                        "used_for",
+                        "concept_vars",
+                        "programming_languages",
+                        "publication_kind", "ownership_kind", 
+                        "geographic_scope", "payment_model",
+                        "platform", "open_source"]
+                         
+
+function rearrange() {
+    // let all = document.querySelectorAll('[data-entities]')
+    for (predicate of correctOrder) {
+        let el = document.getElementById(predicate).parentElement
+        sortedContainer.appendChild(el)
+    }
+}
+
+rearrange()
+
+
+function toggleMoreFilters(button) {
+    unsortedContainer.hidden = !unsortedContainer.hidden
+
+    if(unsortedContainer.hidden) {
+        button.innerHTML = "show more filters"
+    } else { 
+        button.innerHTML = "hide filters"
+    }
+
+}
+
+</script>
