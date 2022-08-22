@@ -15,6 +15,7 @@ class Schema:
     # registry of all predicates and which types use them
     # Key = predicate (string), Val = list(Dgraph Type (string))
     __predicates_types__ = {}
+    __reverse_predicates_types__ = {}
 
     __inheritance__ = {}
 
@@ -51,7 +52,7 @@ class Schema:
         reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), ReverseRelationship)}
 
         queryable_predicates = {key: val for key, val in predicates.items() if val.queryable}
-        queryable_predicates.update({key: val for key, val in reverse_predicates.items() if val.queryable})
+        queryable_predicates.update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
 
         Schema.__queryable_predicates__.update(queryable_predicates)
 
@@ -84,7 +85,7 @@ class Schema:
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
 
         Schema.__queryable_predicates_by_type__[cls.__name__] = {key: val for key, val in predicates.items() if val.queryable}
-        Schema.__queryable_predicates_by_type__[cls.__name__].update({key: val for key, val in reverse_predicates.items() if val.queryable})
+        Schema.__queryable_predicates_by_type__[cls.__name__].update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
         
         # Bind and "activate" predicates for initialized class 
         for key in cls.__dict__:
@@ -104,6 +105,12 @@ class Schema:
                             key].append(cls.__name__)
                 if key not in cls.__predicates__:
                     cls.__predicates__.update({key: attribute})
+            elif isinstance(attribute, ReverseRelationship):
+                if attribute.predicate not in cls.__reverse_predicates_types__:
+                    cls.__reverse_predicates_types__.update({attribute.predicate: [cls.__name__]})
+                else:
+                    if cls.__name__ not in cls.__reverse_predicates_types__[attribute.predicate]:
+                        cls.__reverse_predicates_types__[attribute.predicate].append(cls.__name__)
 
     @classmethod
     def get_types(cls) -> list:
