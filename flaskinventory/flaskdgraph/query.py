@@ -78,7 +78,7 @@ def build_query_string(query: dict, public=True) -> str:
 
     for key, val in cleaned_query.items():
         # get predicate from Schema
-        predicate = Schema.predicates()[key]
+        predicate = Schema.get_queryable_predicates()[key]
 
         # check if we have a non-default operator
         operator = operators.get(key, None)
@@ -153,12 +153,14 @@ def build_query_string(query: dict, public=True) -> str:
 
 def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -> FlaskForm:
 
+    # if no type is specified, just create a form for all types
     if not dgraph_types:
         dgraph_types = Schema.get_types()
 
     class F(FlaskForm):
 
         submit = SubmitField('Query')
+        max_results = SelectField('max results', choices=[10, 25, 50], default=25, name='_max_results', coerce=int)
 
         def get_field(self, field):
             return getattr(self, field, None)
@@ -172,20 +174,13 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
             if not hasattr(F, k):
                 setattr(F, k, v.query_field)
 
-    # add pagination parameters
-    max_results = SelectField('max results', choices=[10, 25, 50], default=25, name='_max_results')
-    setattr(F, 'max_results', max_results)
+    # add pagination parameters: max_results
+    if '_max_results' in populate_obj:
+        if isinstance(populate_obj['_max_results'], list):
+            populate_obj['max_results'] = populate_obj['_max_results'][0]
+        else:
+            populate_obj['max_results'] = populate_obj['_max_results']
 
-    form = F()
-
-    # ability to pre-populate the form with data
-    if populate_obj:
-        print(populate_obj)
-        for k, v in populate_obj.items():
-            if k.startswith('_'):
-                k_name = k[1:]
-            else: k_name = k
-            if hasattr(form, k_name):
-                setattr(getattr(form, k_name), 'data', v)
+    form = F(data=populate_obj)
 
     return form
