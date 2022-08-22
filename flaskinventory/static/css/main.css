@@ -152,11 +152,11 @@
     }
 }
 
-fieldset[hidden] {
+fieldset.multi-step-form[hidden] {
     opacity: 0;
 }
 
-fieldset {
+fieldset.multi-step-form {
     opacity: 1;
     -webkit-animation: fadein 200ms;
     /* Safari, Chrome and Opera > 12.1 */
