@@ -47,3 +47,7 @@ paragraph
 chalkboard
 user-plus
 sign-in-alt
+angle-double-left
+angle-double-right
+angle-left
+angle-right
