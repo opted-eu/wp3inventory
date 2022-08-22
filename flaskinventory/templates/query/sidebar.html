@@ -37,11 +37,11 @@
 
     {% if field.type ==  "TomSelectMutlitpleField" %}
 
-    new TomSelect('#{{ field.id.replace('.', '\\\.') }}', 
+    new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~') }}', 
     {
         create: false, 
         plugins: ['remove_button'], 
-        onItemAdd:function(){ // clear input after item was selected
+        onItemAdd:function(){ // clear input after item was selecte d
                 this.setTextboxValue();
                 this.refreshOptions();
         }
@@ -106,9 +106,6 @@ function clearFields(event) {
 
 entitySelector.addEventListener("change", showFields)
 entitySelector.addEventListener("change", clearFields)
-var event = new Event('change');
-
-entitySelector.dispatchEvent(event)
 
 /* Custom adjust order of query fields */
 
@@ -122,7 +119,7 @@ const correctOrder = ["dgraph.type",
                         "programming_languages",
                         "publication_kind", "ownership_kind", 
                         "geographic_scope", "payment_model",
-                        "platform", "open_source"]
+                        "platform", "open_source", '~sources_included']
                          
 
 function rearrange() {
@@ -132,8 +129,6 @@ function rearrange() {
         sortedContainer.appendChild(el)
     }
 }
-
-rearrange()
 
 
 function toggleMoreFilters(button) {
@@ -146,5 +141,11 @@ function toggleMoreFilters(button) {
     }
 
 }
+
+rearrange()
+var event = new Event('change');
+
+entitySelector.dispatchEvent(event)
+
 
 </script>
