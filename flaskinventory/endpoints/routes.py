@@ -42,7 +42,7 @@ def quicksearch():
                     other_names: other_names
                     type: dgraph.type 
                     title: title
-                    channel {{ channel: name }}
+                    channel {{ channel: unique_name }}
                     doi: doi
                     arxiv: arxiv
                 }}
