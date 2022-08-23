@@ -52,11 +52,13 @@ def about():
 
 @main.route('/imprint')
 def imprint():
-    return render_template('main/imprint.html')
+    return render_template('main/imprint.html',
+        title="Imprint")
 
 @main.route('/privacy')
 def privacy():
-    return render_template('main/privacy.html')
+    return render_template('main/privacy.html',
+        title="Privacy Policy")
 
 @main.route('/notimplemented')
 def under_development():
@@ -64,19 +66,27 @@ def under_development():
 
 @main.route('/guides/newssource')
 def guides_newssource():
-    return render_template('guides/newsource.html', show_sidebar=True)
+    return render_template('guides/newsource.html', show_sidebar=True,
+        title="Guide for adding News Sources",
+        meta_description="What is included in this inventory?")
 
 @main.route('/guides/resources')
 def guides_resources():
-    return render_template('guides/resources.html', show_sidebar=True)
+    return render_template('guides/resources.html', show_sidebar=True,
+        title="Link Collection",
+        meta_description="This is a collection of online resources that provide useful background and meta information on the media landscape in Europe. All resources are curated by the Meteor Team (WP3 of the OPTED Consortium) and the list is updated irregularly.")
 
 @main.route('/guides/faq')
 def guides_faq():
-    return render_template('guides/faq.html', show_sidebar=True)
+    return render_template('guides/faq.html', show_sidebar=True,
+        title="FAQ",
+        meta_description="Making entries to the inventory can sometimes be confusing. Therfore, we collected some frequently asked questions here. All questions are curated by the Meteor Team (WP3 of the OPTED Consortium) and the list is updated irregularly.")
 
 @main.route('/guides/teaching-materials')
 def guides_teaching():
-    return render_template('guides/teaching.html', show_sidebar=True)
+    return render_template('guides/teaching.html', show_sidebar=True, 
+        title="Teaching Materials",
+        meta_description="Meteor is not only an inventory of news sources but can also serve as a tool for teaching courses at universities. The materials for this course are made available here and include: syllabus and slides.")
 
 
 # Misc Routes
@@ -102,7 +112,7 @@ def sitemap():
 
 # Meta Tags
 
-@main.context_processor
+@main.app_context_processor
 def meta_tags():
     return {'meta_url': url_for('main.home', _external=True),
             'meta_description': "OPTED Meteor (Media Text Open Registry) is an inventory for European journalistic texts and is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe.",
