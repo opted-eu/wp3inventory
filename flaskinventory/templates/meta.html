@@ -1,0 +1,65 @@
+<meta name="url" content="{{ meta_url }}">
+
+<meta name="description" content="{{ meta_description }}">
+<meta name="author" content="{{ ', '.join(meta_authors) }}">
+<meta name="keywords" content="{{ meta_keywords }}">
+
+{% if title %}
+    <meta property="og:title" content="{{ title }} | OPTED Meteor" />
+{% else %}
+    <meta property="og:title" content="OPTED Meteor" />
+{% endif %}
+
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ meta_url }}" />
+<meta property="og:description" content="{{ meta_description }}" />
+<meta property="og:site_name" content="OPTED Meteor">
+<meta property="article:author" content="{{ ', '.join(meta_authors) }}">
+<meta property="article:published_time" content="{{ meta_date_published.strftime('%Y-%m-%d')}}">
+
+<link rel="schema.DC" href="http://purl.org/DC/elements/1.0/">
+<meta name="citation_technical_report_institution" content="University of Vienna, Department of Communication">
+<meta name="dc.Title" content="OPTED Meteor">
+{% for author in meta_authors %}
+    <meta name="dc.Creator" content="{{ author }}">
+{% endfor %}
+<meta name="dc.Subject" content="{{ meta_keywords }}">
+<meta name="dc.Description" content="{{ meta_description }}">
+<meta name="dc.Publisher" content="University of Vienna, Department of Communication">
+<meta name="dc.Date" scheme="WTN8601" content="{{ meta_date_published.strftime('%Y-%m-%d') }}">
+<meta name="dc.Type" content="InteractiveResource">
+<meta name="dc.Format" content="text/HTML">
+<meta name="dc.Language" content="en">
+<meta name="dc.Coverage" content="European Union">
+<meta name="dc.Coverage" content="Austria">
+<meta name="dc.Coverage" content="Belgium">
+<meta name="dc.Coverage" content="Bulgaria">
+<meta name="dc.Coverage" content="Cyprus">
+<meta name="dc.Coverage" content="Czech Republic">
+<meta name="dc.Coverage" content="Germany">
+<meta name="dc.Coverage" content="Denmark">
+<meta name="dc.Coverage" content="Estonia">
+<meta name="dc.Coverage" content="Spain">
+<meta name="dc.Coverage" content="Finland">
+<meta name="dc.Coverage" content="France">
+<meta name="dc.Coverage" content="Greece">
+<meta name="dc.Coverage" content="Croatia">
+<meta name="dc.Coverage" content="Hungary">
+<meta name="dc.Coverage" content="Ireland">
+<meta name="dc.Coverage" content="Italy">
+<meta name="dc.Coverage" content="Lithuania">
+<meta name="dc.Coverage" content="Luxemburg">
+<meta name="dc.Coverage" content="Latvia">
+<meta name="dc.Coverage" content="Malta">
+<meta name="dc.Coverage" content="Netherlands">
+<meta name="dc.Coverage" content="Poland">
+<meta name="dc.Coverage" content="Portugal">
+<meta name="dc.Coverage" content="Romania">
+<meta name="dc.Coverage" content="Sweden">
+<meta name="dc.Coverage" content="Slovenia">
+<meta name="dc.Coverage" content="Slovakia">
+<meta name="dc.Coverage" content="United Kingdom">
+<meta name="dc.Coverage" content="Israel">
+<meta name="dc.Coverage" content="Norway">
+<meta name="dc.Coverage" content="Switzerland">
+<meta name="dc.Rights" content="© The Author(s) 2022">

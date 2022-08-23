@@ -98,3 +98,15 @@ def sitemap():
     response = make_response(sitemap_template)
     response.headers['Content-Type'] = 'application/xml'
     return response
+
+
+# Meta Tags
+
+@main.context_processor
+def meta_tags():
+    return {'meta_url': url_for('main.home', _external=True),
+            'meta_description': "OPTED Meteor (Media Text Open Registry) is an inventory for European journalistic texts and is part of the EU-funded Project OPTED where researchers work towards the creation of a new European research infrastructure for the study of political communication in Europe.",
+            'meta_authors': ["Paul Balluff",  "Fabienne Lind", "Marvin Stecker", "Celina Dinhopl", "Hajo G. Boomgaarden", "Annie Waldherr"],
+            'meta_keywords': 'News sources inventory; text as data; European Media Systems; open data; research infrastructure; Media in Europa; Political Texts; Automated Text Analysis',
+            'meta_date_published': datetime.now(),
+            'meta_date_modified': datetime.now()}
