@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, send_from_directory, current_app, 
 from flaskinventory import dgraph
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.view.forms import SimpleQuery
+from flaskinventory.main.model import Tool, Source
 
 from datetime import datetime
 
@@ -12,9 +13,13 @@ main = Blueprint('main', __name__)
 @main.route('/home')
 def home():
     # needs caching!
-    c_choices = get_country_choices(multinational=True)
-    c_choices.insert(0, ('all', 'All'))
-    form = SimpleQuery()
+    c_choices = get_country_choices()
+
+    class Q(SimpleQuery):
+        pass
+
+    setattr(Q, 'used_for', Tool.used_for.query_field)
+    form = Q()
     form.country.choices = c_choices
 
     query_string = '''{

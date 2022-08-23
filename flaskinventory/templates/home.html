@@ -1,11 +1,12 @@
 {% extends "layout.html" %} {% block content %}
 
 <main>
-    <h1>Welcome to the OPTED inventory for media texts!</h1>
-    <p class="fs-5 col-md-8">Quickly and easily query our database of news sources, organisations, datasets, corpora, tools and more! Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
+    <h1>Welcome to the OPTED inventory for media&nbsp;texts!</h1>
+    <p class="lead">Quickly and easily query our database of news sources, organisations, datasets, corpora, tools and more! Find out which databases hold the text data that you are looking for. Do you have a specific source in mind? Try typing the name in the search bar and check if the entry
         already exists!</p>
     <div class="mb-5">
-        <form method="GET" action="{{ url_for('view.query') }}">
+        <form method="POST" action="{{ url_for('view.query') }}" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}    
             <div class="row mb-4">
                 <div class="col-md-5">
                     {{ form.entity.label(class="form-label") }}
@@ -14,19 +15,26 @@
                     </div>
                     {{ form.entity(class="form-select form-select-lg") }}
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-5" id="form-country">
                     {{ form.country.label(class="form-label") }}
                     <div class="invalid-feedback">
                         Please select one type.
                     </div>
-                    {{ form.country(class="form-select form-select-lg") }}
+                    {{ form.country(class="form-select form-select-lg", placeholder='all...') }}
+                </div>
+                <div class="col-md-5" id="form-used_for" hidden>
+                    {{ form.used_for.label(class="form-label") }}
+                    <div class="invalid-feedback">
+                        Please select one type.
+                    </div>
+                    {{ form.used_for(class="form-select form-select-lg", placeholder='anything...') }}
                 </div>
 
             </div>
             <div class="row">
                 <div class="col-md-5 d-flex align-content-end flex-wrap">
-                    <button class="btn btn-primary btn-lg mx-2" type="submit">Query</button>
-                    <a class="mx-2 align-self-end" href="{{ url_for('view.advanced_query') }}">Advanced query</a>
+                    {{ form.submit(class="btn btn-primary btn-lg mx-2") }} 
+                    <a class="mx-2 align-self-end" href="{{ url_for('view.query') }}">Advanced query</a>
                 </div>
             </div>
         </form>
@@ -57,6 +65,26 @@
         </div>
     </div>
 </main>
+
+{% include 'query/tomselect.html' %}
+
+<script>
+
+    const typeSelector = document.getElementById('dgraph.type')
+    typeSelector.addEventListener('change', hideFields)
+
+    function hideFields() {
+        if (typeSelector.value == 'Tool') {
+            document.getElementById('form-used_for').hidden = false
+            document.getElementById('form-country').hidden = true
+        } else {
+            document.getElementById('form-used_for').hidden = true
+            document.getElementById('form-country').hidden = false
+        }
+    }
+
+
+</script>
 
 {% endblock content %}
 
