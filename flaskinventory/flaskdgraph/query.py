@@ -1,6 +1,6 @@
 from .schema import Schema
 
-from wtforms import SubmitField, SelectField
+from wtforms import SubmitField, SelectField, StringField
 from flask_wtf import FlaskForm
 from .customformfields import TomSelectMutlitpleField
 
@@ -42,8 +42,28 @@ def build_query_string(query: dict, public=True) -> str:
     except (KeyError, ValueError):
         page = 0
 
-    # special treatment for dgraph.type
+    # special treatment for free text search
+    # maybe incorporate searchable predicates in Schema someday...
     filters = []
+    try:
+        search_terms = query.pop('_terms')
+        if isinstance(search_terms, list):
+            search_terms = " ".join(search_terms)
+        filters.append("""(anyofterms(name, $searchTerms) OR 
+                            anyofterms(other_names, $searchTerms) OR 
+                            anyofterms(title, $searchTerms) OR 
+                            eq(doi, $searchTerms) OR 
+                            eq(arxiv, $searchTerms) OR 
+                            anyofterms(authors, $searchTerms))""")
+
+        variables = {'$searchTerms': search_terms}
+
+    except (KeyError, ValueError):
+        search_terms = None
+        variables = None
+
+    # special treatment for dgraph.type
+    
     try:
         dgraph_type = query.pop('dgraph.type')
         if isinstance(dgraph_type, str):
@@ -135,7 +155,15 @@ def build_query_string(query: dict, public=True) -> str:
     else:
         cascade = ""
 
-    query_string = f"""{{
+    if variables:
+        variables_declaration = ", ".join([f'{k}: string' for k in variables])
+        variables_declaration = f'query search({variables_declaration})'
+    else:
+        variables_declaration = ''
+
+    query_string = f"""
+        {variables_declaration}
+        {{
         total(func: has(dgraph.type)) 
             @filter({filters}) {cascade} {{
                 count(uid)
@@ -153,6 +181,9 @@ def build_query_string(query: dict, public=True) -> str:
 
 def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -> FlaskForm:
 
+    if populate_obj is None:
+        populate_obj = {}
+
     # if no type is specified, just create a form for all types
     if not dgraph_types:
         dgraph_types = Schema.get_types()
@@ -161,6 +192,7 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
 
         submit = SubmitField('Query')
         max_results = SelectField('max results', choices=[10, 25, 50], default=25, name='_max_results', coerce=int)
+        terms = StringField('Free text search', name='_terms')
 
         def get_field(self, field):
             return getattr(self, field, None)
@@ -180,6 +212,12 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
             populate_obj['max_results'] = populate_obj['_max_results'][0]
         else:
             populate_obj['max_results'] = populate_obj['_max_results']
+
+    if '_terms' in populate_obj:
+        if isinstance(populate_obj['_terms'], list):
+            populate_obj['terms'] = populate_obj['_terms'][0]
+        else:
+            populate_obj['terms'] = populate_obj['_terms']
 
     form = F(data=populate_obj)
 
