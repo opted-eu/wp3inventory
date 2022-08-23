@@ -236,18 +236,23 @@ class _PrimitivePredicate:
         if not isinstance(vals, list):
             vals = [vals]
 
-        if self.is_list_predicate:
-            return " AND ".join([f'{self.comparison_operator}({predicate}, "{strip_query(val)}")' for val in vals])
-        else:
-            if not 'uid' in self.dgraph_predicate_type:
+        if 'uid' in self.dgraph_predicate_type:
+            vals = [validate_uid(v) for v in vals if validate_uid(v)]
+        
+        if len(vals) == 0:
+            return f'has({predicate})'
+
+        try:
+            if self.is_list_predicate:
+                return " AND ".join([f'{self.comparison_operator}({predicate}, "{strip_query(val)}")' for val in vals])
+            else:
                 vals_string = ", ".join([f'"{strip_query(val)}"' for val in vals])
-            else:
-                vals_string = ", ".join(
-                    [f'{validate_uid(val)}' for val in vals if validate_uid(val)])
-            if len(vals) == 1:
-                return f'{self.comparison_operator}({predicate}, {vals_string})'
-            else:
-                return f'{self.comparison_operator}({predicate}, [{vals_string}])'
+                if len(vals) == 1:
+                    return f'{self.comparison_operator}({predicate}, {vals_string})'
+                else:
+                    return f'{self.comparison_operator}({predicate}, [{vals_string}])'
+        except:
+            return f'has({predicate})'
 
     def _prepare_query_field(self):
         # not a very elegant solution...
@@ -941,19 +946,22 @@ class DateTime(Predicate):
     def query_filter(self, vals: Union[str, list, int], custom_operator: Union['lt', 'gt']=None):
         if vals is None:
             return f'has({self.predicate})'
-            
-        if isinstance(vals, list) and len(vals) > 1:
-            vals = [self.validation_hook(val) for val in vals[:2]]
-            return f'{self.comparison_operator}({self.predicate}, "{vals[0].year}-01-01", "{vals[1].year}-12-31")'
+        
+        try:
+            if isinstance(vals, list) and len(vals) > 1:
+                vals = [self.validation_hook(val) for val in vals[:2]]
+                return f'{self.comparison_operator}({self.predicate}, "{vals[0].year}-01-01", "{vals[1].year}-12-31")'
 
-        else:
-            if isinstance(vals, list):
-                vals = vals[0]
-            date = self.validation_hook(vals)
-            if custom_operator:
-                return f'{custom_operator}({self.predicate}, "{date.year}")'
             else:
-                return f'{self.comparison_operator}({self.predicate}, "{date.year}-01-01", "{date.year}-12-31")'
+                if isinstance(vals, list):
+                    vals = vals[0]
+                date = self.validation_hook(vals)
+                if custom_operator:
+                    return f'{custom_operator}({self.predicate}, "{date.year}")'
+                else:
+                    return f'{self.comparison_operator}({self.predicate}, "{date.year}-01-01", "{date.year}-12-31")'
+        except:
+            return f'has({self.predicate})'
 
 class Year(DateTime):
 
