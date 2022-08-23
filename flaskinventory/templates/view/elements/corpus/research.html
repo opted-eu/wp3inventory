@@ -21,7 +21,7 @@
         <dt class="col-sm-3 my-4"><h5>Sources included</h5></dt>
         <dd class="col-sm-9 my-4"><small class="text-muted">Shows how many of the sources listed in this inventory are included in the corpus.</small></dd>
         <dt class="col-sm-3">Total</dt>
-        <dd class="col-sm-9"><a href="{{ url_for('view.advanced_query') }}">{{ entry.num_sources }}</a>
+        <dd class="col-sm-9"><a href="{{ url_for('view.query') }}?dgraph.type=Source&~sources_included={{ entry.uid }}">{{ entry.num_sources }}</a>
         </dd>
     </dl>
 </div>

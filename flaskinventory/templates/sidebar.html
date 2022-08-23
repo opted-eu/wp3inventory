@@ -1,43 +1,42 @@
-<div class="d-flex flex-column align-items-stretch bg-white" style="width: 380px;">
-    <a href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-        <span class="fs-5 fw-semibold">{% if sidebar_title %} {{ sidebar_title }} {% else %}Sidebar{% endif %}</span>
+<span  class="d-flex px-3 py-1 border-bottom">
+    <h5 class="flex-grow-1">{% if sidebar_title %} {{ sidebar_title }} {% else %}Sidebar{% endif %}</h5>
+</span>
+<div class="list-group list-group-flush border-bottom scrollarea">
+
+    {% if sidebar_items %} {% for item in sidebar_items %}
+    <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+            <strong class="mb-1">{{ item.name }} ({{item.channel.name}})</strong>
+            <small></small>
+        </div>
+        <div class="col-10 mb-1 small"></div>
     </a>
-    <div class="list-group list-group-flush border-bottom scrollarea">
-        {% if sidebar_items %} {% for item in sidebar_items %}
-        <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">{{ item.name }} ({{item.channel.name}})</strong>
-                <small></small>
-            </div>
-            <div class="col-10 mb-1 small"></div>
-        </a>
-        {% endfor %} {% else %} {% if sidebar_form %}
+    {% endfor %} {% else %} {% if sidebar_form %}
 
-        <form class="list-group-item py-3 lh-tight" method="GET" action="{{ url_for('view.query') }}">
-            {{ sidebar_form.entity.label(class="form-label") }}
-            <div class="invalid-feedback">
-                Please select one type.
-            </div>
-            {{ sidebar_form.entity(class="form-select") }} {{ sidebar_form.country.label(class="form-label mt-3") }}
-            <div class="invalid-feedback">
-                Please select one type.
-            </div>
-            {{ sidebar_form.country(class="form-select") }}
-            <div class="col-md-5 d-flex align-content-end flex-wrap my-4">
-                <button class="btn btn-primary mx-2" type="submit">Query</button>
-                <a class="mx-2 align-self-end" href="{{ url_for('view.advanced_query') }}">Advanced query</a>
-            </div>
-        </form>
+    <form class="list-group-item py-3 lh-tight" method="GET" action="{{ url_for('view.query') }}">
+        {{ sidebar_form.entity.label(class="form-label") }}
+        <div class="invalid-feedback">
+            Please select one type.
+        </div>
+        {{ sidebar_form.entity(class="form-select") }} {{ sidebar_form.country.label(class="form-label mt-3") }}
+        <div class="invalid-feedback">
+            Please select one type.
+        </div>
+        {{ sidebar_form.country(class="form-select") }}
+        <div class="col-md-5 d-flex align-content-end flex-wrap my-4">
+            <button class="btn btn-primary mx-2" type="submit">Query</button>
+            <a class="mx-2 align-self-end" href="{{ url_for('view.query') }}">Advanced query</a>
+        </div>
+    </form>
 
-        {% endif %}
+    {% endif %}
 
-        <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">List group item heading</strong>
-                <small>Wed</small>
-            </div>
-            <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-        </a>{% endif %}
+    <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+            <strong class="mb-1">List group item heading</strong>
+            <small>Wed</small>
+        </div>
+        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+    </a>{% endif %}
 
-    </div>
 </div>

@@ -5,13 +5,16 @@
 </span>
 <div class="list-group list-group-flush border-bottom scrollarea">
 
-    <form class="list-group-item px-3 lh-tight" method="POST" action="{{ url_for('view.query_dev_result') }}" id="query-sidebar" enctype="multipart/form-data">
+    <form class="list-group-item px-3 lh-tight" method="POST" action="{{ url_for('view.query') }}" id="query-sidebar" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <fieldset class="form-group my-2" id="fieldset-container-sorted">
+            <div class="mb-2">
+                {{ form.terms.label(class="form-label mb-0") }}
+                {{ form.terms(class="form-control") }} 
+            </div>
         </fieldset>
         <a class="link-secondary" href="javascript:;" id="more-filters" onClick="toggleMoreFilters(this)" hidden>show more filters</a>
         <fieldset class="form-group my-1" id="fieldset-container-unsorted" hidden>
-            {# <legend class="border-bottom mb-4">{{ title }}</legend> #}
             {% for field in form._fields %} 
                 {% if field.type not in ['SubmitField'] %}
                     {{ render_query_field(form.get_field(field)) }} 
@@ -30,34 +33,13 @@
 
 </div>
 
-<script>
-{% for f in form._fields %} 
-
-    {% set field = form.get_field(f) %}
-
-    {% if field.type ==  "TomSelectMutlitpleField" %}
-
-    new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~') }}', 
-    {
-        create: false, 
-        plugins: ['remove_button'], 
-        onItemAdd:function(){ // clear input after item was selecte d
-                this.setTextboxValue();
-                this.refreshOptions();
-        }
-        })
-
-    {% endif %}
-
-{% endfor %}
-</script>
-
+{% include 'query/tomselect.html' %}
 
 
 <script>
 
 const entitySelector = document.getElementById('dgraph.type')
-const alwaysVisible = ['country', 'languages', 'channel']
+const alwaysVisible = ['_terms', 'country', 'languages', 'channel']
 
 function hideFields() {
     let all = document.querySelectorAll('[data-entities]')
@@ -88,7 +70,6 @@ function showFields(event) {
 function clearFields(event) {
     let all = document.querySelectorAll('[data-entities]')
     let selectedEntities = [... event.target.selectedOptions].map(e => e.value)
-    console.log(selectedEntities)
     for (el of all) {
         let entities = el.attributes['data-entities'].value.split(',')
         let diff = selectedEntities.filter(a => entities.includes(a))

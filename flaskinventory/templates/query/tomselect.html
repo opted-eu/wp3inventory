@@ -1,0 +1,24 @@
+
+<script>
+    {% for f in form._fields %} 
+    
+        {% set field = form.get_field(f) %}
+    
+        {% if field.type ==  "TomSelectMutlitpleField" %}
+    
+        new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~') }}', 
+        {
+            create: false, 
+            plugins: ['remove_button'], 
+            hidePlaceholder: true,
+            onItemAdd:function(){ // clear input after item was selected
+                    this.setTextboxValue();
+                    this.refreshOptions();
+            }
+            })
+    
+        {% endif %}
+    
+    {% endfor %}
+</script>
+    
