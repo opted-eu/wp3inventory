@@ -104,10 +104,23 @@ const correctOrder = ["dgraph.type",
                          
 
 function rearrange() {
-    // let all = document.querySelectorAll('[data-entities]')
     for (predicate of correctOrder) {
         let el = document.getElementById(predicate).parentElement
         sortedContainer.appendChild(el)
+    }
+    let all = document.querySelectorAll('[data-entities]')
+    for (el of all) {
+        if (el.checked) {
+            if (el.parentElement.parentElement.id != sortedContainer.id) {
+                sortedContainer.appendChild(el.parentElement)
+            }
+        }
+        if (el.value && el.type !== 'checkbox') {
+            console.log(el)
+            if (el.parentElement.parentElement.id != sortedContainer.id) {
+                sortedContainer.appendChild(el.parentElement)
+            }
+        }
     }
 }
 
