@@ -1,23 +1,22 @@
-<div class="d-flex flex-column align-items-stretch bg-white">
-    <a href="#" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-        <span class="fs-5 fw-semibold">Recent Entries</span>
-    </a>
-    <div class="list-group list-group-flush border-bottom scrollarea">
-        {% for item in recent %}
-        <a href="{{ url_for('view.view_uid', uid=item.get('uid'))}}" class="list-group-item list-group-item-action py-1 lh-tight">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1 text-truncate">
-                    {{ item.name }} {{ item.title }} {% if item.get('channel') %}({{item.channel.name}}){% endif %}
-                </strong>
-                <small class="text-muted">
-                    {{ item.creation_date.strftime('%d&nbsp;%b')|safe }}
-                </small>
-            </div>
-            <div class="col-10 mb-1 small">
-                <span class="badge rounded-pill bg-primary">{{ item.get('dgraph.type')[0] }}</span>{% if item.get('country') %}{% for country in item.country %} {{country.name}} {{- ', ' if not loop.last else '' -}} {% endfor %}{% endif %}
-            </div>
-        </a>
-        {% endfor %} 
+<span  class="d-flex px-3 py-1 border-bottom">
+    <h5 class="flex-grow-1">Recent Entries</h5>
+</span>
 
-    </div>
+<div class="list-group list-group-flush border-bottom scrollarea">
+    {% for item in recent %}
+    <a href="{{ url_for('view.view_uid', uid=item.get('uid'))}}" class="list-group-item list-group-item-action py-1 lh-tight">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+            <strong class="mb-1 text-truncate">
+                {{ item.name }} {{ item.title }} {% if item.get('channel') %}({{item.channel.name}}){% endif %}
+            </strong>
+            <small class="text-muted">
+                {{ item.creation_date.strftime('%d&nbsp;%b')|safe }}
+            </small>
+        </div>
+        <div class="col-10 mb-1 small">
+            <span class="badge rounded-pill bg-primary">{{ item.get('dgraph.type')[0] }}</span>{% if item.get('country') %}{% for country in item.country %} {{country.name}} {{- ', ' if not loop.last else '' -}} {% endfor %}{% endif %}
+        </div>
+    </a>
+    {% endfor %} 
+
 </div>

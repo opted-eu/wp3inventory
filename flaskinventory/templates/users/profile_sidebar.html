@@ -1,7 +1,8 @@
 <div class="" style="width: 380px;">
-    <a href="#" class="d-flex align-items-center flex-shrink-0 pb-3 link-dark text-decoration-none">
-        <span class="fs-5 fw-semibold">Tasks</span>
-    </a>
+    <span  class="d-flex py-1">
+        <h5 class="flex-grow-1">Tasks</h5>
+    </span>
+    
     <div class="list-group">
         <a href="{{ url_for('users.my_entries', uid=current_user.id) }}" type="button" class="list-group-item list-group-item-action">
             <i class="fas fa-tasks me-3 fa-fw"></i>My Entries
