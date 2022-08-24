@@ -8,10 +8,10 @@
             <p class="card-text">
                 <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=source.unique_name) }}">
                 {{source.name}} ({{source.channel.name}})</a> {% if source.get('sources_included|from') %}
-                <span class="text-muted mx-3">
+                <span class="text-muted ms-2">
                             from: {{ source.get('sources_included|from').strftime('%Y-%m-%d') }}
                         </span> {%endif%} {% if source.get('sources_included|to') %}
-                <span class="text-muted mx-3">
+                <span class="text-muted ms-1">
                             to: {{ source.get('sources_included|to').strftime('%Y-%m-%d') }}
                         </span> {%endif%} {% endfor %}
         </dd>
