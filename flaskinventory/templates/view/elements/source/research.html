@@ -1,36 +1,18 @@
+{% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>Research</h5></dt>
-        <dd class="col-sm-9 mb-4"><small class="text-muted">Following publications investigated this source. The date range indicates the sample composition.</small></dd>
+        <dd class="col-sm-9 mb-4"><small class="text-muted">Following publications investigated this source.</small></dd>
         {% if entry.papers %} 
+        <dt class="col-sm-3"></dt>
+        <dd class="col-sm-9 mb-4">
             {% for paper in entry.papers %}
-                <dt class="col-sm-3">
-                        <em>{{paper.title}} ({{ paper.published_date.strftime('%Y') }})</em>
-                </dt>
-                <dd class="col-sm-9 mb-4">
-                    <a href="{{ url_for('view.view_generic', dgraph_type='ResearchPaper', uid=paper.uid) }}">
-                        {% if paper.authors is string %}
-                            {{ paper.authors }}
-                        {% else %}
-                            {{ paper.authors[0] }} {{ 'et al.' if paper.authors|length > 1 else '' }}
-                        {% endif %}
-                    </a> 
-                    {% if paper.get('papers|from') %} 
-                        <span class="text-muted mx-3">
-                            from: {{ paper.get('papers|from').strftime('%Y-%m-%d') }}
-                        </span>
-                    {%endif%} 
-                    {% if paper.get('papers|to') %}
-                        <span class="text-muted mx-1">
-                            to: {{ paper.get('papers|to').strftime('%Y-%m-%d') }}
-                        </span> 
-                    {%endif%}
-            </dd>
+                <p>{{ render_publication(paper) }}</p>
             {% endfor %}
+        </dd>
         {% endif %}
     </dl>
 </div>
-{% from "helpers/_viewhelpers.html" import render_publication %}
 <div class="border rounded p-3">
     <dl class="row">
         <dt class="col-sm-3 mb-4"><h5>Corpora</h5></dt>

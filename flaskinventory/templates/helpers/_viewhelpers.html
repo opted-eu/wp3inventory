@@ -54,6 +54,20 @@
     {% if publication.published_date %}
         <span>({{ publication.published_date.strftime('%Y') }})</span>
     {% endif %}
+    {% for key in publication.keys() %}
+        {% if '|from' in key %}
+            <span class="text-muted ms-2">
+                from: {{ publication.get(key).strftime('%Y-%m-%d') }}
+            </span>
+        {%endif%}
+    {% endfor %} 
+    {% for key in publication.keys() %}
+        {% if '|to' in key %}
+            <span class="text-muted ms-1">
+                to: {{ publication.get(key).strftime('%Y-%m-%d') }}
+            </span>
+        {%endif%}
+    {% endfor %} 
     </span>
     {% if publication.entry_review_status == 'pending' %}
     <small data-bs-toggle="tooltip" data-bs-placement="top" title="This entry has to be checked by a reviewer first." class="text-muted">(pending)</small>
