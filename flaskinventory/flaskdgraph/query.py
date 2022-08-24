@@ -22,7 +22,7 @@ def build_query_string(query: dict, public=True) -> str:
         Returns a dql query string with two queries: `total` and `q`
     """
 
-    from flaskinventory.flaskdgraph.dgraph_types import MutualRelationship, SingleRelationship
+    from flaskinventory.flaskdgraph.dgraph_types import Facet, MutualRelationship, SingleRelationship
 
     # get parameter: maximum results per page
     try:
@@ -77,31 +77,33 @@ def build_query_string(query: dict, public=True) -> str:
     # first we clean the query dict
     # make sure that the predicates exists (cannot query arbitrary predicates) and is queryable
     # also asserts that certain predicates remain private (e.g., email addresses)
-    cleaned_query = {k: v for k, v in query.items(
+    _cleaned_query = {k: v for k, v in query.items(
     ) if k in Schema.get_queryable_predicates()}
+    cleaned_query = {Schema.get_queryable_predicates()[k]: v for k, v in _cleaned_query.items() if not isinstance(Schema.get_queryable_predicates()[k], Facet)}
+
+    # preprare facets
+    facets = {Schema.get_queryable_predicates()[k]: v for k, v in _cleaned_query.items() if isinstance(Schema.get_queryable_predicates()[k], Facet)}
+    for facet in facets:
+        if facet.predicate not in _cleaned_query:
+            cleaned_query.update({Schema.predicates()[facet.predicate]: None})
+
     operators = {k.split('*')[0]: v[0]
                  for k, v in query.items() if '*operator' in k}
-    facets = {k.split('|')[0]: {k.split('|')[1]: v[0]}
-              for k, v in query.items() if '|' in k and not '*' in k}
-
-    for k in facets.keys():
-        if k not in cleaned_query.keys() and k in Schema.get_queryable_predicates():
-            cleaned_query.update({k: None})
 
     # prevent querying everything
     if len(cleaned_query) == 0 and len(filters) == 0:
         return False
 
     query_parts = ['uid', 'unique_name', 'name', 'dgraph.type', 'authors', 'other_names', 'published_date']
+    query_parts_total = ['count(uid)']
     if public:
         filters.append('eq(entry_review_status, "accepted")')
 
-    for key, val in cleaned_query.items():
+    for predicate, val in cleaned_query.items():
         # get predicate from Schema
-        predicate = Schema.get_queryable_predicates()[key]
 
         # check if we have a non-default operator
-        operator = operators.get(key, None)
+        operator = operators.get(predicate.predicate, None)
 
         # Let the predicate object generate the filter query part
         predicate_filter = predicate.query_filter(val, custom_operator=operator)
@@ -121,25 +123,28 @@ def build_query_string(query: dict, public=True) -> str:
         # check if we have facet filters
         # "predicate|facet*operator": "name of operator"
         # "audience_size|subscribers*operator": "gt"
-        if key in facets.keys():
-            for facet, subvalue in facets[key].items():
-                facet_operator = operators.get(f'{key}|{facet}', 'eq')
-                facet_filter.append(f'{facet_operator}({facet}, {subvalue})')
-                facet_list.append(facet)
+        for facet, facet_value in facets.items():
+            if facet.predicate == predicate.predicate:
+                facet_operator = operators.get(f'{facet}', 'eq')
+                filt = facet.query_filter(facet_value, operator=facet_operator)
+                if filt:
+                    facet_filter.append(filt)
+                    facet_list.append(facet.key)
 
         if len(facet_filter) > 0:
             facet_filter = f'@facets({" AND ".join(facet_filter)})'
             facet_list = f'@facets({", ".join(facet_list)})'
+            query_parts_total.append(f'{predicate.query} {facet_filter}')
         else:
             facet_filter = ''
             facet_list = ''
 
         if isinstance(predicate, (SingleRelationship, MutualRelationship)):
             query_parts.append(
-                f'{predicate.query} {facet_filter} {facet_list}  {{ uid name unique_name }}')
+                f'{predicate.query} {facet_filter} {facet_list}  {{ uid name unique_name }}'.strip())
         else:
             query_parts.append(
-                f'{predicate.query} {facet_filter} {facet_list}')
+                f'{predicate.query} {facet_filter} {facet_list}'.strip())
 
     filters = " AND ".join(filters)
 
@@ -151,7 +156,8 @@ def build_query_string(query: dict, public=True) -> str:
 
     query_parts = list(set(query_parts))
     if len(facets.keys()) > 0:
-        cascade = "@cascade"
+        cascade = list(set([facet.predicate for facet in facets]))
+        cascade = f"@cascade({', '.join(cascade)})"
     else:
         cascade = ""
 
@@ -166,10 +172,10 @@ def build_query_string(query: dict, public=True) -> str:
         {{
         total(func: has(dgraph.type)) 
             @filter({filters}) {cascade} {{
-                count(uid)
+                {" ".join(query_parts_total)}
             }}
 
-        q(func: has(dgraph.type), orderasc: unique_name, first: {max_results}, offset: {page * max_results}) 
+        q(func: has(dgraph.type), orderasc: name, first: {max_results}, offset: {page * max_results}) 
             @filter({filters}) {cascade} {{
                 {" ".join(query_parts)}
             }}
@@ -205,20 +211,12 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
         for k, v in fields.items():
             if not hasattr(F, k):
                 setattr(F, k, v.query_field)
+                if isinstance(v.operators, list):
+                    operator_selection = SelectField('operator', name=f'{v}*operator', choices=v.operators)
+                    setattr(F, f'{k}*operator', operator_selection)
 
-    # add pagination parameters: max_results
-    if '_max_results' in populate_obj:
-        if isinstance(populate_obj['_max_results'], list):
-            populate_obj['max_results'] = populate_obj['_max_results'][0]
-        else:
-            populate_obj['max_results'] = populate_obj['_max_results']
 
-    if '_terms' in populate_obj:
-        if isinstance(populate_obj['_terms'], list):
-            populate_obj['terms'] = populate_obj['_terms'][0]
-        else:
-            populate_obj['terms'] = populate_obj['_terms']
 
-    form = F(data=populate_obj)
+    form = F(formdata=populate_obj)
 
     return form

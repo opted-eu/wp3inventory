@@ -44,17 +44,18 @@ class Schema:
 
 
     def __init_subclass__(cls) -> None:
-        from .dgraph_types import Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
+        from .dgraph_types import _PrimitivePredicate, Facet, Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
         predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
 
         relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
 
         reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), ReverseRelationship)}
 
+        # base list of queryable predicates
         queryable_predicates = {key: val for key, val in predicates.items() if val.queryable}
+        # add reverse predicates that can be queried
         queryable_predicates.update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
 
-        Schema.__queryable_predicates__.update(queryable_predicates)
 
         # inherit predicates from parent classes
         for parent in cls.__bases__:
@@ -84,14 +85,16 @@ class Schema:
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
 
-        Schema.__queryable_predicates_by_type__[cls.__name__] = {key: val for key, val in predicates.items() if val.queryable}
-        Schema.__queryable_predicates_by_type__[cls.__name__].update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
-        
         # Bind and "activate" predicates for initialized class 
         for key in cls.__dict__:
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
+                if attribute.facets:
+                    for facet in attribute.facets.values():
+                        facet.predicate = key
+                        if facet.queryable:
+                            queryable_predicates.update({str(facet): facet})
                 if key not in cls.__predicates_types__:
                     cls.__predicates_types__.update({key: [cls.__name__]})
                 else:
@@ -111,6 +114,13 @@ class Schema:
                 else:
                     if cls.__name__ not in cls.__reverse_predicates_types__[attribute.predicate]:
                         cls.__reverse_predicates_types__[attribute.predicate].append(cls.__name__)
+
+        Schema.__queryable_predicates__.update(queryable_predicates)
+
+        Schema.__queryable_predicates_by_type__[cls.__name__] = {key: val for key, val in predicates.items() if val.queryable}
+        Schema.__queryable_predicates_by_type__[cls.__name__].update({key: val for key, val in queryable_predicates.items() if isinstance(val, Facet)})
+        Schema.__queryable_predicates_by_type__[cls.__name__].update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
+        
 
     @classmethod
     def get_types(cls) -> list:

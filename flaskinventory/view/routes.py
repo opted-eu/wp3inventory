@@ -152,13 +152,13 @@ def query():
 
 
     r_args = {k: v for k, v in request.args.to_dict(flat=False).items() if v[0] != ''}
-    if '_page' in r_args:
+    try:
         current_page = int(r_args.pop('_page')[0])
-    else:
+    except:
         current_page = 1
 
     form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool', 'Archive', 'Dataset', 'Corpus'], 
-                                populate_obj=r_args)
+                                populate_obj=request.args)
 
     return render_template("query/index.html", form=form, result=result, r_args=r_args, total=total, pages=pages, current_page=current_page)
 

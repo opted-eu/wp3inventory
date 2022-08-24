@@ -15,9 +15,69 @@
         </fieldset>
         <a class="link-secondary" href="javascript:;" id="more-filters" onClick="toggleMoreFilters(this)" hidden>show more filters</a>
         <fieldset class="form-group my-1" id="fieldset-container-unsorted" hidden>
-            {% for field in form._fields %} 
-                {% if field.type not in ['SubmitField'] %}
-                    {{ render_query_field(form.get_field(field)) }} 
+            {% for f in form._fields %}
+                {% set field = form.get_field(f) %}
+                {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name %}        
+                    {% if field.type == 'BooleanField' %}
+                        {% if field.description %}
+                            <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
+                        {% endif %}
+                        <div class="form-check" id="{{ field.name }}-container">
+                                {{ field(class="form-check-input") }} 
+                            <label for="{{ field.id}}" class="form-label">
+                                {{ field.label.text }}
+                            </label>
+                        </div>
+            
+                    {% else %}
+            
+                    <div class="mb-2" id="{{ field.name }}-container">
+                        {% if field.render_kw.hidden %}
+                        {% else %}
+                        <label for="{{ field.id}}" class="form-label mb-0">
+                            {% if field.description %}
+                                {{ field.description }}
+                            {% else %}
+                                {{ field.label.text }}
+                            {% endif %}
+                            
+                        </label>
+                        {% endif %}
+                        {% if field.errors %} 
+                            {{ field(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in field.errors %}
+                                <span>{{ error }}</span> 
+                                {% endfor %}
+                            </div>
+                        {% else %}
+
+                            {% if "%s*operator" % (field.name) in form._fields %}
+                                {% set operator_selection = form.get_field("%s*operator" % (field.name)) %}
+                                <div class="input-group">
+                                    {{ operator_selection(class="form-select", style="max-width: 30%") }} 
+                            {% endif %}
+                        
+                            {% if field.type == 'SelectField' or field.type == 'SelectMultipleField' %}
+                                {{ field(class="form-select") }} 
+                            {% elif field.type == 'RadioField' %}
+                                {% for subfield in field %}
+                                <div class="form-check mb-2">
+                                    {{ subfield(class="form-check-input") }}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                                {% endfor %} 
+                            {% else %}
+                                {{ field(class="form-control") }} 
+                            {% endif %}
+                            {% if "%s*operator" % (field.name) in form._fields %}
+                                </div">
+                                </div>
+                            {% endif %}
+                        {% endif %} 
+                    </div>
+                    {% endif %}
+            
                 {% endif %}
             {% endfor %}
         </fieldset>
@@ -45,7 +105,7 @@ function hideFields() {
     let all = document.querySelectorAll('[data-entities]')
     for (element of all) {
         if (!alwaysVisible.includes(element.id)) {
-            element.parentElement.hidden = true
+            document.getElementById(`${element.id}-container`).hidden = true
         }
     }
 }
@@ -61,7 +121,7 @@ function showFields(event) {
         if (o.selected) {
             let fields = document.querySelectorAll(`[data-entities*="${o.value}"]`)
             for (f of fields) {
-                f.parentElement.hidden = false
+                document.getElementById(`${f.id}-container`).hidden = false
             }
         } 
     }
@@ -105,20 +165,20 @@ const correctOrder = ["dgraph.type",
 
 function rearrange() {
     for (predicate of correctOrder) {
-        let el = document.getElementById(predicate).parentElement
+        let el = document.getElementById(`${predicate}-container`)
         sortedContainer.appendChild(el)
     }
     let all = document.querySelectorAll('[data-entities]')
     for (el of all) {
+        container = document.getElementById(`${el.id}-container`)
         if (el.checked) {
-            if (el.parentElement.parentElement.id != sortedContainer.id) {
-                sortedContainer.appendChild(el.parentElement)
+            if (container != sortedContainer.id) {
+                sortedContainer.appendChild(container)
             }
         }
         if (el.value && el.type !== 'checkbox') {
-            console.log(el)
-            if (el.parentElement.parentElement.id != sortedContainer.id) {
-                sortedContainer.appendChild(el.parentElement)
+            if (container != sortedContainer.id) {
+                sortedContainer.appendChild(container)
             }
         }
     }

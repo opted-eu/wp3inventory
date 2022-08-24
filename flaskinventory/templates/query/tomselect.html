@@ -6,7 +6,7 @@
     
         {% if field.type ==  "TomSelectMutlitpleField" %}
     
-        new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~') }}', 
+        new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~').replace('|', '\\\|') }}', 
         {
             create: false, 
             plugins: ['remove_button'], 

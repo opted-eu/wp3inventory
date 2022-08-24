@@ -268,7 +268,10 @@ class TestQueries(unittest.TestCase):
             print('-- test_facet_filters() --\n')
         with self.client as c:
             query_string = {"audience_size|papers_sold": 52000,
-                            "audience_size|papers_sold*operator": 'gt'}
+                            "audience_size|papers_sold*operator": 'gt',
+                            "audience_size|unit": "papers sold",
+                            "audience_size|count": 52000,
+                            "audience_size|count*operator": 'gt'}
 
             response = c.get(f'/query/development/json', query_string=query_string)
             self.assertEqual(response.json[0]['unique_name'], 'derstandard_print')
