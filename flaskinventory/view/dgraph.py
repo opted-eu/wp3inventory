@@ -29,7 +29,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     else:
         query_func += f'@filter(has(dgraph.type))'
 
-    query_fields = '''{ uid dgraph.type expand(_all_) { uid unique_name name entry_review_status user_displayname authors @facets title channel { name unique_name } }'''
+    query_fields = '''{ uid dgraph.type expand(_all_) (orderasc: unique_name) { uid unique_name name entry_review_status user_displayname authors @facets title channel { name unique_name } }'''
 
     if dgraph_type == 'Source':
         query_fields += '''published_by: ~publishes @facets @filter(type("Organization")) (orderasc: unique_name) { name unique_name uid entry_review_status } 
@@ -92,7 +92,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     elif dgraph_type == 'MetaVar':
         query_fields += '''
                         datasets: ~meta_vars @filter(type("Dataset")) (orderasc: unique_name) { uid name unique_name entry_review_status authors @facets published_date }
-                        corpus: ~meta_vars @filter(type("Corpus"))  { uid name unique_name entry_review_status authors @facets published_date }
+                        corpus: ~meta_vars @filter(type("Corpus"))  (orderasc: unique_name) { uid name unique_name entry_review_status authors @facets published_date }
                         } }
                         '''
     
@@ -106,7 +106,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
 
     elif dgraph_type == 'TextUnit':
         query_fields += '''
-                        corpus: ~text_units @filter(type("Corpus"))  { uid name unique_name entry_review_status authors @facets published_date }
+                        corpus: ~text_units @filter(type("Corpus")) (orderasc: unique_name) { uid name unique_name entry_review_status authors @facets published_date }
                         } }
                         '''
     else:
