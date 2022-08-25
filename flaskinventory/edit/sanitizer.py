@@ -92,7 +92,7 @@ class EditAudienceSizeSanitizer(Sanitizer):
             date = dateparser.parse(date)
             facets = {}
             for key, val in item.items():
-                if key in ['copies_sold', 'likes']:
+                if key in ['count']:
                     try:
                         val = int(val)
                     except:

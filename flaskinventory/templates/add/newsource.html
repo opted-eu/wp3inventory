@@ -471,7 +471,17 @@
                 {{ make_researchtip('Just open the Facebook page and check the current count of "likes"') }}
             </label>
             <p class="my-0"><small id="audience-size-followers-helptext"></small></p>
-            <input name="audience_size|followers" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" aria-describedby="audience-size-followers-feedback">
+            <input name="audience_size|count" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" onChange="audienceSizeFollowers(event)" aria-describedby="audience-size-followers-feedback">
+            <script>
+                function audienceSizeFollowers(event) {
+                    if (event.target.value !== '') {
+                        document.getElementById('audience-size-unit').value = event.target.id.replace('audience-size-', '')
+                    } else {
+                        document.getElementById('audience-size-unit').value = ''
+                    }
+                }
+            </script>
+            <input name="audience_size|unit" type="text" class="form-control" id="audience-size-unit" hidden readonly>
             <div id="audience-size-followers-feedback"></div>
         </div>
 
@@ -486,7 +496,7 @@
                     Germany: https://www.ivw.eu/print/print') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext"></small></p>
-                <input name="audience_size|subscribers" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" aria-describedby="audience-size-subscribers-feedback">
+                <input name="audience_size|count" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" onChange="audienceSizeFollowers(event)" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">

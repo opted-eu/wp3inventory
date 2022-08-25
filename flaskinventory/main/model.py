@@ -3,14 +3,14 @@ from typing import Union
 from flask import current_app
 from flaskinventory import dgraph
 from flaskinventory.errors import InventoryPermissionError, InventoryValidationError
-from flaskinventory.flaskdgraph.dgraph_types import (MutualListRelationship, String, Integer, Boolean, UIDPredicate,
+from flaskinventory.flaskdgraph.dgraph_types import (String, Integer, Boolean, UIDPredicate,
                                                      SingleChoice, MultipleChoice,
                                                      DateTime, Year, GeoScalar,
-                                                     ListString, ListRelationship,
-                                                     Geo, SingleRelationship, UniqueName,
+                                                     ListString, 
+                                                     SingleRelationship, ListRelationship, MutualListRelationship,
+                                                     Geo, UniqueName,
                                                      ReverseRelationship, ReverseListRelationship, 
-                                                     NewID, UID, Scalar)
-
+                                                     NewID, UID, Scalar, Facet)
 
 from flaskinventory.add.external import geocode, reverse_geocode, get_wikidata
 from flaskinventory.users.constants import USER_ROLES
@@ -380,7 +380,7 @@ class Entry(Schema):
                          overwrite=True,
                          new=False)
 
-    description = String(large_textfield=True, queryable=True, comparison_operator="alloftext")
+    description = String(large_textfield=True)
 
     entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
                          large_textfield=True)
@@ -604,7 +604,12 @@ class Source(Entry):
                                     radio_field=True,
                                     queryable=True)
 
-    audience_size = Year(default=datetime.date.today(), edit=False, queryable=True)
+    audience_size = Year(default=datetime.date.today(), 
+                         edit=False,
+                         facets=[Facet("unit", queryable=True, choices=['followers', 'subscribers', 'copies sold', 'likes', 'daily visitors']), 
+                                Facet("count", dtype=int, queryable=True, comparison_operators={'gt': 'greater', 'lt': 'less'}), 
+                                Facet("data_from")]
+                        )
 
     publishes_org = OrganizationAutocode('publishes', 
                                        label='Published by',
@@ -870,7 +875,8 @@ class Tool(Entry):
                             
     published_date = Year(label='Year of publication', 
                             description="Which year was the tool published?",
-                            queryable=True)
+                            queryable=True, 
+                            comparison_operators={'ge': 'after', 'le': 'before', 'eq': 'exact'})
     
     last_updated = DateTime(description="When was the tool last updated?", new=False)
 

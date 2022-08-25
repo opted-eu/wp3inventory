@@ -72,7 +72,7 @@
 {% macro render_query_field(field) %}
     {% if field %}
     <!-- {{  field.id }} -->
-    {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') %}        
+    {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name %}        
         {% if field.type == 'BooleanField' %}
             {% if field.description %}
                 <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
