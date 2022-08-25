@@ -162,36 +162,6 @@ def query():
 
     return render_template("query/index.html", form=form, result=result, r_args=r_args, total=total, pages=pages, current_page=current_page)
 
-@view.route("/query/old", methods=['GET', 'POST'])
-def query_old():
-    if request.args:
-        filt = {'eq': {'entry_review_status': 'accepted'}}
-        if not request.args.get('country', 'all') == 'all':
-            uid = validate_uid(request.args.get('country'))
-            if uid:
-                filt.update({'uid_in': {'country': request.args.get('country')}})
-        data = list_by_type(
-            request.args['entity'], filt=filt)
-
-        cols = []
-        if data:
-            for item in data:
-                cols += item.keys()
-
-        cols = list(set(cols))
-
-        # CACHE THIS
-        c_choices = get_country_choices(multinational=True)
-        c_choices.insert(0, ('all', 'All'))
-        form = SimpleQuery()
-        form.country.choices = c_choices
-        if request.args.get('country'):
-            form.country.data = request.args.get('country')
-        if request.args.get('entity'):
-            form.entity.data = request.args.get('entity')
-        return render_template('query_result.html', title='Query Result', result=data, cols=cols, show_sidebar=True, sidebar_title="Query", sidebar_form=form)
-    return redirect(url_for('main.home'))
-
 
 @view.route("/query/json")
 @login_required
