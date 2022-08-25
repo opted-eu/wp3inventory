@@ -9,11 +9,10 @@
 {% if result %}
 
 <!--- Results Table --->
-
-<table class="table table-hover">
+<table class="table table-hover w-100" style="table-layout: fixed;">
     <thead>
       <tr>
-        <th scope="col">Name</th>
+        <th scope="col" style="width: 70%;">Name</th>
         <th scope="col">Type</th>
         <th scope="col">Country</th>
       </tr>
@@ -23,14 +22,14 @@
       {% for entry in result %}
       <tr>
         {% if entry.get('dgraph.type')[0] in ["Tool", "Paper", "Dataset"] %}
-          <td><span class="d-inline-block text-truncate" style="max-width: 400px;">{{ render_publication(entry) }}</td>
+          <td class="text-truncate">{{ render_publication(entry) }}</td>
         {% else %}
-          <td><a href="{{ url_for('view.view_generic', unique_name=entry.get('unique_name'), dgraph_type=entry.get('dgraph.type')[0])}}">{{ entry.name }} {{ entry.title }} {% if entry.get('channel') %}({{entry.channel.name }}){% endif %}</a></td>
+          <td class="text-truncate"><a href="{{ url_for('view.view_generic', unique_name=entry.get('unique_name'), dgraph_type=entry.get('dgraph.type')[0])}}">{{ entry.name }} {{ entry.title }} {% if entry.get('channel') %}({{entry.channel.name }}){% endif %}</a></td>
         {% endif %}
-          <td>{{ entry.get("dgraph.type")[0] }}</td>
-          <td>
+          <td class="text-truncate" >{{ entry.get("dgraph.type")[0] }}</td>
+          <td class="text-truncate" >
             {% if entry.get("country") %} 
-                <span class="d-inline-block text-truncate" style="max-width: 250px;"
+                <span 
                 title="{% for country in entry.country %}{{ country.name }}{{ ", " if not loop.last else "" }}{% endfor %}">
                 {% for country in entry.country %}
                     {{ country.name }}{{ "," if not loop.last else "" }}
@@ -42,7 +41,6 @@
       {% endfor %}
       </tbody>
   </table>
-
 <!--- Pagination Nav --->
 {% if pages > 1 %}
     <nav aria-label="Pagination" class="mt-4">
