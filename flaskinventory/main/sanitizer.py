@@ -212,10 +212,11 @@ class Sanitizer:
     def _preprocess_facets(self):
         # helper function to sieve out facets from the input data
         # currently only supports single facets
-        for key in self.data.keys():
+        # can only update on facet per mutation (no list facets)
+        for key in self.data:
             if '|' in key:
                 predicate, facet = key.split('|')
-                if predicate in self.facets.keys():
+                if predicate in self.facets:
                     self.facets[predicate].update({facet: self.data[key]})
                 else:
                     self.facets[predicate] = {facet: self.data[key]}
@@ -258,6 +259,7 @@ class Sanitizer:
 
             if key in self.facets.keys():
                 facets = self.facets[key]
+                print(facets)
             else:
                 facets = None
             
@@ -596,7 +598,8 @@ class Sanitizer:
 
         if daily_visitors:
             self.entry['audience_size'] = Scalar(datetime.date.today(), facets={
-                'daily_visitors': daily_visitors,
+                'count': daily_visitors,
+                'unit': "daily visitors",
                 'data_from': f"https://siterankdata.com/{str(self.entry['name']).replace('www.', '')}"})
 
     def fetch_feeds(self):
@@ -631,8 +634,9 @@ class Sanitizer:
             except KeyError:
                 self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
-            facets = {'followers': int(
-                profile['followers'])}
+            facets = {'count': int(
+                profile['followers']),
+                'unit': 'followes'}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
         self.entry['verified_account'] = profile['verified']
@@ -654,8 +658,9 @@ class Sanitizer:
             except KeyError:
                 self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
-            facets = {'followers': int(
-                profile['followers'])}
+            facets = {'count': int(
+                profile['followers']),
+                'unit': 'followers'}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
         if profile.get('joined'):
@@ -677,8 +682,9 @@ class Sanitizer:
         if profile.get('fullname'):
             self.entry['other_names'].append(profile['fullname'])
         if profile.get('followers'):
-            facets = {'followers': int(
-                profile['followers'])}
+            facets = {'count': int(
+                profile['followers']),
+                'unit': 'followers'}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
         self.entry['verified_account'] = profile.get('verified')
@@ -713,8 +719,9 @@ class Sanitizer:
             except KeyError:
                 self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
-            facets = {'followers': int(
-                profile['followers'])}
+            facets = {'count': int(
+                profile['followers']),
+                'unit': 'followers'}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
         self.entry['verified_account'] = profile.get('verified', False)

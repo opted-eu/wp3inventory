@@ -1395,9 +1395,11 @@ def make_nquad(s, p, o) -> str:
         if o.facets is not None:
             facets = []
             for key, val in o.facets.items():
-                if type(val) in [datetime.date, datetime.datetime]:
+                if isinstance(val, list):
+                    val = val[0]
+                if isinstance(val, (datetime.date, datetime.datetime)):
                     facets.append(f'{key}={val.isoformat()}')
-                elif type(val) in [int, float]:
+                elif isinstance(val, (int, float)):
                     facets.append(f'{key}={val}')
                 else:
                     facets.append(f'{key}={_enquote(val)}')
