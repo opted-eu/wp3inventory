@@ -163,6 +163,46 @@ def main():
     finally:
         txn.discard()
 
+<<<<<<< HEAD
+
+    # papers sold
+
+    query_string = """
+    query {
+        c(func: type(Channel)) @filter(eq(unique_name, "print")) {
+            u as uid
+        }
+        q(func: type("Source")) 
+            @filter(has(audience_size) AND uid_in(channel, uid(u))) @cascade {
+                uid
+                audience_size @facets(gt(papers_sold, 0)) @facets
+        }
+    }
+    """
+
+    res = client.txn().query(query_string)
+
+    result = json.loads(res.json)
+
+    for e in result['q']:
+        e['audience_size|count'] = e['audience_size|papers_sold']
+        e['audience_size|unit'] = {'0': 'copies sold'}
+        if 'audience_size|datafrom' in e.keys():
+            e['audience_size|data_from'] = e.pop('audience_size|datafrom')
+
+    for e in result['q']:
+        e.pop('audience_size|papers_sold')
+
+    txn = client.txn()
+
+    try:
+        txn.mutate(set_obj=result['q'])
+        txn.commit()
+    finally:
+        txn.discard()
+
+=======
+>>>>>>> 19b0f6c597f162811223f9a6e142a527029a79ee
     print(Fore.GREEN + 'DONE!' + Style.RESET_ALL)
     deinit()
 
