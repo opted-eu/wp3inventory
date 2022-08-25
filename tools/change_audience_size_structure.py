@@ -163,8 +163,6 @@ def main():
     finally:
         txn.discard()
 
-<<<<<<< HEAD
-
     # papers sold
 
     query_string = """
@@ -201,8 +199,6 @@ def main():
     finally:
         txn.discard()
 
-=======
->>>>>>> 19b0f6c597f162811223f9a6e142a527029a79ee
     print(Fore.GREEN + 'DONE!' + Style.RESET_ALL)
     deinit()
 
