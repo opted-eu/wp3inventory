@@ -148,11 +148,11 @@
             "country_code": "lt"
         },
         {
-            "uid": "_:luxemburg",
-            "unique_name": "luxemburg",
+            "uid": "_:luxembourg",
+            "unique_name": "luxembourg",
             "dgraph.type": "Country",
             "opted_scope": true,
-            "name": "Luxemburg",
+            "name": "Luxembourg",
             "wikidataID": 32,
             "country_code": "lu"
         },
