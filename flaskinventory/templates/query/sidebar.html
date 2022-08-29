@@ -17,7 +17,7 @@
         <fieldset class="form-group my-1" id="fieldset-container-unsorted" hidden>
             {% for f in form._fields %}
                 {% set field = form.get_field(f) %}
-                {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name %}        
+                {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name and not '*connector' in field.name %}        
                     {% if field.type == 'BooleanField' %}
                         {% if field.description %}
                             <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
@@ -34,14 +34,23 @@
                     <div class="mb-2" id="{{ field.name }}-container">
                         {% if field.render_kw.hidden %}
                         {% else %}
+                        <div>
                         <label for="{{ field.id}}" class="form-label mb-0">
                             {% if field.description %}
                                 {{ field.description }}
                             {% else %}
                                 {{ field.label.text }}
                             {% endif %}
+
+                            {% if "%s*connector" % (field.name) in form._fields %}
+                                {% set connector_selection = form.get_field("%s*connector" % (field.name)) %}
+                                <div class="form-check form-check-inline">
+                                    {{ connector_selection(class="form-check-input") }} 
+                                    </div>
+                            {% endif %}
                             
                         </label>
+                        </div>
                         {% endif %}
                         {% if field.errors %} 
                             {{ field(class="form-control is-invalid") }}

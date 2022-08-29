@@ -102,7 +102,8 @@ class Facet:
     """
 
     predicate = None
-    default_operator = "eq"    
+    default_operator = "eq"
+    is_list_predicate = False    
     
     def __init__(self, key: str, 
                 dtype: Union[str, bool, int, float, datetime.datetime]=str,
@@ -773,6 +774,7 @@ class MutualRelationship(_PrimitivePredicate):
     dgraph_predicate_type = 'uid'
     is_list_predicate = False
     default_operator = "uid_in"
+    
 
     def __init__(self,
                  allow_new=False,
@@ -1118,7 +1120,7 @@ class DateTime(Predicate):
             render_kw = {**self.render_kw, **render_kw}
         return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
-    def query_filter(self, vals: Union[str, list, int], custom_operator: Union['lt', 'gt']=None):
+    def query_filter(self, vals: Union[str, list, int], operator: Union['lt', 'gt']=None, **kwargs):
         if vals is None:
             return f'has({self.predicate})'
         
@@ -1131,8 +1133,8 @@ class DateTime(Predicate):
                 if isinstance(vals, list):
                     vals = vals[0]
                 date = self.validation_hook(vals)
-                if custom_operator:
-                    return f'{custom_operator}({self.predicate}, "{date.year}")'
+                if operator:
+                    return f'{operator}({self.predicate}, "{date.year}")'
                 else:
                     return f'{self.default_operator}({self.predicate}, "{date.year}-01-01", "{date.year}-12-31")'
         except:
@@ -1195,7 +1197,7 @@ class Boolean(Predicate):
             raise InventoryValidationError(
                 f'Cannot evaluate provided value as bool: {data}!')
 
-    def query_filter(self, vals, custom_operator=None):
+    def query_filter(self, vals, operator=None):
         if isinstance(vals, list):
             vals = vals[0]
 

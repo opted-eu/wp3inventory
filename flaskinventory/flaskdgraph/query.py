@@ -1,6 +1,6 @@
 from .schema import Schema
 
-from wtforms import SubmitField, SelectField, StringField
+from wtforms import SubmitField, SelectField, StringField, RadioField
 from flask_wtf import FlaskForm
 from .customformfields import TomSelectMutlitpleField
 
@@ -90,6 +90,9 @@ def build_query_string(query: dict, public=True) -> str:
     operators = {k.split('*')[0]: v[0]
                  for k, v in query.items() if '*operator' in k}
 
+    connectors = {k.split('*')[0]: v[0]
+                 for k, v in query.items() if '*connector' in k}
+
     # prevent querying everything
     if len(cleaned_query) == 0 and len(filters) == 0:
         return False
@@ -105,8 +108,11 @@ def build_query_string(query: dict, public=True) -> str:
         # check if we have a non-default operator
         operator = operators.get(predicate.predicate, None)
 
+        # check if we have a non-default operator
+        connector = connectors.get(predicate.predicate, None)
+
         # Let the predicate object generate the filter query part
-        predicate_filter = predicate.query_filter(val, custom_operator=operator)
+        predicate_filter = predicate.query_filter(val, operator=operator, connector=connector)
 
         # check if there are aliases for this predicate
         if predicate.predicate_alias:
@@ -214,6 +220,9 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
                 if isinstance(v.operators, list):
                     operator_selection = SelectField('operator', name=f'{v}*operator', choices=v.operators)
                     setattr(F, f'{k}*operator', operator_selection)
+                if v.is_list_predicate:
+                    connector_selection = RadioField('conncector', name=f'{v}*connector', choices=[('AND', 'and'), ('OR', 'or')])
+                    setattr(F, f'{k}*conncector', connector_selection)
 
 
 
