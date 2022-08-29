@@ -149,9 +149,9 @@ def build_query_string(query: dict, public=True) -> str:
     filters = " AND ".join(filters)
 
     # make sure predicates are always queried
-    if "country" not in _cleaned_query.keys():
+    if "country" not in _cleaned_query:
         query_parts.append('country { uid name unique_name }')
-    if "channel" not in _cleaned_query.keys():
+    if "channel" not in _cleaned_query:
         query_parts.append('channel { uid name unique_name }')
 
     query_parts = list(set(query_parts))

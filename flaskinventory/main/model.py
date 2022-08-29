@@ -524,7 +524,8 @@ class Source(Entry):
 
     special_interest = Boolean(description='Does the news source have one main topical focus?',
                                 label='Yes, is a special interest publication',
-                                queryable=True)
+                                queryable=True,
+                                query_label="Special Interest Publication")
     
     topical_focus = MultipleChoice(description="What is the main topical focus of the news source?",
                                     choices={'politics': 'Politics', 
@@ -623,7 +624,8 @@ class Source(Entry):
                                     choices={'yes': 'Yes',
                                             'no': 'No',
                                             'NA': "Don't know / NA"},
-                                    queryable=True)
+                                    queryable=True,
+                                    query_label="E-Paper Available")
 
     sources_included = ReverseListRelationship('sources_included',
                                                 allow_new=False, 
@@ -786,7 +788,8 @@ class Dataset(Entry):
     concept_vars = ListRelationship(description="List of variables based on concepts (e.g. sentiment, frames, etc)",
                                         relationship_constraint="ConceptVar",
                                         render_kw={'placeholder': 'Select multiple...'},
-                                        autoload_choices=True)
+                                        autoload_choices=True
+                                        )
 
 
 class Corpus(Entry):
@@ -938,11 +941,11 @@ class Tool(Entry):
                                 required=True,
                                 queryable=True)
 
-    concept_vars = ListRelationship(description="Which concepts can the tool measuere (e.g. sentiment, frames, etc)",
+    concept_vars = ListRelationship(description="Which concepts can the tool measure (e.g. sentiment, frames, etc)",
                                         relationship_constraint="ConceptVar",
-                                        render_kw={'placeholder': 'Select multiple...'},
                                         autoload_choices=True,
-                                        queryable=True)
+                                        queryable=True,
+                                        query_label='Concept Variables')
 
     graphical_user_interface = Boolean(description="Does the tool have a graphical user interface?",
                                         label="Yes, it does have a GUI",
