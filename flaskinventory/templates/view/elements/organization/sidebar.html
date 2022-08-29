@@ -3,25 +3,37 @@
 </span>
 
 <div class="list-group list-group-flush border-bottom scrollarea">
-    {% if entry.publishes %} {% for item in entry.publishes %} {% if item.entry_review_status == "accepted" %}
-    <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
+    {% if entry.publishes %} 
+    {% for item in entry.publishes %}
+    <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight {{ 'collapse multi-collapse-related' if loop.index > 7 else '' }}">
         <div class="d-flex w-100 align-items-center justify-content-between">
-            <strong class="mb-1"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
+            <strong class="mb-1 {{ 'text-muted' if item.entry_review_status == 'pending' else '' }}"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
                             {{ item.name }} ({{item.channel.name}})</strong>
-            <small></small>
+                            {% if item.entry_review_status == "pending" %}
+                            <small class="text-muted">pending</small>
+                        {% endif %}
         </div>
         <div class="col-10 mb-1 small"></div>
     </a>
-    {% elif item.entry_review_status == "pending" %}
-    <a href="{{ url_for('view.view_generic', dgraph_type='Source', unique_name=item.unique_name) }}" class="list-group-item list-group-item-action py-3 lh-tight">
-        <div class="d-flex w-100 align-items-center justify-content-between">
-            <strong class="mb-1 text-muted"><i class="icon-{{ item.channel.unique_name }} color-{{ item.channel.unique_name }} fa-fw mx-1" alt="{{ item.channel.name }}"></i>
-                            {{ item.name }} ({{item.channel.name}})</strong>
-            <small class="text-muted">pending</small>
-        </div>
-        <div class="col-10 mb-1 small"></div>
-    </a>
-    {% endif %} {% endfor %} {% else %}
+    {% endfor %} 
+        {% if entry.publishes|length > 7 %} 
+        <a href="#" data-bs-toggle="collapse" data-bs-target=".multi-collapse-related" class="list-group-item list-group-item-action py-3 lh-tight collapsed">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <strong class="if-collapsed">
+                    <i class="fas fa-angle-down fa-fw mx-1" alt="Show more"></i>Show more
+                </strong>
+                <strong class="if-not-collapsed">
+                    <i class="fas fa-angle-up fa-fw mx-1" alt="Show less"></i>
+                    Show less</strong>
+                <small></small>
+                <span class="badge bg-primary rounded-pill if-collapsed">{{ entry.publishes|length - 7 }}</span>
+            </div>
+            <div class="col-10 mb-1 small"></div>
+        </a>
+        {% endif %}
+
+
+    {% else %}
     <a href="#" class="list-group-item list-group-item-action py-3 lh-tight disabled">
         <div class="d-flex w-100 align-items-center justify-content-between">
             <strong class="mb-1">None</strong>
@@ -31,3 +43,17 @@
     </a>
     {% endif %}
 </div>
+
+
+<!-- Ownership Structure -->
+<div class="border rounded py-3 mt-4">
+    <span  class="d-flex px-3 my-2 pb-2 mx-1 border-bottom">
+        <h5 class="flex-grow-1">Ownership Structure
+        <i class="fas mx-1 fa-info-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Current entry is highlighted in orange. Use mouse wheel or pinch to zoom. You can also pan around."></i>
+    </h5>
+    </span>
+    
+    {% include 'view/elements/ownership.html' %}
+    
+</div>
+    

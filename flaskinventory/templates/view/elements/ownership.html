@@ -1,0 +1,20 @@
+
+<script>
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    const csrftoken = "{{ csrf_token() }}";
+    const data = { uid: "{{ entry.uid }}" };
+    $ENDPOINT = "{{ url_for( 'endpoint.ownership' ) }}"
+
+</script>
+<script src="{{ url_for('static', filename='js/d3.v7.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/networkplot.js') }}"></script>
+
+
+<div id="network-plot">
+</div>
+
+<script>
+    MakeNetworkPlot(data, $ENDPOINT, 'network-plot')
+</script>
+
