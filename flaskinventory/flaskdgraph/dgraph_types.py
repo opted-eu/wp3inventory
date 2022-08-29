@@ -250,6 +250,7 @@ class _PrimitivePredicate:
     dgraph_predicate_type = 'string'
     is_list_predicate = False
     default_operator = "eq"
+    default_connector = "OR"
 
     def __init__(self,
                  label: str = None,
@@ -384,13 +385,19 @@ class _PrimitivePredicate:
         else:
             return data
 
-    def query_filter(self, vals: Union[str, list], predicate=None, **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], predicate=None, operator=None, connector=None, **kwargs) -> str:
 
         if not predicate:
             predicate = self.predicate
 
         if vals is None:
             return f'has({predicate})'
+
+        if not operator:
+            operator = self.default_operator
+
+        if not connector:
+            connector = self.default_connector
 
         if not isinstance(vals, list):
             vals = [vals]
@@ -402,14 +409,14 @@ class _PrimitivePredicate:
             return f'has({predicate})'
 
         try:
-            if self.is_list_predicate:
-                return " AND ".join([f'{self.default_operator}({predicate}, "{strip_query(val)}")' for val in vals])
+            if connector == "AND":
+                return " AND ".join([f'{operator}({predicate}, "{strip_query(val)}")' for val in vals])
             else:
                 vals_string = ", ".join([f'"{strip_query(val)}"' for val in vals])
                 if len(vals) == 1:
-                    return f'{self.default_operator}({predicate}, {vals_string})'
+                    return f'{operator}({predicate}, {vals_string})'
                 else:
-                    return f'{self.default_operator}({predicate}, [{vals_string}])'
+                    return f'{operator}({predicate}, [{vals_string}])'
         except:
             return f'has({predicate})'
 
@@ -712,6 +719,7 @@ class ReverseRelationship(_PrimitivePredicate):
 class ReverseListRelationship(ReverseRelationship):
 
     is_list_predicate = True
+    default_connector = "AND"
 
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         if isinstance(data, str):
@@ -861,6 +869,7 @@ class MutualListRelationship(MutualRelationship):
 
     dgraph_predicate_type = '[uid]'
     is_list_predicate = True
+    default_connector = "AND"
 
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         if isinstance(data, (str)):
@@ -948,6 +957,7 @@ class ListString(String):
 
     dgraph_predicate_type = '[string]'
     is_list_predicate = True
+    default_connector = "AND"
 
     def __init__(self, delimiter=',', overwrite=True, *args, **kwargs) -> None:
         self.delimiter = delimiter
@@ -1031,6 +1041,7 @@ class MultipleChoice(SingleChoice):
 
     dgraph_predicate_type = '[string]'
     is_list_predicate = True
+    default_connector = "AND"
 
     def __init__(self, overwrite=True, *args, **kwargs) -> None:
         super().__init__(overwrite=overwrite, *args, **kwargs)
@@ -1338,6 +1349,7 @@ class ListRelationship(SingleRelationship):
 
     dgraph_predicate_type = '[uid]'
     is_list_predicate = True
+    default_connector = "AND"
 
     def __init__(self, overwrite=True, relationship_constraint=None, allow_new=True, autoload_choices=False, *args, **kwargs) -> None:
         super().__init__(relationship_constraint=relationship_constraint, allow_new=allow_new,
