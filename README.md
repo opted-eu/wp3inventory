@@ -10,7 +10,7 @@ This is the code repository for *Meteor* (the WP3 Inventory), which will contain
 
 ## Technical Details
 
-- developed in the Python framework [Flask](https://flask.palletsprojects.com/en/2.0.x/) (most recent version)
+- developed in the Python framework [Flask](https://flask.palletsprojects.com/en/2.0.x/) (version 2.0.x)
 - uses [DGraph](https://dgraph.io/) as backend / data storage
 
 # Getting started
