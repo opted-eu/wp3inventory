@@ -95,6 +95,7 @@ class NewID:
     def nquad(self) -> str:
         return f'{self.newid}'
 
+
 class Facet:
     """
         Base class for facets. Use simple coercion.
@@ -103,27 +104,28 @@ class Facet:
 
     predicate = None
     default_operator = "eq"
-    is_list_predicate = False    
-    
-    def __init__(self, key: str, 
-                dtype: Union[str, bool, int, float, datetime.datetime]=str,
-                queryable=False,
-                coerce=None,
-                query_label=None,
-                comparison_operators=None,
-                render_kw=None,
-                choices=None) -> None:
-        
+    is_list_predicate = False
+
+    def __init__(self, key: str,
+                 dtype: Union[str, bool, int, float, datetime.datetime] = str,
+                 queryable=False,
+                 coerce=None,
+                 query_label=None,
+                 comparison_operators=None,
+                 render_kw=None,
+                 choices=None) -> None:
+
         self.key = key
         self.type = dtype
         self.queryable = queryable
         self._query_label = query_label
         if isinstance(comparison_operators, dict):
-            comparison_operators = [(k, v) for k, v in comparison_operators.items()]
-            comparison_operators.insert(0, ('',''))
+            comparison_operators = [(k, v)
+                                    for k, v in comparison_operators.items()]
+            comparison_operators.insert(0, ('', ''))
         self.operators = comparison_operators
         self.render_kw = render_kw or {}
-        
+
         if isinstance(choices, dict):
             choices = [(k, v) for k, v in choices.items()]
 
@@ -140,7 +142,7 @@ class Facet:
             return f'{self.predicate}|{self.key}'
         else:
             return f'{self.key}'
-    
+
     def corece(self, val) -> Any:
         if self.type == bool:
             return self._coerce_bool(val)
@@ -169,7 +171,6 @@ class Facet:
         if not isinstance(vals, list):
             vals = [vals]
 
-        
         if len(vals) == 0:
             return None
 
@@ -178,22 +179,22 @@ class Facet:
 
         if operator == 'between':
             if self.type == datetime.datetime:
-                    return f'ge({self.key}, "{vals[0].strftime("%Y-%m-%d")}") AND lt({self.key}, "{vals[1].strftime("%Y-%m-%d")}")'
+                return f'ge({self.key}, "{vals[0].strftime("%Y-%m-%d")}") AND lt({self.key}, "{vals[1].strftime("%Y-%m-%d")}")'
             else:
                 return f'ge({self.key}, "{self.coerce(vals[0])}") AND lt({self.key}, "{self.corece(vals[1])}")'
-            
+
         else:
             if self.type == datetime.datetime:
                 val1 = vals[0]
                 val2 = val1 + datetime.timedelta(days=1)
                 return f'ge({self.key}, "{val1.strftime("%Y-%m-%d")}") AND lt({self.key}, "{val2.strftime("%Y-%m-%d")}")'
-            filters = [f'{operator}({self.key}, "{self.corece(val)}")' for val in vals]
+            filters = [
+                f'{operator}({self.key}, "{self.corece(val)}")' for val in vals]
             if len(filters) > 1:
                 filter_string = " OR ".join(filters)
                 return f'({filter_string})'
             else:
                 return filters[0]
-
 
     @staticmethod
     def _coerce_bool(val) -> bool:
@@ -216,7 +217,7 @@ class Facet:
             except:
                 pass
         return dateparser.parse(val)
-        
+
     @property
     def query_label(self) -> str:
         if self._query_label:
@@ -226,7 +227,8 @@ class Facet:
 
     @property
     def query_field(self) -> StringField:
-        self.render_kw.update({'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
+        self.render_kw.update(
+            {'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
         if self.type == bool:
             return BooleanField(label=self.query_label, render_kw=self.render_kw)
         elif self.type == int:
@@ -235,10 +237,6 @@ class Facet:
             return TomSelectMutlitpleField(label=self.query_label, render_kw=self.render_kw, choices=self.choices)
         else:
             return StringField(label=self.query_label, render_kw=self.render_kw)
-        
-
-    
-
 
 
 class _PrimitivePredicate:
@@ -291,17 +289,17 @@ class _PrimitivePredicate:
         # Facets: parameter should accept lists and single Facet objects
         if isinstance(facets, Facet):
             facets = [facets]
-        
+
         if facets:
             self.facets = {facet.key: facet for facet in facets}
         else:
             self.facets = None
 
         if isinstance(comparison_operators, dict):
-            comparison_operators = [(k, v) for k, v in comparison_operators.items()]
-            comparison_operators.insert(0, ('',''))
-        self.operators = comparison_operators       
-
+            comparison_operators = [(k, v)
+                                    for k, v in comparison_operators.items()]
+            comparison_operators.insert(0, ('', ''))
+        self.operators = comparison_operators
 
         # WTF Forms
         self.required = required
@@ -326,9 +324,8 @@ class _PrimitivePredicate:
 
         # other references to this predicate
         # this is used for querying several predicates at once
-        # but they also have different creation logics 
+        # but they also have different creation logics
         self.predicate_alias = predicate_alias
-
 
     def __str__(self) -> str:
         return f'{self.predicate}'
@@ -405,7 +402,7 @@ class _PrimitivePredicate:
 
         if 'uid' in self.dgraph_predicate_type:
             vals = [validate_uid(v) for v in vals if validate_uid(v)]
-        
+
         if len(vals) == 0:
             return f'has({predicate})'
 
@@ -413,7 +410,8 @@ class _PrimitivePredicate:
             if connector == "AND":
                 return " AND ".join([f'{operator}({predicate}, "{strip_query(val)}")' for val in vals])
             else:
-                vals_string = ", ".join([f'"{strip_query(val)}"' for val in vals])
+                vals_string = ", ".join(
+                    [f'"{strip_query(val)}"' for val in vals])
                 if len(vals) == 1:
                     return f'{operator}({predicate}, {vals_string})'
                 else:
@@ -425,15 +423,16 @@ class _PrimitivePredicate:
         # not a very elegant solution...
         # provides a hook for UI (JavaScript)
         if isinstance(self, ReverseRelationship):
-            self.render_kw.update({'data-entities': ",".join(Schema.__reverse_predicates_types__[self.predicate])})
+            self.render_kw.update(
+                {'data-entities': ",".join(Schema.__reverse_predicates_types__[self.predicate])})
         elif self.predicate:
-            self.render_kw.update({'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
+            self.render_kw.update(
+                {'data-entities': ",".join(Schema.__predicates_types__[self.predicate])})
 
     @property
     def query_field(self) -> StringField:
         self._prepare_query_field()
         return StringField(label=self.query_label, render_kw=self.render_kw)
-
 
 
 class Predicate(_PrimitivePredicate):
@@ -444,7 +443,6 @@ class Predicate(_PrimitivePredicate):
         and also provides generators for WTF Form Fields
 
     """
-
 
     def __init__(self, large_textfield=False, *args, **kwargs) -> None:
         """
@@ -478,7 +476,6 @@ class Predicate(_PrimitivePredicate):
         super().__init__(*args, **kwargs)
 
         self.large_textfield = large_textfield
-
 
     def __str__(self) -> str:
         return f'{self.predicate}'
@@ -713,9 +710,10 @@ class ReverseRelationship(_PrimitivePredicate):
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label, 
-                                        choices=self.choices_tuples, 
-                                        render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.query_label,
+                                       choices=self.choices_tuples,
+                                       render_kw=self.render_kw)
+
 
 class ReverseListRelationship(ReverseRelationship):
 
@@ -774,13 +772,12 @@ class MutualRelationship(_PrimitivePredicate):
     dgraph_predicate_type = 'uid'
     is_list_predicate = False
     default_operator = "uid_in"
-    
 
     def __init__(self,
                  allow_new=False,
                  autoload_choices=True,
                  relationship_constraint=None,
-                 overwrite=True, 
+                 overwrite=True,
                  *args, **kwargs) -> None:
 
         super().__init__(overwrite=overwrite, *args, **kwargs)
@@ -788,7 +785,7 @@ class MutualRelationship(_PrimitivePredicate):
         if isinstance(relationship_constraint, str):
             relationship_constraint = [relationship_constraint]
         self.relationship_constraint = relationship_constraint
-        
+
         self.allow_new = allow_new
 
         # if we want the form field to show all choices automatically.
@@ -805,7 +802,6 @@ class MutualRelationship(_PrimitivePredicate):
             return f'<Mutual Relationship Predicate "{self.predicate}">'
         else:
             return f'<Unbound Mutual Relationship Predicate>'
-
 
     def validate(self, data, node, facets=None) -> Union[UID, NewID, dict]:
         """
@@ -954,6 +950,7 @@ class Integer(Predicate):
     def query_field(self) -> IntegerField:
         self._prepare_query_field()
         return IntegerField(label=self.query_label, render_kw=self.render_kw)
+
 
 class ListString(String):
 
@@ -1120,10 +1117,10 @@ class DateTime(Predicate):
             render_kw = {**self.render_kw, **render_kw}
         return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
-    def query_filter(self, vals: Union[str, list, int], operator: Union['lt', 'gt']=None, **kwargs):
+    def query_filter(self, vals: Union[str, list, int], operator: Union['lt', 'gt'] = None, **kwargs):
         if vals is None:
             return f'has({self.predicate})'
-        
+
         try:
             if isinstance(vals, list) and len(vals) > 1:
                 vals = [self.validation_hook(val) for val in vals[:2]]
@@ -1139,6 +1136,7 @@ class DateTime(Predicate):
                     return f'{self.default_operator}({self.predicate}, "{date.year}-01-01", "{date.year}-12-31")'
         except:
             return f'has({self.predicate})'
+
 
 class Year(DateTime):
 
@@ -1210,9 +1208,8 @@ class Boolean(Predicate):
             vals = self.validation_hook(vals)
             try:
                 return super().query_filter(str(vals).lower())
-            except: 
+            except:
                 return f'has({self.predicate})'
-            
 
     @property
     def wtf_field(self) -> BooleanField:
@@ -1331,20 +1328,20 @@ class SingleRelationship(Predicate):
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectField(label=self.label, 
-                                validators=validators, 
-                                description=self.form_description, 
-                                choices=self.choices_tuples, 
-                                render_kw=self.render_kw)
+        return TomSelectField(label=self.label,
+                              validators=validators,
+                              description=self.form_description,
+                              choices=self.choices_tuples,
+                              render_kw=self.render_kw)
 
     @property
     def query_field(self) -> TomSelectMutlitpleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label, 
-                                        choices=self.choices_tuples, 
-                                        render_kw=self.render_kw)
+        return TomSelectMutlitpleField(label=self.query_label,
+                                       choices=self.choices_tuples,
+                                       render_kw=self.render_kw)
 
 
 class ListRelationship(SingleRelationship):

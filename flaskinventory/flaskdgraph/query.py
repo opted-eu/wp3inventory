@@ -63,7 +63,7 @@ def build_query_string(query: dict, public=True) -> str:
         variables = None
 
     # special treatment for dgraph.type
-    
+
     try:
         dgraph_type = query.pop('dgraph.type')
         if isinstance(dgraph_type, str):
@@ -77,12 +77,20 @@ def build_query_string(query: dict, public=True) -> str:
     # first we clean the query dict
     # make sure that the predicates exists (cannot query arbitrary predicates) and is queryable
     # also asserts that certain predicates remain private (e.g., email addresses)
+
+    if public:
+        queryable_predicates = Schema.get_queryable_predicates()
+    else:
+        queryable_predicates = Schema.predicates()
+
     _cleaned_query = {k: v for k, v in query.items(
-    ) if k in Schema.get_queryable_predicates()}
-    cleaned_query = {Schema.get_queryable_predicates()[k]: v for k, v in _cleaned_query.items() if not isinstance(Schema.get_queryable_predicates()[k], Facet)}
+    ) if k in queryable_predicates}
+    cleaned_query = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
+    ) if not isinstance(queryable_predicates[k], Facet)}
 
     # preprare facets
-    facets = {Schema.get_queryable_predicates()[k]: v for k, v in _cleaned_query.items() if isinstance(Schema.get_queryable_predicates()[k], Facet)}
+    facets = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
+    ) if isinstance(queryable_predicates[k], Facet)}
     for facet in facets:
         if facet.predicate not in _cleaned_query:
             cleaned_query.update({Schema.predicates()[facet.predicate]: None})
@@ -91,13 +99,14 @@ def build_query_string(query: dict, public=True) -> str:
                  for k, v in query.items() if '*operator' in k}
 
     connectors = {k.split('*')[0]: v[0]
-                 for k, v in query.items() if '*connector' in k}
+                  for k, v in query.items() if '*connector' in k}
 
     # prevent querying everything
     if len(cleaned_query) == 0 and len(filters) == 0:
         return False
 
-    query_parts = ['uid', 'unique_name', 'name', 'dgraph.type', 'authors', 'other_names', 'published_date']
+    query_parts = ['uid', 'unique_name', 'name', 'dgraph.type',
+                   'authors', 'other_names', 'published_date']
     query_parts_total = ['count(uid)']
     if public:
         filters.append('eq(entry_review_status, "accepted")')
@@ -112,13 +121,15 @@ def build_query_string(query: dict, public=True) -> str:
         connector = connectors.get(predicate.predicate, None)
 
         # Let the predicate object generate the filter query part
-        predicate_filter = predicate.query_filter(val, operator=operator, connector=connector)
+        predicate_filter = predicate.query_filter(
+            val, operator=operator, connector=connector)
 
         # check if there are aliases for this predicate
         if predicate.predicate_alias:
             alias_filters = [predicate_filter]
             for alias in predicate.predicate_alias:
-                alias_filters.append(predicate.query_filter(val, predicate=alias, custom_operator=operator))
+                alias_filters.append(predicate.query_filter(
+                    val, predicate=alias, custom_operator=operator))
             predicate_filter = " OR ".join(alias_filters)
             predicate_filter = f'({predicate_filter})'
 
@@ -203,7 +214,8 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
     class F(FlaskForm):
 
         submit = SubmitField('Query')
-        max_results = SelectField('max results', choices=[10, 25, 50], default=25, name='_max_results', coerce=int)
+        max_results = SelectField('max results', choices=[
+                                  10, 25, 50], default=25, name='_max_results', coerce=int)
         terms = StringField('Free text search', name='_terms')
 
         def get_field(self, field):
@@ -218,13 +230,13 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
             if not hasattr(F, k):
                 setattr(F, k, v.query_field)
                 if isinstance(v.operators, list):
-                    operator_selection = SelectField('operator', name=f'{v}*operator', choices=v.operators)
+                    operator_selection = SelectField(
+                        'operator', name=f'{v}*operator', choices=v.operators)
                     setattr(F, f'{k}*operator', operator_selection)
                 if v.is_list_predicate:
-                    connector_selection = RadioField('connector', name=f'{v}*connector', choices=[('AND', 'and'), ('OR', 'or')])
+                    connector_selection = RadioField(
+                        'connector', name=f'{v}*connector', choices=[('AND', 'and'), ('OR', 'or')])
                     setattr(F, f'{k}*connector', connector_selection)
-
-
 
     form = F(formdata=populate_obj)
 

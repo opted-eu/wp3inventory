@@ -4,6 +4,7 @@ from flask import current_app, _app_ctx_stack
 import pydgraph
 import logging
 
+
 class DGraph(object):
     """
         Class for dgraph database connection
@@ -154,6 +155,16 @@ class DGraph(object):
             return None
         return data['q'][0]['uid']
 
+    def get_uids(self, field: str, value: str) -> list:
+        value = str(value).strip()
+        query_string = f'''
+            query quicksearch($value: string)
+            {{ q(func: eq({field}, $value)) {{ uid {field} }} }}'''
+        data = self.query(query_string, variables={'$value': value})
+        if len(data['q']) == 0:
+            return None
+        return [entry['uid'] for entry in data['q']]
+
     def get_unique_name(self, uid):
 
         query_string = f''' query get_unique_name($value: string)
@@ -163,7 +174,7 @@ class DGraph(object):
             return None
         return data['q'][0]['unique_name']
 
-    def get_dgraphtype(self, uid: str, clean: list =['Entry', 'Resource']):
+    def get_dgraphtype(self, uid: str, clean: list = ['Entry', 'Resource']):
         query_string = f'''query get_dgraphtype($value: string)
                             {{ q(func: uid($value)) @filter(has(dgraph.type)) {{  dgraph.type  }} }}'''
 
@@ -172,7 +183,7 @@ class DGraph(object):
             return False
         if 'User' in data['q'][0]['dgraph.type']:
             return False
-        
+
         if len(clean) > 0:
             for item in clean:
                 if item in data['q'][0]['dgraph.type']:
@@ -243,7 +254,8 @@ class DGraph(object):
         self.logger.debug(f'set nquads:\n{set_nquads}')
         self.logger.debug(f'delete nquads:\n{del_nquads}')
         txn = self.connection.txn()
-        mutation = txn.create_mutation(set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
+        mutation = txn.create_mutation(
+            set_nquads=set_nquads, del_nquads=del_nquads, cond=cond)
         request = txn.create_request(query=query, mutations=[
                                      mutation], commit_now=True)
 

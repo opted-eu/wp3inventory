@@ -1,6 +1,6 @@
 from flaskinventory.flaskdgraph import Schema
 from flaskinventory.flaskdgraph.dgraph_types import (UID, MutualRelationship, NewID, Predicate, ReverseRelationship, Scalar,
-                                        SingleRelationship, GeoScalar, Variable, make_nquad, dict_to_nquad)
+                                                     SingleRelationship, GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
 from flaskinventory.auxiliary import icu_codes
@@ -79,7 +79,7 @@ class Sanitizer:
         if self.dgraph_type == 'Source':
             if not self.is_upsert or self.entry_review_status == 'draft':
                 self.process_source()
-        
+
         if self.dgraph_type == 'ResearchPaper':
             self.process_researchpaper()
 
@@ -113,7 +113,7 @@ class Sanitizer:
             if check.get('entry_added').get('uid') != current_user.id:
                 raise InventoryPermissionError(
                     'You do not have the required permissions to edit this entry!')
-        
+
         entry_review_status = check.get('entry_review_status')
 
         edit_fields = fields or Schema.get_predicates(dgraph_type)
@@ -122,11 +122,12 @@ class Sanitizer:
                 edit_fields.update(Schema.get_reverse_predicates(dgraph_type))
 
         if entry_review_status != 'draft':
-            edit_fields = {key: field for key, field in edit_fields.items() if field.edit}
+            edit_fields = {key: field for key,
+                           field in edit_fields.items() if field.edit}
 
         if not isinstance(dgraph_type, str):
             dgraph_type = dgraph_type.__name__
-            
+
         return cls(data, is_upsert=True, dgraph_type=dgraph_type, entry_review_status=entry_review_status, fields=edit_fields, **kwargs)
 
     def _set_nquads(self):
@@ -163,7 +164,7 @@ class Sanitizer:
             if upsert_query != '':
                 self.upsert_query = upsert_query
             else:
-                self.upsert_query = None 
+                self.upsert_query = None
         else:
             self.delete_nquads = None
 
@@ -184,10 +185,11 @@ class Sanitizer:
         if newentry:
             if entry.get('dgraph.type'):
                 if type(entry['dgraph.type']) != list:
-                    entry['dgraph.type'] = Schema.resolve_inheritance(entry['dgraph.type'])
+                    entry['dgraph.type'] = Schema.resolve_inheritance(
+                        entry['dgraph.type'])
                 elif isinstance(entry['dgraph.type'], list):
                     dtypes = []
-                    for dt in  entry['dgraph.type']:
+                    for dt in entry['dgraph.type']:
                         dtypes += Schema.resolve_inheritance(dt)
                     entry['dgraph.type'] = list(set(dtypes))
             else:
@@ -220,7 +222,7 @@ class Sanitizer:
                     self.facets[predicate].update({facet: self.data[key]})
                 else:
                     self.facets[predicate] = {facet: self.data[key]}
-            
+
             # for list predicates, we track facets via the value
             if '@' in key:
                 val, facet = key.split('@')
@@ -233,7 +235,6 @@ class Sanitizer:
                     if isinstance(val, Scalar):
                         if str(val) in self.facets.keys():
                             val.update_facets(self.facets[str(val)])
-                
 
     def _parse(self):
         if self.data.get('uid'):
@@ -241,7 +242,7 @@ class Sanitizer:
             self.entry_uid = self.fields['uid'].validate(uid)
         else:
             self.entry_uid = self.fields['uid'].default
-        
+
         self.entry['uid'] = self.entry_uid
         self.skip_keys.append(self.fields['uid'].predicate)
 
@@ -255,30 +256,33 @@ class Sanitizer:
 
         for key, item in self.fields.items():
             validated = None
-            if key in self.skip_keys: continue
+            if key in self.skip_keys:
+                continue
 
             if key in self.facets.keys():
                 facets = self.facets[key]
                 print(facets)
             else:
                 facets = None
-            
+
             if self.data.get(key) and isinstance(item, ReverseRelationship):
-                validated = item.validate(self.data[key], self.entry_uid, facets=facets)
+                validated = item.validate(
+                    self.data[key], self.entry_uid, facets=facets)
                 if isinstance(validated, list):
                     self.related_entries += validated
                 else:
                     self.related_entries.append(validated)
                 continue
             elif self.data.get(key) and isinstance(item, MutualRelationship):
-                node_data, data_node = item.validate(self.data[key], self.entry_uid, facets=facets)
+                node_data, data_node = item.validate(
+                    self.data[key], self.entry_uid, facets=facets)
                 self.entry[item.predicate] = node_data
                 if isinstance(data_node, list):
                     self.related_entries += data_node
                 else:
                     self.related_entries.append(data_node)
                 continue
-            
+
             elif self.data.get(key) and isinstance(item, SingleRelationship):
                 related_items = item.validate(self.data[key], facets=facets)
                 validated = []
@@ -287,24 +291,25 @@ class Sanitizer:
                         validated.append(item['uid'])
                         if isinstance(item['uid'], NewID):
                             self.related_entries.append(item)
-                        
+
                 else:
                     validated = related_items['uid']
                     if isinstance(related_items['uid'], NewID):
-                        self.related_entries.append(related_items)                
+                        self.related_entries.append(related_items)
 
             elif self.data.get(key) and hasattr(item, 'validate'):
-                validated = item.validate(self.data[key], facets=facets)  
+                validated = item.validate(self.data[key], facets=facets)
             elif hasattr(item, 'autocode'):
                 if item.autoinput in self.data.keys():
-                    validated = item.autocode(self.data[item.autoinput], facets=facets)        
+                    validated = item.autocode(
+                        self.data[item.autoinput], facets=facets)
             elif hasattr(item, 'default'):
                 validated = item.default
                 if hasattr(validated, 'facets') and facets is not None:
                     validated.update_facets(facets)
 
-        
-            if validated is None: continue
+            if validated is None:
+                continue
 
             if type(validated) == dict:
                 self.entry.update(validated)
@@ -321,7 +326,8 @@ class Sanitizer:
 
         if self.is_upsert:
             self.entry = self._add_entry_meta(self.entry)
-            self.overwrite[self.entry_uid] = [item.predicate for k, item in self.fields.items() if item.overwrite and k in self.data.keys()]
+            self.overwrite[self.entry_uid] = [item.predicate for k, item in self.fields.items(
+            ) if item.overwrite and k in self.data.keys()]
         else:
             self.entry = self._add_entry_meta(self.entry, newentry=True)
             self.entry['unique_name'] = self.generate_unique_name(self.entry)
@@ -330,10 +336,11 @@ class Sanitizer:
 
     def process_related(self):
         for related in self.related_entries:
-            related = self._add_entry_meta(related, newentry=isinstance(related['uid'], NewID))
+            related = self._add_entry_meta(
+                related, newentry=isinstance(related['uid'], NewID))
             if isinstance(related['uid'], NewID) and 'name' not in related.keys():
-                related['name'] = str(related['uid']).replace('_:', '').replace('_', ' ').title()
-            
+                related['name'] = str(related['uid']).replace(
+                    '_:', '').replace('_', ' ').title()
 
     def parse_entry_review_status(self):
         if self.data.get('accept'):
@@ -351,7 +358,8 @@ class Sanitizer:
                 self.entry_review_status == 'pending'
                 self.entry['entry_review_status'] = 'pending'
             elif self.user.user_role >= USER_ROLES.Reviewer:
-                validated = self.fields.get('entry_review_status').validate(self.data.get('entry_review_status'))
+                validated = self.fields.get('entry_review_status').validate(
+                    self.data.get('entry_review_status'))
                 self.entry['entry_review_status'] = validated
             else:
                 raise InventoryPermissionError(
@@ -369,10 +377,6 @@ class Sanitizer:
             self.entry['unique_name'] = unique_name
         elif not self.is_upsert:
             if self.dgraph_type == 'ResearchPaper':
-                name = self.data.get('doi') or self.data.get('arxiv')
-                if name is None:
-                    name = slugify(self.data.get('title'), separator="_")
-            else:
                 name = slugify(self.data.get('name'), separator="_")
 
             query_string = f''' query quicksearch($value: string)
@@ -397,7 +401,8 @@ class Sanitizer:
             wikidata = get_wikidata(self.data.get('name'))
             if wikidata:
                 for key, val in wikidata.items():
-                    if val is None: continue
+                    if val is None:
+                        continue
                     if key not in predicates.keys():
                         continue
                     if key not in self.entry.keys():
@@ -411,10 +416,11 @@ class Sanitizer:
         try:
             unique_name = slugify(str(entry['name']), separator="_")
         except KeyError:
-            current_app.logger.debug(f'<{entry["uid"]}> No key "name" in dict. Autoassigning')
+            current_app.logger.debug(
+                f'<{entry["uid"]}> No key "name" in dict. Autoassigning')
             unique_name = slugify(str(entry['uid']), separator="_")
             if hasattr(entry['uid'], 'original_value'):
-                entry['name'] = entry['uid'].original_value        
+                entry['name'] = entry['uid'].original_value
         if dgraph.get_uid('unique_name', unique_name):
             unique_name += f'_{secrets.token_urlsafe(4)}'
 
@@ -424,7 +430,6 @@ class Sanitizer:
         """
             Special steps for papers
             Generate a name based on author and title
-            assign unique name based on DOI or arXiv
         """
         if isinstance(self.entry['authors'], list) and len(self.entry['authors']) > 1:
             author = f"{self.entry['authors'][0]} et al."
@@ -432,7 +437,7 @@ class Sanitizer:
             author = f"{self.entry['authors'][0]}"
         else:
             author = f"{self.entry['authors']}"[:32]
-        
+
         title = re.match(r".*?[\?:\.!]", str(self.entry['title']))[0]
         title = title.replace(':', '')
 
@@ -440,11 +445,7 @@ class Sanitizer:
 
         self.entry['name'] = f'{author} ({year}): {title}'
 
-        if self.data.get('arxiv'):
-            self.entry['unique_name'] = self.data['arxiv'].strip()
-        if self.data.get('doi'):
-            self.entry['unique_name'] = self.data['doi'].strip()
-
+        self.entry['unique_name'] = slugify(self.entry['name'], separator="_")
 
     def process_source(self):
         """
@@ -472,13 +473,14 @@ class Sanitizer:
             self.fetch_telegram()
         elif channel == 'facebook':
             self.entry['channel_url'] = self.entry['name']
-        
-        try: 
+
+        try:
             country_uid = self.entry['country'][0]
         except TypeError:
             country_uid = self.entry['country']
-            
-        self.entry['unique_name'] = self.source_unique_name(self.entry['name'], channel=channel, country_uid=country_uid)
+
+        self.entry['unique_name'] = self.source_unique_name(
+            self.entry['name'], channel=channel, country_uid=country_uid)
 
         # inherit from main source
         for source in self.related_entries:
@@ -489,18 +491,23 @@ class Sanitizer:
                         if dgraph.get_dgraphtype(rel_channel) == 'Channel':
                             source['channel'] = UID(rel_channel)
                     else:
-                        raise InventoryValidationError(f'No channel provided for related source {source["name"]}! Please indicate channel')
+                        raise InventoryValidationError(
+                            f'No channel provided for related source {source["name"]}! Please indicate channel')
                     source['entry_review_status'] = 'draft'
                     source['unique_name'] = secrets.token_urlsafe(8)
-                    source['publication_kind'] = self.entry.get('publication_kind')
-                    source['special_interest'] = self.entry.get('special_interest')
+                    source['publication_kind'] = self.entry.get(
+                        'publication_kind')
+                    source['special_interest'] = self.entry.get(
+                        'special_interest')
                     source['topical_focus'] = self.entry.get('topical_focus')
-                    source['geographic_scope'] = self.entry.get('geographic_scope')
+                    source['geographic_scope'] = self.entry.get(
+                        'geographic_scope')
                     source['country'] = self.entry.get('country')
-                    source['geographic_scope_subunit'] = self.entry.get('geographic_scope_subunit')
+                    source['geographic_scope_subunit'] = self.entry.get(
+                        'geographic_scope_subunit')
                     source['languages'] = self.entry.get('languages')
-                    source['party_affiliated'] = self.entry.get('party_affiliated')                   
-                    
+                    source['party_affiliated'] = self.entry.get(
+                        'party_affiliated')
 
     @staticmethod
     def source_unique_name(name, channel=None, country=None, country_uid=None):
@@ -545,7 +552,6 @@ class Sanitizer:
         else:
             return f'{name}_{country}_{channel}_{secrets.token_urlsafe(4)}'
 
-
     def resolve_website(self):
         # first check if website exists
         entry_name = str(self.entry['name'])
@@ -562,7 +568,7 @@ class Sanitizer:
         # clean up the display name of the website
         entry_name = entry_name.replace(
             'http://', '').replace('https://', '').lower()
-        
+
         if entry_name.endswith('/'):
             entry_name = entry_name[:-1]
 
@@ -584,7 +590,7 @@ class Sanitizer:
                     continue
                 if url not in self.entry['other_names']:
                     self.entry['other_names'].append(url.strip())
-        
+
         self.entry['name'] = Scalar(entry_name)
         self.entry['channel_url'] = build_url(
             self.data['name'])
@@ -593,7 +599,8 @@ class Sanitizer:
         try:
             daily_visitors = siterankdata(self.entry['name'])
         except Exception as e:
-            current_app.logger.warning(f'Could not fetch siterankdata for {self.entry["name"]}! Exception: {e}')
+            current_app.logger.warning(
+                f'Could not fetch siterankdata for {self.entry["name"]}! Exception: {e}')
             daily_visitors = None
 
         if daily_visitors:
@@ -731,7 +738,6 @@ class Sanitizer:
             self.entry['founded'] = profile.get('joined')
 
 
-
 class OrganizationSanitizer(Sanitizer):
 
     def __init__(self, data, **kwargs):
@@ -743,12 +749,12 @@ class OrganizationSanitizer(Sanitizer):
         if not self.is_upsert:
             self.entry['dgraph.type'].append('Organization')
 
-        
+
 def make_sanitizer(data: dict, dgraph_type, edit=False):
 
     if not isinstance(dgraph_type, str):
         dgraph_type = dgraph_type.__name__
-    
+
     fields = Schema.get_predicates(dgraph_type)
     if Schema.get_reverse_predicates(dgraph_type):
         fields.update(Schema.get_reverse_predicates(dgraph_type))

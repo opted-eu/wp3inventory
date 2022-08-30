@@ -199,7 +199,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
             sidebar_items['actions'] = {'audience_size': url_for(
                 'edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
-    
+
     return render_template('edit/editform.html',
                            title=f'Edit {dgraph_type}',
                            form=form, fields=fields.keys(),

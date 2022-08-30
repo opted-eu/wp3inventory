@@ -5,16 +5,16 @@ from flaskinventory import dgraph
 from flaskinventory.flaskdgraph.dgraph_types import SingleChoice
 from flaskinventory.flaskdgraph import Schema, build_query_string
 from flaskinventory.flaskdgraph.query import generate_query_forms
-from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
-from flaskinventory.view.dgraph import (get_entry, get_rejected, list_by_type)
+from flaskinventory.view.dgraph import (get_entry, get_rejected)
 from flaskinventory.view.utils import can_view
-from flaskinventory.view.forms import SimpleQuery
 from flaskinventory.flaskdgraph.utils import validate_uid, restore_sequence
 from flaskinventory.review.utils import create_review_actions
+from flaskinventory.misc.utils import validate_doi
 
 view = Blueprint('view', __name__)
+
 
 @view.route('/search')
 def search():
@@ -28,13 +28,14 @@ def search():
         flash("Please enter a search query in the top search bar", "info")
         return redirect(url_for('main.home'))
 
+
 @view.route("/view")
 @view.route("/view/uid/<string:uid>")
 def view_uid(uid=None):
     request_args = request.args.to_dict()
     if request_args.get('uid'):
         uid = request_args.pop('uid')
-    
+
     uid = validate_uid(uid)
     if not uid:
         return abort(404)
@@ -59,13 +60,13 @@ def view_rejected(uid):
 
     if not data:
         return abort(404)
-    
+
     if not can_view(data, current_user):
         return abort(403)
-    
+
     return render_template('view/rejected.html',
-                               title=f"Rejected: {data.get('name')}",
-                               entry=data)
+                           title=f"Rejected: {data.get('name')}",
+                           entry=data)
 
 
 @view.route("/view/<string:dgraph_type>/uid/<uid>")
@@ -87,7 +88,7 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
         show_sidebar = True
     else:
         show_sidebar = False
-    
+
     # pretty printing
     fields = Schema.get_predicates(dgraph_type)
     for key, v in data.items():
@@ -95,21 +96,22 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
             try:
                 if isinstance(fields[key], SingleChoice):
                     if isinstance(v, list):
-                        data[key] = [fields[key].choices[subval] for subval in v]
+                        data[key] = [fields[key].choices[subval]
+                                     for subval in v]
                         data[key].sort()
                     else:
                         data[key] = fields[key].choices[v]
             except KeyError:
                 pass
-    
-    review_actions = create_review_actions(current_user, data['uid'], data['entry_review_status'])
-    return render_template('view/generic.html',
-                            title=data.get('name'),
-                            entry=data,
-                            dgraph_type=dgraph_type,
-                            review_actions=review_actions,
-                            show_sidebar=show_sidebar)
 
+    review_actions = create_review_actions(
+        current_user, data['uid'], data['entry_review_status'])
+    return render_template('view/generic.html',
+                           title=data.get('name'),
+                           entry=data,
+                           dgraph_type=dgraph_type,
+                           review_actions=review_actions,
+                           show_sidebar=show_sidebar)
 
 
 @view.route("/query", methods=['GET', 'POST'])
@@ -120,9 +122,9 @@ def query():
             # remove operators if field not selected
             if '*' in k:
                 if k.split('*')[0] not in request.form.to_dict():
-                    continue 
+                    continue
             # remove empty fields
-            if v[0] != '': 
+            if v[0] != '':
                 r[k] = v
         r.pop('csrf_token')
         r.pop('submit')
@@ -130,20 +132,23 @@ def query():
     total = None
     result = None
     pages = 1
-    r = {k: v for k, v in request.args.to_dict(flat=False).items() if v[0] != ''}
+    r = {k: v for k, v in request.args.to_dict(
+        flat=False).items() if v[0] != ''}
     if len(r) > 0:
         query_string = build_query_string(r)
         if query_string:
             search_terms = request.args.get('_terms', '')
             if not search_terms == '':
                 variables = {'$searchTerms': search_terms}
-            else: variables = None
+            else:
+                variables = None
             result = dgraph.query(query_string, variables=variables)
             total = result['total'][0]['count']
 
             max_results = int(request.args.get('_max_results', 25))
             # make sure no random values are passed in as parameters
-            if not max_results in [10, 25, 50]: max_results = 25
+            if not max_results in [10, 25, 50]:
+                max_results = 25
 
             # fancy ceiling division
             pages = -(total // -max_results)
@@ -154,18 +159,18 @@ def query():
             if len(result) > 0:
                 for item in result:
                     if 'Entry' in item['dgraph.type']:
-                        item['dgraph.type'].remove('Entry') 
+                        item['dgraph.type'].remove('Entry')
                     if any(t in item['dgraph.type'] for t in ['ResearchPaper', 'Tool', 'Corpus', 'Dataset']):
                         restore_sequence(item)
 
-
-    r_args = {k: v for k, v in request.args.to_dict(flat=False).items() if v[0] != ''}
+    r_args = {k: v for k, v in request.args.to_dict(
+        flat=False).items() if v[0] != ''}
     try:
         current_page = int(r_args.pop('_page')[0])
     except:
         current_page = 1
 
-    form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool', 'Archive', 'Dataset', 'Corpus'], 
+    form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool', 'Archive', 'Dataset', 'Corpus'],
                                 populate_obj=request.args)
 
     return render_template("query/index.html", form=form, result=result, r_args=r_args, total=total, pages=pages, current_page=current_page)
@@ -179,7 +184,8 @@ def query_json():
     if isinstance(public, str):
         if public == 'False':
             public = False
-    query_string = build_query_string(request.args.to_dict(flat=False), public=public)
+    query_string = build_query_string(
+        request.args.to_dict(flat=False), public=public)
 
     result = dgraph.query(query_string)
 
