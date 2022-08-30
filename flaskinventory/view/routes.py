@@ -115,7 +115,15 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
 @view.route("/query", methods=['GET', 'POST'])
 def query():
     if request.method == 'POST':
-        r = {k: v for k, v in request.form.to_dict(flat=False).items() if v[0] != ''}
+        r = {}
+        for k, v in request.form.to_dict(flat=False).items():
+            # remove operators if field not selected
+            if '*' in k:
+                if k.split('*')[0] not in request.form.to_dict():
+                    continue 
+            # remove empty fields
+            if v[0] != '': 
+                r[k] = v
         r.pop('csrf_token')
         r.pop('submit')
         return redirect(url_for("view.query", **r))

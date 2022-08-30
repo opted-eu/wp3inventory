@@ -31,25 +31,27 @@
             
                     {% else %}
             
-                    <div class="mb-2" id="{{ field.name }}-container">
+                    <div class="mb-3" id="{{ field.name }}-container">
                         {% if field.render_kw.hidden %}
                         {% else %}
-                        <div>
-                        <label for="{{ field.id}}" class="form-label mb-0">
+                        <div class="d-flex">
+                        <label for="{{ field.id }}" class="form-label mb-0 flex-grow-1">
                             {% if field.description %}
                                 {{ field.description }}
                             {% else %}
                                 {{ field.label.text }}
                             {% endif %}
-
-                            {% if "%s*connector" % (field.name) in form._fields %}
-                                {% set connector_selection = form.get_field("%s*connector" % (field.name)) %}
-                                <div class="form-check form-check-inline">
-                                    {{ connector_selection(class="form-check-input") }} 
-                                    </div>
-                            {% endif %}
                             
                         </label>
+                        {% if "%s*connector" % (field.name) in form._fields %}
+                                {% set connector_selection = form.get_field("%s*connector" % (field.name)) %}
+                                {% for subfield in connector_selection %}
+                                <div class="form-check form-check-inline ms-2 me-0 boolean-connector">
+                                    {{ subfield(class="form-check-input") }}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                                {% endfor %} 
+                            {% endif %}
                         </div>
                         {% endif %}
                         {% if field.errors %} 
@@ -117,6 +119,7 @@ function hideFields() {
             document.getElementById(`${element.id}-container`).hidden = true
         }
     }
+    
 }
 
 function showFields(event) {

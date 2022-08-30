@@ -221,8 +221,8 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
                     operator_selection = SelectField('operator', name=f'{v}*operator', choices=v.operators)
                     setattr(F, f'{k}*operator', operator_selection)
                 if v.is_list_predicate:
-                    connector_selection = RadioField('conncector', name=f'{v}*connector', choices=[('AND', 'and'), ('OR', 'or')])
-                    setattr(F, f'{k}*conncector', connector_selection)
+                    connector_selection = RadioField('connector', name=f'{v}*connector', choices=[('AND', 'and'), ('OR', 'or')])
+                    setattr(F, f'{k}*connector', connector_selection)
 
 
 
