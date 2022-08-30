@@ -292,7 +292,7 @@ function drawChart({
 
     // wait 200 ticks and then resize
     const t = d3.timer((elapsed) => {
-        if (elapsed > 200) { 
+        if (elapsed > 400) { 
             t.stop()
             let bbox = d3.select('#network-plot svg').node().getBBox();
             svg.transition().duration(200).
