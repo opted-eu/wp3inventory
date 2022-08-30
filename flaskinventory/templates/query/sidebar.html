@@ -184,12 +184,12 @@ function rearrange() {
     for (el of all) {
         container = document.getElementById(`${el.id}-container`)
         if (el.checked) {
-            if (container != sortedContainer.id) {
+            if (container.parentElement.id != sortedContainer.id) {
                 sortedContainer.appendChild(container)
             }
         }
         if (el.value && el.type !== 'checkbox') {
-            if (container != sortedContainer.id) {
+            if (container.parentElement.id != sortedContainer.id) {
                 sortedContainer.appendChild(container)
             }
         }
