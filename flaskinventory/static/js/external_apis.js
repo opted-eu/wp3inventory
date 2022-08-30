@@ -148,13 +148,18 @@ function fetchMetaData(button) {
 };
 
 function checkInventory(data) {
-    console.log(data)
     let container = document.getElementById('magic-warning-container')
     let button = document.getElementById('magic')
     if (data.status) {
         let identifier = data.data[0].doi
         if (!identifier) {
             identifier = data.data[0].arxiv
+        }
+        if (!identifier) {
+            identifier = data.data[0].pypi
+        }
+        if (!identifier) {
+            identifier = data.data[0].cran
         }
         container.getElementsByTagName('p')[0].innerHTML = `This entry is already in the inventory! 
             You can find it by entering the identifier "${identifier}" in the search box above`
@@ -223,7 +228,6 @@ function buttonWarning(button, message = "Invalid Identifier!") {
     button.getElementsByClassName('button-loading')[0].hidden = true
     button.getElementsByClassName('button-text')[0].hidden = false
     button.getElementsByClassName('button-text')[0].innerText = message
-    console.error(error)
 }
 
 function resolveDOI(text) {
@@ -233,7 +237,6 @@ function resolveDOI(text) {
     // if (headers.get('Content-Type').includes('csl+json')) {
 
     let json = JSON.parse(text)
-    console.log(json)
     result['url'] = json['URL']
     result['doi'] = json['DOI']
     if (Object.keys(json).includes('container-title')) {
@@ -298,8 +301,9 @@ function resolveDOI(text) {
 
 function parseArXiv(xml) {
 
+    
     let parser = new DOMParser()
-
+    
     let publication = parser.parseFromString(xml, 'text/xml')
 
     let total_result = publication.getElementsByTagName('opensearch:totalResults')[0].innerHTML
@@ -312,8 +316,6 @@ function parseArXiv(xml) {
     }
 
     publication = publication.getElementsByTagName('entry')[0]
-
-    console.log(publication)
 
     let result = new Array()
 
@@ -350,6 +352,8 @@ function parseArXiv(xml) {
 
 function parsePyPi(package) {
 
+    let github_regex = new RegExp("https?://github\.com/(.*)")
+
     result = new Array()
 
     result['name'] = package.info['name']
@@ -362,7 +366,16 @@ function parsePyPi(package) {
     result['license'] = package.info['license']
     result['materials'] = []
     for (url in package.info['project_urls']) {
-        result['materials'].push(package.info.project_urls[url])
+        let material_url = package.info.project_urls[url]
+        if (material_url.match(github_regex)) {
+            let github = material_url.match(github_regex)[1]
+            if (github.endsWith('/issues')) {
+                github.replace('/issues', '')
+            }
+            result['github'] = github
+        } else {
+            result['materials'].push(material_url)
+        }
     }
 
     result['programming_languages'] = ['python']

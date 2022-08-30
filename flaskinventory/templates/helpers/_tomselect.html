@@ -418,10 +418,10 @@ if (embeddedJSON) {
 
     function createMaterialsField(materialURL, content=null) {
                 var row = document.createElement('div')
-                row.classList.add('row', 'my-3', 'align-items-center')
+                row.classList.add('row', 'my-3', 'align-items-end')
                 row.id = 'container-' + materialURL
                 var label = document.createElement('label')
-                label.classList.add('col', 'form-label')
+                label.classList.add('col', 'form-label', 'px-4', 'font-monospace')
                 label.setAttribute('for', materialURL + '@kind')
                 label.innerText = materialURL;
                 row.append(label)

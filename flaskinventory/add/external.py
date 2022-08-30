@@ -689,6 +689,8 @@ def arxiv(arxiv: str) -> Union[dict, bool]:
     return result
 
 
+GITHUB_REGEX = re.compile(r"https?://github\.com/(.*)")
+
 def cran(pkg) -> Union[dict, bool]:
 
     api = 'https://crandb.r-pkg.org/'
@@ -719,7 +721,13 @@ def cran(pkg) -> Union[dict, bool]:
         result['other_names'] = data['Title']
 
     if 'URL' in data.keys():
-        result['url'] = data['URL']
+        url = data['URL']
+        if GITHUB_REGEX.search(url):
+            result['github'] = GITHUB_REGEX.search(url)[1]
+
+        result['url'] = url.split(',')[0].strip()
+        
+
 
     if 'License' in data.keys():
         result['license'] = data['License']
