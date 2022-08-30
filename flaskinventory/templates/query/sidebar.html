@@ -17,7 +17,7 @@
         <fieldset class="form-group my-1" id="fieldset-container-unsorted" hidden>
             {% for f in form._fields %}
                 {% set field = form.get_field(f) %}
-                {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name %}        
+                {% if field.type not in ['SubmitField', 'CSRFTokenField'] and not field.name.startswith('_') and not '*operator' in field.name and not '*connector' in field.name %}        
                     {% if field.type == 'BooleanField' %}
                         {% if field.description %}
                             <p class="fw-bold" style='padding-left: 0!;'>{{ field.description }}</p>
@@ -31,10 +31,11 @@
             
                     {% else %}
             
-                    <div class="mb-2" id="{{ field.name }}-container">
+                    <div class="mb-3" id="{{ field.name }}-container">
                         {% if field.render_kw.hidden %}
                         {% else %}
-                        <label for="{{ field.id}}" class="form-label mb-0">
+                        <div class="d-flex">
+                        <label for="{{ field.id }}" class="form-label mb-0 flex-grow-1">
                             {% if field.description %}
                                 {{ field.description }}
                             {% else %}
@@ -42,6 +43,16 @@
                             {% endif %}
                             
                         </label>
+                        {% if "%s*connector" % (field.name) in form._fields %}
+                                {% set connector_selection = form.get_field("%s*connector" % (field.name)) %}
+                                {% for subfield in connector_selection %}
+                                <div class="form-check form-check-inline ms-2 me-0 boolean-connector">
+                                    {{ subfield(class="form-check-input") }}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                                {% endfor %} 
+                            {% endif %}
+                        </div>
                         {% endif %}
                         {% if field.errors %} 
                             {{ field(class="form-control is-invalid") }}
@@ -108,6 +119,7 @@ function hideFields() {
             document.getElementById(`${element.id}-container`).hidden = true
         }
     }
+    
 }
 
 function showFields(event) {
@@ -172,12 +184,12 @@ function rearrange() {
     for (el of all) {
         container = document.getElementById(`${el.id}-container`)
         if (el.checked) {
-            if (container != sortedContainer.id) {
+            if (container.parentElement.id != sortedContainer.id) {
                 sortedContainer.appendChild(container)
             }
         }
         if (el.value && el.type !== 'checkbox') {
-            if (container != sortedContainer.id) {
+            if (container.parentElement.id != sortedContainer.id) {
                 sortedContainer.appendChild(container)
             }
         }

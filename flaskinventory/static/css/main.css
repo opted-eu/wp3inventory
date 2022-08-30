@@ -114,30 +114,37 @@
 
 .color-facebook {
     color: #3b5999;
+    fill: #3b5999;
 }
 
 .color-twitter {
     color: #55acee;
+    fill: #55acee;
 }
 
 .color-instagram {
-    color: #e4405f;
+    color: #f82877;
+    fill: #f82877;
 }
 
 .color-researchgate {
     color: #40ba9b;
+    fill: #40ba9b;
 }
 
 .color-github {
     color: black;
+fill: black;
 }
 
 .color-vkontakte {
     color: #2787f5;
+    fill: #2787f5;
 }
 
 .color-telegram {
     color: #0088cc;
+    fill: #0088cc;
 }
 
 
@@ -147,6 +154,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -178,12 +186,12 @@ dt {
 }
 
 .tooltip-inner {
-    max-width: 350px!important;
-    text-align: left!important;
+    max-width: 350px !important;
+    text-align: left !important;
 }
 
 .ts-no-arrow {
-    background-image: none!important;
+    background-image: none !important;
 }
 
 .bg-indigo {
@@ -198,10 +206,20 @@ dt {
 }
 
 .header-branding-small {
-        font-weight: normal;
-        letter-spacing: normal;
-        font-size: small;
-        font-family: var(--bs-body-font-family);
+    font-weight: normal;
+    letter-spacing: normal;
+    font-size: small;
+    font-family: var(--bs-body-font-family);
+}
+
+/* Collapse controls */
+
+[data-bs-toggle="collapse"].collapsed .if-not-collapsed {
+    display: none;
+}
+
+[data-bs-toggle="collapse"]:not(.collapsed) .if-collapsed {
+    display: none;
 }
 
 /* External Links */
@@ -258,4 +276,58 @@ dt {
 
 .bd-toc nav li {
     margin-bottom: 0.25rem;
+}
+
+/* Network Graph Styling */
+
+svg .node-group {
+    font-size: 0.7rem;
+    color: var(--bs-body-color);
+}
+
+svg .Organization {
+    /* indigo-300 */
+    fill: #a370f7;
+}
+
+svg .Source {
+    /* green-300 */
+    /* fill: #75b798; */
+}
+
+
+svg .currentNode {
+    fill: var(--bs-orange)!important;
+}
+
+svg .color-website {
+    /* green-300 */
+    fill: #75b798;
+}
+
+svg .color-print {
+    /* green-300 */
+    fill: var(--bs-gray);
+}
+
+svg .node-group:hover {
+    font-size: 1.1rem;
+    color: var(--bs-link-color);
+    fill: var(--bs-link-color);
+}
+
+svg .node-group:hover circle {
+    stroke: black;
+}
+
+svg .node-group:hover .Organization {
+    fill: var(--bs-indigo);
+}
+
+svg .node-group:hover .Source {
+    /* fill: var(--bs-green); */
+}
+
+svg .node-group:hover .color-website {
+    fill: var(--bs-green);
 }

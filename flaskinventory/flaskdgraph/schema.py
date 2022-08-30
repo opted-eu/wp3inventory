@@ -23,7 +23,6 @@ class Schema:
     __perm_registry_new__ = {}
     __perm_registry_edit__ = {}
 
-
     # Registry of all predicates
     # key = Name of predicate (string), value = predicate (object)
     __predicates__ = {}
@@ -41,21 +40,23 @@ class Schema:
 
     __queryable_predicates_by_type__ = {}
 
-
-
     def __init_subclass__(cls) -> None:
         from .dgraph_types import _PrimitivePredicate, Facet, Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
-        predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (Predicate, MutualRelationship))}
+        predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(
+            getattr(cls, key), (Predicate, MutualRelationship))}
 
-        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), (SingleRelationship, MutualRelationship))}
+        relationship_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(
+            getattr(cls, key), (SingleRelationship, MutualRelationship))}
 
-        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(getattr(cls, key), ReverseRelationship)}
+        reverse_predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(
+            getattr(cls, key), ReverseRelationship)}
 
         # base list of queryable predicates
-        queryable_predicates = {key: val for key, val in predicates.items() if val.queryable}
+        queryable_predicates = {key: val for key,
+                                val in predicates.items() if val.queryable}
         # add reverse predicates that can be queried
-        queryable_predicates.update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
-
+        queryable_predicates.update(
+            {val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
 
         # inherit predicates from parent classes
         for parent in cls.__bases__:
@@ -85,7 +86,7 @@ class Schema:
         Schema.__perm_registry_new__[cls.__name__] = cls.__permission_new__
         Schema.__perm_registry_edit__[cls.__name__] = cls.__permission_edit__
 
-        # Bind and "activate" predicates for initialized class 
+        # Bind and "activate" predicates for initialized class
         for key in cls.__dict__:
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
@@ -110,17 +111,21 @@ class Schema:
                     cls.__predicates__.update({key: attribute})
             elif isinstance(attribute, ReverseRelationship):
                 if attribute.predicate not in cls.__reverse_predicates_types__:
-                    cls.__reverse_predicates_types__.update({attribute.predicate: [cls.__name__]})
+                    cls.__reverse_predicates_types__.update(
+                        {attribute.predicate: [cls.__name__]})
                 else:
                     if cls.__name__ not in cls.__reverse_predicates_types__[attribute.predicate]:
-                        cls.__reverse_predicates_types__[attribute.predicate].append(cls.__name__)
+                        cls.__reverse_predicates_types__[
+                            attribute.predicate].append(cls.__name__)
 
         Schema.__queryable_predicates__.update(queryable_predicates)
 
-        Schema.__queryable_predicates_by_type__[cls.__name__] = {key: val for key, val in predicates.items() if val.queryable}
-        Schema.__queryable_predicates_by_type__[cls.__name__].update({key: val for key, val in queryable_predicates.items() if isinstance(val, Facet)})
-        Schema.__queryable_predicates_by_type__[cls.__name__].update({val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
-        
+        Schema.__queryable_predicates_by_type__[cls.__name__] = {
+            key: val for key, val in predicates.items() if val.queryable}
+        Schema.__queryable_predicates_by_type__[cls.__name__].update(
+            {key: val for key, val in queryable_predicates.items() if isinstance(val, Facet)})
+        Schema.__queryable_predicates_by_type__[cls.__name__].update(
+            {val._predicate: val for key, val in reverse_predicates.items() if val.queryable})
 
     @classmethod
     def get_types(cls) -> list:
@@ -137,6 +142,8 @@ class Schema:
             Helpful when input is all lower case
             `Schema.get_type('fileformat')` -> 'FileFormat'
         """
+        if not dgraph_type:
+            return None
         assert isinstance(dgraph_type, str)
         for t in list(cls.__types__.keys()):
             if t.lower() == dgraph_type.lower():
@@ -248,17 +255,16 @@ class Schema:
                 return cls.__queryable_predicates_by_type__[cls.__name__]
             except KeyError:
                 return cls.__queryable_predicates__
-    
+
         if not isinstance(_cls, str):
             _cls = _cls.__name__
         else:
             _cls = cls.get_type(_cls)
-        
+
         try:
             return cls.__queryable_predicates_by_type__[_cls]
         except KeyError:
             return {}
-
 
     @staticmethod
     def populate_form(form: FlaskForm, populate_obj: dict, fields: dict) -> FlaskForm:
@@ -321,10 +327,10 @@ class Schema:
         return form
 
     @classmethod
-    def generate_edit_entry_form(cls, dgraph_type=None, 
-                                populate_obj: dict = None, 
-                                entry_review_status='pending', 
-                                skip_fields: list = None) -> FlaskForm:
+    def generate_edit_entry_form(cls, dgraph_type=None,
+                                 populate_obj: dict = None,
+                                 entry_review_status='pending',
+                                 skip_fields: list = None) -> FlaskForm:
 
         from .dgraph_types import SingleRelationship, ReverseRelationship, MutualRelationship
 

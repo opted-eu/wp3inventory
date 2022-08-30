@@ -51,3 +51,7 @@ angle-double-left
 angle-double-right
 angle-left
 angle-right
+angle-double-down
+angle-double-up
+angle-down
+angle-up

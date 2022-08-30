@@ -44,7 +44,8 @@ def new_entry():
                         }}
                 }}
         '''
-        result = dgraph.query(query_string, variables={'$query': query, '$identifier': identifier})
+        result = dgraph.query(query_string, variables={
+                              '$query': query, '$identifier': identifier})
         if len(result['check']) > 0:
             return render_template('add/database_check.html', query=form.name.data, result=result['check'], entity=form.entity.data)
         else:
@@ -71,7 +72,7 @@ def new_source():
         draft = get_draft(draft)
     elif existing:
         existing = get_existing(existing)
-    
+
     return render_template("add/newsource.html", draft=draft, existing=existing)
 
 
@@ -102,11 +103,10 @@ def from_draft(entity=None, uid=None):
         return redirect(url_for('add.new_entry'))
 
 
-
 @add.route("/add/<string:dgraph_type>", methods=['GET', 'POST'])
 @add.route("/add/<string:dgraph_type>/draft/<string:draft>", methods=['GET', 'POST'])
 @login_required
-def new(dgraph_type=None, draft=None, populate_form: dict=None):
+def new(dgraph_type=None, draft=None, populate_form: dict = None):
     try:
         dgraph_type = Schema.get_type(dgraph_type)
     except:
@@ -115,8 +115,9 @@ def new(dgraph_type=None, draft=None, populate_form: dict=None):
     if not dgraph_type:
         return abort(404)
 
-    form = Schema.generate_new_entry_form(dgraph_type=dgraph_type, populate_obj=populate_form)
-    
+    form = Schema.generate_new_entry_form(
+        dgraph_type=dgraph_type, populate_obj=populate_form)
+
     if draft is None:
         draft = request.args.get('draft')
     if draft:
@@ -154,7 +155,8 @@ def new(dgraph_type=None, draft=None, populate_form: dict=None):
 
         try:
             if sanitizer.is_upsert:
-                result = dgraph.upsert(sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
+                result = dgraph.upsert(
+                    sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
             else:
                 result = dgraph.upsert(None, set_nquads=sanitizer.set_nquads)
             flash(f'{dgraph_type} has been added!', 'success')

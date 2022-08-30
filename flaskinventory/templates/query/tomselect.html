@@ -9,7 +9,7 @@
         new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~').replace('|', '\\\|') }}', 
         {
             create: false, 
-            plugins: ['remove_button'], 
+            plugins: ['remove_button', 'clear_button'], 
             hidePlaceholder: true,
             onItemAdd:function(){ // clear input after item was selected
                     this.setTextboxValue();

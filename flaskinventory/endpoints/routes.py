@@ -226,3 +226,35 @@ def identifier_lookup():
     else:
         result['status'] = False
     return jsonify(result)
+
+
+@endpoint.route('/endpoint/ownership', methods=['POST'])
+def ownership():
+    current_app.logger.debug(f'Received JSON: \n{request.json}')
+    try:
+        if 'uid' in request.json:
+            uid = validate_uid(request.json.get('uid'))
+            if not uid:
+                return abort(404)
+            query_string = """query ownership($id: string) {
+                                tmp(func: uid($id)) @recurse  {
+                                    u as uid owns publishes ~owns ~publishes                                     
+                                }
+                                q(func: uid(uid(u))) 
+                                    @filter(eq(entry_review_status, "accepted") AND 
+                                        eq(dgraph.type,["Organization", "Source"]))  {
+			                        name uid dgraph.type
+                                    channel { unique_name }
+                                    publishes @filter(eq(entry_review_status, "accepted")) { uid }
+                                    owns @filter(eq(entry_review_status, "accepted")) { uid }
+                                }
+                            }"""
+            result = dgraph.query(query_string=query_string, variables={'$id': uid})
+            return jsonify(result['q'])
+        else:
+            return abort(404)
+    except Exception as e:
+        error = {'error': f'{e}'}
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        current_app.logger.error(tb_str)
+        return jsonify(error)
