@@ -8,6 +8,7 @@
 from typing import Union, Any
 import datetime
 import json
+from copy import deepcopy
 
 # external utils
 from slugify import slugify
@@ -1195,7 +1196,7 @@ class Boolean(Predicate):
             raise InventoryValidationError(
                 f'Cannot evaluate provided value as bool: {data}!')
 
-    def query_filter(self, vals, operator=None):
+    def query_filter(self, vals, **kwargs):
         if isinstance(vals, list):
             vals = vals[0]
 
@@ -1218,8 +1219,9 @@ class Boolean(Predicate):
     @property
     def query_field(self) -> BooleanField:
         self._prepare_query_field()
-        self.render_kw.update({'value': 'true'})
-        return BooleanField(label=self.query_label, render_kw=self.render_kw)
+        render_kw = deepcopy(self.render_kw)
+        render_kw.update({'value': 'true'})
+        return BooleanField(label=self.query_label, render_kw=render_kw)
 
 
 class Geo(Predicate):

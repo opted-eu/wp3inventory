@@ -149,7 +149,12 @@ function clearFields(event) {
             try {
                 el.tomselect.clear()
             } catch {
+                if (el.type !== 'checkbox') {
                 el.value = ""
+                } else {
+                    el.checked = false
+                }
+
             }
         }
     }
