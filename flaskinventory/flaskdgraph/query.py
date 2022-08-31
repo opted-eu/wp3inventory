@@ -2,7 +2,7 @@ from .schema import Schema
 
 from wtforms import SubmitField, SelectField, StringField, RadioField
 from flask_wtf import FlaskForm
-from .customformfields import TomSelectMutlitpleField
+from .customformfields import TomSelectMultipleField
 
 
 # Default Behaviour:
@@ -221,7 +221,7 @@ def generate_query_forms(dgraph_types: list = None, populate_obj: dict = None) -
         def get_field(self, field):
             return getattr(self, field, None)
 
-    setattr(F, 'dgraph.type', TomSelectMutlitpleField(
+    setattr(F, 'dgraph.type', TomSelectMultipleField(
         'Entity Type', choices=dgraph_types))
 
     for dt in dgraph_types:

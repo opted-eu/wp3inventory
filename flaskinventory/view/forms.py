@@ -2,7 +2,7 @@ from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.validators import DataRequired
-from flaskinventory.flaskdgraph.customformfields import TomSelectMutlitpleField
+from flaskinventory.flaskdgraph.customformfields import TomSelectMultipleField
 
 class SimpleQuery(FlaskForm):
 
@@ -13,12 +13,12 @@ class SimpleQuery(FlaskForm):
                              ('Archive', 'Data Archive'),
                              ('Dataset', 'Dataset'),
                              ('Tool', 'Tool'),
-                             ('Corpus', 'Corpus'),
-                             ('ResearchPaper', 'Research Paper')],
+                             ('Corpus', 'Corpus')
+                             ],
                             validators=[DataRequired()],
                             name='dgraph.type')
     
-    country = TomSelectMutlitpleField('Filter by Country')
+    country = TomSelectMultipleField('Filter by Country')
 
     submit = SubmitField('Query')
 

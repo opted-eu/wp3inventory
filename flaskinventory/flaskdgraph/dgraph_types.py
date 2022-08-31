@@ -18,7 +18,7 @@ from dateutil import parser as dateparser
 from flaskinventory import dgraph
 
 from .schema import Schema
-from .customformfields import NullableDateField, TomSelectField, TomSelectMutlitpleField
+from .customformfields import NullableDateField, TomSelectField, TomSelectMultipleField
 from .utils import validate_uid, strip_query
 
 from flaskinventory.errors import InventoryPermissionError, InventoryValidationError
@@ -234,7 +234,7 @@ class Facet:
         elif self.type == int:
             return IntegerField(label=self.query_label, render_kw=self.render_kw)
         elif self.choices:
-            return TomSelectMutlitpleField(label=self.query_label, render_kw=self.render_kw, choices=self.choices)
+            return TomSelectMultipleField(label=self.query_label, render_kw=self.render_kw, choices=self.choices)
         else:
             return StringField(label=self.query_label, render_kw=self.render_kw)
 
@@ -706,11 +706,11 @@ class ReverseRelationship(_PrimitivePredicate):
         return super().query_filter(vals, predicate=self._predicate, **kwargs)
 
     @property
-    def query_field(self) -> TomSelectMutlitpleField:
+    def query_field(self) -> TomSelectMultipleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label,
+        return TomSelectMultipleField(label=self.query_label,
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
 
@@ -761,10 +761,10 @@ class ReverseListRelationship(ReverseRelationship):
                                      for c in choices[dgraph_type.lower()]})
 
     @property
-    def wtf_field(self) -> TomSelectMutlitpleField:
+    def wtf_field(self) -> TomSelectMultipleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
-        return TomSelectMutlitpleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMultipleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class MutualRelationship(_PrimitivePredicate):
@@ -893,7 +893,7 @@ class MutualListRelationship(MutualRelationship):
     def wtf_field(self) -> TomSelectField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
-        return TomSelectMutlitpleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMultipleField(label=self.label, description=self.form_description, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 """
@@ -1031,9 +1031,9 @@ class SingleChoice(String):
                                choices=self.choices_tuples, render_kw=self.render_kw)
 
     @property
-    def query_field(self) -> TomSelectMutlitpleField:
+    def query_field(self) -> TomSelectMultipleField:
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMultipleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class MultipleChoice(SingleChoice):
@@ -1059,21 +1059,21 @@ class MultipleChoice(SingleChoice):
         return data
 
     @property
-    def wtf_field(self) -> Union[SelectMultipleField, TomSelectMutlitpleField]:
+    def wtf_field(self) -> Union[SelectMultipleField, TomSelectMultipleField]:
         if self.required:
             validators = [DataRequired()]
         else:
             validators = [Optional()]
         if self.tom_select:
-            return TomSelectMutlitpleField(label=self.label, validators=validators, description=self.form_description,
+            return TomSelectMultipleField(label=self.label, validators=validators, description=self.form_description,
                                            choices=self.choices_tuples, render_kw=self.render_kw)
         return SelectMultipleField(label=self.label, validators=validators, description=self.form_description,
                                    choices=self.choices_tuples, render_kw=self.render_kw)
 
     @property
-    def query_field(self) -> TomSelectMutlitpleField:
+    def query_field(self) -> TomSelectMultipleField:
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
+        return TomSelectMultipleField(label=self.query_label, choices=self.choices_tuples, render_kw=self.render_kw)
 
 
 class DateTime(Predicate):
@@ -1335,11 +1335,11 @@ class SingleRelationship(Predicate):
                               render_kw=self.render_kw)
 
     @property
-    def query_field(self) -> TomSelectMutlitpleField:
+    def query_field(self) -> TomSelectMultipleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         self._prepare_query_field()
-        return TomSelectMutlitpleField(label=self.query_label,
+        return TomSelectMultipleField(label=self.query_label,
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
 
@@ -1367,14 +1367,14 @@ class ListRelationship(SingleRelationship):
         return uids
 
     @property
-    def wtf_field(self) -> TomSelectMutlitpleField:
+    def wtf_field(self) -> TomSelectMultipleField:
         if self.autoload_choices and self.relationship_constraint:
             self.get_choices()
         if self.required:
             validators = [DataRequired()]
         else:
             validators = [Optional()]
-        return TomSelectMutlitpleField(label=self.label,
+        return TomSelectMultipleField(label=self.label,
                                        validators=validators,
                                        description=self.form_description,
                                        choices=self.choices_tuples,

@@ -3,7 +3,7 @@ from wtforms import (SelectField, DateField, SelectMultipleField)
 import datetime
 
 
-class TomSelectMutlitpleField(SelectMultipleField):
+class TomSelectMultipleField(SelectMultipleField):
 
     def pre_validate(self, form):
         pass
