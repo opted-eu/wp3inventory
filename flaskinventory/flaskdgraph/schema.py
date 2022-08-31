@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -159,7 +160,7 @@ class Schema:
         """
         if not isinstance(_cls, str):
             _cls = _cls.__name__
-        return cls.__types__[_cls]
+        return deepcopy(cls.__types__[_cls])
 
     @classmethod
     def get_relationships(cls, _cls) -> dict:
@@ -185,7 +186,7 @@ class Schema:
         if not isinstance(_cls, str):
             _cls = _cls.__name__
         if _cls in cls.__reverse_relationship_predicates__:
-            return cls.__reverse_relationship_predicates__[_cls]
+            return deepcopy(cls.__reverse_relationship_predicates__[_cls])
         else:
             return None
 
@@ -200,20 +201,20 @@ class Schema:
             `FileFormat.predicates()` -> Only predicates for this DGraph Type
         """
         try:
-            predicates = cls.__types__[cls.__name__]
+            predicates = deepcopy(cls.__types__[cls.__name__])
         except KeyError:
-            predicates = cls.__predicates__
+            predicates = deepcopy(cls.__predicates__)
 
         return predicates
 
     @classmethod
     def relationship_predicates(cls) -> dict:
-        return cls.__relationship_predicates__
+        return deepcopy(cls.__relationship_predicates__)
 
     @classmethod
     def reverse_predicates(cls) -> dict:
         if cls.__name__ in cls.__reverse_relationship_predicates__:
-            return cls.__reverse_relationship_predicates__[cls.__name__]
+            return deepcopy(cls.__reverse_relationship_predicates__[cls.__name__])
         else:
             return None
 
@@ -252,9 +253,9 @@ class Schema:
     def get_queryable_predicates(cls, _cls=None) -> dict:
         if _cls is None:
             try:
-                return cls.__queryable_predicates_by_type__[cls.__name__]
+                return deepcopy(cls.__queryable_predicates_by_type__[cls.__name__])
             except KeyError:
-                return cls.__queryable_predicates__
+                return deepcopy(cls.__queryable_predicates__)
 
         if not isinstance(_cls, str):
             _cls = _cls.__name__
@@ -262,7 +263,7 @@ class Schema:
             _cls = cls.get_type(_cls)
 
         try:
-            return cls.__queryable_predicates_by_type__[_cls]
+            return deepcopy(cls.__queryable_predicates_by_type__[_cls])
         except KeyError:
             return {}
 
