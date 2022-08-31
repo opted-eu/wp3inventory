@@ -8,7 +8,8 @@ from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.users.forms import (InviteUserForm, RegistrationForm, LoginForm, UpdatePasswordForm,
                                         UpdateProfileForm, RequestResetForm, ResetPasswordForm,
                                         EditUserForm, AcceptInvitationForm)
-from flaskinventory.users.utils import send_reset_email, send_invite_email, send_verification_email, requires_access_level, make_users_table
+from flaskinventory.users.utils import requires_access_level, make_users_table
+from flaskinventory.users.emails import send_reset_email, send_invite_email, send_verification_email
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User, get_user_data, user_login, create_user, list_users, list_entries
 from secrets import token_hex
@@ -87,11 +88,11 @@ def update_profile():
         flash(f'Your account has been updated', 'success')
         return redirect(url_for('users.profile'))
     elif request.method == 'GET':
-        form.user_displayname.data = getattr(
-            current_user, "user_displayname", None)
-        form.user_affiliation.data = getattr(
-            current_user, "user_affiliation", None)
-        form.user_orcid.data = getattr(current_user, "user_orcid", None)
+        for field in form._fields:
+            try:
+                setattr(getattr(form, field), 'data', getattr(current_user, field))
+            except AttributeError:
+                continue
         # form.avatar_img.data = current_user.avatar_img
     return render_template('users/update_profile.html', title='Update Profile', form=form)
 
@@ -153,7 +154,8 @@ def delete():
                 'pw': secrets.token_urlsafe(8),
                 'user_orcid': '',
                 'user_role': 1,
-                'user_affiliation': ''}
+                'user_affiliation': '',
+                'preference_emails': False}
     dgraph.update_entry(mutation, uid=current_user.id)
     logout_user()
     flash(f'Your account has been deleted!', 'info')

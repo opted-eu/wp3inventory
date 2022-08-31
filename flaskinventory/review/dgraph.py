@@ -7,7 +7,7 @@ from flaskinventory.flaskdgraph.dgraph_types import (UID, NewID, Predicate, Scal
                                         GeoScalar, Variable, make_nquad, dict_to_nquad)
 from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryDatabaseError
-
+from flaskinventory.users.emails import send_accept_email
 
 def get_overview(dgraphtype, country=None, user=None):
     if dgraphtype == 'all':
@@ -70,6 +70,26 @@ def check_entry(uid=None, unique_name=None):
     return data['q'][0]
 
 
+def send_acceptance_notification(uid):
+    # assummes uid is safe and exists
+    query_string = """query get_entry($query: string) {
+                        q(func: uid($query)) { 
+                            uid name 
+                            dgraph.type
+                            channel { name }
+                            entry_added { uid user_displayname email preference_emails } 
+                        } 
+                    }"""
+    
+    entry = dgraph.query(query_string=query_string, variables={'$query': uid})
+    
+    try:
+        if entry['q'][0]['entry_added']['preference_emails']:
+            send_accept_email(entry['q'][0])
+    except KeyError:
+        pass
+
+
 def accept_entry(uid, user):
     accepted = {'uid': UID(uid), 'entry_review_status': 'accepted',
                 "reviewed_by": UID(user.id, facets={'timestamp': datetime.now()})}
@@ -77,6 +97,7 @@ def accept_entry(uid, user):
     set_nquads = " \n ".join(dict_to_nquad(accepted))
 
     dgraph.upsert(None, set_nquads=set_nquads)
+    
 
 
 def reject_entry(uid, user):

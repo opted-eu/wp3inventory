@@ -57,6 +57,8 @@ class UpdateProfileForm(FlaskForm):
     user_orcid = StringField('ORCID',
                              validators=[Length(max=20)])
 
+    preference_emails = BooleanField("Send me notification emails", render_kw={"role": "switch"})
+
     submit = SubmitField('Update')
 
 

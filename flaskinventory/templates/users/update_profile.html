@@ -2,7 +2,7 @@
 
 
 <div class="content-section pt-4">
-<div class="row justify-content-center">
+<div class="row">
 <div class="col-6">
     <form method="POST" action="" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
@@ -31,6 +31,11 @@
                     <span>{{ error }}</span> {% endfor %}
                 </div>
                 {% else %} {{ form.user_orcid(class="form-control form-control-lg", placeholder="{{ current_user.orcid }}") }} {% endif %} {{ form.user_orcid.label() }}
+            </div>
+
+            <div class="form-check form-switch">
+                {{ form.preference_emails(class="form-check-input") }}
+                {{ form.preference_emails.label(class="form-check-label") }}
             </div>
 
         </fieldset>

@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template, url_for,
 from flask_login import login_required, current_user
 from flaskinventory.misc.forms import get_country_choices
 from flaskinventory.review.forms import ReviewFilter
-from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry
+from flaskinventory.review.dgraph import get_overview, accept_entry, reject_entry, send_acceptance_notification
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.utils import requires_access_level
 
@@ -48,10 +48,11 @@ def submit():
         if request.form.get('accept'):
             try:
                 accept_entry(uid, current_user)
+                send_acceptance_notification(uid)
                 flash('Entry has been accepted!', category='success')
                 return redirect(url_for('review.overview', **request.args))
             except Exception as e:
-                current_app.logger.error(f'Could not accept entry with uid {uid}: {e}')
+                current_app.logger.exception(f'Could not accept entry with uid {uid}: {e}')
                 flash(f'Reviewing entry failed! Error: {e}', category='danger')
                 return redirect(url_for('review.overview', **request.args))
         elif request.form.get('reject'):

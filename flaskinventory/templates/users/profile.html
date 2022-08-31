@@ -19,6 +19,8 @@
         <dd class="col-sm-9">{{ current_user.user_affiliation }}</dd>
         <dt class="col-sm-3 mb-4">ORCID</dt>
         <dd class="col-sm-9"><a href="https://orcid.org/{{ current_user.user_orcid }}" target="_blank">{{ current_user.user_orcid }}</a></dd>
+        <dt class="col-sm-3 mb-4">Email Notifications</dt>
+        <dd class="col-sm-9"><span>{{ 'Activated' if current_user.preference_emails else 'Deactivated' }}</span></dd>
     </dl>
     <a class="btn btn-outline-info mx-2" href="{{ url_for('users.update_profile') }}">Update Profile</a>
     <a class="btn btn-sm btn-outline-warning mx-2" href="{{ url_for('users.change_password') }}">Change Password</a>

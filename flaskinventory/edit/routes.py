@@ -12,7 +12,7 @@ from flaskinventory.edit.forms import RefreshWikidataForm
 from flaskinventory.edit.utils import can_delete, can_edit, channel_filter
 from flaskinventory.edit.sanitizer import EditAudienceSizeSanitizer
 from flaskinventory.edit.dgraph import draft_delete, get_entry, get_audience
-from flaskinventory.review.dgraph import check_entry
+from flaskinventory.review.dgraph import check_entry, send_acceptance_notification
 from flaskinventory.misc.utils import IMD2dict
 import traceback
 import json
@@ -182,6 +182,7 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
                 sanitizer.upsert_query, del_nquads=sanitizer.delete_nquads, set_nquads=sanitizer.set_nquads)
             if request.form.get('accept'):
                 flash(f'{dgraph_type} has been edited and accepted', 'success')
+                send_acceptance_notification(uid)
                 return redirect(url_for('review.overview', **request.args))
             else:
                 flash(f'{dgraph_type} has been updated', 'success')

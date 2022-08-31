@@ -141,7 +141,7 @@ def get_user_data(**kwargs):
     else:
         raise ValueError()
 
-    query_fields = f'{{ uid email pw_reset @facets user_displayname user_orcid date_joined user_role user_affiliation }} }}'
+    query_fields = f'{{ uid email pw_reset @facets user_displayname user_orcid date_joined user_role user_affiliation preference_emails }} }}'
     query_string = query_func + query_fields
     data = dgraph.query(query_string)
     if len(data['q']) == 0:
@@ -198,6 +198,7 @@ def create_user(user_data, invited_by=None):
     user_data['dgraph.type'] = 'User'
     user_data['user_role'] = USER_ROLES.Contributor
     user_data['user_displayname'] = secrets.token_urlsafe(6)
+    user_data['preference_emails'] = True
     user_data['date_joined'] = datetime.datetime.now(
         datetime.timezone.utc).isoformat()
     if not current_app.debug:
