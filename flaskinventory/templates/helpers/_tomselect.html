@@ -299,7 +299,7 @@ if (embeddedJSON) {
 
     {% elif field.type == 'TomSelectField' %}
 
-        new TomSelect('#{{ field.id }}', TomSelectCountryConfig, 
+        new TomSelect('#{{ field.id }}', 
         {
             selectOnTab: true,
             onItemAdd:function(){ // clear input after item was selected
