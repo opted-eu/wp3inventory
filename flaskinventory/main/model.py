@@ -490,7 +490,7 @@ class Source(Entry):
                                     choices={'tv':  "TV (broadcast, cable, satellite, etc)",
                                              'radio': "Radio",
                                              "podcast": "Podcast",
-                                             "NA": "Don't know / NA"},
+                                             'NA': "Don't know / NA"},
                                     queryable=True)
 
     website_allows_comments = SingleChoice(description='Does the online news source have user comments below individual news articles?',
@@ -920,7 +920,7 @@ class Tool(Entry):
                                             queryable=True)
 
     open_source = SingleChoice(description="Is this tool open source?",
-                                choices={'na': 'NA / Unknown',
+                                choices={'NA': 'NA / Unknown',
                                         'yes': 'Yes',
                                         'no': 'No, proprietary'},
                                 queryable=True)
@@ -928,7 +928,7 @@ class Tool(Entry):
     license = String(description="What kind of license attached to the tool?")
 
     user_access = SingleChoice(description="How can the user access the tool?",
-                                choices={'na': 'NA / Unknown',
+                                choices={'NA': 'NA / Unknown',
                                         'free': 'Free',
                                         'registration': 'Registration',
                                         'request': 'Upon Request',
@@ -977,7 +977,7 @@ class Tool(Entry):
                                         queryable=True)
 
     author_validated = SingleChoice(description="Do the authors of the tool report any validation?",
-                                    choices={'na': 'NA / Unknown',
+                                    choices={'NA': 'NA / Unknown',
                                             'yes': 'Yes',
                                             'no': 'No, not reported'},
                                     queryable=True)
