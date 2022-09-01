@@ -36,13 +36,7 @@ def get_audience(uid):
     rows = []
     # convert to list of dicts
     if 'audience_size' not in data.keys():
-        cols = ['date']
-        if data['channel']['unique_name'] == 'print':
-            cols += ['copies_sold', 'data_from']
-        elif data['channel']['unique_name'] == 'facebook':
-            cols.append('likes')
-        else:
-            return False
+        cols = ['date', 'unit', 'count']
     else:
         keys = [key for key in data.keys() if key.startswith('audience_size|')]
         for i, item in enumerate(data['audience_size']):
