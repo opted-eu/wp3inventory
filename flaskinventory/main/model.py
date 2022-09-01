@@ -590,7 +590,7 @@ class Source(Entry):
     payment_model = SingleChoice(description="Is the content produced by the news source accessible free of charge?",
                                     choices={'free': 'All content is free of charge', 
                                             'partly free': 'Some content is free of charge', 
-                                            'not free': 'No content is free of charge', 
+                                            'not free': 'Paid content only', 
                                             'NA': "Don't Know / NA"},
                                     required=True,
                                     radio_field=True,
