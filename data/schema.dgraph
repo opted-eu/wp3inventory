@@ -279,7 +279,7 @@ channel_epaper: string .
 transcript_kind: string @index(hash) .
 payment_model: string @index(hash) .
 contains_ads: string @index(hash) .
-publication_kind: [string] .
+publication_kind: [string] @index(hash) .
 special_interest: bool @index(bool) .
 topical_focus: [string] .
 publication_cycle: string @index(hash) .
