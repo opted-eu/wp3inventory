@@ -5,7 +5,7 @@
     <h2><i class="icon-{{ entry.unique_name }} color-{{ entry.unique_name }}" alt="{{ entry.name }}"></i></h2>
 {% elif 'Organization' in entry['dgraph.type'] %}
     <h2>
-    {% if entry.ownership_kind == "political party" %}
+    {% if entry.ownership_kind == "Political Party" %}
         <i class="fas fa-flag" alt="Political Party"></i>
         {% else %}
         <i class="fas fa-building" alt="Organisation"></i>
