@@ -106,7 +106,7 @@ def build_query_string(query: dict, public=True) -> str:
         return False
 
     query_parts = ['uid', 'unique_name', 'name', 'dgraph.type',
-                   'authors', 'other_names', 'published_date']
+                   'authors @facets', 'other_names', 'published_date']
     query_parts_total = ['count(uid)']
     if public:
         filters.append('eq(entry_review_status, "accepted")')
