@@ -72,7 +72,8 @@ def build_query_string(query: dict, public=True) -> str:
             dgraph_type = [dgraph_type]
         type_filter = " OR ".join(
             [f'type("{Schema.get_type(dt)}")' for dt in dgraph_type if Schema.get_type(dt)])
-        filters.append(f'({type_filter})')
+        if type_filter:
+            filters.append(f'({type_filter})')
     except KeyError:
         dgraph_type = None
 
@@ -87,23 +88,18 @@ def build_query_string(query: dict, public=True) -> str:
 
     _cleaned_query = {k: v for k, v in query.items(
     ) if k in queryable_predicates}
-    print(_cleaned_query)
     cleaned_query = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
     ) if not isinstance(queryable_predicates[k], Facet)}
 
-    print(cleaned_query)
     # preprare facets
     facets = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
     ) if isinstance(queryable_predicates[k], Facet)}
-    print(facets)
 
     facet_predicates = list(set([f.predicate for f in facets]))
 
     for facet in facet_predicates:
         if facet not in _cleaned_query:
             cleaned_query.update({Schema.predicates()[facet]: None})
-    
-    print(cleaned_query)
 
     operators = {k.split('*')[0]: v[0]
                  for k, v in query.items() if '*operator' in k}
