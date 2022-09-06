@@ -176,7 +176,9 @@ function fillForm(data) {
         if (field) {
             if (field.multiple) {
                 for (let v of data[key]) {
-                    document.querySelector(`#${field.id} option[value="${v}"]`).selected = true
+                    if (document.querySelector(`#${field.id} option[value="${v}"]`)) {
+                        document.querySelector(`#${field.id} option[value="${v}"]`).selected = true
+                    }
                 }
             } else {
                 field.value = data[key]
