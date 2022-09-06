@@ -30,6 +30,13 @@
     <small class="px-2 text-muted border-start">Created: <span class="font-monospace">{{ entry.creation_date.strftime('%Y-%m-%d') }}</span></small>
     {% endif %}
     <small class="px-2 text-muted border-start">UID: <span class="font-monospace">{{ entry.uid }}</span></small>
+    <small class="px-2 border-start"><a class="text-secondary" href="#" 
+        data-name="d3Az"
+        data-domain="b3B0ZWQ"
+        data-tld="eu"
+        data-subject="Correction for {{ entry.name }} ({{ entry.uid }})"
+        data-body="Dear Meteor Team,%0D%0A%0D%0AI browsed your website and noticed that something is wrong in this entry: {{ url_for('view.view_uid', uid=entry.uid, _external=True) }}.%0D%0A%0D%0A-- PLEASE WRITE YOUR CORRECTION HERE -- %0D%0A%0D%0APlease also note that you are very welcome to create an account on Meteor and contribute your suggestions directly."
+        onclick="window.location.href = 'mailto:' + atob(this.dataset.name) + '@' + atob(this.dataset.domain) + '.' + this.dataset.tld + '?subject=' + this.dataset.subject + '&body=' + this.dataset.body; return false;"><i class="fas fa-bug me-1"></i>Something not right?</a></small>
 </div>
 {% include "view/elements/general_information.html" %}
 
