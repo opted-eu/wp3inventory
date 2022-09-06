@@ -87,15 +87,23 @@ def build_query_string(query: dict, public=True) -> str:
 
     _cleaned_query = {k: v for k, v in query.items(
     ) if k in queryable_predicates}
+    print(_cleaned_query)
     cleaned_query = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
     ) if not isinstance(queryable_predicates[k], Facet)}
 
+    print(cleaned_query)
     # preprare facets
     facets = {queryable_predicates[k]: v for k, v in _cleaned_query.items(
     ) if isinstance(queryable_predicates[k], Facet)}
-    for facet in facets:
-        if facet.predicate not in _cleaned_query:
-            cleaned_query.update({Schema.predicates()[facet.predicate]: None})
+    print(facets)
+
+    facet_predicates = list(set([f.predicate for f in facets]))
+
+    for facet in facet_predicates:
+        if facet not in _cleaned_query:
+            cleaned_query.update({Schema.predicates()[facet]: None})
+    
+    print(cleaned_query)
 
     operators = {k.split('*')[0]: v[0]
                  for k, v in query.items() if '*operator' in k}
