@@ -432,7 +432,7 @@ class Organization(Entry):
                                  description='Which news sources publishes the organisation (or person)?',
                                  render_kw={'placeholder': 'Type to search existing news sources and add multiple...'})
     
-    owns = ListRelationship(allow_new=False,
+    owns = ListRelationship(allow_new=True,
                             relationship_constraint='Organization',
                             overwrite=True,
                             description='Which other media organisations are owned by this new organisation (or person)?',

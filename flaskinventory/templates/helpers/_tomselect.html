@@ -88,6 +88,19 @@ if (embeddedJSON) {
         var TomSelectOrganisationConfig = {
                 plugins: ['remove_button'],
                 valueField: 'uid',
+                create: function(input, callback) {
+                    var returnData = {
+                        value: input,
+                        uid: input,
+                        unique_name: input,
+                        text: input,
+                        name: input,
+                        country: [
+                            { name: 'NEW!' }
+                        ]
+                    };
+                    callback(returnData);
+                },
                 labelField: 'name',
                 searchField: 'name',
                 delimiter: ',',
