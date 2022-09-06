@@ -722,7 +722,8 @@ class Archive(Entry):
     text_units = ListRelationship(description="List of text units available in the data archive (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
                                     relationship_constraint="TextUnit",
                                     render_kw={'placeholder': 'Select multiple...'},
-                                    autoload_choices=True)
+                                    autoload_choices=True,
+                                    allow_new=True)
 
 class Dataset(Entry):
 
@@ -846,7 +847,8 @@ class Corpus(Entry):
     text_units = ListRelationship(description="List of text units included in the corpus (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
                                     relationship_constraint="TextUnit",
                                     render_kw={'placeholder': 'Select multiple...'},
-                                    autoload_choices=True)
+                                    autoload_choices=True,
+                                    allow_new=True)
 
     meta_vars = ListRelationship(description="List of meta data included in the corpus (e.g., date, language, source, medium)",
                                     relationship_constraint="MetaVar",
@@ -1038,7 +1040,8 @@ class ResearchPaper(Entry):
     text_units = ListRelationship(description="List of text units analysed in the publication (e.g., sentences, paragraphs, tweets, news articles, summaries, headlines)",
                                     relationship_constraint="TextUnit",
                                     render_kw={'placeholder': 'Select multiple...'},
-                                    autoload_choices=True)
+                                    autoload_choices=True,
+                                    allow_new=True)
     
     datasets_used = ListRelationship(description="Which dataset(s) where used in the publication?",
                                             autoload_choices=True,
