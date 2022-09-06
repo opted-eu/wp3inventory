@@ -121,7 +121,7 @@
     <p>You cannot find what you're looking for? Maybe the resource you're searching is not yet in <em>Meteor</em>.</p>
     <p>You could consider making a new entry and contributing to the community</p>
     <ul>
-        {{ "<li>Create an account.</li>" if not current_user.is_authenticated }}
+        {{ "<li>Create an account.</li>"|safe if not current_user.is_authenticated }}
         <li><a href="{{ url_for('add.new_entry') }}" class="alert-link">Add a new entry in a few steps</a></li>
         <li>Consider giving the <a class="alert-link" href="{{ url_for('main.guides_newssource')}}">provided guides</a> a quick read.</li>
     </ul>
