@@ -50,7 +50,7 @@ def build_query_string(query: dict, public=True) -> str:
         if isinstance(search_terms, list):
             search_terms = " ".join(search_terms)
         filters.append("""(anyofterms(name, $searchTerms) OR 
-                            regexp(name, $searchTerms) OR
+                            regexp(name, /$searchTerms/i) OR
                             anyofterms(description, $searchTerms) OR
                             anyofterms(other_names, $searchTerms) OR 
                             anyofterms(title, $searchTerms) OR 
