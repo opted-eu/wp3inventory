@@ -380,7 +380,7 @@ class Entry(Schema):
                          overwrite=True,
                          new=False)
 
-    description = String(large_textfield=True)
+    description = String(large_textfield=True, overwrite=True)
 
     entry_notes = String(description='Do you have any other notes on the entry that you just coded?',
                          large_textfield=True)
