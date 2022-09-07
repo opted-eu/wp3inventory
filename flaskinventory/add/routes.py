@@ -22,7 +22,8 @@ add = Blueprint('add', __name__)
 def new_entry():
     form = NewEntry()
     if form.validate_on_submit():
-        query = strip_query(form.name.data)
+        query = form.name.data.replace('https://', '').replace('http://', '').replace('www.', '')
+        query = strip_query(query)
         identifier = form.name.data.strip()
         query_string = f'''
                 query database_check($query: string, $identifier: string)
