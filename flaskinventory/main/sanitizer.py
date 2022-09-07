@@ -686,7 +686,10 @@ class Sanitizer:
             'name'].lower().replace('@', '')
 
         if profile.get('fullname'):
-            self.entry['other_names'].append(profile['fullname'])
+            try:
+                self.entry['other_names'].append(profile['fullname'])
+            except KeyError:
+                self.entry['other_names'] = [profile['fullname']]
         if profile.get('followers'):
             facets = {'count': int(
                 profile['followers']),
