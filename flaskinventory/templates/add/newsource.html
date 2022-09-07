@@ -216,16 +216,17 @@
         <div id="group-topical-focus" class="mb-5 form-group" hidden>
             <label for="topical-focus" class="form-label fw-bold fs-5">What is the main topical focus of the news source?</label>
             <p class="my-0"><small id="topical-focus-helptext"></small></p>
-            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback">
-                        <option value="" selected>Choose or add other</option>
-                        <option value="politics">Politics</option>
-                        <option value="society">Society & Panorama</option>
+            <select name="topical_focus" class="form-select form-select-lg" id="topical-focus" aria-describedby="topical-focus-feedback" multiple>
+                        <option value="" selected>Choose multiple...</option>
                         <option value="economy">Business, Economy, Finance & Stocks</option>
+                        <option value="education">Education</option>
+                        <option value="environment">Environment</option>
+                        <option value="health">Health</option>
+                        <option value="media">Media</option>
+                        <option value="politics">Politics</option>
                         <option value="religion">Religion</option>
                         <option value="science">Science & Technology</option>
-                        <option value="media">Media</option>
-                        <option value="environment">Environment</option>
-                        <option value="education">Education</option>
+                        <option value="society">Society & Panorama</option>
                     </select>
             <div id="topical-focus-feedback"></div>
         </div>

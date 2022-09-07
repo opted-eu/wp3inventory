@@ -983,7 +983,6 @@ ready(() => {
 
             var TomSelectPublicationKindConfig = {
                 plugins: ['remove_button'],
-                create: true,
                 selectOnTab: true,
                 onInitialize: function() { // hacky way of forcing the field to be not-validated on load
                     this.input.classList.remove('is-invalid');
@@ -1002,7 +1001,7 @@ ready(() => {
             new TomSelect('#publication-kind', TomSelectPublicationKindConfig);
 
             var TomSelectTopicalFocusConfig = {
-                create: true,
+                create: false,
                 selectOnTab: true,
                 onInitialize: function() { // hacky way of forcing the field to be not-validated on load
                     this.input.classList.remove('is-invalid');

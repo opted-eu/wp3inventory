@@ -528,14 +528,17 @@ class Source(Entry):
                                 query_label="Special Interest Publication")
     
     topical_focus = MultipleChoice(description="What is the main topical focus of the news source?",
-                                    choices={'politics': 'Politics', 
-                                             'society': 'Society & Panorama', 
+                                    choices={
                                              'economy': 'Business, Economy, Finance & Stocks', 
-                                             'religion': 'Religion', 
-                                             'science': 'Science & Technology', 
-                                             'media': 'Media', 
+                                             'education': 'Education',
                                              'environment': 'Environment', 
-                                             'education': 'Education'},
+                                             'health': 'Health',
+                                             'media': 'Media', 
+                                             'politics': 'Politics', 
+                                             'religion': 'Religion', 
+                                             'society': 'Society & Panorama', 
+                                             'science': 'Science & Technology', 
+                                             },
                                     tom_select=True,
                                     queryable=True)
     
