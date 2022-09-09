@@ -23,6 +23,8 @@ function fetchMetaData(button) {
 
     // clear form
     document.getElementById('form-add-new').reset()
+    for (e of document.getElementsByTagName('input')) { if (e.tomselect) { e.tomselect.clear() } }
+    for (e of document.getElementsByTagName('select')) { if (e.tomselect) { e.tomselect.clear() } }
 
     showSpinner(button)
     let container = document.getElementById('magic-warning-container')
