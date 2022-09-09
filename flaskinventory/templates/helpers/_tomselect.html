@@ -225,7 +225,7 @@ if (embeddedJSON) {
     
     new TomSelect('#authors', {
         create: true, 
-        plugins: ['remove_button'], 
+        plugins: ['remove_button', 'drag_drop'], 
         delimiter: ';',
         render: {
                 no_results:function(data,escape){
