@@ -70,9 +70,9 @@ def guides_newssource():
         title="Guide for adding News Sources",
         meta_description="What is included in this inventory?")
 
-@main.route('/guides/resources')
-def guides_resources():
-    return render_template('guides/resources.html', show_sidebar=True,
+@main.route('/guides/link-collection')
+def link_collection():
+    return render_template('guides/link_collection.html', show_sidebar=True,
         title="Link Collection",
         meta_description="This is a collection of online resources that provide useful background and meta information on the media landscape in Europe. All resources are curated by the Meteor Team (WP3 of the OPTED Consortium) and the list is updated irregularly.")
 
