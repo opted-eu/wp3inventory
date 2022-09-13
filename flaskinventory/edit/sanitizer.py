@@ -31,14 +31,14 @@ class EditAudienceSizeSanitizer(Sanitizer):
         self.is_upsert = True
         self.entry_uid = UID(uid)
 
-        self._check_channel()
+        # self._check_channel()
 
         self.entry = {"uid": self.entry_uid}
         self.entry = self._add_entry_meta(self.entry)
         if type(data) is not list:
             raise InventoryValidationError('Invalid Data Provided.')
-        if len(data) == 0:
-            raise InventoryValidationError('No Data Provided.')
+        # if len(data) == 0:
+        #    raise InventoryValidationError('No Data Provided.')
 
         self.data = data
 
@@ -97,8 +97,10 @@ class EditAudienceSizeSanitizer(Sanitizer):
                         val = int(val)
                     except:
                         raise InventoryValidationError('Wrong data entered! Make sure you only entered whole numbers.')
+                else:
+                    val = str(val).lower()
                 facets[key] = val
             self.entry['audience_size'].append(Scalar(date, facets=facets))
-        if len(self.entry['audience_size']) == 0:
-            raise InventoryValidationError('Invalid Data! None of the provided data points could be parsed.')    
+        # if len(self.entry['audience_size']) == 0:
+        #    raise InventoryValidationError('Invalid Data! None of the provided data points could be parsed.')    
         

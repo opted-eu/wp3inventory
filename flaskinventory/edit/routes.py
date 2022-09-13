@@ -197,9 +197,9 @@ def entry(dgraph_type=None, unique_name=None, uid=None):
         wikidata_form.uid.data = uid
         sidebar_items.update({'actions': {'wikidata': wikidata_form}})
     if dgraph_type == 'Source':
-        if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
-            sidebar_items['actions'] = {'audience_size': url_for(
-                'edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
+        # if entry['q'][0]['channel']['unique_name'] in ['print', 'facebook']:
+        sidebar_items['actions'] = {'audience_size': url_for(
+            'edit.source_audience', uid=entry['q'][0]['uid'], **request.args)}
 
     return render_template('edit/editform.html',
                            title=f'Edit {dgraph_type}',
@@ -221,9 +221,9 @@ def source_audience(uid):
     if not can_edit(check, current_user):
         return abort(403)
 
-    if check['channel']['unique_name'] not in ['print', 'facebook']:
-        flash('You can only edit the audience size for print and Facebook news sources', 'info')
-        return redirect(url_for('edit.source', uid=uid, **request.args))
+    # if check['channel']['unique_name'] not in ['print', 'facebook']:
+    #     flash('You can only edit the audience size for print and Facebook news sources', 'info')
+    #     return redirect(url_for('edit.source', uid=uid, **request.args))
 
     if request.method == 'POST':
         current_app.logger.debug(

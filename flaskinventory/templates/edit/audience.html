@@ -33,7 +33,7 @@ const csrftoken = "{{ csrf_token() }}"
 const endpoint = "{{ url_for('edit.source_audience', uid=entry.get('uid') ) }}"
 
 function editRow(rowNum) {
-    let cells = document.querySelectorAll(`#row-${rowNum} input`)
+    let cells = document.querySelectorAll(`#row-${rowNum} input, #row-${rowNum} select`)
     for (input of cells) {
         input.removeAttribute('disabled')
         input.classList.remove('border-0')
@@ -47,7 +47,25 @@ function addRow() {
     let tr = document.createElement('tr')
     tr.setAttribute('id', 'row-' + rowNum)
     for (col of cols) {
-        let el = document.createElement('input')
+        let el
+        if (col == 'unit') {
+            el = document.createElement('select')
+            el.classList.add("form-select")
+            let selection = document.createElement('option')
+            selection.innerText = "Select unit..."
+            el.append(selection)
+            for (opt of ['copies sold', 'likes', 'followers', 'daily visitors', 'subscribers']) {
+                let o = document.createElement('option')
+                o.value = opt
+                o.innerText = opt
+                el.append(o)
+            }
+        } else {
+            el = document.createElement('input')
+                // type="text" class="form-control" placeholder="Username" name="username">
+            el.setAttribute('type', 'text')
+            el.classList.add('form-control')
+        }
         el.setAttribute('type', 'text')
         el.classList.add('form-control')
         el.setAttribute('name', 'audience_size_' + rowNum + '_' + col)
@@ -110,7 +128,7 @@ function tableToJSON() {
 
     let row = 0
     for (tr of rows) {
-        let inputs = document.querySelectorAll(`#${tr.id} input`)
+        let inputs = document.querySelectorAll(`#${tr.id} input, #${tr.id} select`)
         for (item of inputs) {
             let column = item.getAttribute('column')
             outputArray[row][column] = item.value
@@ -158,27 +176,28 @@ const cols = data.cols
 var rows = data.rows
 
 for (col of cols) {
-    let el = document.createElement('th')
-    el.innerHTML = col.replace('_', ' ')
-    el.setAttribute('scope', 'col')
-    el.setAttribute('id', 'col-' + col)
-    el.classList.add('text-capitalize')
-    htmlcols.append(el)
+    let thead = document.createElement('th')
+    thead.innerHTML = col.replace('_', ' ')
+    thead.setAttribute('scope', 'col')
+    thead.setAttribute('id', 'col-' + col)
+    thead.classList.add('text-capitalize')
+    thead.classList.add('px-3')
+    htmlcols.append(thead)
 };
 
 /* append col for actions */
-let el = document.createElement('th')
-el.innerHTML = 'Actions'
-el.setAttribute('scope', 'col')
-el.setAttribute('id', 'col-' + 'action')
-htmlcols.append(el)
+let thead = document.createElement('th')
+thead.innerHTML = 'Actions'
+thead.setAttribute('scope', 'col')
+thead.setAttribute('id', 'col-' + 'action')
+htmlcols.append(thead)
 
 /* append cols in footer */
 for (let i = 0; i < cols.length; i++) {
     let addRowBtn = document.getElementById('addRow').parentElement
     let footerRow = addRowBtn.parentElement
-    let el = document.createElement('td')
-    footerRow.insertBefore(el, addRowBtn)
+    let td = document.createElement('td')
+    footerRow.insertBefore(td, addRowBtn)
 
 }
 
@@ -207,13 +226,31 @@ if (rows.length == 0) {
     /* populate blank rows */
     let i = 0
     for (item of rows) {
+        console.log(item)
         for (key of Object.keys(item)) {
+            console.log(key)
             let td = document.querySelector(`#row-${i} td[data-cell="${key}"]`)
                 // el.innerHTML = item[key]
-            let el = document.createElement('input')
-                // type="text" class="form-control" placeholder="Username" name="username">
-            el.setAttribute('type', 'text')
-            el.classList.add('form-control')
+            let el
+            if (key == 'unit') {
+                el = document.createElement('select')
+                el.classList.add("form-select")
+                let selection = document.createElement('option')
+                selection.innerText = "Select unit..."
+                el.append(selection)
+                for (opt of ['copies sold', 'likes', 'followers', 'daily visitors', 'subscribers']) {
+                    let o = document.createElement('option')
+                    o.value = opt
+                    o.innerText = opt
+                    el.append(o)
+                }
+            } else {
+                el = document.createElement('input')
+                    // type="text" class="form-control" placeholder="Username" name="username">
+                el.setAttribute('type', 'text')
+                el.classList.add('form-control')
+            }
+            console.log(el)
             el.classList.add('border-0')
             el.classList.add('bg-transparent')
             el.setAttribute('name', 'audience_size_' + i + '_' + key)
