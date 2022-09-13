@@ -261,7 +261,6 @@ class Sanitizer:
 
             if key in self.facets.keys():
                 facets = self.facets[key]
-                print(facets)
             else:
                 facets = None
 

@@ -226,9 +226,7 @@ if (rows.length == 0) {
     /* populate blank rows */
     let i = 0
     for (item of rows) {
-        console.log(item)
         for (key of Object.keys(item)) {
-            console.log(key)
             let td = document.querySelector(`#row-${i} td[data-cell="${key}"]`)
                 // el.innerHTML = item[key]
             let el
@@ -250,7 +248,6 @@ if (rows.length == 0) {
                 el.setAttribute('type', 'text')
                 el.classList.add('form-control')
             }
-            console.log(el)
             el.classList.add('border-0')
             el.classList.add('bg-transparent')
             el.setAttribute('name', 'audience_size_' + i + '_' + key)
