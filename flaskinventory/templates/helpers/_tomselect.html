@@ -299,9 +299,10 @@ if (embeddedJSON) {
 
     {% elif field.type ==  "TomSelectMultipleField" %}
 
+    let tsCreate{{ field.id }} = document.getElementById('{{ field.id }}').hasAttribute('data-ts-create')
     new TomSelect('#{{ field.id.replace('.', '\\\.').replace('~', '\\\~').replace('|', '\\\|') }}', 
     {
-        create: false, 
+        create: tsCreate{{ field.id }}, 
         plugins: ['remove_button', 'clear_button'], 
         hidePlaceholder: true,
         onItemAdd:function(){ // clear input after item was selected

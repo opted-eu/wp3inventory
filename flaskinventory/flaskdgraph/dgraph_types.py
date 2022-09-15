@@ -627,6 +627,7 @@ class ReverseRelationship(_PrimitivePredicate):
         self._target_predicate = predicate_name
         self.predicate = predicate_name
         self.allow_new = allow_new
+        self.render_kw.update({'data-ts-create': allow_new})
 
         self.default_predicates = default_predicates
 
@@ -788,6 +789,7 @@ class MutualRelationship(_PrimitivePredicate):
         self.relationship_constraint = relationship_constraint
 
         self.allow_new = allow_new
+        self.render_kw.update({'data-ts-create': allow_new})
 
         # if we want the form field to show all choices automatically.
         self.autoload_choices = autoload_choices
@@ -1273,6 +1275,9 @@ class SingleRelationship(Predicate):
         self.choices_tuples = []
 
         super().__init__(*args, **kwargs)
+        
+        # hook for Tom-Select to decide whether new entries should be allowed
+        self.render_kw.update({'data-ts-create': allow_new})
 
     def validate(self, data, facets=None) -> Union[UID, NewID, dict]:
         if data == '':
