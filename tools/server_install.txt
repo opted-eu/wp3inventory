@@ -108,25 +108,33 @@ sudo service flaskinventory start
 
 ```
 server {
+        if ($http_user_agent ~* "SemrushBot|Semrush|AhrefsBot|Barkrowler|DotBot|DataForSeoBot|Adsbot|IonCrawl|YandexBot") {
+                return 403;
+                }
         listen 80;
         server_name meteor.opted.eu wp3.opted.eu a493-server1.pub.univie.ac.at;
         return 301 https://meteor.opted.eu$request_uri;
         }
 
 server {
+        if ($http_user_agent ~* "SemrushBot|Semrush|AhrefsBot|Barkrowler|DotBot|DataForSeoBot|Adsbot|IonCrawl|YandexBot") {
+                return 403;
+        }
         listen 443 ssl;
-        ssl_certificate/etc/ssl/certificate.cer;
-        ssl_certificate_key/etc/ssl/private/key.key;
+        ssl_certificate /etc/ssl/wp3_opted_eu_cert.cer;
+        ssl_certificate_key /etc/ssl/private/wp3.opted.eu.key;
         server_name wp3.opted.eu a493-server1.pub.univie.ac.at;
         return 301 https://meteor.opted.eu$request_uri;
         }
 
-
 server {
+        if ($http_user_agent ~* "SemrushBot|Semrush|AhrefsBot|Barkrowler|DotBot|DataForSeoBot|Adsbot|IonCrawl|YandexBot") {
+                return 403;
+        }
         listen 443 ssl;
-        ssl_certificate /etc/ssl/certificate.cer;
-        ssl_certificate_key /etc/ssl/private/key.key;
-        server_name meteor.opted.eu wp3.opted.eu a493-server1.pub.univie.ac.at;
+        ssl_certificate /etc/ssl/meteor_opted_eu_cert.cer;
+        ssl_certificate_key /etc/ssl/private/wp3.opted.eu.key;
+        server_name meteor.opted.eu;
 
         location / {
                 include proxy_params;
@@ -137,9 +145,10 @@ server {
                 include /etc/nginx/mime.types;
                 root /home/ava/wp3inventory/flaskinventory;
         }
-        
+
         location /favicon.ico {
                 alias /home/ava/wp3inventory/flaskinventory/static/favicon.ico;
         }
+
 }
 ```
