@@ -19,7 +19,7 @@ pyjwt
 Jinja2
 MarkupSafe
 Pillow
-protobuf==3.20.0
+protobuf==3.20.2
 pycparser
 pydgraph
 python-dateutil
