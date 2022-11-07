@@ -641,7 +641,7 @@ class Sanitizer:
         if profile.get('followers'):
             facets = {'count': int(
                 profile['followers']),
-                'unit': 'followes'}
+                'unit': 'followers'}
             self.entry['audience_size'] = Scalar(
                 str(datetime.date.today()), facets=facets)
         self.entry['verified_account'] = profile['verified']
