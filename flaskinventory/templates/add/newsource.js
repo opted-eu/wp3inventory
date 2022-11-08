@@ -1420,8 +1420,15 @@ function setFieldValidity(field) {
 
 // submit form
 
+function filterEmpty(k, v) {
+    if (String(v) === v) {
+        return v != ""
+    } else if (Array.isArray(v)) {
+        return v[0] != ""
+    }
+}
+
 function serializeForm(f) {
-    var obj = {};
     var formData = new FormData(f);
 
     var obj = Object.fromEntries(
@@ -1432,7 +1439,8 @@ function serializeForm(f) {
     )
 
     // remove empty strings
-    var obj = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != ""));
+    obj = Object.fromEntries(Object.entries(obj).filter(([k, v]) => filterEmpty(k,v)));
+
     obj['entry_review_status'] = 'pending'
     return obj;
 };
