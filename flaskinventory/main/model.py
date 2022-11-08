@@ -510,7 +510,8 @@ class Source(Entry):
                     queryable=True)
 
     publication_kind = MultipleChoice(description='What label or labels describe the main source?',
-                                      choices={'newspaper': 'Newspaper / News Site', 
+                                      choices={'newspaper': 'Newspaper', 
+                                                'news site': 'News Site',
                                                 'news agency': 'News Agency', 
                                                 'magazine': 'Magazine', 
                                                 'tv show': 'TV Show / TV Channel', 
