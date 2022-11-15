@@ -111,9 +111,13 @@ def build_query_string(query: dict, public=True) -> str:
     if len(cleaned_query) == 0 and len(filters) == 0:
         return False
 
+    # these are the default predicates that we ALWAYS want to return
+    # should be moved outside the function and declared as a setting
     query_parts = ['uid', 'unique_name', 'name', 'dgraph.type',
                    'authors @facets', 'other_names', 'published_date']
+
     query_parts_total = ['count(uid)']
+
     if public:
         filters.append('eq(entry_review_status, "accepted")')
 
@@ -123,7 +127,7 @@ def build_query_string(query: dict, public=True) -> str:
         # check if we have a non-default operator
         operator = operators.get(predicate.predicate, None)
 
-        # check if we have a non-default operator
+        # check if we have a non-default connector
         connector = connectors.get(predicate.predicate, None)
 
         # Let the predicate object generate the filter query part
@@ -171,12 +175,14 @@ def build_query_string(query: dict, public=True) -> str:
 
     filters = " AND ".join(filters)
 
-    # make sure predicates are always queried
+    # make sure these default predicates are always queried
+    # should be moved outside of this function and made as a setting
     if "country" not in _cleaned_query:
         query_parts.append('country { uid name unique_name }')
     if "channel" not in _cleaned_query:
         query_parts.append('channel { uid name unique_name }')
 
+    # handle facets
     query_parts = list(set(query_parts))
     if len(facets.keys()) > 0:
         cascade = list(set([facet.predicate for facet in facets]))

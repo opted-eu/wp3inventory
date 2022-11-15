@@ -126,14 +126,22 @@ def query():
             # remove empty fields
             if v[0] != '':
                 r[k] = v
-        r.pop('csrf_token')
-        r.pop('submit')
+        try:
+            # in testing environments CSRF tokens are disabled
+            r.pop('csrf_token')
+            r.pop('submit')
+        except:
+            pass
         return redirect(url_for("view.query", **r))
     total = None
     result = None
     pages = 1
     r = {k: v for k, v in request.args.to_dict(
         flat=False).items() if v[0] != ''}
+    try:
+        json_output = r.pop('json')
+    except:
+        json_output = False
     if len(r) > 0:
         query_string = build_query_string(r)
         if query_string:
@@ -173,6 +181,13 @@ def query():
     form = generate_query_forms(dgraph_types=['Source', 'Organization', 'Tool', 'Archive', 'Dataset', 'Corpus'],
                                 populate_obj=request.args)
 
+    if json_output:
+        j_result = {'_status': 200, 
+                    '_page': current_page, 
+                    '_total_pages': pages, 
+                    '_total_results': total or 0, 
+                    'result': result or []}
+        return jsonify(j_result)
     return render_template("query/index.html", form=form, result=result, r_args=r_args, total=total, pages=pages, current_page=current_page)
 
 
