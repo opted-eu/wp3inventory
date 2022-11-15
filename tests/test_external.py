@@ -102,6 +102,13 @@ class TestSanitizers(unittest.TestCase):
             feeds = external.find_feeds(website)
             self.assertGreaterEqual(len(feeds), 1)
 
+    def test_feeds(self):
+        sites = ["https://www.tagesschau.de/", "https://www.krone.at/", "https://www.nzz.ch/"]
+        with self.app.app_context():
+            for site in sites:
+                external.find_feeds(site)
+                external.find_sitemaps(site)
+
     def test_twitter(self):
         handle = "heiseonline"
         with self.app.app_context():
