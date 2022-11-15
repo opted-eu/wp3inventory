@@ -42,6 +42,7 @@ class Config:
     SLACK_LOGGING_ENABLED = False
     SLACK_WEBHOOK = None
 
+
 class TestQueries(unittest.TestCase):
 
     @classmethod
@@ -89,117 +90,208 @@ class TestQueries(unittest.TestCase):
         with self.client:
             response = self.client.post(
                 '/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
+            assert response.status_code == 302
+            assert "profile" in response.location
 
     def tearDown(self):
-        # with self.client:
-        #     self.client.get('/logout')
-        pass
+        with self.client:
+            self.client.get('/logout')
 
     def test_query_builder(self):
+        query = {'languages': ['de'],
+                 'channel': [self.channel_print],
+                 'email': ["wp3@opted.eu"],
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 3)
+
+        query = {'languages': ['de', 'en'],
+                 'languages*connector': ['OR'],
+                 'channel': [self.channel_website],
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 2)
+
+        query = {'country': [self.austria_uid, self.germany_uid],
+                 'country*connector': ['AND'],
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 1)
+
+        query = {'country': [self.switzerland_uid, self.germany_uid],
+                 'country*connector': ['OR'],
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 1)
+
+        query = {'dgraph.type': ['ResearchPaper'],
+                 'published_date': [2010],
+                 'published_date*operator': ['gt']
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 1)
+
+        query = {'dgraph.type': ['Source'],
+                 'audience_size|count': [300000],
+                 'audience_size|count*operator': ['lt']
+                 }
+
+        query_string = build_query_string(query)
+        res = dgraph.query(query_string)
+        self.assertEqual(res['total'][0]['count'], 4)
+
+    def test_query_route_post(self):
         if self.verbatim:
-            print('-- test_query_builder() --\n')
+            print('-- test_query_route() --\n')
 
         with self.client as c:
-            # response = c.get('/query/development?languages=de&channel=0x2713&email=wp3@opted.eu')
-            # pprint(response.json)
-            query_string = {'languages': ['de', 'en'],
-                            'channel': self.channel_print,
-                            'email': "wp3@opted.eu"
-                        }
+            query = {'languages': ['de', 'en'],
+                     'languages*connector': ['OR'],
+                     'channel': self.channel_print,
+                     'email': "wp3@opted.eu",
+                     'json': True
+                     }
 
-            response = c.get('/query/development/json', query_string=query_string)
-            req_dict = request.args.to_dict(flat=False)
-            # print(req_dict)
-            self.assertCountEqual(req_dict['languages'], ['en', 'de'])
-            # pprint(response.json)
-            response = c.get(f'/query/development?languages=de&channel={self.channel_print}&channel={self.channel_website}')
-            # pprint(response.json)
+            response = c.post('/query', data=query,
+                              follow_redirects=True)
 
+            self.assertEqual(response.json['_total_results'], 3)
 
-    # different predicates are combined with AND operators
-    # e.g., publication_kind == "newspaper" AND geographic_scope == "national"
+    def test_private_predicates(self):
+        if self.verbatim:
+            print('-- test_private_predicates() --\n')
+
+        with self.client as c:
+            query = {'email': "wp3@opted.eu",
+                     'json': True
+                     }
+
+            response = c.post('/query', data=query,
+                              follow_redirects=True)
+
+            self.assertEqual(response.json['_total_results'], 0)
+
+            query = {'user_displayname': "Contributor",
+                     'json': True
+                     }
+
+            response = c.post('/query', data=query,
+                              follow_redirects=True)
+
+            self.assertEqual(response.json['_total_results'], 0)
+
     def test_different_predicates(self):
         if self.verbatim:
             print('-- test_different_predicates() --\n')
 
         with self.client as c:
-            query_string = {"languages": ["de"],
-                            "publication_kind": "alternative media",
-                            "channel": self.channel_print}
+            query = {"languages": ["de"],
+                     "publication_kind": "alternative media",
+                     "channel": self.channel_print,
+                     'json': True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], "direkt_print")
+            response = c.get('/query',
+                             query_string=query)
 
-            query_string = {"publication_kind": "newspaper",
-                            "channel": self.channel_website,
-                            "country": self.austria_uid}
+            self.assertEqual(response.json['result'][0]['unique_name'], "direkt_print")
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], "www.derstandard.at")
+            query = {"publication_kind": "newspaper",
+                     "channel": self.channel_website,
+                     "country": self.austria_uid,
+                     "json": True}
 
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], "www.derstandard.at")
+
+    def test_same_scalar_predicates(self):
     # same Scalar predicates are combined with OR operators
     # e.g., payment_model == "free" OR payment_model == "partly free"
-    def test_same_scalar_predicates(self):
         if self.verbatim:
             print('-- test_same_scalar_predicates() --\n')
 
         with self.client as c:
             # German that is free OR partly for free
-            query_string = {"languages": ["de"],
-                            "payment_model": ["free", "partly free"]
-                            }
+            query = {"languages": ["de"],
+                     "payment_model": ["free", "partly free"],
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], "www.derstandard.at")
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], "www.derstandard.at")
 
             # English that is free OR partly for free
-            query_string = {"languages": ["en"],
-                            "payment_model": ["free", "partly free"]
-                            }
+            query = {"languages": ["en"],
+                     "payment_model": ["free", "partly free"],
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], "globalvoices_org_website")
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], "globalvoices_org_website")
 
             # Free or partly for free IN Germany, but in English
-            query_string = {"languages": ["en"],    
-                            "payment_model": ["free", "partly free"],
-                            "country": self.germany_uid
-                            }
+            query = {"languages": ["en"],
+                     "payment_model": ["free", "partly free"],
+                     "country": self.germany_uid,
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 0)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 0)
 
             # twitter OR instagram IN austria
-            query_string = {"channel": [self.channel_twitter, self.channel_instagram],
-                            "country": self.austria_uid
-                            }
+            query = {"channel": [self.channel_twitter, self.channel_instagram],
+                     "country": self.austria_uid,
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 2)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 2)
 
-
+    def test_same_list_predicates(self):
     # same List predicates are combined with AND operators
     # e.g., languages == "en" AND languages == "de"
-    def test_same_list_predicates(self):
         if self.verbatim:
             print('-- test_same_list_predicates() --\n')
 
         with self.client as c:
             # English AND German speaking that is either free or partly free
-            query_string = {"languages": ["de", "en"],
-                            "payment_model": ["free", "partly free"]
-                            }
+            query = {"languages": ["de", "en"],
+                     "payment_model": ["free", "partly free"],
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 0)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 0)
 
             # English AND Hungarian speaking that is either free or partly free
-            query_string = {"languages": ["en", "hu"],
-                            "payment_model": ["free", "partly free"]
-                            }
+            query = {"languages": ["en", "hu"],
+                     "payment_model": ["free", "partly free"],
+                     "json": True
+                     }
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], "globalvoices_org_website")
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], "globalvoices_org_website")
 
     def test_date_predicates(self):
         if self.verbatim:
@@ -207,94 +299,106 @@ class TestQueries(unittest.TestCase):
 
         with self.client as c:
             # Founded by exact year
-            query_string = {"founded": ["1995"]}
+            query = {"founded": ["1995"],
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 2)
-            
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 2)
 
             # Founded in range
-            query_string = {"founded": ["1990", "2000"]}
+            query = {"founded": ["1990", "2000"],
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 4)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 4)
 
             # Founded before year
-            query_string = {"founded": ["2000"],
-                            "founded*operator": 'lt'}
+            query = {"founded": ["2000"],
+                     "founded*operator": 'lt',
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 6)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 6)
 
             # Founded after year
-            query_string = {"founded": ["2000"],
-                            "founded*operator": 'gt'}
+            query = {"founded": ["2000"],
+                     "founded*operator": 'gt',
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 5)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 5)
 
-
-            # self.assertEqual(len(response.json), 0)
+            # self.assertEqual(len(response.json['result']), 0)
 
     def test_boolean_predicates(self):
         if self.verbatim:
             print('-- test_boolean_predicates() --\n')
         with self.client as c:
             # verified social media account
-            query_string = {"verified_account": True}
+            query = {"verified_account": True,
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 3)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 3)
 
-            query_string = {"verified_account": 'true'}
+            query = {"verified_account": 'true',
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 3)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 3)
 
-    
     def test_integer_predicates(self):
         if self.verbatim:
             print('-- test_integer_predicates() --\n')
         # No queryable integer predicate in current data model
         # with self.client as c:
-        #     query_string = {"publication_cycle_weekday": 3}
+        #     query = {"publication_cycle_weekday": 3}
 
-        #     response = c.get(f'/query/development/json', query_string=query_string)
-        #     self.assertEqual(response.json[0]['unique_name'], 'falter_print')
-
+        #     response = c.get('/query', query_string=query)
+        #     self.assertEqual(response.json['result'][0]['unique_name'], 'falter_print')
 
     def test_facet_filters(self):
         if self.verbatim:
             print('-- test_facet_filters() --\n')
         with self.client as c:
-            query_string = {"audience_size|papers_sold": 52000,
-                            "audience_size|papers_sold*operator": 'gt',
-                            "audience_size|unit": "papers sold",
-                            "audience_size|count": 52000,
-                            "audience_size|count*operator": 'gt'}
+            query = {"audience_size|unit": "copies sold",
+                     "audience_size|count": 52000,
+                     "audience_size|count*operator": 'gt',
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(response.json[0]['unique_name'], 'derstandard_print')
+            response = c.get('/query',
+                             query_string=query)
+            print(response.json)
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], 'derstandard_print')
 
-            # TODO: arbitrary filtering for facets:
-            # papers_sold / copies_sold / followers ????
 
     def test_type_filters(self):
         if self.verbatim:
             print('-- test_type_filters() --\n')
-        
+
         with self.client as c:
-            query_string = {"dgraph.type": "Source",
-                            "country": self.germany_uid}
+            query = {"dgraph.type": "Source",
+                     "country": self.germany_uid,
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 1)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 1)
 
-            query_string = {"dgraph.type": ["Source", "Organization"],
-                            "country": self.austria_uid}
+            query = {"dgraph.type": ["Source", "Organization"],
+                     "country": self.austria_uid,
+                     "json": True}
 
-            response = c.get(f'/query/development/json', query_string=query_string)
-            self.assertEqual(len(response.json), 11)
+            response = c.get('/query',
+                             query_string=query)
+            self.assertEqual(len(response.json['result']), 11)
 
 
 if __name__ == "__main__":
