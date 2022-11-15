@@ -1,12 +1,11 @@
 #  Ugly hack to allow absolute import from the root folder
 # whatever its name is. Please forgive the heresy.
 
-if __name__ == "__main__" and __package__ is None:
+if __name__ == "__main__":
     from sys import path
     from os.path import dirname
 
     path.append(dirname(path[0]))
-    __package__ = "examples"
 
 from flaskinventory.main.model import Source
 from flaskinventory.flaskdgraph import Schema
@@ -203,7 +202,8 @@ class TestQueries(unittest.TestCase):
             response = c.get('/query',
                              query_string=query)
 
-            self.assertEqual(response.json['result'][0]['unique_name'], "direkt_print")
+            self.assertEqual(
+                response.json['result'][0]['unique_name'], "direkt_print")
 
             query = {"publication_kind": "newspaper",
                      "channel": self.channel_website,
@@ -216,8 +216,8 @@ class TestQueries(unittest.TestCase):
                 response.json['result'][0]['unique_name'], "www.derstandard.at")
 
     def test_same_scalar_predicates(self):
-    # same Scalar predicates are combined with OR operators
-    # e.g., payment_model == "free" OR payment_model == "partly free"
+        # same Scalar predicates are combined with OR operators
+        # e.g., payment_model == "free" OR payment_model == "partly free"
         if self.verbatim:
             print('-- test_same_scalar_predicates() --\n')
 
@@ -266,8 +266,8 @@ class TestQueries(unittest.TestCase):
             self.assertEqual(len(response.json['result']), 2)
 
     def test_same_list_predicates(self):
-    # same List predicates are combined with AND operators
-    # e.g., languages == "en" AND languages == "de"
+        # same List predicates are combined with AND operators
+        # e.g., languages == "en" AND languages == "de"
         if self.verbatim:
             print('-- test_same_list_predicates() --\n')
 
@@ -374,10 +374,8 @@ class TestQueries(unittest.TestCase):
 
             response = c.get('/query',
                              query_string=query)
-            print(response.json)
             self.assertEqual(
                 response.json['result'][0]['unique_name'], 'derstandard_print')
-
 
     def test_type_filters(self):
         if self.verbatim:
