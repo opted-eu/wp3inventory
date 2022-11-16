@@ -2,12 +2,11 @@
 #  Ugly hack to allow absolute import from the root folder
 # whatever its name is. Please forgive the heresy.
 
-if __name__ == "__main__" and __package__ is None:
+if __name__ == "__main__":
     from sys import path
     from os.path import dirname
 
     path.append(dirname(path[0]))
-    __package__ = "examples"
 
 from pprint import pprint
 from datetime import datetime
@@ -59,6 +58,10 @@ class MockUser(User):
 
 
 class TestSanitizers(unittest.TestCase):
+
+    """
+        Test Cases for Sanitizer classes
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -141,28 +144,7 @@ class TestSanitizers(unittest.TestCase):
         with self.client:
             self.client.get('/logout')
 
-    def _test_login(self):
-        # print('-- test_login() --\n')
-
-        with self.client:
-            response = self.client.post(
-                '/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
-            self.assertEqual(current_user.user_displayname, 'Contributor')
-            self.client.get('/logout')
-
-        with self.client:
-            response = self.client.post(
-                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
-            self.assertEqual(current_user.user_displayname, 'Reviewer')
-            self.client.get('/logout')
-
-        with self.client:
-            response = self.client.post(
-                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
-            self.assertEqual(current_user.user_displayname, 'Admin')
-            self.client.get('/logout')
-
-    def _test_new_entry(self):
+    def test_new_entry(self):
         # print('-- test_new_entry() --\n')
 
         with self.client:
@@ -191,7 +173,7 @@ class TestSanitizers(unittest.TestCase):
             self.assertRaises(InventoryPermissionError,
                               Sanitizer, self.mock_data2)
 
-    def _test_list_facets(self):
+    def test_list_facets(self):
         mock_data = {
             'name': 'Test',
             'other_names': 'Jay Jay,Jules,JB',
@@ -207,9 +189,39 @@ class TestSanitizers(unittest.TestCase):
 
             with self.app.app_context():
                 sanitizer = Sanitizer(mock_data)
-                pprint(sanitizer.entry)
+                # get rid of regular str entries
+                sanitizer.entry['other_names'] = [
+                    scalar for scalar in sanitizer.entry['other_names'] if not isinstance(scalar, str)]
 
-    def _test_edit_entry(self):
+                # assert we have all three as scalar with the correct attribute
+                self.assertIsInstance(
+                    sanitizer.entry['other_names'][0], Scalar)
+                self.assertTrue(
+                    hasattr(sanitizer.entry['other_names'][0], "facets"))
+                self.assertEqual(sanitizer.entry['other_names'][0].facets, {
+                                 'kind': 'first'})
+                self.assertIn(
+                    '<other_names> "Jay Jay" (kind="first")', sanitizer.set_nquads)
+
+                self.assertIsInstance(
+                    sanitizer.entry['other_names'][1], Scalar)
+                self.assertTrue(
+                    hasattr(sanitizer.entry['other_names'][1], "facets"))
+                self.assertEqual(sanitizer.entry['other_names'][1].facets, {
+                                 'kind': 'official'})
+                self.assertIn(
+                    '<other_names> "Jules" (kind="official")', sanitizer.set_nquads)
+
+                self.assertIsInstance(
+                    sanitizer.entry['other_names'][2], Scalar)
+                self.assertTrue(
+                    hasattr(sanitizer.entry['other_names'][2], "facets"))
+                self.assertEqual(sanitizer.entry['other_names'][2].facets, {
+                                 'kind': 'CS-GO'})
+                self.assertIn('<other_names> "JB" (kind="CS-GO")',
+                              sanitizer.set_nquads)
+
+    def test_edit_entry(self):
         # print('-- test_edit_entry() --\n')
 
         with self.client:
@@ -251,7 +263,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertCountEqual(
                     sanitizer.overwrite[sanitizer.entry_uid], ['other_names'])
 
-    def _test_new_org(self):
+    def test_new_org(self):
         # print('-- test_new_org() --\n')
 
         with self.client:
@@ -285,8 +297,9 @@ class TestSanitizers(unittest.TestCase):
                 self.assertIsNotNone(sanitizer.set_nquads)
                 self.assertIsNone(sanitizer.delete_nquads)
 
-    def _test_edit_org(self):
-        overwrite_keys = ['country', 'publishes']
+    def test_edit_org(self):
+        overwrite_keys = ['country', 'publishes',
+                          'is_person', 'founded', 'address_string']
 
         mock_org_edit = {
             "uid": self.derstandard_mbh_uid,
@@ -312,7 +325,6 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 sanitizer = Sanitizer.edit(
                     mock_org_edit, dgraph_type=Organization)
-                # self.assertEqual(type(sanitizer.entry['founded']), datetime)
                 self.assertCountEqual(
                     sanitizer.overwrite[sanitizer.entry['uid']], overwrite_keys)
                 self.assertEqual(len(sanitizer.entry['publishes']), 5)
@@ -327,7 +339,7 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
                 # self.assertEqual(type(sanitizer.entry['founded']), datetime)
 
-    def test_new_source(self):
+    def _test_new_source(self):
 
         test_draft = {'uid': '0x7a244', 'channel': self.channel_website, 'channel_unique_name': 'website', 'name': 'https://www.schwaebische-post.de/', 'website_allows_comments': 'yes', 'website_comments_registration_required': 'no', 'founded': '2000', 'publication_kind': 'newspaper', 'special_interest': 'no', 'publication_cycle': 'continuous',
                       'geographic_scope': 'subnational', 'country': self.germany_uid, 'languages': 'de', 'payment_model': 'partly free', 'contains_ads': 'non subscribers', 'publishes_org': self.derstandard_mbh_uid, 'related': [self.falter_print_uid], 'entry_review_status': 'pending'}
@@ -476,10 +488,8 @@ class TestSanitizers(unittest.TestCase):
             self.assertEqual(current_user.user_displayname, 'Admin')
 
             with self.app.app_context():
-                Source.country.get_choices()
-                Organization.country.get_choices()
-                Source.publishes_org
-                sanitizer = Sanitizer(test_draft, dgraph_type=Source)
+               
+                sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
                 # pprint(sanitizer.entry)
                 # pprint(sanitizer.related_entries)
                 print(sanitizer.set_nquads)
