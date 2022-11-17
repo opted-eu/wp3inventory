@@ -339,10 +339,44 @@ class TestSanitizers(unittest.TestCase):
                 self.assertEqual(len(sanitizer.entry['publishes']), 4)
                 # self.assertEqual(type(sanitizer.entry['founded']), datetime)
 
-    def _test_new_source(self):
+    def test_draft_source(self):
+
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
+            self.assertEqual(current_user.user_displayname, 'Admin')
+
+            with self.app.app_context():
+                dgraph.update_entry
+
+
 
         test_draft = {'uid': '0x7a244', 'channel': self.channel_website, 'channel_unique_name': 'website', 'name': 'https://www.schwaebische-post.de/', 'website_allows_comments': 'yes', 'website_comments_registration_required': 'no', 'founded': '2000', 'publication_kind': 'newspaper', 'special_interest': 'no', 'publication_cycle': 'continuous',
                       'geographic_scope': 'subnational', 'country': self.germany_uid, 'languages': 'de', 'payment_model': 'partly free', 'contains_ads': 'non subscribers', 'publishes_org': self.derstandard_mbh_uid, 'related': [self.falter_print_uid], 'entry_review_status': 'pending'}
+
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
+            self.assertEqual(current_user.user_displayname, 'Admin')
+
+            with self.app.app_context():
+               
+                sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+                # pprint(sanitizer.related_entries)
+                print(sanitizer.set_nquads)
+                # print(sanitizer.delete_nquads)
+                # print('---------')
+                # print(sanitizer.set_nquads)
+                # sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+                # sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+                # sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
+                # pprint(sanitizer.entry)
+
+
+    def test_new_source(self):
 
         mock_website = {
             "channel_unique_name": "website",
@@ -482,27 +516,7 @@ class TestSanitizers(unittest.TestCase):
                          'related': ['0x704f8', 'some related source'],
                          'newsource_some related source': '0x704e9'}
 
-        with self.client:
-            response = self.client.post(
-                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
-            self.assertEqual(current_user.user_displayname, 'Admin')
-
-            with self.app.app_context():
-               
-                sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # pprint(sanitizer.related_entries)
-                print(sanitizer.set_nquads)
-                # print(sanitizer.delete_nquads)
-                # print('---------')
-                # print(sanitizer.set_nquads)
-                # sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-
+        
 
 if __name__ == "__main__":
     unittest.main()
