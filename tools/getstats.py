@@ -19,12 +19,14 @@ query_total_entries = """
 } """
 
 query_sources = """
+query get_sources($maximum: int, $offset: int)
 {
 	sources(func: type("Source"), first: $maximum, offset: $offset) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
         uid expand(_all_) { uid unique_name country_code opted_scope }
     }
 } """
 query_organizations = """
+query get_organizations($maximum: int, $offset: int)
 {
     organizations(func: type("Organization"), first: $maximum, offset: $offset) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
         uid expand(_all_) { uid unique_name country_code }
