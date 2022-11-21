@@ -44,7 +44,7 @@ total_sources = total['sources'][0]['total']
 total_organizations = total['sources'][0]['total']
 results_maximum = 1000
 offset = 0
-variables = {'$maximum': results_maximum, '$offset': offset}
+variables = {'$maximum': str(results_maximum), '$offset': ""}
 
 pages_sources = math.ceil(total_sources / results_maximum)
 pages_organizations = math.ceil(total_sources / results_maximum)
@@ -52,11 +52,12 @@ pages_organizations = math.ceil(total_sources / results_maximum)
 sources = []
 
 for i in range(1, pages_sources + 1):
+    variables['$offset'] = str(offset)
     res = client.txn(read_only=True).query(query_sources, variables=variables)
     raw = json.loads(res.json)
 
     sources += raw['sources']
-    variables['offset'] += results_maximum
+    offset += results_maximum
 
 
 output = Path.home() / f'sources_dump_{date.today()}.json'
@@ -96,17 +97,18 @@ df.to_csv(output)
 ## Organizations
 results_maximum = 1000
 offset = 0
-variables = {'$maximum': results_maximum, '$offset': offset}
+variables = {'$maximum': str(results_maximum), '$offset': ""}
 
 organizations = []
 
 for i in range(1, pages_organizations + 1):
-    res = client.txn(read_only=True).query(query_sources, variables=variables)
+    variables['$offset'] = str(offset)
+    res = client.txn(read_only=True).query(query_organizations, variables=variables)
     raw = json.loads(res.json)
 
     organizations += raw['organizations']
 
-    variables['offset'] += results_maximum
+    offset += results_maximum
 
 output = Path.home() / f'organizations_dump_{date.today()}.json'
 
