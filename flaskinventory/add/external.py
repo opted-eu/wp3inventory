@@ -147,17 +147,11 @@ def find_feeds(site: str) -> list:
     if site.endswith('/'):
         site = site[:-1]
 
-    headers = {"user-agent":
-               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"}
-
     # first: naive approach
     try:
-        r = requests.get(site + '/rss', headers=headers, verify=False)
+        r = perform_request(site + '/rss')
         if 'xml' in r.headers['Content-Type'] or 'rss' in r.headers['Content-Type']:
             return [site + '/rss']
-    except requests.exceptions.SSLError:
-        site = site.replace('https', 'http')
-        r = requests.get(site, verify=False)
     except Exception:
         pass
 
