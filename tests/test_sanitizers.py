@@ -341,40 +341,86 @@ class TestSanitizers(unittest.TestCase):
 
     def test_draft_source(self):
 
+        test_draft = {'uid': '_:newdraft',
+                      'dgraph.type': 'Source',
+                      'channel': {'uid': self.channel_website},
+                      'name': 'https://www.schwaebische-post.de/',
+                      'publication_kind': 'newspaper',
+                      'geographic_scope': 'subnational',
+                      'country': {'uid': self.germany_uid},
+                      'languages': 'de',
+                      'entry_review_status': 'draft',
+                      'entry_added': {'uid': self.reviewer.uid}}
+
+        # create a mock draft entry
         with self.client:
             response = self.client.post(
-                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
-            self.assertEqual(current_user.user_displayname, 'Admin')
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
 
             with self.app.app_context():
-                dgraph.update_entry
+                res = dgraph.mutation(test_draft)
+                # get the UID of the mock draft
+                uid = res.uids['newdraft']
 
+            self.client.get('/logout')
 
+        test_draft = {'uid': uid,
+                      'channel': self.channel_website,
+                      'channel_unique_name': 'website',
+                      'name': 'https://www.schwaebische-post.de/',
+                      'website_allows_comments': 'yes',
+                      'website_comments_registration_required': 'no',
+                      'founded': '2000',
+                      'publication_kind': 'newspaper',
+                      'special_interest': 'no',
+                      'publication_cycle': 'continuous',
+                      'geographic_scope': 'subnational',
+                      'country': self.germany_uid,
+                      'languages': 'de',
+                      'payment_model': 'partly free',
+                      'contains_ads': 'non subscribers',
+                      'publishes_org': self.derstandard_mbh_uid,
+                      'related': [self.falter_print_uid],
+                      'entry_review_status': 'pending'}
 
-        test_draft = {'uid': '0x7a244', 'channel': self.channel_website, 'channel_unique_name': 'website', 'name': 'https://www.schwaebische-post.de/', 'website_allows_comments': 'yes', 'website_comments_registration_required': 'no', 'founded': '2000', 'publication_kind': 'newspaper', 'special_interest': 'no', 'publication_cycle': 'continuous',
-                      'geographic_scope': 'subnational', 'country': self.germany_uid, 'languages': 'de', 'payment_model': 'partly free', 'contains_ads': 'non subscribers', 'publishes_org': self.derstandard_mbh_uid, 'related': [self.falter_print_uid], 'entry_review_status': 'pending'}
-
+        # test if user
         with self.client:
             response = self.client.post(
-                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
-            self.assertEqual(current_user.user_displayname, 'Admin')
+                '/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
+            self.assertEqual(current_user.user_displayname, 'Contributor')
 
             with self.app.app_context():
-               
+                with self.assertRaises(InventoryPermissionError):
+                    sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
+                
+            self.client.get('/logout')
+
+        # test if owner can edit
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+
                 sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # pprint(sanitizer.related_entries)
-                print(sanitizer.set_nquads)
-                # print(sanitizer.delete_nquads)
-                # print('---------')
-                # print(sanitizer.set_nquads)
-                # sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
-                # pprint(sanitizer.entry)
-                # sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
-                # pprint(sanitizer.entry)
+                self.assertIn("<entry_edit_history>", sanitizer.set_nquads)
+                self.assertIn(
+                    '<unique_name> "www_schwaebische_post_de"', sanitizer.set_nquads)
 
+            self.client.get('/logout')
+
+        # delete draft after test
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'wp3@opted.eu', 'password': 'admin123'})
+            self.assertEqual(current_user.user_displayname, 'Admin')
+
+            with self.app.app_context():
+                res = dgraph.delete({'uid': uid})
+
+            self.client.get('/logout')
 
     def test_new_source(self):
 
@@ -410,6 +456,19 @@ class TestSanitizers(unittest.TestCase):
             "newsource_https://instagram.com/tagesschau": f"{self.channel_instagram}",
         }
 
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_website, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
+
         mock_twitter = {
             "channel": self.channel_twitter,
             "name": "tagesschau",
@@ -431,6 +490,19 @@ class TestSanitizers(unittest.TestCase):
             "entry_notes": "Some notes",
             "party_affiliated": "no",
         }
+
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_twitter, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
 
         mock_instagram = {
             "channel": self.channel_instagram,
@@ -457,6 +529,19 @@ class TestSanitizers(unittest.TestCase):
             ]
         }
 
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
+
         mock_telegram = {
             "channel": self.channel_telegram,
             "name": "ARD_tagesschau_bot",
@@ -482,6 +567,19 @@ class TestSanitizers(unittest.TestCase):
             ]
         }
 
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
+
         mock_vk = {
             "channel": self.channel_vkontakte,
             "name": "anonymousnews_org",
@@ -495,8 +593,20 @@ class TestSanitizers(unittest.TestCase):
             "entry_notes": "Some notes",
         }
 
-        mock_facebook = {'channel': '0x704e5',
-                         'channel_unique_name': 'facebook',
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
+
+        mock_facebook = {'channel': self.channel_facebook,
                          'name': 'some_source',
                          'other_names': 'other names',
                          'founded': '2000',
@@ -506,17 +616,27 @@ class TestSanitizers(unittest.TestCase):
                          'publication_cycle': 'multiple times per week',
                          'publication_cycle_weekday': ['1', '2', '3'],
                          'geographic_scope': 'national',
-                         'country': '0x7051a',
-                         'geographic_scope_single': '0x7051a',
+                         'country': self.germany_uid,
                          'languages': 'ak',
                          'contains_ads': 'yes',
-                         'publishes_org': ['0x704ed', 'New Media'],
-                         'audience_size|followers': '1234444',
-                         'party_affiliated': 'no',
-                         'related': ['0x704f8', 'some related source'],
-                         'newsource_some related source': '0x704e9'}
+                         'publishes_org': ['New Media'],
+                         'audience_size|count': '1234444',
+                         'audience_size|unit': 'likes',
+                         'party_affiliated': 'no'}
 
-        
+        with self.client:
+            response = self.client.post(
+                '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
+            self.assertEqual(current_user.user_displayname, 'Reviewer')
+
+            with self.app.app_context():
+                self.assertEqual
+
+                sanitizer = Sanitizer(mock_facebook, dgraph_type=Source)
+                self.assertEqual(type(sanitizer.set_nquads), str)
+
+            self.client.get('/logout')
+
 
 if __name__ == "__main__":
     unittest.main()
