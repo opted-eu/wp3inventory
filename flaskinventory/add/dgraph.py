@@ -145,6 +145,7 @@ def get_existing(uid):
         existing.pop('publication_cycle_weekday', None)
         existing.pop('founded', None)
         existing.pop('channel_epaper', None)
+        existing.pip('payment_model', None)
         existing = json.dumps(existing, default=str)
     else:
         existing = None
