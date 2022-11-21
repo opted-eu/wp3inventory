@@ -634,6 +634,8 @@ class TestSanitizers(unittest.TestCase):
 
                 sanitizer = Sanitizer(mock_facebook, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
+                mock_facebook['geographic_scope'] = 'NA'
+                self.assertRaises(InventoryValidationError, Sanitizer, mock_facebook, dgraph_type=Source)
 
             self.client.get('/logout')
 

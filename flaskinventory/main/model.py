@@ -569,8 +569,7 @@ class Source(Entry):
     geographic_scope = SingleChoice(description="What is the geographic scope of the news source?",
                                     choices={'multinational': 'Multinational', 
                                              'national': 'National', 
-                                             'subnational': 'Subnational', 
-                                             'NA': "Don't Know / NA"},
+                                             'subnational': 'Subnational'},
                                     required=True,
                                     radio_field=True,
                                     queryable=True)
