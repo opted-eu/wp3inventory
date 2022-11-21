@@ -5,14 +5,28 @@ import pydgraph
 import pandas as pd
 from pathlib import Path
 from datetime import date
+import math
 
-query_string = """
+query_total_entries = """
 {
 	sources(func: type("Source")) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
-        uid expand(_all_) { uid unique_name country_code opted_scope }
+        total: count(uid)
     }
 
     organizations(func: type("Organization")) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
+         total: count(uid)
+    }
+} """
+
+query_sources = """
+{
+	sources(func: type("Source"), first: $maximum, offset: $offset) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
+        uid expand(_all_) { uid unique_name country_code opted_scope }
+    }
+} """
+query_organizations = """
+{
+    organizations(func: type("Organization"), first: $maximum, offset: $offset) @filter(eq(entry_review_status, "accepted") or eq(entry_review_status, "pending")) {
         uid expand(_all_) { uid unique_name country_code }
     }
 }
@@ -20,10 +34,29 @@ query_string = """
 
 client_stub = pydgraph.DgraphClientStub('localhost:9080')
 client = pydgraph.DgraphClient(client_stub)
-res = client.txn(read_only=True).query(query_string)
-raw = json.loads(res.json)
 
-sources = raw['sources']
+total = client.txn(read_only=True).query(query_total_entries)
+total = json.loads(total.json)
+
+total_sources = total['sources'][0]['total']
+total_organizations = total['sources'][0]['total']
+results_maximum = 1000
+offset = 0
+variables = {'$maximum': results_maximum, '$offset': offset}
+
+pages_sources = math.ceil(total_sources / results_maximum)
+pages_organizations = math.ceil(total_sources / results_maximum)
+
+sources = []
+
+for i in range(1, pages_sources + 1):
+    res = client.txn(read_only=True).query(query_sources, variables=variables)
+    raw = json.loads(res.json)
+
+    sources += raw['sources']
+    variables['offset'] += results_maximum
+
+
 output = Path.home() / f'sources_dump_{date.today()}.json'
 
 with open(output, 'w') as f:
@@ -59,9 +92,20 @@ output = Path.home() / f'sources_flattened_{date.today()}.csv'
 df.to_csv(output)
 
 ## Organizations
+results_maximum = 1000
+offset = 0
+variables = {'$maximum': results_maximum, '$offset': offset}
 
+organizations = []
 
-organizations = raw['organizations']
+for i in range(1, pages_organizations + 1):
+    res = client.txn(read_only=True).query(query_sources, variables=variables)
+    raw = json.loads(res.json)
+
+    organizations += raw['organizations']
+
+    variables['offset'] += results_maximum
+
 output = Path.home() / f'organizations_dump_{date.today()}.json'
 
 with open(output, 'w') as f:
