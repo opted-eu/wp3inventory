@@ -167,15 +167,17 @@ def check_user_by_email(email):
 
 def user_login(email, pw):
     if not current_app.debug:
-        query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ account_status }} }}'
-        userstatus = dgraph.query(query_string)
+        query_string = f"""query login_attempt($email: string)
+                        {{login_attempt(func: eq(email, $email)) {{ account_status }} }}"""
+        userstatus = dgraph.query(query_string, variables={"$email": email})
         if len(userstatus['login_attempt']) == 0:
             return False
         if userstatus['login_attempt'][0]['account_status'] != 'active':
             return False
 
-    query_string = f'{{login_attempt(func: eq(email, "{email}")) {{ checkpwd(pw, "{pw}") }} }}'
-    result = dgraph.query(query_string)
+    query_string = f"""query login_attempt($email: string, $pw: string)
+                    {{login_attempt(func: eq(email, $email)) {{ checkpwd(pw, $pw) }} }}"""
+    result = dgraph.query(query_string, variables={"$email": email, "$pw": pw})
     if len(result['login_attempt']) == 0:
         return False
     else:
