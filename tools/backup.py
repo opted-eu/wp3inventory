@@ -48,7 +48,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if "errors" in r.json().keys():
-        logger.error(r.json()['error'])
+        logger.error(r.json()['errors'])
         sys.exit(1)
 
     logger.info('DGraph backup successful...')
