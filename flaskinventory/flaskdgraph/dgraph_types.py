@@ -160,7 +160,7 @@ class Facet:
 
     def query_filter(self, vals: Union[str, list], operator=None, predicate=None, **kwargs) -> str:
 
-        if not predicate:
+                if not predicate:
             predicate = self.predicate
 
         if not operator:
@@ -176,19 +176,16 @@ class Facet:
             return None
 
         if self.type == datetime.datetime:
-            vals = [self.corece(vals)]
-
-        if operator == 'between':
-            if self.type == datetime.datetime:
-                return f'ge({self.key}, "{vals[0].strftime("%Y-%m-%d")}") AND lt({self.key}, "{vals[1].strftime("%Y-%m-%d")}")'
+            if operator == 'between':
+                return f'ge({self.key}, "{self.corece(vals[0]).strftime("%Y-%m-%d")}") AND lt({self.key}, "{self.corece(vals[1]).strftime("%Y-%m-%d")}")'
             else:
-                return f'ge({self.key}, "{self.coerce(vals[0])}") AND lt({self.key}, "{self.corece(vals[1])}")'
-
-        else:
-            if self.type == datetime.datetime:
-                val1 = vals[0]
+                val1 = self.corece(vals[0])
                 val2 = val1 + datetime.timedelta(days=1)
                 return f'ge({self.key}, "{val1.strftime("%Y-%m-%d")}") AND lt({self.key}, "{val2.strftime("%Y-%m-%d")}")'
+
+        else:
+            if operator == 'between':
+                return f'ge({self.key}, "{self.corece(vals[0])}") AND lt({self.key}, "{self.corece(vals[1])}")'
             filters = [
                 f'{operator}({self.key}, "{self.corece(val)}")' for val in vals]
             if len(filters) > 1:
@@ -196,7 +193,7 @@ class Facet:
                 return f'({filter_string})'
             else:
                 return filters[0]
-
+            
     @staticmethod
     def _coerce_bool(val) -> bool:
         if isinstance(val, bool):
