@@ -539,6 +539,7 @@ class Source(Entry):
                                              'religion': 'Religion', 
                                              'society': 'Society & Panorama', 
                                              'science': 'Science & Technology', 
+                                             'youth': 'Youth'
                                              },
                                     tom_select=True,
                                     queryable=True)
