@@ -320,7 +320,9 @@ class _PrimitivePredicate:
             self.render_kw.update(readonly=read_only)
 
         # default value applied when nothing is specified
-        if isinstance(default, (Scalar, UID, NewID, list, tuple, set)) or default is None:
+        if callable(default):
+            self._default = default
+        elif isinstance(default, (Scalar, UID, NewID, list, tuple, set)) or default is None:
             self._default = default
         else:
             self._default = Scalar(default)
@@ -350,7 +352,11 @@ class _PrimitivePredicate:
 
     @property
     def default(self):
-        return self._default
+        try:
+            # check if default value is result of a function
+            return self._default()
+        except:
+            return self._default
 
     @property
     def label(self) -> str:
