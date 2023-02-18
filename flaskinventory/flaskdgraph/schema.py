@@ -370,9 +370,14 @@ class Schema:
             if v.edit and current_user.user_role >= v.permission:
                 if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)) and k in populate_obj.keys():
                     if not v.autoload_choices:
-                        choices = [(subval['uid'], subval['name'])
-                                   for subval in populate_obj[k]]
+                        if isinstance(populate_obj[k], list):
+                            choices = [(subval['uid'], subval.get('name', subval['uid']))
+                                    for subval in populate_obj[k]]
+                        else:
+                            choices = [(populate_obj[k]['uid'], populate_obj[k].get('name', populate_obj[k]['uid']))]
+                        
                         v.choices_tuples = choices
+
                 setattr(F, k, v.wtf_field)
 
         if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':
