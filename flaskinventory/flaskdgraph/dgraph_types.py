@@ -5,7 +5,7 @@
     May later be used for automatic query building
 """
 
-from typing import Union, Any
+from typing import Union, Any, Literal
 import datetime
 import json
 from copy import deepcopy
@@ -30,6 +30,13 @@ from wtforms import (StringField, SelectField, SelectMultipleField,
                      DateField, BooleanField, TextAreaField, RadioField, IntegerField)
 from wtforms.validators import DataRequired, Optional
 
+
+"""
+    Type Hints
+"""
+
+AvailableOperators = Literal['eq', 'between', 'gt', 'lt', 'ge', 'le']
+AvailableConnectors = Literal['AND', 'OR', 'NOT']
 
 """
     DGraph Primitives
@@ -158,7 +165,7 @@ class Facet:
             except:
                 return None
 
-    def query_filter(self, vals: Union[str, list], operator=None, predicate=None, **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], operator: AvailableOperators=None, predicate=None, **kwargs) -> str:
 
         if vals is None:
             return None
@@ -346,7 +353,7 @@ class _PrimitivePredicate:
         return self._default
 
     @property
-    def label(self):
+    def label(self) -> str:
         if self._label:
             return self._label
         else:
@@ -382,7 +389,7 @@ class _PrimitivePredicate:
         else:
             return data
 
-    def query_filter(self, vals: Union[str, list], predicate=None, operator=None, connector=None, **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], predicate=None, operator: AvailableOperators=None, connector: AvailableConnectors=None, **kwargs) -> str:
 
         if not predicate:
             predicate = self.predicate
@@ -1117,7 +1124,7 @@ class DateTime(Predicate):
             render_kw = {**self.render_kw, **render_kw}
         return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
-    def query_filter(self, vals: Union[str, list, int], operator: Union['lt', 'gt'] = None, **kwargs):
+    def query_filter(self, vals: Union[str, list, int], operator: Literal['lt', 'gt'] = None, **kwargs) -> str:
         if vals is None:
             return f'has({self.predicate})'
 
@@ -1195,7 +1202,7 @@ class Boolean(Predicate):
             raise InventoryValidationError(
                 f'Cannot evaluate provided value as bool: {data}!')
 
-    def query_filter(self, vals, **kwargs):
+    def query_filter(self, vals, **kwargs) -> str:
         if isinstance(vals, list):
             vals = vals[0]
 
