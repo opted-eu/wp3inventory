@@ -99,7 +99,7 @@ function drawChart({
         height = 600,
         color = "#495057",
         nodeRadius = 15,
-        forceStrength = -800,
+        forceStrength = -500,
         invalidation = null
     } = {}) {
 
@@ -107,8 +107,8 @@ function drawChart({
         .force("link", d3.forceLink(links).id(d => d.id).distance(30))
         .force("charge", d3.forceManyBody().strength(forceStrength))
         .force("x", d3.forceX())
-        .force("y", d3.forceY())
-        .force("bounds", boxingForce);
+        .force("y", d3.forceY());
+        // .force("bounds", boxingForce);
 
     const svg = d3.create("svg")
         .attr("version", "1.1")
@@ -290,14 +290,15 @@ function drawChart({
 
     });
 
-    // wait 200 ticks and then resize
+    // wait some ticks and then resize
     const t = d3.timer((elapsed) => {
-        if (elapsed > 400) { 
+        if (elapsed > 500) { 
             t.stop()
             let bbox = d3.select('#network-plot svg').node().getBBox();
-            svg.transition().duration(200).
+            console.log(bbox)
+            svg.
+                transition().duration(400).
                 attr("viewBox", `${bbox.x},${bbox.y-nodeRadius*2},${bbox.width+nodeRadius*2},${bbox.height+nodeRadius*2}`)
-            
             };
       }, 150);
 
