@@ -256,6 +256,7 @@ class _PrimitivePredicate:
     is_list_predicate = False
     default_operator = "eq"
     default_connector = "OR"
+    bound_dgraph_type = None
 
     def __init__(self,
                  label: str = None,
@@ -445,7 +446,24 @@ class _PrimitivePredicate:
     def query_field(self) -> StringField:
         self._prepare_query_field()
         return StringField(label=self.query_label, render_kw=self.render_kw)
+    
+    """ ORM Methods """
 
+    def __hash__(self):
+        return id(self)
+
+    def __eq__(self, other) -> str:
+        if self.bound_dgraph_type:
+            return f'''{{ {self.bound_dgraph_type.lower()}(func: type({self.bound_dgraph_type})) @filter({self.default_operator}({self.query}, {other})) {{ uid expand(_all_)  }} }}'''
+        
+        return f'''{{ q(func: has({self.predicate})) @filter({self.default_operator}({self.query}, {other})) {{ uid expand(_all_)  }} }}'''
+
+    def count(self, **kwargs) -> str:
+        # TODO: add filters via **kwargs
+        if self.bound_dgraph_type:
+            return f'''{{ {self.predicate}(func: type({self.bound_dgraph_type})) @filter(has({self.predicate})) {{ count(uid) }} }} '''
+        
+        return f'''{{ {self.predicate}(func: has({self.predicate})) {{ count(uid) }} }} '''
 
 class Predicate(_PrimitivePredicate):
 
@@ -727,6 +745,19 @@ class ReverseRelationship(_PrimitivePredicate):
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
 
+    """ ORM Methods """
+
+    def count(self, uid, **kwargs):
+        filt = [f"uid_in({self.predicate}, {uid})"]
+        if kwargs:
+            filt += [f'eq({k}, "{v}")' for k, v in kwargs.items()]
+        
+        filt = " AND ".join(filt)
+        filt = f"@filter({filt})"
+
+        return f'{{ {self._predicate}(func: has({self.predicate})) {filt} {{ count(uid) }} }}'
+
+
 
 class ReverseListRelationship(ReverseRelationship):
 
@@ -938,6 +969,11 @@ class UIDPredicate(Predicate):
             raise InventoryValidationError(f'This is not a uid: {uid}')
         else:
             return UID(uid)
+        
+    def __eq__(self, other):
+        if self.bound_dgraph_type:
+            return f'{{ {self.bound_dgraph_type.lower()}(func: uid({other})) @filter(type({self.bound_dgraph_type})) {{ uid expand(_all_) }} }}'
+        return f'{{ q(func: uid({other})) {{ uid expand(_all_) }} }}'
 
 
 class Integer(Predicate):
@@ -1358,6 +1394,28 @@ class SingleRelationship(Predicate):
         return TomSelectMultipleField(label=self.query_label,
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
+
+    """ ORM Methods """
+
+    def count(self, uid, _reverse=False, **kwargs):
+        filt = []
+        if self.bound_dgraph_type and _reverse:
+            filt.append(f'type({self.bound_dgraph_type})')
+        if _reverse:
+            filt.append(f'uid_in({self.predicate}, "{uid}")')
+        if kwargs:
+            filt += [f'eq({k}, "{v}")' for k, v in kwargs.items()]
+        
+        if len(filt) > 0:
+            filt = " AND ".join(filt)
+            filt = f"@filter({filt})"
+        else:
+            filt = ""
+        
+        if _reverse:
+            return f'{{ {self.predicate}(func: has({self.predicate})) {filt} {{ count(uid) }} }}'
+
+        return f'{{ {self.predicate}(func: uid({uid})) {{ count({self.predicate} {filt}) }} }}'
 
 
 class ListRelationship(SingleRelationship):

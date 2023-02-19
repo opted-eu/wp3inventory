@@ -8,7 +8,7 @@ from flaskinventory.flaskdgraph.utils import restore_sequence, validate_uid
     Inventory Detail View Functions
 """
 
-def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None) -> Union[dict, None]:
+def get_entry(unique_name: str = None, uid: str = None, dgraph_type: Union[str, Schema] = None) -> Union[dict, None]:
     query_var = 'query get_entry($value: string) '
     if unique_name:
         query_func = f'{{ entry(func: eq(unique_name, $value))'
@@ -23,8 +23,10 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
         return None
 
     if dgraph_type:
-        assert isinstance(dgraph_type, str), "Only strings are accepted"
-        dgraph_type = Schema.get_type(dgraph_type)
+        try:
+            dgraph_type = Schema.get_type(dgraph_type)
+        except TypeError:
+            pass
         query_func += f'@filter(type({dgraph_type}))'
     else:
         query_func += f'@filter(has(dgraph.type))'
@@ -124,6 +126,7 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     restore_sequence(data)
 
     return data
+
 
 
 def get_rejected(uid):
