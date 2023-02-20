@@ -609,8 +609,7 @@ class Source(Entry):
                                     radio_field=True,
                                     queryable=True)
 
-    audience_size = Year(default=datetime.date.today(), 
-                         edit=False,
+    audience_size = Year(edit=False,
                          facets=[Facet("unit", queryable=True, choices=['followers', 'subscribers', 'copies sold', 'likes', 'daily visitors']), 
                                 Facet("count", dtype=int, queryable=True, comparison_operators={'gt': 'greater', 'lt': 'less'}), 
                                 Facet("data_from")]

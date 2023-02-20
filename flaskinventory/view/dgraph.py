@@ -1,5 +1,6 @@
 from flaskinventory import dgraph
 from flaskinventory.flaskdgraph import Schema
+from flaskinventory.main.model import *
 
 from typing import Union
 from flaskinventory.flaskdgraph.utils import restore_sequence, validate_uid
@@ -8,23 +9,23 @@ from flaskinventory.flaskdgraph.utils import restore_sequence, validate_uid
     Inventory Detail View Functions
 """
 
-def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None) -> Union[dict, None]:
+def get_entry(unique_name: str = None, uid: str = None, dgraph_type: Union[str, Schema] = None) -> Union[dict, None]:
     query_var = 'query get_entry($value: string) '
     if unique_name:
-        query_func = f'{{ entry(func: eq(unique_name, $value))'
-        var = unique_name
-    elif uid:
-        uid = validate_uid(uid)
-        if not uid:
-            return None
-        query_func = f'{{ entry(func: uid($value))'
-        var = uid
-    else:
+        uid = dgraph.get_uid("unique_name", unique_name)
+
+    uid = validate_uid(uid)
+    if not uid:
         return None
 
+    query_func = f'{{ entry(func: uid($value))'
+    var = uid
+
     if dgraph_type:
-        assert isinstance(dgraph_type, str), "Only strings are accepted"
-        dgraph_type = Schema.get_type(dgraph_type)
+        try:
+            dgraph_type = Schema.get_type(dgraph_type)
+        except TypeError:
+            pass
         query_func += f'@filter(type({dgraph_type}))'
     else:
         query_func += f'@filter(has(dgraph.type))'
@@ -42,40 +43,12 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
     elif dgraph_type == 'Organization':
         query_fields += 'owned_by: ~owns @filter(type(Organization)) (orderasc: unique_name) { uid name unique_name entry_review_status } } }'
 
-    elif dgraph_type == 'Channel':
-        query_fields += 'num_sources: count(~channel) } }'
-
-    elif dgraph_type == 'Archive':
-        query_fields += 'num_sources: count(sources_included) } }'
-
-    elif dgraph_type == 'Dataset':
-        query_fields += '''
-                        num_sources: count(sources_included) } }
-                        '''
-
     elif dgraph_type == 'Corpus':
         query_fields += '''
-                        num_sources: count(sources_included) 
                         papers: ~corpus_used @facets @filter(type("ResearchPaper")) (orderasc: name) { uid title published_date name entry_review_status authors @facets } 
                         } }
                         '''
 
-    elif dgraph_type == 'Country':
-        query_fields += '''
-                        num_sources: count(~country @filter(type("Source")))  
-                        num_orgs: count(~country @filter(type("Organization"))) } }
-                        '''
-    
-    elif dgraph_type == 'Multinational':
-        query_fields += '''
-                        num_sources: count(~country @filter(type("Source"))) } }
-                        '''
-
-    elif dgraph_type == 'Subunit':
-        query_fields += '''
-                        num_sources: count(~geographic_scope_subunit @filter(type("Source"))) } }
-                        '''
-    
     elif dgraph_type == 'Operation':
         query_fields += '''
                         tools: ~used_for @filter(type("Tool")) (orderasc: unique_name) { uid name unique_name entry_review_status authors @facets published_date programming_languages platform } } }
@@ -123,7 +96,38 @@ def get_entry(unique_name: str = None, uid: str = None, dgraph_type: str = None)
 
     restore_sequence(data)
 
+    if dgraph_type == 'Channel':
+        num_sources = dgraph.query(Source.channel.count(uid, _reverse=True, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['channel'][0]['count']
+
+    elif dgraph_type == 'Archive':
+        num_sources = dgraph.query(Archive.sources_included.count(uid, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['sources_included'][0]['count(sources_included)']
+
+    elif dgraph_type == 'Dataset':
+        num_sources = dgraph.query(Dataset.sources_included.count(uid, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['sources_included'][0]['count(sources_included)']
+
+    elif dgraph_type == 'Corpus':
+        num_sources = dgraph.query(Corpus.sources_included.count(uid, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['sources_included'][0]['count(sources_included)']
+
+    elif dgraph_type == 'Country':
+        num_sources = dgraph.query(Source.country.count(uid, _reverse=True, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['country'][0]['count']
+        num_orgs = dgraph.query(Organization.country.count(uid, _reverse=True, entry_review_status="accepted"))
+        data['num_orgs'] = num_orgs['country'][0]['count']
+    
+    elif dgraph_type == 'Multinational':
+        num_sources = dgraph.query(Source.country.count(uid, _reverse=True, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['country'][0]['count']
+
+    elif dgraph_type == 'Subunit':
+        num_sources = dgraph.query(Source.geographic_scope_subunit.count(uid, _reverse=True, entry_review_status="accepted"))
+        data['num_sources'] = num_sources['geographic_scope_subunit'][0]['count']
+
     return data
+
 
 
 def get_rejected(uid):

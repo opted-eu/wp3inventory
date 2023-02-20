@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import deepcopy, copy
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -68,6 +68,10 @@ class Schema:
                     parent.__name__).items() if k not in predicates})
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
                     parent.__name__).items() if k not in reverse_predicates})
+                
+                for attr in parent.__dict__:
+                    if isinstance(parent.__dict__[attr], _PrimitivePredicate):
+                        setattr(cls, attr, copy(getattr(cls, attr)))
 
                 # register inheritance
                 if cls.__name__ not in Schema.__inheritance__:
@@ -92,6 +96,7 @@ class Schema:
             attribute = getattr(cls, key)
             if isinstance(attribute, (Predicate, MutualRelationship)):
                 setattr(attribute, 'predicate', key)
+                setattr(attribute, 'bound_dgraph_type', cls.__name__)
                 if attribute.facets:
                     for facet in attribute.facets.values():
                         facet.predicate = key
@@ -145,7 +150,7 @@ class Schema:
         """
         if not dgraph_type:
             return None
-        assert isinstance(dgraph_type, str)
+        assert isinstance(dgraph_type, str), TypeError
         for t in list(cls.__types__.keys()):
             if t.lower() == dgraph_type.lower():
                 return t
@@ -370,9 +375,14 @@ class Schema:
             if v.edit and current_user.user_role >= v.permission:
                 if isinstance(v, (SingleRelationship, ReverseRelationship, MutualRelationship)) and k in populate_obj.keys():
                     if not v.autoload_choices:
-                        choices = [(subval['uid'], subval['name'])
-                                   for subval in populate_obj[k]]
+                        if isinstance(populate_obj[k], list):
+                            choices = [(subval['uid'], subval.get('name', subval['uid']))
+                                    for subval in populate_obj[k]]
+                        else:
+                            choices = [(populate_obj[k]['uid'], populate_obj[k].get('name', populate_obj[k]['uid']))]
+                        
                         v.choices_tuples = choices
+
                 setattr(F, k, v.wtf_field)
 
         if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':

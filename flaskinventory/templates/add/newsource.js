@@ -107,7 +107,7 @@ function channelVisibility(fieldOptions, allNames, el) {
     document.getElementById('name-website-tooltip').hidden = true;
     document.getElementById('name-instagram-tooltip').hidden = true;
     document.getElementById('name-twitter-tooltip').hidden = true;
-    document.querySelector('#group-audience-size-followers').hidden = true
+    document.querySelector('#group-audience-size-likes').hidden = true
 
     if (index != 99) {
         document.querySelector("#name-question").innerText = fieldOptions.channel[index]['form_name_question'];
@@ -214,7 +214,7 @@ function channelVisibility(fieldOptions, allNames, el) {
         document.getElementById('name-facebook-tooltip').hidden = false;
         document.querySelector('#group-source-founded').hidden = false
         document.querySelector('#source-founded-question').innerHTML = `What year was the facebook page created?`
-        document.querySelector('#group-audience-size-followers').hidden = false
+        document.querySelector('#group-audience-size-likes').hidden = false
 
         document.querySelector('label[for="contains_ads1"]').innerHTML = 'Yes'
 

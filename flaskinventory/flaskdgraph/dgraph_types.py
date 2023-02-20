@@ -5,7 +5,7 @@
     May later be used for automatic query building
 """
 
-from typing import Union, Any
+from typing import Union, Any, Literal
 import datetime
 import json
 from copy import deepcopy
@@ -30,6 +30,13 @@ from wtforms import (StringField, SelectField, SelectMultipleField,
                      DateField, BooleanField, TextAreaField, RadioField, IntegerField)
 from wtforms.validators import DataRequired, Optional
 
+
+"""
+    Type Hints
+"""
+
+AvailableOperators = Literal['eq', 'between', 'gt', 'lt', 'ge', 'le']
+AvailableConnectors = Literal['AND', 'OR', 'NOT']
 
 """
     DGraph Primitives
@@ -158,16 +165,16 @@ class Facet:
             except:
                 return None
 
-    def query_filter(self, vals: Union[str, list], operator=None, predicate=None, **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], operator: AvailableOperators=None, predicate=None, **kwargs) -> str:
 
+        if vals is None:
+            return None
+        
         if not predicate:
             predicate = self.predicate
 
         if not operator:
             operator = self.default_operator
-
-        if vals is None:
-            return None
 
         if not isinstance(vals, list):
             vals = [vals]
@@ -175,22 +182,20 @@ class Facet:
         if len(vals) == 0:
             return None
 
+        vals = [self.corece(val) for val in vals]
         if self.type == datetime.datetime:
-            vals = [self.corece(vals)]
-
-        if operator == 'between':
-            if self.type == datetime.datetime:
+            if operator == 'between':
                 return f'ge({self.key}, "{vals[0].strftime("%Y-%m-%d")}") AND lt({self.key}, "{vals[1].strftime("%Y-%m-%d")}")'
             else:
-                return f'ge({self.key}, "{self.coerce(vals[0])}") AND lt({self.key}, "{self.corece(vals[1])}")'
-
-        else:
-            if self.type == datetime.datetime:
                 val1 = vals[0]
                 val2 = val1 + datetime.timedelta(days=1)
                 return f'ge({self.key}, "{val1.strftime("%Y-%m-%d")}") AND lt({self.key}, "{val2.strftime("%Y-%m-%d")}")'
+
+        if operator == 'between':
+            return f'ge({self.key}, "{vals[0]}") AND lt({self.key}, "{vals[1]}")'
+        else:
             filters = [
-                f'{operator}({self.key}, "{self.corece(val)}")' for val in vals]
+                f'{operator}({self.key}, "{val}")' for val in vals]
             if len(filters) > 1:
                 filter_string = " OR ".join(filters)
                 return f'({filter_string})'
@@ -251,6 +256,7 @@ class _PrimitivePredicate:
     is_list_predicate = False
     default_operator = "eq"
     default_connector = "OR"
+    bound_dgraph_type = None
 
     def __init__(self,
                  label: str = None,
@@ -315,7 +321,9 @@ class _PrimitivePredicate:
             self.render_kw.update(readonly=read_only)
 
         # default value applied when nothing is specified
-        if isinstance(default, (Scalar, UID, NewID, list, tuple, set)) or default is None:
+        if callable(default):
+            self._default = default
+        elif isinstance(default, (Scalar, UID, NewID, list, tuple, set)) or default is None:
             self._default = default
         else:
             self._default = Scalar(default)
@@ -345,10 +353,14 @@ class _PrimitivePredicate:
 
     @property
     def default(self):
-        return self._default
+        try:
+            # check if default value is result of a function
+            return self._default()
+        except:
+            return self._default
 
     @property
-    def label(self):
+    def label(self) -> str:
         if self._label:
             return self._label
         else:
@@ -384,7 +396,7 @@ class _PrimitivePredicate:
         else:
             return data
 
-    def query_filter(self, vals: Union[str, list], predicate=None, operator=None, connector=None, **kwargs) -> str:
+    def query_filter(self, vals: Union[str, list], predicate=None, operator: AvailableOperators=None, connector: AvailableConnectors=None, **kwargs) -> str:
 
         if not predicate:
             predicate = self.predicate
@@ -434,7 +446,24 @@ class _PrimitivePredicate:
     def query_field(self) -> StringField:
         self._prepare_query_field()
         return StringField(label=self.query_label, render_kw=self.render_kw)
+    
+    """ ORM Methods """
 
+    def __hash__(self):
+        return id(self)
+
+    def __eq__(self, other) -> str:
+        if self.bound_dgraph_type:
+            return f'''{{ {self.bound_dgraph_type.lower()}(func: type({self.bound_dgraph_type})) @filter({self.default_operator}({self.query}, {other})) {{ uid expand(_all_)  }} }}'''
+        
+        return f'''{{ q(func: has({self.predicate})) @filter({self.default_operator}({self.query}, {other})) {{ uid expand(_all_)  }} }}'''
+
+    def count(self, **kwargs) -> str:
+        # TODO: add filters via **kwargs
+        if self.bound_dgraph_type:
+            return f'''{{ {self.predicate}(func: type({self.bound_dgraph_type})) @filter(has({self.predicate})) {{ count(uid) }} }} '''
+        
+        return f'''{{ {self.predicate}(func: has({self.predicate})) {{ count(uid) }} }} '''
 
 class Predicate(_PrimitivePredicate):
 
@@ -716,6 +745,19 @@ class ReverseRelationship(_PrimitivePredicate):
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
 
+    """ ORM Methods """
+
+    def count(self, uid, **kwargs):
+        filt = [f"uid_in({self.predicate}, {uid})"]
+        if kwargs:
+            filt += [f'eq({k}, "{v}")' for k, v in kwargs.items()]
+        
+        filt = " AND ".join(filt)
+        filt = f"@filter({filt})"
+
+        return f'{{ {self._predicate}(func: has({self.predicate})) {filt} {{ count(uid) }} }}'
+
+
 
 class ReverseListRelationship(ReverseRelationship):
 
@@ -927,6 +969,11 @@ class UIDPredicate(Predicate):
             raise InventoryValidationError(f'This is not a uid: {uid}')
         else:
             return UID(uid)
+        
+    def __eq__(self, other):
+        if self.bound_dgraph_type:
+            return f'{{ {self.bound_dgraph_type.lower()}(func: uid({other})) @filter(type({self.bound_dgraph_type})) {{ uid expand(_all_) }} }}'
+        return f'{{ q(func: uid({other})) {{ uid expand(_all_) }} }}'
 
 
 class Integer(Predicate):
@@ -1119,7 +1166,7 @@ class DateTime(Predicate):
             render_kw = {**self.render_kw, **render_kw}
         return IntegerField(label=self.query_label, render_kw=self.render_kw)
 
-    def query_filter(self, vals: Union[str, list, int], operator: Union['lt', 'gt'] = None, **kwargs):
+    def query_filter(self, vals: Union[str, list, int], operator: Literal['lt', 'gt'] = None, **kwargs) -> str:
         if vals is None:
             return f'has({self.predicate})'
 
@@ -1197,7 +1244,7 @@ class Boolean(Predicate):
             raise InventoryValidationError(
                 f'Cannot evaluate provided value as bool: {data}!')
 
-    def query_filter(self, vals, **kwargs):
+    def query_filter(self, vals, **kwargs) -> str:
         if isinstance(vals, list):
             vals = vals[0]
 
@@ -1347,6 +1394,28 @@ class SingleRelationship(Predicate):
         return TomSelectMultipleField(label=self.query_label,
                                        choices=self.choices_tuples,
                                        render_kw=self.render_kw)
+
+    """ ORM Methods """
+
+    def count(self, uid, _reverse=False, **kwargs):
+        filt = []
+        if self.bound_dgraph_type and _reverse:
+            filt.append(f'type({self.bound_dgraph_type})')
+        if _reverse:
+            filt.append(f'uid_in({self.predicate}, "{uid}")')
+        if kwargs:
+            filt += [f'eq({k}, "{v}")' for k, v in kwargs.items()]
+        
+        if len(filt) > 0:
+            filt = " AND ".join(filt)
+            filt = f"@filter({filt})"
+        else:
+            filt = ""
+        
+        if _reverse:
+            return f'{{ {self.predicate}(func: has({self.predicate})) {filt} {{ count(uid) }} }}'
+
+        return f'{{ {self.predicate}(func: uid({uid})) {{ count({self.predicate} {filt}) }} }}'
 
 
 class ListRelationship(SingleRelationship):

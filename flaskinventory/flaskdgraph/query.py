@@ -49,7 +49,14 @@ def build_query_string(query: dict, public=True) -> str:
         search_terms = query.pop('_terms')
         if isinstance(search_terms, list):
             search_terms = " ".join(search_terms)
-        filters.append("""(anyofterms(name, $searchTerms) OR 
+        if search_terms.startswith('"') and search_terms.endswith('"'):
+            filters.append("""(allofterms(name, $searchTerms) OR
+                                allofterms(other_names, $searchTerms) OR
+                                allofterms(description, $searchTerms) OR
+                                allofterms(title, $searchTerms) OR
+                                allofterms(authors, $searchTerms))""")
+        else:
+            filters.append("""(anyofterms(name, $searchTerms) OR 
                             regexp(name, /$searchTerms/i) OR
                             anyofterms(description, $searchTerms) OR
                             anyofterms(other_names, $searchTerms) OR 

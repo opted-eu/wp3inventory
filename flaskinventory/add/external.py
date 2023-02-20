@@ -289,7 +289,7 @@ def siterankdata(site: str) -> Union[int, bool]:
 
     try:
         soup = bs4(r.content, 'lxml')
-        visitor_string = soup.find(text=re.compile('Daily Unique Visitors'))
+        visitor_string = soup.find(string=re.compile('Daily Unique Visitors'))
         visitors = visitor_string.parent.parent.h3.getText(strip=True)
         visitors = int(visitors.replace(',', ''))
         return visitors

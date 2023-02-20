@@ -462,30 +462,39 @@
 
     <fieldset id="section-audience" class="multi-step-form" hidden>
         <h3 class="mb-4">Information about the Audience</h3>
-        <div id="group-audience-size-followers" class="mb-5">
-            <label for="audience-size-followers" class="form-label fw-bold fs-5">How many likes does the Facebook page currently have?
+        <input name="audience_size|count" id="audience-size-count" type="number" step="1" hidden readonly>
+        <div id="group-audience-size-likes" class="mb-5">
+            <label for="audience-size-likes" class="form-label fw-bold fs-5">
+                How many likes does the Facebook page currently have?
                 <span class="text-muted mx-1">(optional)</span>
                 {{ make_tooltip('Usually, we would retrieve this information automatically. However, Facebook does not allow us to do this.') }}
                 {{ make_researchtip('Just open the Facebook page and check the current count of "likes"') }}
             </label>
-            <p class="my-0"><small id="audience-size-followers-helptext"></small></p>
-            <input name="audience_size|count" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-followers" onChange="audienceSizeFollowers(event)" aria-describedby="audience-size-followers-feedback">
+            <p class="my-0"><small id="audience-size-likes-helptext"></small></p>
+            <input name="" type="number" step="1" placeholder="Please specify an absolute number" class="form-control form-control-lg" id="audience-size-likes" onChange="audienceSizeHandler(event)" aria-describedby="audience-size-likes-feedback">
             <script>
-                function audienceSizeFollowers(event) {
+                function audienceSizeHandler(event) {
                     if (event.target.value !== '') {
                         document.getElementById('audience-size-unit').value = event.target.id.replace('audience-size-', '')
+                        document.getElementById('audience-size-count').value = event.target.value
+                        if (event.target.id.includes('likes')) {
+                            let y = new Date().getFullYear()
+                            document.getElementById('audience-size-year').value = y
+                        };
                     } else {
                         document.getElementById('audience-size-unit').value = ''
+                        document.getElementById('audience-size-count').value = ''
                     }
                 }
             </script>
             <input name="audience_size|unit" type="text" class="form-control" id="audience-size-unit" hidden readonly>
-            <div id="audience-size-followers-feedback"></div>
+            <div id="audience-size-likes-feedback"></div>
         </div>
 
         <div id="group-audience-size" class="mb-5">
             <div id="group-audience-size-subscribers" class="mb-5">
-                <label for="audience-size-subscribers" class="form-label fw-bold fs-5">How many copies of this newspaper are sold per issue?
+                <label for="audience-size-subscribers" class="form-label fw-bold fs-5">
+                    How many copies of this newspaper are sold per issue?
                     <span class="text-muted mx-1">(optional)</span>
                     {{ make_tooltip('If the newspaper has regional editions try to find the total number of sold copies for all of them combined. The newspaper will have varying sales figures for different days in the week, try to find an average number of copies sold per issue per day. Important: Please check carefully whether the source allows the public use and free distribution of the number.') }}
                     {{ make_researchtip('Use established and recognized sources to retrieve this information. Visit https://www.ifabc.org/members/full-member-list-alphabetically to find an appropriate source for many European countries. 
@@ -494,7 +503,7 @@
                     Germany: https://www.ivw.eu/print/print') }}
                 </label>
                 <p class="my-0"><small id="audience-size-helptext"></small></p>
-                <input name="audience_size|count" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" onChange="audienceSizeFollowers(event)" aria-describedby="audience-size-subscribers-feedback">
+                <input name="" type="number" step="1" placeholder="Please specify an absolute number (no percentage)" class="form-control form-control-lg" id="audience-size-subscribers" onChange="audienceSizeHandler(event)" aria-describedby="audience-size-subscribers-feedback">
                 <div id="audience-size-subscribers-feedback"></div>
             </div>
             <div id="group-audience-size-year" class="mb-5">

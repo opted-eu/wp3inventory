@@ -46,6 +46,10 @@ def get_audience(uid):
             rows.append(d)
 
         cols = ['date'] + [key.replace('audience_size|', '') for key in keys]
+
+    if data['channel']['unique_name'] == 'print':
+        if 'data_from' not in cols:
+            cols.append('data_from')
     
     output = {'cols': cols, 'rows': rows}
 

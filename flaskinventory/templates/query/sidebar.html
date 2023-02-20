@@ -137,6 +137,12 @@ function showFields(event) {
             }
         } 
     }
+    let container_empty = Array.from(unsortedContainer.children).filter(child => !child.hidden)
+    if (container_empty.length == 0) {
+        document.getElementById('more-filters').hidden = true
+    } else {
+        document.getElementById('more-filters').hidden = false
+    }
 }
 
 function clearFields(event) {
@@ -145,7 +151,7 @@ function clearFields(event) {
     for (el of all) {
         let entities = el.attributes['data-entities'].value.split(',')
         let diff = selectedEntities.filter(a => entities.includes(a))
-        if (diff.length == 0 && !alwaysVisible.includes(el.id)) {
+        if (diff.length == 0) {
             try {
                 el.tomselect.clear()
             } catch {

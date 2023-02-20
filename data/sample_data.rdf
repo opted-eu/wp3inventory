@@ -316,6 +316,12 @@
         _:admin <user_role> "10" .
         _:admin <account_status> "active" .
 
+        _:derstandardat <entry_added> _:admin (timestamp=2021-05-17T10:00:00, ip="192.168.0.1") .
+        _:derstandardprint <entry_added> _:admin (timestamp=2021-06-17T10:00:00, ip="192.168.0.1") .
+        _:derstandardtwitter <entry_added> _:admin (timestamp=2021-06-18T10:00:00, ip="192.168.0.1") .
+        _:derstandardinstagram <entry_added> _:admin (timestamp=2022-05-17T10:00:00, ip="192.168.0.1") .
+        _:derstandardfacebook <entry_added> _:admin (timestamp=2022-05-17T10:00:00, ip="192.168.0.1") .
+
         _:contributor <dgraph.type> "User" .
         _:contributor <email> "contributor@opted.eu" .
         _:contributor <pw> "contributor123" .
