@@ -80,6 +80,19 @@ If you are not sure where to start, just drop us an email or tweet and we are ha
 
 # Changelog
 
+### 20 Feb 2023 (Version 1.3)
+
+ - Fix bug where print news sources would have an empty audience size (just the date appearing without the count)
+ - Fix bug where reviewers could not change "data from" when editing audience size
+ - Improved user interface in the query view:
+    - Better clearing of filters when switching entity types
+    - "Show more filters" only appears now if there are actually more filters
+ - URLs are now prettier
+ - Improved rendering of network plots when viewing organizations or news sources
+ - Users can now search for entries with exact key word matching. You can now search for `"The Newspaper"` and get only results with exactly this phrase. 
+ - Total count of entities now only considers entries that are accepted. E.g., when looking at channel "Instagram", you see a count of sources that use this channel. The number is now the count of accepted news sources.
+ - Bug fixes and improvements in backend (see GitHub issues #217, #218, #220, #222)
+
 ### 06 Sep 2022 (Version 1.2.2): Improvements
 
  - Added little button in detail views that allow the user to directly send an email to the WP3 Team
