@@ -40,10 +40,11 @@ def view_uid(uid=None):
     if not uid:
         return abort(404)
     dgraphtype = dgraph.get_dgraphtype(uid)
+    unique_name = dgraph.get_unique_name(uid)
     if dgraphtype:
         if dgraphtype.lower() == 'rejected':
             return redirect(url_for('view.view_rejected', uid=uid))
-        return redirect(url_for('view.view_generic', dgraph_type=dgraphtype, uid=uid, **request_args))
+        return redirect(url_for('view.view_generic', dgraph_type=dgraphtype, unique_name=unique_name, **request_args))
     else:
         return abort(404)
 
@@ -77,6 +78,13 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
         if uid:
             return redirect(url_for('view.view_uid', uid=uid))
         else:
+            return abort(404)
+        
+    if not unique_name:
+        try:
+            unique_name = dgraph.get_unique_name(uid)
+            return redirect(url_for('view.view_generic', dgraph_type=dgraph_type, unique_name=unique_name))
+        except:
             return abort(404)
 
     data = get_entry(uid=uid, unique_name=unique_name, dgraph_type=dgraph_type)
