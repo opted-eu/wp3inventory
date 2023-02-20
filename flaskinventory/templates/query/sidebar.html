@@ -137,6 +137,12 @@ function showFields(event) {
             }
         } 
     }
+    let container_empty = Array.from(unsortedContainer.children).filter(child => !child.hidden)
+    if (container_empty.length == 0) {
+        document.getElementById('more-filters').hidden = true
+    } else {
+        document.getElementById('more-filters').hidden = false
+    }
 }
 
 function clearFields(event) {
