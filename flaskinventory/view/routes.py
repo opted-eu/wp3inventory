@@ -40,10 +40,10 @@ def view_uid(uid=None):
     if not uid:
         return abort(404)
     dgraphtype = dgraph.get_dgraphtype(uid)
-    unique_name = dgraph.get_unique_name(uid)
+    if dgraphtype.lower() == 'rejected':
+        return redirect(url_for('view.view_rejected', uid=uid))
     if dgraphtype:
-        if dgraphtype.lower() == 'rejected':
-            return redirect(url_for('view.view_rejected', uid=uid))
+        unique_name = dgraph.get_unique_name(uid)
         return redirect(url_for('view.view_generic', dgraph_type=dgraphtype, unique_name=unique_name, **request_args))
     else:
         return abort(404)
@@ -63,6 +63,7 @@ def view_rejected(uid):
         return abort(404)
 
     if not can_view(data, current_user):
+        flash('You tried to view a rejected entry. Make sure you are logged in and have the right permissions.', "warning")
         return abort(403)
 
     return render_template('view/rejected.html',
