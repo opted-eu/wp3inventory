@@ -151,7 +151,7 @@ function clearFields(event) {
     for (el of all) {
         let entities = el.attributes['data-entities'].value.split(',')
         let diff = selectedEntities.filter(a => entities.includes(a))
-        if (diff.length == 0) {
+        if (diff.length == 0 && !alwaysVisible.includes(el.id)) {
             try {
                 el.tomselect.clear()
             } catch {
@@ -163,6 +163,9 @@ function clearFields(event) {
 
             }
         }
+    }
+    if (selectedEntities.length == 1 && selectedEntities[0] == 'Tool') {
+            document.getElementById('country').tomselect.clear()
     }
 }
 

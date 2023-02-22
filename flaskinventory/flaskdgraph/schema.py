@@ -1,4 +1,4 @@
-from copy import deepcopy, copy
+from copy import deepcopy
 from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import SubmitField
@@ -69,10 +69,6 @@ class Schema:
                 reverse_predicates.update({k: v for k, v in Schema.get_reverse_predicates(
                     parent.__name__).items() if k not in reverse_predicates})
                 
-                for attr in parent.__dict__:
-                    if isinstance(parent.__dict__[attr], _PrimitivePredicate):
-                        setattr(cls, attr, copy(getattr(cls, attr)))
-
                 # register inheritance
                 if cls.__name__ not in Schema.__inheritance__:
                     Schema.__inheritance__[cls.__name__] = [parent.__name__]
@@ -382,7 +378,6 @@ class Schema:
                             choices = [(populate_obj[k]['uid'], populate_obj[k].get('name', populate_obj[k]['uid']))]
                         
                         v.choices_tuples = choices
-
                 setattr(F, k, v.wtf_field)
 
         if current_user.user_role >= USER_ROLES.Reviewer and entry_review_status == 'pending':
