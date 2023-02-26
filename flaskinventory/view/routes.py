@@ -39,7 +39,12 @@ def view_uid(uid=None):
     uid = validate_uid(uid)
     if not uid:
         return abort(404)
+    
     dgraphtype = dgraph.get_dgraphtype(uid)
+
+    if not dgraphtype:
+        return abort(404)
+    
     if dgraphtype.lower() == 'rejected':
         return redirect(url_for('view.view_rejected', uid=uid))
     if dgraphtype:
@@ -92,6 +97,16 @@ def view_generic(dgraph_type=None, uid=None, unique_name=None):
 
     if not data:
         return abort(404)
+
+
+    if not can_view(data, current_user):
+        if current_user.is_authenticated:
+            flash("You do not have the permissions to view this entry.", "warning")
+            return abort(403)
+        else:
+            flash("You do not have the permissions to view this entry. Try to login?", "warning")
+            return redirect(url_for('users.login'))
+        
 
     if any(x in data['dgraph.type'] for x in ['Source', 'Organization']):
         show_sidebar = True
