@@ -258,7 +258,7 @@ wikidataID: int @index(int) .
 founded: dateTime @index(year) .
 country: [uid] @reverse .
 country_code: string @index(exact).
-description: string @index(fulltext, trigram).
+description: string @index(fulltext, trigram, term).
 location_point: geo @index(geo) .
 
 # Channel Predicates

@@ -59,7 +59,7 @@ def main():
     txn = client.txn()
 
     query = """{
-        q(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql)) { v as uid } }"""
+        q(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql) AND NOT type(Rejected) AND NOT has(entry_review_status)) { v as uid } }"""
     nquad = """
         uid(v) <entry_review_status> "accepted" .
         uid(v) <dgraph.type> "Entry" .
@@ -73,7 +73,7 @@ def main():
 
     query = """{
         q(func: eq(email, "wp3@opted.eu")) { v as uid }
-        s(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql)) { u as uid } }"""
+        s(func: has(dgraph.type)) @filter(NOT type(User) AND NOT type(dgraph.graphql) AND NOT has(entry_added)) { u as uid } }"""
     nquad = """
         uid(u) <entry_added> uid(v) .
         """

@@ -28,8 +28,12 @@ def validate_uid(uid: Any) -> Union[str, bool]:
             int(uid, 16)
         except ValueError:
             return False
+        if int(uid, 16) <= 0:
+            return False
         return uid
     elif type(uid) == int:
+        if uid <= 0:
+            return False
         return str(hex(uid))
     else:
         return False

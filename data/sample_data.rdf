@@ -427,8 +427,13 @@
         _:direkt_print <channel> _:print . 
 
 
-
-         
+        _:test_rejected <dgraph.type> "Rejected" .
+        _:test_rejected <entry_review_status> "rejected" .
+        _:test_rejected <reviewed_by> _:reviewer (timestamp=2022-03-12T12:14:40.393389Z) .
+        _:test_rejected <entry_added> _:contributor (timestamp=2022-03-11T12:12:40.393389Z) .
+        _:test_rejected <creation_date> "2022-03-11T12:12:40.393389Z" . 
+        _:test_rejected <name> "Unit Test Rejected" .
+        _:test_rejected <unique_name> "rejected12345" .         
 
     }
 }
