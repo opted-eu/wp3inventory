@@ -24,6 +24,8 @@ type User {
     invited_by
     account_status
     preference_emails
+    follows
+    follow_notification
 }
 
 type Entry {
@@ -241,6 +243,8 @@ user_affiliation: string @index(term) .
 invited_by: [uid] @reverse .
 account_status: string @index(hash) .
 preference_emails: bool @index(bool) .
+follows: [uid] @reverse .
+follow_notification: [uid] .
 
 # Generic Predicates 
 unique_name: string @index(hash, trigram) @upsert .
