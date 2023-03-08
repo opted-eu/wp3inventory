@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from flaskinventory import dgraph
 import jwt
 from flaskinventory.users.constants import USER_ROLES
+from flaskinventory.flaskdgraph import dgraph_types
 import datetime
 import secrets
 
@@ -76,6 +77,18 @@ class User(UserMixin):
             algorithm="HS256"
         )
         return reset_token
+    
+    def user_follow(self, follow_uid):
+        user_id = dgraph_types.UID(self.id)
+        follow_uid = dgraph_types.UID(follow_uid)
+        nquad = dgraph_types.make_nquad(user_id.nquad, "follows", follow_uid.nquad)
+        dgraph.upsert(query=None, set_nquads=nquad)
+
+    def user_unfollow(self, unfollow_uid):
+        user_id = dgraph_types.UID(self.id)
+        unfollow_uid = dgraph_types.UID(unfollow_uid)
+        nquad = dgraph_types.make_nquad(user_id.nquad, "follows", unfollow_uid.nquad)
+        dgraph.upsert(query=None, del_nquads=nquad)
 
     @staticmethod
     def verify_reset_token(token):
@@ -261,3 +274,30 @@ def list_entries(user, onlydrafts=False):
                     entry['dgraph.type'].remove('Resource')
 
     return data['q']
+
+def prepare_update_notification_followers(uid):
+    uid = dgraph_types.UID(uid)
+    query_string = f"""
+        {{ q(func: uid({uid.query}) {{
+                country{{~follows{{uid}}}}
+                related{{~follows{{uid}}}}
+                sources_included{{~follows{{uid}}}}
+                tools_used{{~follows{{uid}}}}
+                datasets_used{{~follows{{uid}}}}
+                corpus_used{{~follows{{uid}}}}
+                ~owns{{~follows{{uid}}}}
+                ~publishes{{~follows{{uid}}}}
+            }}
+        }}
+    """
+    data = dgraph.query(query_string)
+    followers_uid = []
+    for i in data['q'][0]:
+        for tmp_id in data['q'][0][i][0]["~follows"]:
+            followers_uid.append(tmp_id['uid'])
+    followers_uid = list(set(followers_uid))
+    for i in followers_uid:
+        s = dgraph_types.UID(i)
+        p = "follow_notification"
+        nquad = dgraph_types.make_nquad(s.nquad, p, uid.nquad)
+        dgraph.upsert(None, nquad)
