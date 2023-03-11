@@ -7,6 +7,7 @@ from flaskinventory.misc import get_ip
 
 
 class Config:
+    TESTING = False
     SECRET_KEY = os.environ.get(
         'flaskinventory_SECRETKEY', secrets.token_hex(32))
     DEBUG_MODE = os.environ.get('DEBUG_MODE', False)
