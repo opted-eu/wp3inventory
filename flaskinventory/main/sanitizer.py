@@ -4,9 +4,9 @@ from flaskinventory.flaskdgraph.dgraph_types import (UID, MutualRelationship, Ne
 from flaskinventory.flaskdgraph.utils import validate_uid
 from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
 from flaskinventory.auxiliary import icu_codes
-from flaskinventory.add.external import (geocode, instagram,
-                                         parse_meta, reverse_geocode, siterankdata, find_sitemaps, find_feeds,
-                                         build_url, twitter, facebook, get_wikidata, telegram, vkontakte)
+from flaskinventory.add.external import (instagram, twitter, get_wikidata, telegram, vkontakte,
+                                         parse_meta, siterankdata, find_sitemaps, find_feeds,
+                                         build_url)
 from flaskinventory.users.constants import USER_ROLES
 from flaskinventory.users.dgraph import User
 from flaskinventory import dgraph
@@ -91,7 +91,7 @@ class Sanitizer:
         if not isinstance(data, dict):
             raise TypeError('Data object has to be type dict!')
         if not isinstance(user, User):
-            raise InventoryPermissionError('User Object is not class User!')
+            raise InventoryPermissionError(f'User Object is not class User! Received class: {type(user)}')
         if not isinstance(ip, str):
             raise TypeError('IP Address is not string!')
         return True
@@ -554,7 +554,9 @@ class Sanitizer:
         # first check if website exists
         entry_name = str(self.entry['name'])
         try:
-            names, urls = parse_meta(entry_name)
+            result = parse_meta(entry_name)
+            names = result['names']
+            urls = result['urls']
         except:
             raise InventoryValidationError(
                 f"Could not resolve website! URL provided does not exist: {self.data.get('name')}")
