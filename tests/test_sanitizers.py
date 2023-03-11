@@ -7,46 +7,23 @@ if __name__ == "__main__":
     from os.path import dirname
 
     path.append(dirname(path[0]))
+    from test_setup import BasicTestSetup
+    from flaskinventory import dgraph
 
-from pprint import pprint
-from datetime import datetime
-import unittest
-import copy
-import secrets
-from flaskinventory.flaskdgraph import Schema
-from flaskinventory.flaskdgraph.dgraph_types import UID, Scalar
-from flaskinventory.misc.forms import get_country_choices
-from flaskinventory.main.model import Entry, Organization, Source
-from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
-from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
-from flaskinventory import create_app, dgraph
-from flaskinventory.users.constants import USER_ROLES
-from flaskinventory.users.dgraph import User, get_user_data
-from flask_login import current_user
-
-
-class Config:
-    TESTING = True
-    WTF_CSRF_ENABLED = False
-    SECRET_KEY = secrets.token_hex(32)
-    DEBUG_MODE = False
-    MAIL_SERVER = 'localhost'
-    MAIL_PORT = 25
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = False
-    MAIL_USERNAME = None
-    MAIL_PASSWORD = None
-    MAIL_DEFAULT_SENDER = None
-    TWITTER_CONSUMER_KEY = None
-    TWITTER_CONSUMER_SECRET = None
-    TWITTER_ACCESS_TOKEN = None
-    TWITTER_ACCESS_SECRET = None
-    VK_TOKEN = None
-    TELEGRAM_APP_ID = None
-    TELEGRAM_APP_HASH = None
-    TELEGRAM_BOT_TOKEN = None
-    SLACK_LOGGING_ENABLED = False
-    SLACK_WEBHOOK = None
+    import unittest
+    from unittest.mock import patch
+    import copy
+    import secrets
+    import datetime
+    from flaskinventory.flaskdgraph import Schema
+    from flaskinventory.flaskdgraph.dgraph_types import UID, Scalar
+    from flaskinventory.main.model import Entry, Organization, Source
+    from flaskinventory.main.sanitizer import Sanitizer, make_sanitizer
+    from flaskinventory.errors import InventoryValidationError, InventoryPermissionError
+    from flaskinventory import create_app, dgraph
+    from flaskinventory.users.constants import USER_ROLES
+    from flaskinventory.users.dgraph import User, get_user_data
+    from flask_login import current_user
 
 
 class MockUser(User):
@@ -56,54 +33,23 @@ class MockUser(User):
     def __init__(self, user_role=USER_ROLES.Contributor):
         self.user_role = user_role
 
+def mock_wikidata(*args):
+    return {'wikidataID': 49653, 
+            'other_names': [], 
+            'founded': datetime.datetime(1950, 6, 5, 0, 0), 
+            'address_string': 'Stuttgart', 
+            'address_geo': {'type': 'Point', 
+                            'coordinates': [9.1800132, 48.7784485]}}
 
-class TestSanitizers(unittest.TestCase):
+@patch('flaskinventory.main.sanitizer.get_wikidata', mock_wikidata) 
+class TestSanitizers(BasicTestSetup):
 
     """
         Test Cases for Sanitizer classes
     """
 
-    @classmethod
-    def setUpClass(cls):
-        cls.app = create_app(config_json="test_config.json")
-        cls.client = cls.app.test_client()
-
-        with cls.app.app_context():
-            cls.derstandard_mbh_uid = dgraph.get_uid(
-                'unique_name', "derstandard_mbh")
-            cls.falter_print_uid = dgraph.get_uid(
-                'unique_name', 'falter_print')
-            cls.derstandard_print = dgraph.get_uid(
-                'unique_name', 'derstandard_print')
-            cls.www_derstandard_at = dgraph.get_uid(
-                'unique_name', 'www.derstandard.at')
-            cls.derstandard_facebook = dgraph.get_uid(
-                'unique_name', 'derstandard_facebook')
-            cls.derstandard_instagram = dgraph.get_uid(
-                'unique_name', 'derstandard_instagram')
-            cls.derstandard_twitter = dgraph.get_uid(
-                'unique_name', 'derstandard_twitter')
-            cls.austria_uid = dgraph.get_uid('unique_name', 'austria')
-            cls.germany_uid = dgraph.get_uid('unique_name', 'germany')
-            cls.channel_website = dgraph.get_uid('unique_name', 'website')
-            cls.channel_print = dgraph.get_uid('unique_name', 'print')
-            cls.channel_twitter = dgraph.get_uid('unique_name', 'twitter')
-            cls.channel_facebook = dgraph.get_uid('unique_name', 'facebook')
-            cls.country_choices = get_country_choices()
-            cls.channel_website = dgraph.get_uid('unique_name', 'website')
-            cls.channel_twitter = dgraph.get_uid('unique_name', 'twitter')
-            cls.channel_instagram = dgraph.get_uid('unique_name', 'instagram')
-            cls.channel_vkontakte = dgraph.get_uid('unique_name', 'vkontakte')
-            cls.channel_telegram = dgraph.get_uid('unique_name', 'telegram')
-            cls.channel_transcript = dgraph.get_uid(
-                'unique_name', 'transcript')
-            cls.channel_print = dgraph.get_uid('unique_name', 'print')
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        return super().tearDownClass()
-
     def setUp(self):
+
         self.anon_user = MockUser(user_role=USER_ROLES.Anon)
         self.contributor = User(email="contributor@opted.eu")
         self.reviewer = User(email="reviewer@opted.eu")
@@ -124,7 +70,7 @@ class TestSanitizers(unittest.TestCase):
                                     'creation_date', 'unique_name', 'name', 'other_names', 'entry_notes', 'wikidataID']
 
         self.mock2_solution_keys = ['dgraph.type', 'uid', 'entry_added', 'entry_review_status',
-                                    'creation_date', 'unique_name', 'name', 'other_names', 'entry_notes']
+                                    'creation_date', 'unique_name', 'name', 'other_names', 'entry_notes', 'wikidataID']
 
         self.mock_organization = {
             'name': 'Deutsche Bank',
@@ -158,7 +104,6 @@ class TestSanitizers(unittest.TestCase):
                 self.assertCountEqual(
                     list(sanitizer.entry.keys()), self.mock1_solution_keys)
                 self.assertEqual(type(sanitizer.entry['other_names']), list)
-                self.assertGreater(len(sanitizer.entry['other_names']), 2)
 
                 sanitizer = Sanitizer(self.mock_data2)
                 self.assertEqual(sanitizer.is_upsert, False)
@@ -172,6 +117,7 @@ class TestSanitizers(unittest.TestCase):
             self.client.get('/logout')
             self.assertRaises(InventoryPermissionError,
                               Sanitizer, self.mock_data2)
+            
 
     def test_list_facets(self):
         mock_data = {
@@ -180,8 +126,8 @@ class TestSanitizers(unittest.TestCase):
             'Jay Jay@kind': 'first',
             'Jules@kind': 'official',
             'JB@kind': 'CS-GO'
-
         }
+
         with self.client:
             response = self.client.post(
                 '/login', data={'email': 'contributor@opted.eu', 'password': 'contributor123'})
@@ -341,10 +287,11 @@ class TestSanitizers(unittest.TestCase):
 
     def test_draft_source(self):
 
-        test_draft = {'uid': '_:newdraft',
+        new_draft = {'uid': '_:newdraft',
                       'dgraph.type': 'Source',
-                      'channel': {'uid': self.channel_website},
-                      'name': 'https://www.schwaebische-post.de/',
+                      'channel': {'uid': self.channel_print},
+                      'channel_unique_name': 'print',
+                      'name': 'Schwäbische Post',
                       'publication_kind': 'newspaper',
                       'geographic_scope': 'subnational',
                       'country': {'uid': self.germany_uid},
@@ -359,18 +306,16 @@ class TestSanitizers(unittest.TestCase):
             self.assertEqual(current_user.user_displayname, 'Reviewer')
 
             with self.app.app_context():
-                res = dgraph.mutation(test_draft)
+                res = dgraph.mutation(new_draft)
                 # get the UID of the mock draft
                 uid = res.uids['newdraft']
 
             self.client.get('/logout')
 
-        test_draft = {'uid': uid,
-                      'channel': self.channel_website,
-                      'channel_unique_name': 'website',
-                      'name': 'https://www.schwaebische-post.de/',
-                      'website_allows_comments': 'yes',
-                      'website_comments_registration_required': 'no',
+        edited_draft = {'uid': uid,
+                      'channel': self.channel_print,
+                      'channel_unique_name': 'print',
+                      'name': 'Schwäbische Post',
                       'founded': '2000',
                       'publication_kind': 'newspaper',
                       'special_interest': 'no',
@@ -392,7 +337,7 @@ class TestSanitizers(unittest.TestCase):
 
             with self.app.app_context():
                 with self.assertRaises(InventoryPermissionError):
-                    sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
+                    sanitizer = Sanitizer.edit(edited_draft, dgraph_type=Source)
                 
             self.client.get('/logout')
 
@@ -404,10 +349,10 @@ class TestSanitizers(unittest.TestCase):
 
             with self.app.app_context():
 
-                sanitizer = Sanitizer.edit(test_draft, dgraph_type=Source)
+                sanitizer = Sanitizer.edit(edited_draft, dgraph_type=Source)
                 self.assertIn("<entry_edit_history>", sanitizer.set_nquads)
                 self.assertIn(
-                    '<unique_name> "www_schwaebische_post_de"', sanitizer.set_nquads)
+                    '<unique_name> "schwabische_post"', sanitizer.set_nquads)
 
             self.client.get('/logout')
 
@@ -422,9 +367,18 @@ class TestSanitizers(unittest.TestCase):
 
             self.client.get('/logout')
 
-    def test_new_source(self):
+    @patch('flaskinventory.main.sanitizer.parse_meta') 
+    @patch('flaskinventory.main.sanitizer.siterankdata') 
+    @patch('flaskinventory.main.sanitizer.find_sitemaps') 
+    @patch('flaskinventory.main.sanitizer.find_feeds') 
+    def test_new_website(self, mock_find_feeds, mock_find_sitemaps, mock_siterankdata, mock_parse_meta):
+        mock_parse_meta.return_value = {'names': ['Tagesthemen'], 
+                                        'urls': ['https://www.tagesschau.de/']}
+        mock_siterankdata.return_value = 3_000_000
+        mock_find_sitemaps.return_value = ["https://www.tagesschau.de/xml/rss2/"]
+        mock_find_feeds.return_value = ["https://www.tagesschau.de/rss"]
 
-        mock_website = {
+        new_website = {
             "channel_unique_name": "website",
             "channel": self.channel_website,
             "name": "https://www.tagesschau.de/",
@@ -464,14 +418,22 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 self.assertEqual
 
-                sanitizer = Sanitizer(mock_website, dgraph_type=Source)
+                sanitizer = Sanitizer(new_website, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
 
             self.client.get('/logout')
 
-        mock_twitter = {
+    @patch('flaskinventory.main.sanitizer.twitter') 
+    def test_new_twitter(self, mock_twitter):
+
+        mock_twitter.return_value = {'followers': 3_000_000, 
+                                        'fullname': 'tagesschau', 
+                                        'joined': datetime.date(2007, 1, 1), 
+                                        'verified': True}
+
+        new_twitter = {
             "channel": self.channel_twitter,
-            "name": "tagesschau",
+            "name": "@tagesschau",
             "other_names": "Tagesschau,Tagesthemen",
             "publication_kind": "tv show",
             "special_interest": "yes",
@@ -499,12 +461,20 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 self.assertEqual
 
-                sanitizer = Sanitizer(mock_twitter, dgraph_type=Source)
+                sanitizer = Sanitizer(new_twitter, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
+                mock_twitter.assert_called_with('tagesschau')
 
             self.client.get('/logout')
 
-        mock_instagram = {
+    @patch('flaskinventory.main.sanitizer.instagram') 
+    def test_new_instagram(self, mock_instagram):
+
+        mock_instagram.return_value = {'followers': 3_000_000, 
+                                       'fullname': "tagesschau", 
+                                       'verified': True}
+
+        new_instagram = {
             "channel": self.channel_instagram,
             "name": "tagesschau",
             "other_names": "Tagesschau,Tagesthemen",
@@ -537,12 +507,21 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 self.assertEqual
 
-                sanitizer = Sanitizer(mock_instagram, dgraph_type=Source)
+                sanitizer = Sanitizer(new_instagram, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
 
             self.client.get('/logout')
 
-        mock_telegram = {
+    @patch('flaskinventory.main.sanitizer.telegram') 
+    def test_new_telegram(self, mock_telegram):
+
+        mock_telegram.return_value = {'followers': 1_000_000, 
+                                      'fullname': "ARD_tagesschau_bot", 
+                                      'joined': datetime.date(2012, 1, 1), 
+                                      'verified': True, 
+                                      'telegram_id': 12345678}
+
+        new_telegram = {
             "channel": self.channel_telegram,
             "name": "ARD_tagesschau_bot",
             "other_names": "Tagesschau,Tagesthemen",
@@ -575,12 +554,20 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 self.assertEqual
 
-                sanitizer = Sanitizer(mock_telegram, dgraph_type=Source)
+                sanitizer = Sanitizer(new_telegram, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
 
             self.client.get('/logout')
 
-        mock_vk = {
+    @patch('flaskinventory.main.sanitizer.vkontakte') 
+    def test_new_vk(self, mock_vk):
+
+        mock_vk.return_value = {'followers': 100_000, 
+                                'fullname': "anonymousnews_org", 
+                                'verified': False,
+                                'description': 'Description text'}
+
+        new_vk = {
             "channel": self.channel_vkontakte,
             "name": "anonymousnews_org",
             "publication_kind": "alternative media",
@@ -601,10 +588,12 @@ class TestSanitizers(unittest.TestCase):
             with self.app.app_context():
                 self.assertEqual
 
-                sanitizer = Sanitizer(mock_vk, dgraph_type=Source)
+                sanitizer = Sanitizer(new_vk, dgraph_type=Source)
                 self.assertEqual(type(sanitizer.set_nquads), str)
 
             self.client.get('/logout')
+
+    def test_new_facebook(self):
 
         mock_facebook = {'channel': self.channel_facebook,
                          'name': 'some_source',
@@ -623,7 +612,7 @@ class TestSanitizers(unittest.TestCase):
                          'audience_size|count': '1234444',
                          'audience_size|unit': 'likes',
                          'party_affiliated': 'no'}
-
+        
         with self.client:
             response = self.client.post(
                 '/login', data={'email': 'reviewer@opted.eu', 'password': 'reviewer123'})
@@ -641,4 +630,4 @@ class TestSanitizers(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

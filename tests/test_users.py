@@ -2,35 +2,21 @@
 if __name__ == "__main__":
     from sys import path
     from os.path import dirname
+    import unittest
 
     path.append(dirname(path[0]))
 
-import unittest
-from flask_login import current_user
-from flaskinventory import create_app, AnonymousUser, dgraph
-from flaskinventory.users.dgraph import User, create_user
+    from flask_login import current_user
+    from flaskinventory import create_app, AnonymousUser, dgraph
+    from flaskinventory.users.dgraph import User, create_user
+    from test_setup import BasicTestSetup
 
 
-class TestUsers(unittest.TestCase):
+class TestUsers(BasicTestSetup):
 
     """
         Test cases for handling simple user actions
     """
-
-    @classmethod
-    def setUpClass(cls):
-        cls.app = create_app(config_json="test_config.json")
-        cls.client = cls.app.test_client()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        return super().tearDownClass()
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_login(self):
         # print('-- test_login() --\n')
@@ -88,4 +74,4 @@ class TestUsers(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
