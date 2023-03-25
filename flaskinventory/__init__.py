@@ -56,6 +56,9 @@ def create_app(config_class=Config, config_json=None):
     else:
         app.config.from_object(config_class)
 
+    if 'TESTING' not in app.config:
+        app.config['TESTING'] = False
+
     if app.config.get('DEBUG_MODE'):
         app.debug = True
     

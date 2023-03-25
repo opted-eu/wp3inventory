@@ -7,6 +7,7 @@ from os.path import dirname
 
 path.append(dirname(path[0]))
 
+from flaskinventory.misc.forms import get_country_choices
 
 class Config:
     TESTING = True
@@ -37,10 +38,16 @@ class BasicTestSetup(unittest.TestCase):
     user_login = None
     logged_in = None
 
+    config_json = None
+
     @classmethod
     def setUpClass(cls):
         cls.verbatim = False
-        cls.app = create_app(config_class=Config)
+        if cls.config_json:
+            cls.app = create_app(config_json=cls.config_json)
+        else:
+            cls.app = create_app(config_class=Config)
+            
         cls.client = cls.app.test_client()
 
         with cls.app.app_context():
@@ -72,6 +79,8 @@ class BasicTestSetup(unittest.TestCase):
 
             cls.countries = [cls.austria_uid,
                              cls.germany_uid, cls.switzerland_uid]
+            
+            cls.country_choices = get_country_choices()
 
             cls.channel_website = dgraph.get_uid('unique_name', 'website')
             cls.channel_print = dgraph.get_uid('unique_name', 'print')

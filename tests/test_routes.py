@@ -5,6 +5,7 @@ if __name__ == "__main__":
     from sys import path
     from os.path import dirname
     from flask import request, url_for
+    from flask_login import current_user
     import unittest
 
     path.append(dirname(path[0]))
@@ -17,8 +18,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
     """ View Routes """
 
     def test_view_search(self):
-        if self.verbatim:
-            print('-- test_view_search() --\n')
 
         # /search?query=bla
         with self.client as c:
@@ -43,8 +42,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
                                                    dgraph_type='Source'))
 
     def test_view_uid(self):
-        if self.verbatim:
-            print('-- test_view_uid() --\n')
 
         # /view
         # /view?uid=<uid>
@@ -90,8 +87,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
             self.assertEqual(response.status_code, 404)
 
     def test_view_uid_pending(self):
-        if self.verbatim:
-            print('-- test_view_uid_pending() --\n')
 
         # pending entries
 
@@ -145,8 +140,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
                  'entry_added': {'uid': self.admin_uid}})
 
     def test_view_uid_draft(self):
-        if self.verbatim:
-            print('-- test_view_uid_draft() --\n')
 
         # draft entries
 
@@ -201,8 +194,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
                  'entry_added': {'uid': self.admin_uid}})
 
     def test_view_rejected(self):
-        if self.verbatim:
-            print('-- test_view_rejected() --\n')
 
         # /view
         # /view?uid=<uid>
@@ -220,8 +211,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
                 self.assertEqual(response.status_code, 200)
 
     def test_view_generic(self):
-        if self.verbatim:
-            print('-- test_view_generic() --\n')
 
         # /view/<string:dgraph_type>/uid/<uid>
         # /view/<string:dgraph_type>/<string:unique_name>
@@ -258,8 +247,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
     """ Review Routes """
 
     def test_overview(self):
-        if self.verbatim:
-            print('-- test_overview() --\n')
 
         # /review/overview
         # /review/overview?country=0x123&entity=0x234
@@ -295,8 +282,6 @@ class TestRoutesLoggedOut(BasicTestSetup):
                 self.assertEqual(response.status_code, 200)
 
     def test_review_submit(self):
-        if self.verbatim:
-            print('-- test_review_submit() --\n')
 
         # POST /review/submit
 
@@ -372,12 +357,15 @@ class TestRoutesLoggedInContributor(TestRoutesLoggedOut):
                   'password': 'contributor123'}
     logged_in = 'contributor'
 
+    user_displayname = 'Contributor'
+
     def setUp(self):
         with self.client:
             response = self.client.post(
                 '/login', data=self.user_login)
             assert response.status_code == 302
             assert "profile" in response.location
+            assert current_user.user_displayname == self.user_displayname
 
     def tearDown(self):
         with self.client:
@@ -389,12 +377,16 @@ class TestRoutesLoggedInReviewer(TestRoutesLoggedInContributor):
     user_login = {'email': 'reviewer@opted.eu', 'password': 'reviewer123'}
     logged_in = 'reviewer'
 
+    user_displayname = 'Reviewer'
+
 
 class TestRoutesLoggedInAdmin(TestRoutesLoggedInContributor):
 
     user_login = {'email': 'wp3@opted.eu', 'password': 'admin123'}
     logged_in = 'admin'
 
+    user_displayname = 'Admin'
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

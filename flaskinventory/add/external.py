@@ -197,22 +197,22 @@ def find_feeds(site: str) -> list:
     return result
 
 
-def parse_meta(url: str) -> Tuple[list, list]:
+def parse_meta(url: str) -> dict:
 
     urls = []
     names = []
 
     site = build_url(url)
     if not site:
-        return False, False
+        return {'names': False, 'urls': False}
 
     r = perform_request(site)
 
     if not r:
-        return False, False
+        return {'names': False, 'urls': False}
 
     if not r.ok:
-        return False, False
+        return {'names': False, 'urls': False}
 
     soup = bs4(r.content, 'lxml')
 
@@ -231,7 +231,7 @@ def parse_meta(url: str) -> Tuple[list, list]:
     if schema_url:
         urls.append(schema_url)
 
-    return list(set(names)), list(set(urls))
+    return {'names': list(set(names)), 'urls': list(set(urls))}
 
 
 def opengraph(soup: str) -> Tuple[str, str]:
