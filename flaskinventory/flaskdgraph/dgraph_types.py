@@ -253,6 +253,7 @@ class _PrimitivePredicate:
     """
 
     dgraph_predicate_type = 'string'
+    dgraph_directives = None
     is_list_predicate = False
     default_operator = "eq"
     default_connector = "OR"
@@ -276,7 +277,8 @@ class _PrimitivePredicate:
                  tom_select=False,
                  render_kw: dict = None,
                  predicate_alias: list = None,
-                 comparison_operators: str = None) -> None:
+                 comparison_operators: str = None,
+                 directives: list = None) -> None:
         """
             Contruct a new Primitive Predicate
         """
@@ -292,6 +294,12 @@ class _PrimitivePredicate:
         self.query_description = query_description
         self.permission = permission
         self.operators = comparison_operators
+
+        if directives:
+            if self.dgraph_directives:
+                self.dgraph_directives += directives
+            else:
+                self.dgraph_directives = directives
 
         # Facets: parameter should accept lists and single Facet objects
         if isinstance(facets, Facet):
@@ -530,7 +538,7 @@ class Predicate(_PrimitivePredicate):
 class Scalar:
 
     """
-        Utility class for 
+        Utility class for Single Values
     """
 
     def __init__(self, value, facets=None):
@@ -814,6 +822,7 @@ class ReverseListRelationship(ReverseRelationship):
 class MutualRelationship(_PrimitivePredicate):
 
     dgraph_predicate_type = 'uid'
+    dgraph_directives = ['@reverse']
     is_list_predicate = False
     default_operator = "uid_in"
 
@@ -956,6 +965,11 @@ class String(Predicate):
 
 class UIDPredicate(Predicate):
 
+    """
+        This class represents the uid value that each node in Dgraph has by default.
+        Not to be confused with relationships!        
+    """
+
     dgraph_predicate_type = 'uid'
     is_list_predicate = False
     default_operator = 'uid_in'
@@ -1022,6 +1036,8 @@ class ListString(String):
 
 class UniqueName(String):
 
+    dgraph_directives = ['@index(hash, trigram)', '@upsert']
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(required=True, new=False,
                          permission=USER_ROLES.Reviewer, *args, **kwargs)
@@ -1041,6 +1057,8 @@ class UniqueName(String):
 
 
 class SingleChoice(String):
+
+    dgraph_directives = ['@index(hash)']
 
     def __init__(self, choices: dict = None, default='NA', radio_field=False, *args, **kwargs) -> None:
 
@@ -1301,6 +1319,7 @@ class Geo(Predicate):
 class SingleRelationship(Predicate):
 
     dgraph_predicate_type = 'uid'
+    dgraph_directives = ['@reverse']
     is_list_predicate = False
     default_operator = 'uid_in'
 
@@ -1421,6 +1440,7 @@ class SingleRelationship(Predicate):
 class ListRelationship(SingleRelationship):
 
     dgraph_predicate_type = '[uid]'
+    dgraph_directives = ['@reverse']
     is_list_predicate = True
     default_connector = "AND"
 

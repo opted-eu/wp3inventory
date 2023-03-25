@@ -13,6 +13,7 @@ class Schema:
     # Key = Dgraph Type (string), val = dict of predicates
     __types__ = {}
 
+
     # registry of all predicates and which types use them
     # Key = predicate (string), Val = list(Dgraph Type (string))
     __predicates_types__ = {}
@@ -42,6 +43,7 @@ class Schema:
     __queryable_predicates_by_type__ = {}
 
     def __init_subclass__(cls) -> None:
+
         from .dgraph_types import _PrimitivePredicate, Facet, Predicate, SingleRelationship, ReverseRelationship, MutualRelationship
         predicates = {key: getattr(cls, key) for key in cls.__dict__ if isinstance(
             getattr(cls, key), (Predicate, MutualRelationship))}
@@ -156,7 +158,7 @@ class Schema:
     def get_predicates(cls, _cls) -> dict:
         """
             Get all predicates of a DGraph Type
-            Returns a dict of `{'predicate_name': <DGraph Predicate>}`
+            Returns a deepcopy dict of `{'predicate_name': <DGraph Predicate>}`
             `Schema.get_predicates('Source')` -> {'name': <DGraph Predicate "name"> ...}
         """
         if not isinstance(_cls, str):
@@ -237,6 +239,45 @@ class Schema:
         if _cls in cls.__inheritance__:
             dgraph_types += cls.__inheritance__[_cls]
         return dgraph_types
+    
+    @classmethod
+    def generate_dgraph_schema(cls) -> str:
+
+        # The Schema first defines all types and their predicates
+        type_definitions = []
+
+        # We get every dgraph type in the schema
+        for dgraph_type in cls.get_types():    
+            # get every predicate for this type
+            predicates = cls.get_predicates(dgraph_type)
+            # get potential parent types
+            inheritance = cls.resolve_inheritance(dgraph_type)
+            inheritance.remove(dgraph_type)
+            # remove predicates that are inherited
+            for parent in inheritance:
+                for inherited_predicate in cls.get_predicates(parent):
+                    predicates.pop(inherited_predicate)
+            # remove the special uid predicate that all dgraph types have by default
+            if 'uid' in predicates:
+                _ = predicates.pop('uid')
+            type_definition = "\n    ".join(predicates.keys())
+            type_definition = 'type ' + dgraph_type + ' {\n    ' + type_definition + '\n}' 
+            type_definitions.append(type_definition)
+
+        # Next we declare all predicates and their directives
+
+        predicate_definitions = []
+
+        for predicate_name, predicate in cls.predicates().items():
+            if predicate_name == 'uid':
+                continue
+            definition = f'{predicate_name}: {predicate.dgraph_predicate_type} {" ".join(predicate.dgraph_directives or [])} .'
+            predicate_definitions.append(definition)
+
+        schema_string = "\n\n".join(type_definitions) + '\n\n'
+        schema_string += "\n".join(predicate_definitions)
+
+        return schema_string
 
     @classmethod
     def permissions_new(cls, _cls) -> int:
