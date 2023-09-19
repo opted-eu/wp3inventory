@@ -26,7 +26,7 @@
       {% for entry in result %}
       <tr>
         <td><a href="{{ url_for('view.view_uid', uid=entry.get('uid'))}}">{{ entry.name }}</a></td>
-        {% if entity == 'Source' %}
+        {% if entity.get('channel') %}
         <td>{{ entry.channel.get('name')}}</td>
         {% endif %}
         <td>{% if entry.get('country') %}{{ entry.country[0].get('name') }}{% endif %}</td>
