@@ -1,3 +1,7 @@
+# Archived
+
+This repository has reached the end of its life-cycle. If you look for meteor, go to: https://github.com/opted-eu/meteor-api
+
 # Introduction
 
 This is the code repository for *Meteor* (the WP3 Inventory), which will contain an interlinked knowledge graph of news sources, media organizations, and data archives in Europe (for details see the [OPTED main page](https://opted.eu/)). Currently, this is a prototype / work in progress.
